@@ -1,8 +1,8 @@
 from typing import List, Sequence, Tuple
 
-from qtpy import QtGui
-from qtpy.QtCore import QEvent, QPoint, QRect, QRectF, Qt, Signal
-from qtpy.QtWidgets import (
+from .qtcompat import QtGui
+from .qtcompat.QtCore import QEvent, QPoint, QPointF, QRect, QRectF, Qt, Signal
+from .qtcompat.QtWidgets import (
     QApplication,
     QSlider,
     QStyle,
@@ -290,9 +290,11 @@ class QRangeSlider(QSlider):
         hdl_idx = 0
         dist = float("inf")
 
+        if isinstance(pos, QPointF):
+            pos = QPoint(pos.x(), pos.y())
         # TODO: this should be reversed, to prefer higher value handles
         for i, hdl in enumerate(self._handleRects(opt)):
-            if pos in hdl:
+            if hdl.contains(pos):
                 return ("handle", i)  # TODO: use enum for 'handle'
             hdl_center = self._pick(hdl.center())
             abs_dist = abs(event_position - hdl_center)
@@ -373,7 +375,7 @@ class QRangeSlider(QSlider):
             e.accept()
 
     def _scrollByDelta(
-        self, orientation: Qt.Orientation, modifiers: Qt.KeyboardModifiers, delta: int
+        self, orientation, modifiers: Qt.KeyboardModifiers, delta: int
     ) -> bool:
         steps_to_scroll = 0
         pg_step = self.pageStep()

@@ -16,7 +16,7 @@ behave like a standard QSlider... just with multiple handles.
 - Uses platform-specific Qt styles
 - Supports style sheets
 - Supports mouse wheel and keypress (soon) events
-- Supports both PyQt5 and PySide2 (via qtpy)
+- Supports PyQt5, PyQt6, PySide2 and PySide6
 
 
 ## Installation
