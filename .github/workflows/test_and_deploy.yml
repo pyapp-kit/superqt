@@ -110,7 +110,7 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: screenshots
+          name: screenshots ${{ matrix.platform }} ${{ matrix.backend }}
           path: screenshots
 
 
