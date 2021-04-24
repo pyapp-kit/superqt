@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/pypi/l/PyQRangeSlider.svg?color=green)](https://github.com/tlambert03/PyQRangeSlider/raw/master/LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/PyQRangeSlider.svg?color=green)](https://pypi.org/project/PyQRangeSlider)
 [![Python Version](https://img.shields.io/pypi/pyversions/PyQRangeSlider.svg?color=green)](https://python.org)
-[![tests](https://github.com/tlambert03/PyQRangeSlider/workflows/tests/badge.svg)](https://github.com/tlambert03/PyQRangeSlider/actions)
+[![Test](https://github.com/tlambert03/PyQRangeSlider/actions/workflows/test_and_deploy.yml/badge.svg)](https://github.com/tlambert03/PyQRangeSlider/actions/workflows/test_and_deploy.yml)
 [![codecov](https://codecov.io/gh/tlambert03/PyQRangeSlider/branch/master/graph/badge.svg)](https://codecov.io/gh/tlambert03/PyQRangeSlider)
 
 Multi-handle range slider widget for PyQt/PySide
