@@ -29,12 +29,15 @@ jobs:
           - python-version: 3.9
             platform: ubuntu-latest
             backend: pyside6
+            screenshot: 1
           - python-version: 3.9
             platform: windows-latest
             backend: pyside6
+            screenshot: 1
           - python-version: 3.9
             platform: macos-11.0
             backend: pyside6
+            screenshot: 1
           - python-version: 3.9
             platform: ubuntu-latest
             backend: pyqt6
@@ -96,23 +99,23 @@ jobs:
         uses: codecov/codecov-action@v1
 
       - name: Install for screenshots
-        if: matrix.python-version == '3.9'
+        if: matrix.screenshot
         run: pip install . ${{ matrix.backend }}
 
       - name: Screenshots
-        if: runner.os == 'Linux' && matrix.python-version == '3.9'
+        if: runner.os == 'Linux' && matrix.screenshot
         uses: GabrielBB/xvfb-action@v1
         with:
           run: python examples/screenshots.py
 
       - name: Screenshots
-        if: runner.os != 'Linux' && matrix.python-version == '3.9'
+        if: runner.os != 'Linux' && matrix.screenshot
         run: python examples/screenshots.py
 
       - uses: actions/upload-artifact@v2
-        if: matrix.python-version == '3.9'
+        if: matrix.screenshot
         with:
-          name: screenshots ${{ matrix.platform }} ${{ matrix.backend }}
+          name: screenshots ${{ runner.os }}
           path: screenshots
 
 
