@@ -10,27 +10,26 @@
 Modified from qtpy.QtCore.
 Provides QtCore classes and functions.
 """
-# flake8: noqa
 
 from . import PYQT5, PYQT6, PYSIDE2, PYSIDE6, PythonQtError
 
 if PYQT5:
     from PyQt5.QtCore import QT_VERSION_STR as __version__
     from PyQt5.QtCore import *
-    from PyQt5.QtCore import pyqtBoundSignal as SignalInstance
-    from PyQt5.QtCore import pyqtProperty as Property
-    from PyQt5.QtCore import pyqtSignal as Signal
-    from PyQt5.QtCore import pyqtSlot as Slot
+    from PyQt5.QtCore import pyqtBoundSignal as SignalInstance  # noqa
+    from PyQt5.QtCore import pyqtProperty as Property  # noqa
+    from PyQt5.QtCore import pyqtSignal as Signal  # noqa
+    from PyQt5.QtCore import pyqtSlot as Slot  # noqa
 
     # Those are imported from `import *`
     del pyqtSignal, pyqtBoundSignal, pyqtSlot, pyqtProperty, QT_VERSION_STR
 elif PYQT6:
     from PyQt6.QtCore import QT_VERSION_STR as __version__
     from PyQt6.QtCore import *
-    from PyQt6.QtCore import pyqtBoundSignal as SignalInstance
-    from PyQt6.QtCore import pyqtProperty as Property
-    from PyQt6.QtCore import pyqtSignal as Signal
-    from PyQt6.QtCore import pyqtSlot as Slot
+    from PyQt6.QtCore import pyqtBoundSignal as SignalInstance  # noqa
+    from PyQt6.QtCore import pyqtProperty as Property  # noqa
+    from PyQt6.QtCore import pyqtSignal as Signal  # noqa
+    from PyQt6.QtCore import pyqtSlot as Slot  # noqa
 
     # backwards compat with PyQt5
     # namespace moves:
