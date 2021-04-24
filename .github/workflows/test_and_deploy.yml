@@ -25,11 +25,43 @@ jobs:
         python-version: [3.7, 3.8, 3.9]
         backend: [pyqt5, pyside2]
         include:
+          # pyqt6 and pyside6 on latest platforms
+          - python-version: 3.9
+            platform: ubuntu-latest
+            backend: pyside6
+          - python-version: 3.9
+            platform: windows-latest
+            backend: pyside6
+          - python-version: 3.9
+            platform: macos-11.0
+            backend: pyside6
+          - python-version: 3.9
+            platform: ubuntu-latest
+            backend: pyqt6
+          - python-version: 3.9
+            platform: windows-latest
+            backend: pyqt6
+          - python-version: 3.9
+            platform: macos-11.0
+            backend: pyqt6
+
+          # big sur, 3.9
           - python-version: 3.9
             platform: macos-11.0
             backend: pyside2
+          - python-version: 3.9
+            platform: macos-11.0
+            backend: pyqt5
+
+          # legacy OS
+          - python-version: 3.8
+            platform: ubuntu-18.04
+            backend: pyside2
           - python-version: 3.6
             platform: ubuntu-16.04
+            backend: pyqt5
+          - python-version: 3.6
+            platform: windows-2016
             backend: pyqt5
     steps:
       - uses: actions/checkout@v2
