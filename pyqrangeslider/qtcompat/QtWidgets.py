@@ -37,8 +37,7 @@ elif PYQT6:
     QApplication.exec_ = exec_
 
 elif PYSIDE6:
-    pass
-
+    from PySide6.QtWidgets import *  # noqa
 
 else:
     raise PythonQtError("No Qt bindings could be found")

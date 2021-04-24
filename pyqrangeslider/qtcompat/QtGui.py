@@ -38,6 +38,6 @@ elif PYQT6:
     QMouseEvent.pos = pos
 
 elif PYSIDE6:
-    pass
+    from PySide6.QtGui import *  # noqa
 else:
     raise PythonQtError("No Qt bindings could be found")
