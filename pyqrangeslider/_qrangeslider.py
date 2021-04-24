@@ -1,3 +1,4 @@
+import re
 from typing import List, Sequence, Tuple
 
 from .qtcompat import QtGui
@@ -50,12 +51,16 @@ class QRangeSlider(QSlider):
         self._repeatMultiplier = 1  # TODO
         # for wheel nav
         self._offset_accum = 0
+
         # color
-        self._bar_color_active = "#3B88FD"
-        self._bar_color_inactive = "#8F8F8F"
-        self._bar_color_disabled = "#BBBBBB"
+        self._bar_color_active = QtGui.QColor("#3B88FD")
+        self._bar_color_inactive = QtGui.QColor("#8F8F8F")
+        self._bar_color_disabled = QtGui.QColor("#BBBBBB")
         self._bar_height = 3
         self._bar_width = 3
+
+        # try to parse QSS for the bar height and color
+        self._parse_stylesheet = True
 
     def value(self) -> Tuple[int, ...]:
         return tuple(self._value)
@@ -114,13 +119,16 @@ class QRangeSlider(QSlider):
         r_bar = self._barRect(opt)
         if self._bar_color_active is not None:  # FIXME
             if self.palette().currentColorGroup() == QtGui.QPalette.Active:
-                color = QtGui.QColor(self._bar_color_active)
+                color = self._bar_color_active
             elif self.palette().currentColorGroup() == QtGui.QPalette.Inactive:
-                color = QtGui.QColor(self._bar_color_inactive)
+                color = self._bar_color_inactive
             else:
-                color = QtGui.QColor(self._bar_color_disabled)
+                color = self._bar_color_disabled
         else:
             color = self.palette().color(QtGui.QPalette.Highlight)
+        if isinstance(color, QtGui.QGradient):
+            color.setStart(r_bar.topLeft())
+            color.setFinalStop(r_bar.bottomRight())
         painter.fillRect(r_bar, color)
 
         # draw handles
@@ -439,7 +447,6 @@ class QRangeSlider(QSlider):
         return  # TODO
 
     def _traverseStyleSheet(self):
-        import re
 
         qss = self.styleSheet()
         p = self
@@ -450,24 +457,80 @@ class QRangeSlider(QSlider):
 
         # Find bar color
         # TODO: optional horizontal or vertical
-        match = re.search(r"Slider::sub-page[^{]*{\s*([^}]+)}", qss, re.S)
+        match = re.search(r"Slider::sub-page:?([^{\s]*)?\s*{\s*([^}]+)}", qss, re.S)
         if match:
-            for line in match.groups()[0].splitlines():
+            orientation, content = match.groups()
+            for line in reversed(content.splitlines()):
                 bgrd = re.search(r"background(-color)?:\s*([^;]+)", line)
                 if bgrd:
-                    self._bar_color_active = bgrd.groups()[-1]
+                    self._bar_color_active = parse_color(bgrd.groups()[-1])
                     # TODO: bar color inactive?
                     # TODO: bar color disabled?
-                    # TODO: block double event?
-                    self.setStyleSheet(
-                        f"{type(self).__name__}::sub-page{{background: none}}"
-                    )
+                    class_name = type(self).__name__
+                    _ss = f"\n{class_name}::sub-page:{orientation}{{background: none}}"
+                    # TODO: block double event
+                    self.setStyleSheet(qss + _ss)
+                    break
 
         # Find bar height/width
         for orient, dim in (("horizontal", "height"), ("vertical", "width")):
             match = re.search(rf"Slider::groove:{orient}\s*{{\s*([^}}]+)}}", qss, re.S)
             if match:
-                for line in match.groups()[0].splitlines():
+                for line in reversed(match.groups()[0].splitlines()):
                     bgrd = re.search(rf"{dim}\s*:\s*(\d+)", line)
                     if bgrd:
                         setattr(self, f"_bar_{dim}", float(bgrd.groups()[-1]))
+
+
+qlineargrad_pattern = re.compile(
+    r"""
+    qlineargradient\(
+        x1:\s*(?P<x1>\d*\.?\d+),\s*
+        y1:\s*(?P<y1>\d*\.?\d+),\s*
+        x2:\s*(?P<x2>\d*\.?\d+),\s*
+        y2:\s*(?P<y2>\d*\.?\d+),\s*
+        stop:0\s*(?P<stop0>\S+),.*
+        stop:1\s*(?P<stop1>\S+)
+    \)""",
+    re.X,
+)
+
+qradial_pattern = re.compile(
+    r"""
+    qradialgradient\(
+        cx:\s*(?P<cx>\d*\.?\d+),\s*
+        cy:\s*(?P<cy>\d*\.?\d+),\s*
+        radius:\s*(?P<radius>\d*\.?\d+),\s*
+        fx:\s*(?P<fx>\d*\.?\d+),\s*
+        fy:\s*(?P<fy>\d*\.?\d+),\s*
+        stop:0\s*(?P<stop0>\S+),.*
+        stop:1\s*(?P<stop1>\S+)
+    \)""",
+    re.X,
+)
+
+
+def parse_color(color: str):
+    qc = QtGui.QColor(color)
+    if qc.isValid():
+        return qc
+
+    # try linear gradient:
+    match = qlineargrad_pattern.match(color)
+    if match:
+        grad = QtGui.QLinearGradient(*[float(i) for i in match.groups()[:4]])
+        grad.setColorAt(0, QtGui.QColor(match.groupdict()["stop0"]))
+        grad.setColorAt(1, QtGui.QColor(match.groupdict()["stop1"]))
+        return grad
+
+    # try linear gradient:
+    match = qradial_pattern.match(color)
+    print("match", match.groupdict())
+    if match:
+        grad = QtGui.QRadialGradient(*[float(i) for i in match.groups()[:5]])
+        grad.setColorAt(0, QtGui.QColor(match.groupdict()["stop0"]))
+        grad.setColorAt(1, QtGui.QColor(match.groupdict()["stop1"]))
+        return grad
+
+    # fallback to dark gray
+    return QtGui.QColor("#333")
