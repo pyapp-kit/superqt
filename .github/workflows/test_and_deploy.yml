@@ -96,19 +96,21 @@ jobs:
         uses: codecov/codecov-action@v1
 
       - name: Install for screenshots
+        if: matrix.python-version == '3.9'
         run: pip install . ${{ matrix.backend }}
 
       - name: Screenshots
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' && matrix.python-version == '3.9'
         uses: GabrielBB/xvfb-action@v1
         with:
           run: python examples/screenshots.py
 
       - name: Screenshots
-        if: runner.os != 'Linux'
+        if: runner.os != 'Linux' && matrix.python-version == '3.9'
         run: python examples/screenshots.py
 
       - uses: actions/upload-artifact@v2
+        if: matrix.python-version == '3.9'
         with:
           name: screenshots ${{ matrix.platform }} ${{ matrix.backend }}
           path: screenshots
