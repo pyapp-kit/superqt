@@ -95,19 +95,18 @@ jobs:
       - name: Coverage
         uses: codecov/codecov-action@v1
 
+      - name: Install for screenshots
+        run: pip install . ${{ matrix.backend }}
+
       - name: Screenshots
         if: runner.os == 'Linux'
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: |
-            pip install . ${{ matrix.backend }}
-            python examples/screenshots.py
+          run: python examples/screenshots.py
 
       - name: Screenshots
         if: runner.os != 'Linux'
-        run: |
-          pip install . ${{ matrix.backend }}
-          python examples/screenshots.py
+        run: python examples/screenshots.py
 
       - uses: actions/upload-artifact@v2
         with:
