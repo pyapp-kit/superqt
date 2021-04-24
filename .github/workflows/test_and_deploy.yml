@@ -93,6 +93,17 @@ jobs:
       - name: Coverage
         uses: codecov/codecov-action@v1
 
+      - name: Screenshots
+        run: |
+          pip install . ${{ matrix.backend }}
+          python examples/screenshots.py
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: screenshots
+          path: screenshots
+
+
   deploy:
     # this will run when you have tagged a commit, starting with "v*"
     # and requires that you have put your twine API key in your
