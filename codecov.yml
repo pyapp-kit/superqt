@@ -1,0 +1,14 @@
+ignore:
+  - qtrangeslider/_version.py
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 1% # coverage can drop by up to 1% while still posting success
+    patch:
+      default:
+        target: auto
+        threshold: 40% # coverage can drop by up to 40% while still posting success
+comment:
+  require_changes: true # if true: only post the PR comment if coverage changes
