@@ -5,6 +5,6 @@ so this file is currently here to support "pip install -e ."
 from setuptools import setup
 
 setup(
-    use_scm_version={"write_to": "pyqrangeslider/_version.py"},
+    use_scm_version={"write_to": "qtrangeslider/_version.py"},
     setup_requires=["setuptools_scm"],
 )

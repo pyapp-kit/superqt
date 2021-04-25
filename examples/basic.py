@@ -1,5 +1,5 @@
-from pyqrangeslider import QRangeSlider
-from pyqrangeslider.qtcompat.QtWidgets import QApplication
+from qtrangeslider import QRangeSlider
+from qtrangeslider.qtcompat.QtWidgets import QApplication
 
 app = QApplication([])
 

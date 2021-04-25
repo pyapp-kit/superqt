@@ -1,7 +1,7 @@
 import pytest
 
-from pyqrangeslider import QRangeSlider
-from pyqrangeslider.qtcompat.QtCore import Qt
+from qtrangeslider import QRangeSlider
+from qtrangeslider.qtcompat.QtCore import Qt
 
 
 @pytest.mark.parametrize("orientation", ["Horizontal", "Vertical"])

@@ -1,6 +1,6 @@
-from pyqrangeslider import QRangeSlider
-from pyqrangeslider.qtcompat import QtCore
-from pyqrangeslider.qtcompat import QtWidgets as QtW
+from qtrangeslider import QRangeSlider
+from qtrangeslider.qtcompat import QtCore
+from qtrangeslider.qtcompat import QtWidgets as QtW
 
 QSS = """
 
@@ -65,7 +65,7 @@ class DemoWidget(QtW.QWidget):
         szp = QtW.QSizePolicy.Maximum
         left = QtW.QWidget()
         left.setLayout(QtW.QVBoxLayout())
-        left.setContentsMargins(0, 0, 0, 0)
+        left.setContentsMargins(2, 2, 2, 2)
         label1 = QtW.QLabel("Regular QSlider Unstyled")
         label2 = QtW.QLabel("QRangeSliders Unstyled")
         label3 = QtW.QLabel("Styled Sliders (using same stylesheet)")
