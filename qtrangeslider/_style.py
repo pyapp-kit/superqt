@@ -65,7 +65,7 @@ class RangeSliderStyle:
             val.setAlphaF(self.tick_bar_alpha or SYSTEM_STYLE.tick_bar_alpha)
 
         return val
-    
+
     def offset(self, opt: QStyleOptionSlider) -> int:
         tp = opt.tickPosition
         off = 0
@@ -93,16 +93,16 @@ BASE_STYLE = RangeSliderStyle(
     brush_active="#3B88FD",
     brush_inactive="#8F8F8F",
     brush_disabled="#BBBBBB",
-    pen_active = 'transparent',
-    pen_inactive = 'transparent',
-    pen_disabled = 'transparent',
-    vertical_thickness = 4,
-    horizontal_thickness = 4,
-    tick_offset = 0,
-    tick_bar_alpha = 0.3,
-    v_offset = 0,
-    h_offset = 0,
-    has_stylesheet = False,
+    pen_active="transparent",
+    pen_inactive="transparent",
+    pen_disabled="transparent",
+    vertical_thickness=4,
+    horizontal_thickness=4,
+    tick_offset=0,
+    tick_bar_alpha=0.3,
+    v_offset=0,
+    h_offset=0,
+    has_stylesheet=False,
 )
 
 CATALINA_STYLE = replace(
@@ -130,12 +130,12 @@ BIG_SUR_STYLE = replace(
 
 LINUX_STYLE = replace(
     BASE_STYLE,
-    brush_active='#44A0D9',
-    brush_inactive='#44A0D9',
-    brush_disabled='#44A0D9',
-    pen_active = '#286384',
-    pen_inactive = '#286384',
-    pen_disabled = '#286384',
+    brush_active="#44A0D9",
+    brush_inactive="#44A0D9",
+    brush_disabled="#44A0D9",
+    pen_active="#286384",
+    pen_inactive="#286384",
+    pen_disabled="#286384",
 )
 
 SYSTEM = platform.system()
