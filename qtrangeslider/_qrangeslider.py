@@ -108,7 +108,7 @@ class QRangeSlider(QSlider):
             brush.setStart(r_bar.topLeft())
             brush.setFinalStop(r_bar.bottomRight())
 
-        painter.setPen(Qt.NoPen)
+        painter.setPen(self._style.pen(opt))
         painter.setBrush(brush)
         painter.drawRect(r_bar)
 
@@ -146,6 +146,8 @@ class QRangeSlider(QSlider):
             painter.drawComplexControl(QStyle.CC_Slider, opt)
 
     def event(self, ev: QEvent) -> bool:
+        if ev.type() == QEvent.WindowActivate:
+            self.update()
         if ev.type() == QEvent.StyleChange:
             update_styles_from_stylesheet(self)
         if ev.type() in (QEvent.HoverEnter, QEvent.HoverLeave, QEvent.HoverMove):

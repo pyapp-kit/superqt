@@ -49,6 +49,23 @@ class RangeSliderStyle:
 
         return val
 
+    def pen(self, opt: QStyleOptionSlider) -> Union[Qt.PenStyle, QColor]:
+        cg = opt.palette.currentColorGroup()
+        attr = {
+            QPalette.Active: "pen_active",  # 0
+            QPalette.Disabled: "pen_disabled",  # 1
+            QPalette.Inactive: "pen_inactive",  # 2
+        }[cg]
+        val = getattr(self, attr) or getattr(SYSTEM_STYLE, attr)
+        if not val:
+            return Qt.NoPen
+        if isinstance(val, str):
+            val = QColor(val)
+        if opt.tickPosition != QSlider.NoTicks:
+            val.setAlphaF(self.tick_bar_alpha or SYSTEM_STYLE.tick_bar_alpha)
+
+        return val
+    
     def offset(self, opt: QStyleOptionSlider) -> int:
         tp = opt.tickPosition
         off = 0
@@ -72,7 +89,24 @@ class RangeSliderStyle:
 
 # ##########  System-specific default styles ############
 
-CATALINA_STYLE = RangeSliderStyle(
+BASE_STYLE = RangeSliderStyle(
+    brush_active="#3B88FD",
+    brush_inactive="#8F8F8F",
+    brush_disabled="#BBBBBB",
+    pen_active = 'transparent',
+    pen_inactive = 'transparent',
+    pen_disabled = 'transparent',
+    vertical_thickness = 4,
+    horizontal_thickness = 4,
+    tick_offset = 0,
+    tick_bar_alpha = 0.3,
+    v_offset = 0,
+    h_offset = 0,
+    has_stylesheet = False,
+)
+
+CATALINA_STYLE = replace(
+    BASE_STYLE,
     brush_active="#3B88FD",
     brush_inactive="#8F8F8F",
     brush_disabled="#D2D2D2",
@@ -94,6 +128,16 @@ BIG_SUR_STYLE = replace(
     tick_bar_alpha=0.2,
 )
 
+LINUX_STYLE = replace(
+    BASE_STYLE,
+    brush_active='#44A0D9',
+    brush_inactive='#44A0D9',
+    brush_disabled='#44A0D9',
+    pen_active = '#286384',
+    pen_inactive = '#286384',
+    pen_disabled = '#286384',
+)
+
 SYSTEM = platform.system()
 if SYSTEM == "Darwin":
     if int(platform.mac_ver()[0].split(".", maxsplit=1)[0]) >= 11:
@@ -101,12 +145,11 @@ if SYSTEM == "Darwin":
     else:
         SYSTEM_STYLE = CATALINA_STYLE
 elif SYSTEM == "Windows":
-    SYSTEM_STYLE = RangeSliderStyle()
+    SYSTEM_STYLE = BASE_STYLE
 elif SYSTEM == "Linux":
-    LINUX = True
-    SYSTEM_STYLE = RangeSliderStyle()
+    SYSTEM_STYLE = LINUX_STYLE
 else:
-    SYSTEM_STYLE = RangeSliderStyle()
+    SYSTEM_STYLE = BASE_STYLE
 
 
 # ################ Stylesheet parsing logic ########################
