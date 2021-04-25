@@ -44,6 +44,9 @@ class RangeSliderStyle:
         if isinstance(val, str):
             val = QColor(val)
 
+        if not val:
+            return Qt.NoBrush
+
         if opt.tickPosition != QSlider.NoTicks:
             val.setAlphaF(self.tick_bar_alpha or SYSTEM_STYLE.tick_bar_alpha)
 
@@ -93,9 +96,9 @@ BASE_STYLE = RangeSliderStyle(
     brush_active="#3B88FD",
     brush_inactive="#8F8F8F",
     brush_disabled="#BBBBBB",
-    pen_active="transparent",
-    pen_inactive="transparent",
-    pen_disabled="transparent",
+    pen_active=None,
+    pen_inactive=None,
+    pen_disabled=None,
     vertical_thickness=4,
     horizontal_thickness=4,
     tick_offset=0,
@@ -128,6 +131,13 @@ BIG_SUR_STYLE = replace(
     tick_bar_alpha=0.2,
 )
 
+WINDOWS_STYLE = replace(
+    BASE_STYLE,
+    brush_active="#550179D7",
+    brush_inactive="#330179D7",
+    brush_disabled=None,
+)
+
 LINUX_STYLE = replace(
     BASE_STYLE,
     brush_active="#44A0D9",
@@ -145,7 +155,7 @@ if SYSTEM == "Darwin":
     else:
         SYSTEM_STYLE = CATALINA_STYLE
 elif SYSTEM == "Windows":
-    SYSTEM_STYLE = BASE_STYLE
+    SYSTEM_STYLE = WINDOWS_STYLE
 elif SYSTEM == "Linux":
     SYSTEM_STYLE = LINUX_STYLE
 else:
