@@ -15,11 +15,6 @@ from .qtcompat.QtWidgets import (
 Control = Tuple[str, int]
 
 
-def _bound(min_: int, max_: int, value: int) -> int:
-    """Return value bounded by min_ and max_."""
-    return max(min_, min(max_, value))
-
-
 class QRangeSlider(QSlider):
     # Emitted when the slider value has changed, with the new slider values
     valueChanged = Signal(tuple)
@@ -85,6 +80,9 @@ class QRangeSlider(QSlider):
         return tuple(self._position)
 
     def setSliderPosition(self, sld_idx: int, pos: int) -> None:
+
+        # TODO: make it take a tuple, and assert that the length is correct
+        # only setting `value` is allowed to change the number of handles
         pos = self._min_max_bound(pos)
         # prevent sliders from moving beyond their neighbors
         pos = self._neighbor_bound(pos, sld_idx, self._position)
@@ -192,8 +190,11 @@ class QRangeSlider(QSlider):
             self.update()
             self.setSliderDown(True)
         elif self._pressedControl[0] == "bar":
+            self.setRepeatAction(QSlider.SliderNoAction)  # why again?
             self._clickOffset = self._pixelPosToRangeValue(self._pick(ev.pos()))
             self._sldPosAtPress = tuple(self._position)
+            self.update()
+            self.setSliderDown(True)
 
     def mouseMoveEvent(self, ev: QtGui.QMouseEvent) -> None:
         # TODO: add pixelMetric(QStyle::PM_MaximumDragDistance, &opt, this);
@@ -230,7 +231,7 @@ class QRangeSlider(QSlider):
         old_pressed = self._pressedControl
         self._pressedControl = self.NULL_CTRL
         self.setRepeatAction(QSlider.SliderNoAction)
-        if old_pressed[0] == "handle":
+        if old_pressed[0] in ("handle", "bar"):
             self.setSliderDown(False)
         self.update()  # TODO: restrict to the rect of old_pressed
 
@@ -488,6 +489,13 @@ class QRangeSlider(QSlider):
                     if bgrd:
                         setattr(self, f"_bar_{dim}", float(bgrd.groups()[-1]))
 
+
+def _bound(min_: int, max_: int, value: int) -> int:
+    """Return value bounded by min_ and max_."""
+    return max(min_, min(max_, value))
+
+
+# Styles Parsing ##############
 
 qlineargrad_pattern = re.compile(
     r"""

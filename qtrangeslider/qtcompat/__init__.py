@@ -31,13 +31,13 @@ QT_API = "QT_API"
 # Names of the expected PyQt5 api
 PYQT5_API = ["pyqt5"]
 
-# Names of the expected PyQt5 api
+# Names of the expected PyQt6 api
 PYQT6_API = ["pyqt6"]
 
 # Names of the expected PySide2 api
 PYSIDE2_API = ["pyside2"]
 
-# Names of the expected PySide2 api
+# Names of the expected PySide6 api
 PYSIDE6_API = ["pyside6"]
 
 # Detecting if a binding was specified by the user
@@ -142,7 +142,13 @@ if API in PYSIDE6_API:
         PYSIDE6 = True
 
     except ImportError:
-        raise PythonQtError("No Qt bindings could be found")
+        API = None
+
+if API is None:
+    raise PythonQtError(
+        "No Qt bindings could be found.\nYou must install one of the following packages "
+        "to use QtRangeSlider: PyQt5, PyQt6, PySide2, or PySide6"
+    )
 
 # If a correct API name is passed to QT_API and it could not be found,
 # switches to another and informs through the warning

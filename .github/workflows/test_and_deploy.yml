@@ -106,11 +106,11 @@ jobs:
         if: runner.os == 'Linux' && matrix.screenshot
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: python examples/screenshots.py
+          run: python examples/demo_widget.py
 
       - name: Screenshots
         if: runner.os != 'Linux' && matrix.screenshot
-        run: python examples/screenshots.py
+        run: python examples/demo_widget.py
 
       - uses: actions/upload-artifact@v2
         if: matrix.screenshot

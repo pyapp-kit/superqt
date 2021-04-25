@@ -7,7 +7,7 @@ Version](https://img.shields.io/pypi/pyversions/QtRangeSlider.svg?color=green)](
 [![Test](https://github.com/tlambert03/QtRangeSlider/actions/workflows/test_and_deploy.yml/badge.svg)](https://github.com/tlambert03/QtRangeSlider/actions/workflows/test_and_deploy.yml)
 [![codecov](https://codecov.io/gh/tlambert03/QtRangeSlider/branch/master/graph/badge.svg)](https://codecov.io/gh/tlambert03/QtRangeSlider)
 
-**Multi-handle range slider widget for PyQt/PySide**
+**The missing multi-handle range slider widget for PyQt & PySide**
 
 ![slider](screenshots/slider.png)
 
@@ -31,24 +31,78 @@ You can install `QtRangeSlider` via pip:
 ```sh
 pip install qtrangeslider
 
-# note: you must also install a Qt Backend
-# supports PyQt5, PySide2, PyQt6, and PySide6
-# as a convenience you can install via extras:
+# NOTE: you must also install a Qt Backend.
+# PyQt5, PySide2, PyQt6, and PySide6 are supported
+# As a convenience you can install them as extras:
 pip install qtrangeslider[pyqt5]
-
 ```
 
-And then to use it:
 
-```python
-from qtrangeslider import QRangeSlider
-```
+------
 
 ## API
 
-As `QRangeSlider` inherits from `QtWidgets.QSlider`, you can use all of the
-same methods available in the [QSlider API](https://doc.qt.io/qt-5/qslider.html)
+To create a slider:
 
+```python
+from qtrangeslider import QRangeSlider
+
+# as usual:
+# you must create a QApplication before create a widget.
+range_slider = QRangeSlider()
+```
+
+As `QRangeSlider` inherits from `QtWidgets.QSlider`, you can use all of the
+same methods available in the [QSlider API](https://doc.qt.io/qt-5/qslider.html).  The major difference is that `value` and `sliderPosition` are reimplemented as `tuples` of `int` (where the length of the tuple is equal to the number of handles in the slider.)
+
+### value: Tuple[int, ...]
+
+This property holds the current value of all handles in the slider.
+
+The slider forces all values to be within the legal range:
+`minimum <= value <= maximum`.
+
+Changing the value also changes the sliderPosition.
+
+##### Access Functions:
+
+```python
+range_slider.value() -> Tuple[int, ...]
+```
+
+```python
+range_slider.setValue(val: Sequence[int]) -> None
+```
+
+##### Notifier Signal:
+
+```python
+valueChanged(Tuple[int, ...])
+```
+
+### sliderPosition: Tuple[int, ...]
+
+This property holds the current slider positions.  It is a `tuple` with length equal to the number of handles.
+
+If [tracking](https://doc.qt.io/qt-5/qabstractslider.html#tracking-prop) is enabled (the default), this is identical to [`value`](#value--tupleint-).
+
+##### Access Functions:
+
+```python
+range_slider.sliderPosition() -> Tuple[int, ...]
+```
+
+```python
+range_slider.setSliderPosition(val: Sequence[int]) -> None
+```
+
+##### Notifier Signal:
+
+```python
+sliderMoved(Tuple[int, ...])
+```
+
+------
 
 ## Example
 
@@ -58,6 +112,8 @@ style of `QSlider` – with or without tick marks.  When styles have been applie
 using [Qt Style Sheets](https://doc.qt.io/qt-5/stylesheet-reference.html), then
 `QRangeSlider` will inherit any styles applied to `QSlider` (since it inherits
 from QSlider).
+
+> The code for these example widgets is [here](examples/demo_widget.py)
 
 <details>
 
@@ -111,6 +167,5 @@ QSlider::sub-page:horizontal {
 
 If you encounter any problems, please [file an issue] along with a detailed
 description.
-
 
 [file an issue]: https://github.com/tlambert03/QtRangeSlider/issues
