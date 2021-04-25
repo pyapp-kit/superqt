@@ -25,9 +25,7 @@ class QRangeSlider(QSlider):
 
     _NULL_CTRL = ("None", -1)
 
-    def __init__(
-        self, orientation: Qt.Orientation = Qt.Horizontal, parent: QWidget = None
-    ):
+    def __init__(self, orientation=Qt.Horizontal, parent: QWidget = None):
         super().__init__(orientation, parent)
 
         # list of values
