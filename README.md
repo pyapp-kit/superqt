@@ -55,7 +55,7 @@ range_slider = QRangeSlider()
 As `QRangeSlider` inherits from `QtWidgets.QSlider`, you can use all of the
 same methods available in the [QSlider API](https://doc.qt.io/qt-5/qslider.html).  The major difference is that `value` and `sliderPosition` are reimplemented as `tuples` of `int` (where the length of the tuple is equal to the number of handles in the slider.)
 
-### value: Tuple[int, ...]
+### `value: Tuple[int, ...]`
 
 This property holds the current value of all handles in the slider.
 
@@ -80,7 +80,7 @@ range_slider.setValue(val: Sequence[int]) -> None
 valueChanged(Tuple[int, ...])
 ```
 
-### sliderPosition: Tuple[int, ...]
+### `sliderPosition: Tuple[int, ...]`
 
 This property holds the current slider positions.  It is a `tuple` with length equal to the number of handles.
 
@@ -102,6 +102,15 @@ range_slider.setSliderPosition(val: Sequence[int]) -> None
 sliderMoved(Tuple[int, ...])
 ```
 
+### Additional properties
+
+These options are in addition to the Qt QSlider API, and control the behavior of the bar between handles.
+
+| getter        | setter          | type     | default  | description |
+| ------------- | -------------   |--------- | -------- | --------- |
+| `barIsVisible`  | `setBarIsVisible` <br>`hideBar` / `showBar` | `bool`   |  `True`  | <small>Whether the bar between handles is visible.</small> |
+| `barMovesAllHandles`  | `setBarMovesAllHandles` | `bool`   |  `True`  | <small>Whether clicking on the bar moves all handles or just the nearest</small> |
+| `barIsRigid`  | `setBarIsRigid` | `bool`   |  `True`  | <small>Whether bar length is constant or "elastic" when dragging the bar beyond min/max.</small> |
 ------
 
 ## Example
@@ -112,7 +121,9 @@ style of `QSlider` – with or without tick marks.  When styles have been applie
 using [Qt Style Sheets](https://doc.qt.io/qt-5/stylesheet-reference.html), then
 `QRangeSlider` will inherit any styles applied to `QSlider` (since it inherits
 from QSlider).  If you'd like to style `QRangeSlider` differently than `QSlider`,
-then you can also target it directly in your style sheet.
+then you can also target it directly in your style sheet.  The one "special"
+property for QRangeSlider is `qproperty-barColor`, which sets the color of the
+bar between the handles.
 
 > The code for these example widgets is [here](examples/demo_widget.py)
 
@@ -121,12 +132,19 @@ then you can also target it directly in your style sheet.
 <summary><em>See style sheet used for this example</em></summary>
 
 ```css
-/* Because QRangeSlider inherits QSlider, it will also inherit styles */
+/*
+Because QRangeSlider inherits from QSlider, it will also inherit styles
+*/
+QSlider {
+    min-height: 20px;
+}
+
 QSlider::groove:horizontal {
-   border: 0px;
-   background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #777, stop:1 #aaa);
-   height: 20px;
-   border-radius: 10px;
+    border: 0px;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #777, stop:1 #aaa);
+    height: 20px;
+    border-radius: 10px;
 }
 
 QSlider::handle {
@@ -137,15 +155,19 @@ QSlider::handle {
     border-radius: 10px;
 }
 
-/* "QSlider::sub-page" (which styles the area to the left of the
-QSlider handle) is the one exception ... */
+/*
+"QSlider::sub-page" is the one exception ...
+(it styles the area to the left of the QSlider handle)
+*/
 QSlider::sub-page:horizontal {
     background: #447;
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
 }
 
-/* for QRangeSlider, use "qproperty-barColor" */
+/*
+for QRangeSlider: use "qproperty-barColor".  "sub-page" will not work.
+*/
 QRangeSlider {
     qproperty-barColor: #447;
 }

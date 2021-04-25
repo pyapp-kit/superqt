@@ -3,11 +3,15 @@ from qtrangeslider.qtcompat import QtCore
 from qtrangeslider.qtcompat import QtWidgets as QtW
 
 QSS = """
+QSlider {
+    min-height: 20px;
+}
+
 QSlider::groove:horizontal {
-   border: 0px;
-   background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #777, stop:1 #aaa);
-   height: 20px;
-   border-radius: 10px;
+    border: 0px;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #777, stop:1 #aaa);
+    height: 20px;
+    border-radius: 10px;
 }
 
 QSlider::handle {
