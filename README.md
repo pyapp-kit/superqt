@@ -152,17 +152,19 @@ QSlider::sub-page:horizontal {
 
 ### macOS
 
-![mac](images/demo_macos.png)
+##### Catalina
+![mac](images/demo_darwin.png)
 
-### Window
+##### Big Sur
+![mac](images/demo_darwin11.png)
 
-(coming)
-<!-- ![mac](images/demo_windows.png) -->
+### Windows
+
+![mac](images/demo_windows.png)
 
 ### Linux
 
-(coming)
-<!-- ![mac](images/demo_linux.png) -->
+![mac](images/demo_linux.png)
 
 ## Issues
 
