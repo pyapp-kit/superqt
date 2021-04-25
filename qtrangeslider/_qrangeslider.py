@@ -35,17 +35,16 @@ class QRangeSlider(QSlider):
     sliderMoved = Signal(tuple)
 
     _NULL_CTRL = ("None", -1)
-    _DEFAULT_VALUE = (20, 80)
 
     def __init__(self, *args):
         super().__init__(*args)
 
         # list of values
-        self._value: List[int] = self._DEFAULT_VALUE
+        self._value: List[int] = [20, 80]
 
         # list of current positions of each handle. same length as _value
         # If tracking is enabled (the default) this will be identical to _value
-        self._position: List[int] = self._DEFAULT_VALUE
+        self._position: List[int] = [20, 80]
         self._pressedControl: ControlType = self._NULL_CTRL
         self._hoverControl: ControlType = self._NULL_CTRL
 
