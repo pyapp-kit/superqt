@@ -4,7 +4,16 @@ from typing import List, Sequence, Tuple
 
 from ._style import RangeSliderStyle, update_styles_from_stylesheet
 from .qtcompat import QtGui
-from .qtcompat.QtCore import QEvent, QPoint, QPointF, QRect, QRectF, Qt, Signal
+from .qtcompat.QtCore import (
+    Property,
+    QEvent,
+    QPoint,
+    QPointF,
+    QRect,
+    QRectF,
+    Qt,
+    Signal,
+)
 from .qtcompat.QtWidgets import (
     QApplication,
     QSlider,
@@ -62,8 +71,17 @@ class QRangeSlider(QSlider):
 
         # color
         self._style = RangeSliderStyle()
+        self.setStyleSheet("")
 
     # ###############  Public API  #######################
+
+    def setStyleSheet(self, styleSheet: str) -> None:
+        # sub-page styles render on top of the lower sliders and don't work here.
+        override = f"""
+            \n{type(self).__name__}::sub-page:horizontal {{background: none}}
+            \n{type(self).__name__}::sub-page:vertical {{background: none}}
+        """
+        return super().setStyleSheet(styleSheet + override)
 
     def value(self) -> Tuple[int, ...]:
         """Get current value of the widget as a tuple of integers."""
@@ -179,6 +197,14 @@ class QRangeSlider(QSlider):
         opt.sliderValue = 0
         opt.sliderPosition = 0
         return opt
+
+    def _getBarColor(self):
+        return self._style.brush_active or QtGui.QColor()
+
+    def _setBarColor(self, color):
+        self._style.brush_active = color
+
+    barColor = Property(QtGui.QColor, _getBarColor, _setBarColor)
 
     def _drawBar(self, painter: QStylePainter, opt: QStyleOptionSlider):
 

@@ -124,27 +124,30 @@ then you can also target it directly in your style sheet.
 /* Because QRangeSlider inherits QSlider, it will also inherit styles */
 QSlider::groove:horizontal {
    border: 0px;
-   background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #FDE282, stop:1 #EB9A5D);
-   height: 16px;
-   border-radius: 2px;
+   background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #777, stop:1 #aaa);
+   height: 20px;
+   border-radius: 10px;
 }
 
-QSlider::handle:horizontal {
-    background: #271848;
-    border: 1px solid #583856;
-    width: 18px;
-    margin: -2px 0;
-    border-radius: 3px;
+QSlider::handle {
+    background: qradialgradient(cx:0, cy:0, radius: 1.2, fx:0.5,
+                                fy:0.5, stop:0 #eef, stop:1 #000);
+    height: 20px;
+    width: 20px;
+    border-radius: 10px;
 }
 
-QSlider::handle:hover {
-   background-color: #2F4F4F;
-}
-
-/* "QSlider::sub-page" will style the "bar" area between the QRangeSlider handles */
+/* "QSlider::sub-page" (which styles the area to the left of the
+QSlider handle) is the one exception ... */
 QSlider::sub-page:horizontal {
-    background: #AF5A50;
-    border-radius: 2px;
+    background: #447;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+/* for QRangeSlider, use "qproperty-barColor" */
+QRangeSlider {
+    qproperty-barColor: #447;
 }
 ```
 

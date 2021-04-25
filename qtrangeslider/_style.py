@@ -191,14 +191,29 @@ qradial_pattern = re.compile(
     re.X,
 )
 
+rgba_pattern = re.compile(
+    r"""
+    rgba?\(
+        (?P<r>\d+),\s*
+        (?P<g>\d+),\s*
+        (?P<b>\d+),?\s*(?P<a>\d+)?\)
+    """,
+    re.X,
+)
+
 
 def parse_color(color: str) -> Union[str, QGradient]:
     qc = QColor(color)
     if qc.isValid():
         return qc
 
+    match = rgba_pattern.search(color)
+    if match:
+        rgba = [int(x) if x else 255 for x in match.groups()]
+        return QColor(*rgba)
+
     # try linear gradient:
-    match = qlineargrad_pattern.match(color)
+    match = qlineargrad_pattern.search(color)
     if match:
         grad = QLinearGradient(*[float(i) for i in match.groups()[:4]])
         grad.setColorAt(0, QColor(match.groupdict()["stop0"]))
@@ -206,8 +221,7 @@ def parse_color(color: str) -> Union[str, QGradient]:
         return grad
 
     # try linear gradient:
-    match = qradial_pattern.match(color)
-    print("match", match.groupdict())
+    match = qradial_pattern.search(color)
     if match:
         grad = QRadialGradient(*[float(i) for i in match.groups()[:5]])
         grad.setColorAt(0, QColor(match.groupdict()["stop0"]))
@@ -220,33 +234,31 @@ def parse_color(color: str) -> Union[str, QGradient]:
 
 def update_styles_from_stylesheet(obj: "QRangeSlider"):
     qss = obj.styleSheet()
-    p = obj
-    while p.parent():
-        qss = p.styleSheet() + qss
-        p = p.parent()
+
+    parent = obj.parent()
+    while parent is not None:
+        qss = parent.styleSheet() + qss
+        parent = parent.parent()
     qss = QApplication.instance().styleSheet() + qss
 
-    obj._style.has_stylesheet = False
+    # obj._style.has_stylesheet = False
 
-    # Find bar color
-    # TODO: optional horizontal or vertical
-    match = re.search(r"Slider::sub-page:?([^{\s]*)?\s*{\s*([^}]+)}", qss, re.S)
-    if match:
-        orientation, content = match.groups()
-        for line in reversed(content.splitlines()):
-            bgrd = re.search(r"background(-color)?:\s*([^;]+)", line)
-            if bgrd:
-                color = parse_color(bgrd.groups()[-1])
-                obj._style.brush_active = color
-                # TODO: parse for inactive and disabled
-                obj._style.brush_inactive = color
-                obj._style.brush_disabled = color
-                obj._style.has_stylesheet = True
-                class_name = type(obj).__name__
-                _ss = f"\n{class_name}::sub-page:{orientation}{{background: none}}"
-                # TODO: block double event
-                obj.setStyleSheet(qss + _ss)
-                break
+    # # Find bar color
+    # # TODO: optional horizontal or vertical
+    # match = re.search(r"Slider::sub-page:?([^{\s]*)?\s*{\s*([^}]+)}", qss, re.S)
+    # if match:
+    #     orientation, content = match.groups()
+    #     for line in reversed(content.splitlines()):
+    #         bgrd = re.search(r"background(-color)?:\s*([^;]+)", line)
+    #         if bgrd:
+    #             color = parse_color(bgrd.groups()[-1])
+    #             obj._style.brush_active = color
+    #             # TODO: parse for inactive and disabled
+    #             obj._style.brush_inactive = color
+    #             obj._style.brush_disabled = color
+    #             obj._style.has_stylesheet = True
+    #             obj.update()
+    #             break
 
     # Find bar height/width
     for orient, dim in (("horizontal", "height"), ("vertical", "width")):
