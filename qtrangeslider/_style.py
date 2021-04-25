@@ -1,7 +1,7 @@
 import platform
 import re
 from dataclasses import dataclass, replace
-from typing import Union
+from typing import TYPE_CHECKING, Union
 
 from .qtcompat.QtCore import Qt
 from .qtcompat.QtGui import (
@@ -11,7 +11,10 @@ from .qtcompat.QtGui import (
     QPalette,
     QRadialGradient,
 )
-from .qtcompat.QtWidgets import QApplication, QSlider
+from .qtcompat.QtWidgets import QApplication, QSlider, QStyleOptionSlider
+
+if TYPE_CHECKING:
+    from ._qrangeslider import QRangeSlider
 
 
 @dataclass
@@ -24,9 +27,14 @@ class RangeSliderStyle:
     pen_disabled: str = None
     vertical_thickness: float = None
     horizontal_thickness: float = None
-    tick_offest: float = None
+    tick_offset: float = None
+    tick_bar_alpha: float = None
+    v_offset: float = None
+    h_offset: float = None
+    has_stylesheet: bool = False
 
-    def brush(self, cg: QPalette.ColorGroup) -> Union[QGradient, QColor]:
+    def brush(self, opt: QStyleOptionSlider) -> Union[QGradient, QColor]:
+        cg = opt.palette.currentColorGroup()
         attr = {
             QPalette.Active: "brush_active",  # 0
             QPalette.Disabled: "brush_disabled",  # 1
@@ -35,19 +43,28 @@ class RangeSliderStyle:
         val = getattr(self, attr) or getattr(SYSTEM_STYLE, attr)
         if isinstance(val, str):
             val = QColor(val)
+
+        if opt.tickPosition != QSlider.NoTicks:
+            val.setAlphaF(self.tick_bar_alpha or SYSTEM_STYLE.tick_bar_alpha)
+
         return val
 
-    def offset(self, tp: QSlider.TickPosition) -> int:
-        val = self.tick_offest or SYSTEM_STYLE.tick_offest
-        if tp & QSlider.TicksAbove:
-            return val
-        elif tp & QSlider.TicksBelow:
-            return -val
-        else:
-            return 0
+    def offset(self, opt: QStyleOptionSlider) -> int:
+        tp = opt.tickPosition
+        off = 0
+        if not self.has_stylesheet:
+            if opt.orientation == Qt.Horizontal:
+                off += self.h_offset or SYSTEM_STYLE.h_offset or 0
+            else:
+                off += self.v_offset or SYSTEM_STYLE.v_offset or 0
+            if tp & QSlider.TicksAbove:
+                off += self.tick_offset or SYSTEM_STYLE.tick_offset
+            elif tp & QSlider.TicksBelow:
+                off -= self.tick_offset or SYSTEM_STYLE.tick_offset
+        return off
 
-    def thickness(self, orientation: Qt.Orientation) -> float:
-        if orientation == Qt.Horizontal:
+    def thickness(self, opt: QStyleOptionSlider) -> float:
+        if opt.orientation == Qt.Horizontal:
             return self.horizontal_thickness or SYSTEM_STYLE.horizontal_thickness
         else:
             return self.vertical_thickness or SYSTEM_STYLE.vertical_thickness
@@ -61,10 +78,19 @@ CATALINA_STYLE = RangeSliderStyle(
     brush_disabled="#BBBBBB",
     horizontal_thickness=3,
     vertical_thickness=3,
-    tick_offest=4,
+    tick_bar_alpha=0.3,
+    tick_offset=4,
 )
 
-BIG_SUR_STYLE = replace(CATALINA_STYLE)
+BIG_SUR_STYLE = replace(
+    CATALINA_STYLE,
+    brush_active="#0A81FE",
+    tick_offset=0,
+    horizontal_thickness=4,
+    vertical_thickness=4,
+    h_offset=-2,
+    tick_bar_alpha=0.2,
+)
 
 SYSTEM = platform.system()
 if SYSTEM == "Darwin":
@@ -137,13 +163,15 @@ def parse_color(color: str) -> Union[str, QGradient]:
     return "#333"
 
 
-def update_styles_from_stylesheet(obj):
+def update_styles_from_stylesheet(obj: "QRangeSlider"):
     qss = obj.styleSheet()
     p = obj
     while p.parent():
         qss = p.styleSheet() + qss
         p = p.parent()
     qss = QApplication.instance().styleSheet() + qss
+
+    obj._style.has_stylesheet = False
 
     # Find bar color
     # TODO: optional horizontal or vertical
@@ -154,6 +182,7 @@ def update_styles_from_stylesheet(obj):
             bgrd = re.search(r"background(-color)?:\s*([^;]+)", line)
             if bgrd:
                 obj._style.brush_active = parse_color(bgrd.groups()[-1])
+                obj._style.has_stylesheet = True
                 # TODO: bar color inactive?
                 # TODO: bar color disabled?
                 class_name = type(obj).__name__
@@ -171,3 +200,4 @@ def update_styles_from_stylesheet(obj):
                 if bgrd:
                     thickness = float(bgrd.groups()[-1])
                     setattr(obj._style, f"{orient}_thickness", thickness)
+                    obj._style.has_stylesheet = True

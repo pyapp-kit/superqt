@@ -48,7 +48,7 @@ class QRangeSlider(QSlider):
         # for keyboard nav
         self._repeatMultiplier = 1  # TODO
         # for wheel nav
-        self._tick__accum = 0
+        self._offset_accum = 0
 
         # color
         self._style = RangeSliderStyle()
@@ -101,7 +101,7 @@ class QRangeSlider(QSlider):
 
     def _drawBar(self, painter: QStylePainter, opt: QStyleOptionSlider):
 
-        brush = self._style.brush(self.palette().currentColorGroup())
+        brush = self._style.brush(opt)
 
         r_bar = self._barRect(opt)
         if isinstance(brush, QtGui.QGradient):
@@ -270,16 +270,16 @@ class QRangeSlider(QSlider):
         r_bar = QRectF(r_groove)
         hdl_low, *_, hdl_high = self._handleRects(opt)
 
-        thickness = self._style.thickness(opt.orientation)
-        tick_offset = self._style.offset(self.tickPosition())
+        thickness = self._style.thickness(opt)
+        offset = self._style.offset(opt)
 
         if opt.orientation == Qt.Horizontal:
-            r_bar.setTop(r_bar.center().y() - thickness / 2 + tick_offset)
+            r_bar.setTop(r_bar.center().y() - thickness / 2 + offset)
             r_bar.setHeight(thickness)
             r_bar.setLeft(hdl_low.center().x())
             r_bar.setRight(hdl_high.center().x())
         else:
-            r_bar.setLeft(r_bar.center().x() - thickness / 2 + tick_offset)
+            r_bar.setLeft(r_bar.center().x() - thickness / 2 + offset)
             r_bar.setWidth(thickness)
             r_bar.setBottom(hdl_low.center().y())
             r_bar.setTop(hdl_high.center().y())
