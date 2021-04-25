@@ -1,6 +1,6 @@
-import re
 from typing import List, Sequence, Tuple
 
+from ._style import RangeSliderStyle, update_styles_from_stylesheet
 from .qtcompat import QtGui
 from .qtcompat.QtCore import QEvent, QPoint, QPointF, QRect, QRectF, Qt, Signal
 from .qtcompat.QtWidgets import (
@@ -12,7 +12,7 @@ from .qtcompat.QtWidgets import (
     QWidget,
 )
 
-Control = Tuple[str, int]
+ControlType = Tuple[str, int]
 
 
 class QRangeSlider(QSlider):
@@ -23,9 +23,11 @@ class QRangeSlider(QSlider):
     # The value is the positions of *all* handles.
     sliderMoved = Signal(tuple)
 
-    NULL_CTRL = ("None", -1)
+    _NULL_CTRL = ("None", -1)
 
-    def __init__(self, orientation=Qt.Horizontal, parent: QWidget = None):
+    def __init__(
+        self, orientation: Qt.Orientation = Qt.Horizontal, parent: QWidget = None
+    ):
         super().__init__(orientation, parent)
 
         # list of values
@@ -33,29 +35,23 @@ class QRangeSlider(QSlider):
         # list of current positions of each handle.  Must be same length as _value
         # If tracking is enabled (the default) this will be identical to _value
         self._position: List[int] = [20, 80]
-        self._pressedControl: Control = self.NULL_CTRL
-        self._hoverControl: Control = self.NULL_CTRL
+        self._pressedControl: ControlType = self._NULL_CTRL
+        self._hoverControl: ControlType = self._NULL_CTRL
 
         # whether bar length is constant when dragging the bar
         # if False, the bar can shorten when dragged beyond min/max
         self._bar_is_stiff = True
         # whether clicking on the bar moves all handles, or just the nearest handle.
         self._bar_moves_all = True
+        self._should_draw_bar = True
 
         # for keyboard nav
         self._repeatMultiplier = 1  # TODO
         # for wheel nav
-        self._offset_accum = 0
+        self._tick__accum = 0
 
         # color
-        self._bar_color_active = QtGui.QColor("#3B88FD")
-        self._bar_color_inactive = QtGui.QColor("#8F8F8F")
-        self._bar_color_disabled = QtGui.QColor("#BBBBBB")
-        self._bar_height = 3
-        self._bar_width = 3
-
-        # try to parse QSS for the bar height and color
-        self._parse_stylesheet = True
+        self._style = RangeSliderStyle()
 
     def value(self) -> Tuple[int, ...]:
         return tuple(self._value)
@@ -103,6 +99,19 @@ class QRangeSlider(QSlider):
         opt.sliderPosition = 0
         return opt
 
+    def _drawBar(self, painter: QStylePainter, opt: QStyleOptionSlider):
+
+        brush = self._style.brush(self.palette().currentColorGroup())
+
+        r_bar = self._barRect(opt)
+        if isinstance(brush, QtGui.QGradient):
+            brush.setStart(r_bar.topLeft())
+            brush.setFinalStop(r_bar.bottomRight())
+
+        painter.setPen(Qt.NoPen)
+        painter.setBrush(brush)
+        painter.drawRect(r_bar)
+
     def paintEvent(self, a0: QtGui.QPaintEvent) -> None:
         """Paint the slider."""
         # initialize painter and options
@@ -113,21 +122,8 @@ class QRangeSlider(QSlider):
         opt.subControls = QStyle.SC_SliderGroove | QStyle.SC_SliderTickmarks
         painter.drawComplexControl(QStyle.CC_Slider, opt)
 
-        # draw bar
-        r_bar = self._barRect(opt)
-        if self._bar_color_active is not None:  # FIXME
-            if self.palette().currentColorGroup() == QtGui.QPalette.Active:
-                color = self._bar_color_active
-            elif self.palette().currentColorGroup() == QtGui.QPalette.Inactive:
-                color = self._bar_color_inactive
-            else:
-                color = self._bar_color_disabled
-        else:
-            color = self.palette().color(QtGui.QPalette.Highlight)
-        if isinstance(color, QtGui.QGradient):
-            color.setStart(r_bar.topLeft())
-            color.setFinalStop(r_bar.bottomRight())
-        painter.fillRect(r_bar, color)
+        if self._should_draw_bar:
+            self._drawBar(painter, opt)
 
         # draw handles
         opt.subControls = QStyle.SC_SliderHandle
@@ -151,7 +147,7 @@ class QRangeSlider(QSlider):
 
     def event(self, ev: QEvent) -> bool:
         if ev.type() == QEvent.StyleChange:
-            self._traverseStyleSheet()
+            update_styles_from_stylesheet(self)
         if ev.type() in (QEvent.HoverEnter, QEvent.HoverLeave, QEvent.HoverMove):
             old_hover = self._hoverControl
             self._hoverControl = self._getControlAtPos(ev.pos())
@@ -229,7 +225,7 @@ class QRangeSlider(QSlider):
             return
         ev.accept()
         old_pressed = self._pressedControl
-        self._pressedControl = self.NULL_CTRL
+        self._pressedControl = self._NULL_CTRL
         self.setRepeatAction(QSlider.SliderNoAction)
         if old_pressed[0] in ("handle", "bar"):
             self.setSliderDown(False)
@@ -274,21 +270,17 @@ class QRangeSlider(QSlider):
         r_bar = QRectF(r_groove)
         hdl_low, *_, hdl_high = self._handleRects(opt)
 
-        tp = self.tickPosition()
-        if tp & QSlider.TicksAbove:
-            displace = 4
-        elif tp & QSlider.TicksBelow:
-            displace = -4
-        else:
-            displace = 0
+        thickness = self._style.thickness(opt.orientation)
+        tick_offset = self._style.offset(self.tickPosition())
+
         if opt.orientation == Qt.Horizontal:
-            r_bar.setTop(r_bar.center().y() - self._bar_height / 2 + displace)
-            r_bar.setHeight(self._bar_height)
+            r_bar.setTop(r_bar.center().y() - thickness / 2 + tick_offset)
+            r_bar.setHeight(thickness)
             r_bar.setLeft(hdl_low.center().x())
             r_bar.setRight(hdl_high.center().x())
         else:
-            r_bar.setLeft(r_bar.center().x() - self._bar_width / 2 + displace)
-            r_bar.setWidth(self._bar_width)
+            r_bar.setLeft(r_bar.center().x() - thickness / 2 + tick_offset)
+            r_bar.setWidth(thickness)
             r_bar.setBottom(hdl_low.center().y())
             r_bar.setTop(hdl_high.center().y())
 
@@ -296,7 +288,7 @@ class QRangeSlider(QSlider):
 
     def _getControlAtPos(
         self, pos: QPoint, opt: QStyleOptionSlider = None, closest_handle=False
-    ) -> Control:
+    ) -> ControlType:
         """Update self._pressedControl based on ev.pos()."""
         if not opt:
             opt = self._getStyleOption()
@@ -333,7 +325,7 @@ class QRangeSlider(QSlider):
             elif closest_handle:
                 return ("handle", hdl_idx)
 
-        return self.NULL_CTRL
+        return self._NULL_CTRL
 
     def _handle_offset(self, opt: QStyleOptionSlider) -> QPoint:
         # to take half of the slider off for the setSliderPosition call we use the
@@ -454,98 +446,7 @@ class QRangeSlider(QSlider):
     def keyPressEvent(self, ev: QtGui.QKeyEvent) -> None:
         return  # TODO
 
-    def _traverseStyleSheet(self):
-
-        qss = self.styleSheet()
-        p = self
-        while p.parent():
-            qss = p.styleSheet() + qss
-            p = p.parent()
-        qss = QApplication.instance().styleSheet() + qss
-
-        # Find bar color
-        # TODO: optional horizontal or vertical
-        match = re.search(r"Slider::sub-page:?([^{\s]*)?\s*{\s*([^}]+)}", qss, re.S)
-        if match:
-            orientation, content = match.groups()
-            for line in reversed(content.splitlines()):
-                bgrd = re.search(r"background(-color)?:\s*([^;]+)", line)
-                if bgrd:
-                    self._bar_color_active = parse_color(bgrd.groups()[-1])
-                    # TODO: bar color inactive?
-                    # TODO: bar color disabled?
-                    class_name = type(self).__name__
-                    _ss = f"\n{class_name}::sub-page:{orientation}{{background: none}}"
-                    # TODO: block double event
-                    self.setStyleSheet(qss + _ss)
-                    break
-
-        # Find bar height/width
-        for orient, dim in (("horizontal", "height"), ("vertical", "width")):
-            match = re.search(rf"Slider::groove:{orient}\s*{{\s*([^}}]+)}}", qss, re.S)
-            if match:
-                for line in reversed(match.groups()[0].splitlines()):
-                    bgrd = re.search(rf"{dim}\s*:\s*(\d+)", line)
-                    if bgrd:
-                        setattr(self, f"_bar_{dim}", float(bgrd.groups()[-1]))
-
 
 def _bound(min_: int, max_: int, value: int) -> int:
     """Return value bounded by min_ and max_."""
     return max(min_, min(max_, value))
-
-
-# Styles Parsing ##############
-
-qlineargrad_pattern = re.compile(
-    r"""
-    qlineargradient\(
-        x1:\s*(?P<x1>\d*\.?\d+),\s*
-        y1:\s*(?P<y1>\d*\.?\d+),\s*
-        x2:\s*(?P<x2>\d*\.?\d+),\s*
-        y2:\s*(?P<y2>\d*\.?\d+),\s*
-        stop:0\s*(?P<stop0>\S+),.*
-        stop:1\s*(?P<stop1>\S+)
-    \)""",
-    re.X,
-)
-
-qradial_pattern = re.compile(
-    r"""
-    qradialgradient\(
-        cx:\s*(?P<cx>\d*\.?\d+),\s*
-        cy:\s*(?P<cy>\d*\.?\d+),\s*
-        radius:\s*(?P<radius>\d*\.?\d+),\s*
-        fx:\s*(?P<fx>\d*\.?\d+),\s*
-        fy:\s*(?P<fy>\d*\.?\d+),\s*
-        stop:0\s*(?P<stop0>\S+),.*
-        stop:1\s*(?P<stop1>\S+)
-    \)""",
-    re.X,
-)
-
-
-def parse_color(color: str):
-    qc = QtGui.QColor(color)
-    if qc.isValid():
-        return qc
-
-    # try linear gradient:
-    match = qlineargrad_pattern.match(color)
-    if match:
-        grad = QtGui.QLinearGradient(*[float(i) for i in match.groups()[:4]])
-        grad.setColorAt(0, QtGui.QColor(match.groupdict()["stop0"]))
-        grad.setColorAt(1, QtGui.QColor(match.groupdict()["stop1"]))
-        return grad
-
-    # try linear gradient:
-    match = qradial_pattern.match(color)
-    print("match", match.groupdict())
-    if match:
-        grad = QtGui.QRadialGradient(*[float(i) for i in match.groups()[:5]])
-        grad.setColorAt(0, QtGui.QColor(match.groupdict()["stop0"]))
-        grad.setColorAt(1, QtGui.QColor(match.groupdict()["stop1"]))
-        return grad
-
-    # fallback to dark gray
-    return QtGui.QColor("#333")

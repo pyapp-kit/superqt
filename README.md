@@ -111,7 +111,8 @@ These screenshots show `QRangeSlider` (multiple handles) next to the native `QSl
 style of `QSlider` – with or without tick marks.  When styles have been applied
 using [Qt Style Sheets](https://doc.qt.io/qt-5/stylesheet-reference.html), then
 `QRangeSlider` will inherit any styles applied to `QSlider` (since it inherits
-from QSlider).
+from QSlider).  If you'd like to style `QRangeSlider` differently than `QSlider`,
+then you can also target it directly in your style sheet.
 
 > The code for these example widgets is [here](examples/demo_widget.py)
 
