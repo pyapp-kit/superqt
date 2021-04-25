@@ -156,7 +156,7 @@ QRangeSlider {
 ### macOS
 
 ##### Catalina
-![mac](images/demo_darwin.png)
+![mac](images/demo_darwin10.png)
 
 ##### Big Sur
 ![mac](images/demo_darwin11.png)
