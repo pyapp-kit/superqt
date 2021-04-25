@@ -273,13 +273,20 @@ class QRangeSlider(QSlider):
         r_bar = QRectF(r_groove)
         hdl_low, *_, hdl_high = self._handleRects(opt)
 
+        tp = self.tickPosition()
+        if tp & QSlider.TicksAbove:
+            displace = 4
+        elif tp & QSlider.TicksBelow:
+            displace = -4
+        else:
+            displace = 0
         if opt.orientation == Qt.Horizontal:
-            r_bar.setTop(r_bar.center().y() - self._bar_height / 2)
+            r_bar.setTop(r_bar.center().y() - self._bar_height / 2 + displace)
             r_bar.setHeight(self._bar_height)
             r_bar.setLeft(hdl_low.center().x())
             r_bar.setRight(hdl_high.center().x())
         else:
-            r_bar.setLeft(r_bar.center().x() - self._bar_width / 2)
+            r_bar.setLeft(r_bar.center().x() - self._bar_width / 2 + displace)
             r_bar.setWidth(self._bar_width)
             r_bar.setBottom(hdl_low.center().y())
             r_bar.setTop(hdl_high.center().y())

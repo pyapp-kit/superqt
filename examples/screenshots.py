@@ -40,7 +40,8 @@ class DemoWidget(QtW.QWidget):
         range_hslider = QRangeSlider(QtCore.Qt.Horizontal)
         range_hslider.setValue((20, 80))
         multi_range_hslider = QRangeSlider(QtCore.Qt.Horizontal)
-        multi_range_hslider.setValue((10, 40, 60, 90))
+        multi_range_hslider.setValue((11, 33, 66, 88))
+        multi_range_hslider.setTickPosition(QtW.QSlider.TicksAbove)
 
         styled_reg_hslider = QtW.QSlider(QtCore.Qt.Horizontal)
         styled_reg_hslider.setValue(50)
@@ -100,6 +101,7 @@ class DemoWidget(QtW.QWidget):
 
 if __name__ == "__main__":
 
+    import sys
     from pathlib import Path
 
     dest = Path("screenshots")
@@ -107,4 +109,8 @@ if __name__ == "__main__":
 
     app = QtW.QApplication([])
     demo = DemoWidget()
-    demo.grab().save(str(dest / "demo_widget.png"))
+
+    if "-x" in sys.argv:
+        app.exec_()
+    else:
+        demo.grab().save(str(dest / "demo_widget.png"))
