@@ -95,7 +95,6 @@ class DemoWidget(QtW.QWidget):
         self.layout().addWidget(right)
         self.setGeometry(600, 300, 580, 300)
         self.activateWindow()
-        QtW.QApplication.processEvents()
         self.show()
 
 
@@ -113,4 +112,7 @@ if __name__ == "__main__":
     if "-x" in sys.argv:
         app.exec_()
     else:
-        demo.grab().save(str(dest / "demo_widget.png"))
+        import platform
+
+        QtW.QApplication.processEvents()
+        demo.grab().save(str(dest / f"demo_{platform.system().lower()}.png"))

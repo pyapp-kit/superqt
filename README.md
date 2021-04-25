@@ -9,7 +9,7 @@ Version](https://img.shields.io/pypi/pyversions/QtRangeSlider.svg?color=green)](
 
 **The missing multi-handle range slider widget for PyQt & PySide**
 
-![slider](screenshots/slider.png)
+![slider](images/slider.png)
 
 The goal of this package is to provide a Range Slider (a slider with 2 or more
 handles) that feels as "native" as possible.  Styles should match the OS by
@@ -152,17 +152,17 @@ QSlider::sub-page:horizontal {
 
 ### macOS
 
-![mac](screenshots/demo_macos.png)
+![mac](images/demo_macos.png)
 
 ### Window
 
 (coming)
-<!-- ![mac](screenshots/demo_windows.png) -->
+<!-- ![mac](images/demo_windows.png) -->
 
 ### Linux
 
 (coming)
-<!-- ![mac](screenshots/demo_linux.png) -->
+<!-- ![mac](images/demo_linux.png) -->
 
 ## Issues
 

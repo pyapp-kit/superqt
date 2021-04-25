@@ -75,7 +75,7 @@ class RangeSliderStyle:
 CATALINA_STYLE = RangeSliderStyle(
     brush_active="#3B88FD",
     brush_inactive="#8F8F8F",
-    brush_disabled="#BBBBBB",
+    brush_disabled="#D2D2D2",
     horizontal_thickness=3,
     vertical_thickness=3,
     tick_bar_alpha=0.3,
@@ -85,6 +85,8 @@ CATALINA_STYLE = RangeSliderStyle(
 BIG_SUR_STYLE = replace(
     CATALINA_STYLE,
     brush_active="#0A81FE",
+    brush_inactive="#D5D5D5",
+    brush_disabled="#E6E6E6",
     tick_offset=0,
     horizontal_thickness=4,
     vertical_thickness=4,
@@ -181,10 +183,12 @@ def update_styles_from_stylesheet(obj: "QRangeSlider"):
         for line in reversed(content.splitlines()):
             bgrd = re.search(r"background(-color)?:\s*([^;]+)", line)
             if bgrd:
-                obj._style.brush_active = parse_color(bgrd.groups()[-1])
+                color = parse_color(bgrd.groups()[-1])
+                obj._style.brush_active = color
+                # TODO: parse for inactive and disabled
+                obj._style.brush_inactive = color
+                obj._style.brush_disabled = color
                 obj._style.has_stylesheet = True
-                # TODO: bar color inactive?
-                # TODO: bar color disabled?
                 class_name = type(obj).__name__
                 _ss = f"\n{class_name}::sub-page:{orientation}{{background: none}}"
                 # TODO: block double event
