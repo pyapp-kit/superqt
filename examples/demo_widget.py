@@ -9,27 +9,27 @@ QSlider {
 
 QSlider::groove:horizontal {
     border: 0px;
-    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #777, stop:1 #aaa);
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #888, stop:1 #ddd);
     height: 20px;
     border-radius: 10px;
 }
 
 QSlider::handle {
-    background: qradialgradient(cx:0, cy:0, radius: 1.2, fx:0.5,
-                                fy:0.5, stop:0 #eef, stop:1 #000);
+    background: qradialgradient(cx:0, cy:0, radius: 1.2, fx:0.35,
+                                fy:0.3, stop:0 #eef, stop:1 #002);
     height: 20px;
     width: 20px;
     border-radius: 10px;
 }
 
 QSlider::sub-page:horizontal {
-    background: #447;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #227, stop:1 #77a);
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
 }
 
 QRangeSlider {
-    qproperty-barColor: #447;
+    qproperty-barColor: "qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #227, stop:1 #77a)";
 }
 """
 

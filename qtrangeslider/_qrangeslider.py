@@ -202,9 +202,11 @@ class QRangeSlider(QSlider):
         return self._style.brush_active or QtGui.QColor()
 
     def _setBarColor(self, color):
-        self._style.brush_active = color
+        from ._style import parse_color
 
-    barColor = Property(QtGui.QColor, _getBarColor, _setBarColor)
+        self._style.brush_active = parse_color(color)
+
+    barColor = Property(str, _getBarColor, _setBarColor)
 
     def _drawBar(self, painter: QStylePainter, opt: QStyleOptionSlider):
 
