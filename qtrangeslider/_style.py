@@ -3,6 +3,7 @@ import re
 from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, Union
 
+from .qtcompat import PYQT_VERSION
 from .qtcompat.QtCore import Qt
 from .qtcompat.QtGui import (
     QColor,
@@ -77,9 +78,9 @@ class RangeSliderStyle:
                 off += self.h_offset or SYSTEM_STYLE.h_offset or 0
             else:
                 off += self.v_offset or SYSTEM_STYLE.v_offset or 0
-            if tp & QSlider.TicksAbove:
+            if tp == QSlider.TicksAbove:
                 off += self.tick_offset or SYSTEM_STYLE.tick_offset
-            elif tp & QSlider.TicksBelow:
+            elif tp == QSlider.TicksBelow:
                 off -= self.tick_offset or SYSTEM_STYLE.tick_offset
         return off
 
@@ -119,6 +120,9 @@ CATALINA_STYLE = replace(
     tick_offset=4,
 )
 
+if PYQT_VERSION and int(PYQT_VERSION.split(".")[0]) == 6:
+    CATALINA_STYLE = replace(CATALINA_STYLE, tick_offset=2)
+
 BIG_SUR_STYLE = replace(
     CATALINA_STYLE,
     brush_active="#0A81FE",
@@ -130,6 +134,9 @@ BIG_SUR_STYLE = replace(
     h_offset=-2,
     tick_bar_alpha=0.2,
 )
+
+if PYQT_VERSION and int(PYQT_VERSION.split(".")[0]) == 6:
+    BIG_SUR_STYLE = replace(BIG_SUR_STYLE, tick_offset=-3)
 
 WINDOWS_STYLE = replace(
     BASE_STYLE,
