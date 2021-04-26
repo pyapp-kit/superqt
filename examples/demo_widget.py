@@ -106,8 +106,6 @@ if __name__ == "__main__":
     import sys
     from pathlib import Path
 
-    QtW.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
-
     dest = Path("screenshots")
     dest.mkdir(exist_ok=True)
 
