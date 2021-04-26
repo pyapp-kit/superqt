@@ -195,6 +195,16 @@ class QRangeSlider(QSlider):
                 offset = self.minimum() - ref[0]
         self.setSliderPosition([i + offset for i in ref])
 
+    def _spreadAllPositions(self, shrink=False, gain=1.2, ref=None) -> None:
+        if ref is None:
+            ref = self._position
+        # if self._bar_is_rigid:  # TODO
+
+        if shrink:
+            gain = 1 / gain
+        center = abs(ref[-1] + ref[0]) / 2
+        self.setSliderPosition([((i - center) * gain) + center for i in ref])
+
     def _getStyleOption(self) -> QStyleOptionSlider:
         opt = QStyleOptionSlider()
         self.initStyleOption(opt)
@@ -533,7 +543,11 @@ class QRangeSlider(QSlider):
 
         _prev_value = self.value()
 
-        self._offsetAllPositions(steps_to_scroll)
+        if modifiers & Qt.AltModifier:
+
+            self._spreadAllPositions(shrink=steps_to_scroll < 0)
+        else:
+            self._offsetAllPositions(steps_to_scroll)
         self.triggerAction(QSlider.SliderMove)
 
         if _prev_value == self.value():
