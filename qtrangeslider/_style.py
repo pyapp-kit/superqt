@@ -43,15 +43,17 @@ class RangeSliderStyle:
         }[cg]
         val = getattr(self, attr) or getattr(SYSTEM_STYLE, attr)
         if isinstance(val, str):
-            val = QColor(val)
+            _val = QColor(val)
+            if not _val.isValid():
+                _val = parse_color(val)
 
-        if not val:
+        if not _val:
             return Qt.NoBrush
 
         if opt.tickPosition != QSlider.NoTicks:
-            val.setAlphaF(self.tick_bar_alpha or SYSTEM_STYLE.tick_bar_alpha)
+            _val.setAlphaF(self.tick_bar_alpha or SYSTEM_STYLE.tick_bar_alpha)
 
-        return val
+        return _val
 
     def pen(self, opt: QStyleOptionSlider) -> Union[Qt.PenStyle, QColor]:
         cg = opt.palette.currentColorGroup()
@@ -209,7 +211,7 @@ rgba_pattern = re.compile(
 )
 
 
-def parse_color(color: str) -> Union[str, QGradient]:
+def parse_color(color: str) -> Union[QColor, QGradient]:
     qc = QColor(color)
     if qc.isValid():
         return qc
@@ -236,7 +238,7 @@ def parse_color(color: str) -> Union[str, QGradient]:
         return grad
 
     # fallback to dark gray
-    return "#333"
+    return QColor("#333")
 
 
 def update_styles_from_stylesheet(obj: "QRangeSlider"):
