@@ -125,7 +125,8 @@ class QRangeSlider(QSlider):
             )
 
         for i, v in enumerate(val):
-            self._setSliderPositionAt(i, v, _update=i == len(val) - 1)
+            self._setSliderPositionAt(i, v, _update=False)
+        self._updateSliderMove()
 
     def barIsRigid(self) -> bool:
         """Whether bar length is constant when dragging the bar.
@@ -173,23 +174,26 @@ class QRangeSlider(QSlider):
             return
         self._position[index] = pos
         if _update:
-            if not self.hasTracking():
-                self.update()
-            if self.isSliderDown():
-                self.sliderMoved.emit(tuple(self._position))
-            if self.hasTracking():
-                self.triggerAction(QSlider.SliderMove)
+            self._updateSliderMove()
+
+    def _updateSliderMove(self):
+        if not self.hasTracking():
+            self.update()
+        if self.isSliderDown():
+            self.sliderMoved.emit(tuple(self._position))
+        if self.hasTracking():
+            self.triggerAction(QSlider.SliderMove)
 
     def _offsetAllPositions(self, offset: int, ref=None) -> None:
         if ref is None:
             ref = self._position
-        _new = [i - offset for i in ref]
         if self._bar_is_rigid:
-            # FIXME: if there is an overflow ... it should still hit the edge.
-            if all(self.minimum() <= i <= self.maximum() for i in _new):
-                self.setSliderPosition(_new)
-        else:
-            self.setSliderPosition(_new)
+            # NOTE: This assumes monotonically increasing slider positions
+            if offset > 0 and ref[-1] + offset > self.maximum():
+                offset = self.maximum() - ref[-1]
+            elif ref[0] + offset < self.minimum():
+                offset = self.minimum() - ref[0]
+        self.setSliderPosition([i + offset for i in ref])
 
     def _getStyleOption(self) -> QStyleOptionSlider:
         opt = QStyleOptionSlider()
@@ -309,8 +313,9 @@ class QRangeSlider(QSlider):
             self._setSliderPositionAt(self._pressedControl[1], new)
         elif self._pressedControl[0] == "bar":
             ev.accept()
+
             delta = self._clickOffset - self._pixelPosToRangeValue(self._pick(ev.pos()))
-            self._offsetAllPositions(delta, self._sldPosAtPress)
+            self._offsetAllPositions(-delta, self._sldPosAtPress)
         else:
             ev.ignore()
             return
@@ -528,7 +533,7 @@ class QRangeSlider(QSlider):
 
         _prev_value = self.value()
 
-        self._offsetAllPositions(-steps_to_scroll)
+        self._offsetAllPositions(steps_to_scroll)
         self.triggerAction(QSlider.SliderMove)
 
         if _prev_value == self.value():
