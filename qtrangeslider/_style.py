@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Union
 from .qtcompat import PYQT_VERSION
 from .qtcompat.QtCore import Qt
 from .qtcompat.QtGui import (
+    QBrush,
     QColor,
     QGradient,
     QLinearGradient,
@@ -34,26 +35,28 @@ class RangeSliderStyle:
     h_offset: float = None
     has_stylesheet: bool = False
 
-    def brush(self, opt: QStyleOptionSlider) -> Union[QGradient, QColor]:
+    def brush(self, opt: QStyleOptionSlider) -> QBrush:
         cg = opt.palette.currentColorGroup()
         attr = {
             QPalette.Active: "brush_active",  # 0
             QPalette.Disabled: "brush_disabled",  # 1
             QPalette.Inactive: "brush_inactive",  # 2
         }[cg]
-        val = getattr(self, attr) or getattr(SYSTEM_STYLE, attr)
-        if isinstance(val, str):
-            _val = QColor(val)
-            if not _val.isValid():
-                _val = parse_color(val)
-
-        if not _val:
+        _val = getattr(self, attr) or getattr(SYSTEM_STYLE, attr)
+        if _val is None:
             return Qt.NoBrush
 
-        if opt.tickPosition != QSlider.NoTicks:
-            _val.setAlphaF(self.tick_bar_alpha or SYSTEM_STYLE.tick_bar_alpha)
+        if isinstance(_val, str):
+            val = QColor(_val)
+            if not val.isValid():
+                val = parse_color(_val, default_attr=attr)
+        else:
+            val = _val
 
-        return _val
+        if opt.tickPosition != QSlider.NoTicks:
+            val.setAlphaF(self.tick_bar_alpha or SYSTEM_STYLE.tick_bar_alpha)
+
+        return QBrush(val)
 
     def pen(self, opt: QStyleOptionSlider) -> Union[Qt.PenStyle, QColor]:
         cg = opt.palette.currentColorGroup()
@@ -211,7 +214,7 @@ rgba_pattern = re.compile(
 )
 
 
-def parse_color(color: str) -> Union[QColor, QGradient]:
+def parse_color(color: str, default_attr) -> Union[QColor, QGradient]:
     qc = QColor(color)
     if qc.isValid():
         return qc
@@ -238,7 +241,7 @@ def parse_color(color: str) -> Union[QColor, QGradient]:
         return grad
 
     # fallback to dark gray
-    return QColor("#333")
+    return QColor(getattr(SYSTEM_STYLE, default_attr))
 
 
 def update_styles_from_stylesheet(obj: "QRangeSlider"):

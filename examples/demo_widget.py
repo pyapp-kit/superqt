@@ -29,7 +29,7 @@ QSlider::sub-page:horizontal {
 }
 
 QRangeSlider {
-    qproperty-barColor: "qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #227, stop:1 #77a)";
+    qproperty-barColor: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #227, stop:1 #77a);
 }
 """
 
