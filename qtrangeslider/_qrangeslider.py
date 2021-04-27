@@ -72,6 +72,7 @@ class QRangeSlider(QSlider):
         # color
         self._style = RangeSliderStyle()
         self.setStyleSheet("")
+        update_styles_from_stylesheet(self)
 
     # ###############  Public API  #######################
 

@@ -42,9 +42,21 @@ class RangeSliderStyle:
             QPalette.Disabled: "brush_disabled",  # 1
             QPalette.Inactive: "brush_inactive",  # 2
         }[cg]
-        _val = getattr(self, attr) or getattr(SYSTEM_STYLE, attr)
+        _val = getattr(self, attr)
+        if not _val:
+            if self.has_stylesheet:
+                # if someone set a general style sheet but didn't specify
+                # :active, :inactive, etc... then Qt just uses whatever they
+                # DID specify
+                for i in ("active", "inactive", "disabled"):
+                    _val = getattr(self, f"brush_{i}")
+                    if _val:
+                        break
+            else:
+                _val = getattr(SYSTEM_STYLE, attr)
+
         if _val is None:
-            return Qt.NoBrush
+            return QBrush()
 
         if isinstance(_val, str):
             val = QColor(_val)
@@ -252,25 +264,8 @@ def update_styles_from_stylesheet(obj: "QRangeSlider"):
         qss = parent.styleSheet() + qss
         parent = parent.parent()
     qss = QApplication.instance().styleSheet() + qss
-
-    # obj._style.has_stylesheet = False
-
-    # # Find bar color
-    # # TODO: optional horizontal or vertical
-    # match = re.search(r"Slider::sub-page:?([^{\s]*)?\s*{\s*([^}]+)}", qss, re.S)
-    # if match:
-    #     orientation, content = match.groups()
-    #     for line in reversed(content.splitlines()):
-    #         bgrd = re.search(r"background(-color)?:\s*([^;]+)", line)
-    #         if bgrd:
-    #             color = parse_color(bgrd.groups()[-1])
-    #             obj._style.brush_active = color
-    #             # TODO: parse for inactive and disabled
-    #             obj._style.brush_inactive = color
-    #             obj._style.brush_disabled = color
-    #             obj._style.has_stylesheet = True
-    #             obj.update()
-    #             break
+    if not qss:
+        return
 
     # Find bar height/width
     for orient, dim in (("horizontal", "height"), ("vertical", "width")):
