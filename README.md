@@ -106,14 +106,14 @@ sliderMoved(Tuple[int, ...])
 
 These options are in addition to the Qt QSlider API, and control the behavior of the bar between handles.
 
-| getter        | setter          | type     | default  | description |
-| ------------- | -------------   |--------- | -------- | --------- |
-| `barIsVisible`  | `setBarIsVisible` <br>`hideBar` / `showBar` | `bool`   |  `True`  | <small>Whether the bar between handles is visible.</small> |
-| `barMovesAllHandles`  | `setBarMovesAllHandles` | `bool`   |  `True`  | <small>Whether clicking on the bar moves all handles or just the nearest</small> |
-| `barIsRigid`  | `setBarIsRigid` | `bool`   |  `True`  | <small>Whether bar length is constant or "elastic" when dragging the bar beyond min/max.</small> |
+| getter               | setter                                      | type   | default | description                                                                                      |
+| -------------------- | ------------------------------------------- | ------ | ------- | ------------------------------------------------------------------------------------------------ |
+| `barIsVisible`       | `setBarIsVisible` <br>`hideBar` / `showBar` | `bool` | `True`  | <small>Whether the bar between handles is visible.</small>                                       |
+| `barMovesAllHandles` | `setBarMovesAllHandles`                     | `bool` | `True`  | <small>Whether clicking on the bar moves all handles or just the nearest</small>                 |
+| `barIsRigid`         | `setBarIsRigid`                             | `bool` | `True`  | <small>Whether bar length is constant or "elastic" when dragging the bar beyond min/max.</small> |
 ------
 
-## Example
+## Examples
 
 These screenshots show `QRangeSlider` (multiple handles) next to the native `QSlider`
 (single handle). With no styles applied, `QRangeSlider` will match the native OS
@@ -178,18 +178,81 @@ QRangeSlider {
 ### macOS
 
 ##### Catalina
-![mac](images/demo_darwin10.png)
+![mac10](images/demo_darwin10.png)
 
 ##### Big Sur
-![mac](images/demo_darwin11.png)
+![mac11](images/demo_darwin11.png)
 
 ### Windows
 
-![mac](images/demo_windows.png)
+![window](images/demo_windows.png)
 
 ### Linux
 
-![mac](images/demo_linux.png)
+![linux](images/demo_linux.png)
+
+
+## Labeled Sliders
+
+This package also includes two "labeled" slider variants. One for `QRangeSlider`, and one for the native `QSlider`:
+
+### `QLabeledRangeSlider`
+
+![labeled_range](images/labeled_range.png)
+
+```python
+from qtrangeslider import QLabeledRangeSlider
+```
+
+This has the same API as `QRangeSlider` with the following additional options:
+
+#### `handleLabelPosition`/`setHandleLabelPosition`
+
+Where/whether labels are shown adjacent to slider handles.
+
+**type:** `QLabeledRangeSlider.LabelPosition`
+
+**default:** `LabelPosition.LabelsAbove`
+
+*options:*
+
+- `LabelPosition.NoLabel` (no labels shown adjacent to handles)
+- `LabelPosition.LabelsAbove`
+- `LabelPosition.LabelsBelow`
+- `LabelPosition.LabelsRight` (alias for `LabelPosition.LabelsAbove`)
+- `LabelPosition.LabelsLeft` (alias for `LabelPosition.LabelsBelow`)
+
+
+#### `edgeLabelMode`/`setEdgeLabelMode`
+
+**type:** `QLabeledRangeSlider.EdgeLabelMode`
+
+**default:** `EdgeLabelMode.LabelsAbove`
+
+*options:*
+
+- `EdgeLabelMode.NoLabel`: no labels shown at slider extremes
+- `EdgeLabelMode.LabelIsRange`: edge labels shown the min/max values
+- `EdgeLabelMode.LabelIsValue`: edge labels shown the slider range
+
+
+#### fine tuning position of labels:
+
+If you find that you need to fine tune the position of the handle labels:
+
+- `QLabeledRangeSlider.label_shift_x`: adjust horizontal label position
+- `QLabeledRangeSlider.label_shift_y`: adjust vertical label position
+
+### `QLabeledSlider`
+
+
+![labeled_range](images/labeled_qslider.png)
+
+```python
+from qtrangeslider import QLabeledSlider
+```
+
+(no additional options at this point)
 
 ## Issues
 

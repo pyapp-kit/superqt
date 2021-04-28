@@ -22,7 +22,7 @@ elif PYQT6:
 
     # backwards compat with PyQt5
     # namespace moves:
-    for cls in (QStyle, QSlider, QSizePolicy):
+    for cls in (QStyle, QSlider, QSizePolicy, QSpinBox):
         for attr in dir(cls):
             if not attr[0].isupper():
                 continue
