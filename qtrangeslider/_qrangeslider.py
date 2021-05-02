@@ -2,6 +2,7 @@ import textwrap
 from collections import abc
 from typing import List, Sequence, Tuple
 
+from ._hooked import _HookedSlider
 from ._style import RangeSliderStyle, update_styles_from_stylesheet
 from .qtcompat import QtGui
 from .qtcompat.QtCore import (
@@ -25,7 +26,7 @@ from .qtcompat.QtWidgets import (
 ControlType = Tuple[str, int]
 
 
-class QRangeSlider(QSlider):
+class QRangeSlider(_HookedSlider, QSlider):
     """MultiHandle Range Slider widget.
 
     Same API as QSlider, but `value`, `setValue`, `sliderPosition`, and
@@ -93,12 +94,11 @@ class QRangeSlider(QSlider):
 
         The number of handles will be equal to the length of the sequence
         """
-        if not isinstance(val, abc.Sequence) and len(val) >= 2:
+        if not (isinstance(val, abc.Sequence) and len(val) >= 2):
             raise ValueError("value must be iterable of len >= 2")
         val = [self._min_max_bound(v) for v in val]
         if self._value == val and self._position == val:
             return
-
         self._value[:] = val[:]
         if self._position != val:
             self._position = val
@@ -106,7 +106,7 @@ class QRangeSlider(QSlider):
                 self.sliderMoved.emit(tuple(self._position))
 
         self.sliderChange(QSlider.SliderValueChange)
-        self.valueChanged.emit(tuple(self._value))
+        self.valueChanged.emit(self.value())
 
     def sliderPosition(self) -> Tuple[int, ...]:
         """Get current value of the widget as a tuple of integers.
@@ -173,6 +173,7 @@ class QRangeSlider(QSlider):
         pos = self._neighbor_bound(pos, index, self._position)
         if pos == self._position[index]:
             return
+
         self._position[index] = pos
         if _update:
             self._updateSliderMove()
@@ -256,7 +257,8 @@ class QRangeSlider(QSlider):
         elif self._hoverControl[0] == "handle":
             hidx = self._hoverControl[1]
         for idx, pos in enumerate(self._position):
-            opt.sliderPosition = pos
+            opt.sliderPosition = self._pre_set_hook(pos)
+
             if idx == pidx:  # make pressed handles appear sunken
                 opt.state |= QStyle.State_Sunken
             else:
@@ -361,14 +363,14 @@ class QRangeSlider(QSlider):
         style = self.style().proxy()
 
         if handle_index is not None:  # get specific handle rect
-            opt.sliderPosition = self._position[handle_index]
+            opt.sliderPosition = self._pre_set_hook(self._position[handle_index])
             return style.subControlRect(
                 QStyle.CC_Slider, opt, QStyle.SC_SliderHandle, self
             )
         else:
             rects = []
             for p in self._position:
-                opt.sliderPosition = p
+                opt.sliderPosition = self._pre_set_hook(p)
                 r = style.subControlRect(
                     QStyle.CC_Slider, opt, QStyle.SC_SliderHandle, self
                 )
@@ -454,7 +456,6 @@ class QRangeSlider(QSlider):
     def _pixelPosToRangeValue(self, pos: int, opt: QStyleOptionSlider = None) -> int:
         if not opt:
             opt = self._getStyleOption()
-
         groove_rect = self._grooveRect(opt)
         handle_rect = self._handleRects(opt, 0)
         if self.orientation() == Qt.Horizontal:
@@ -465,13 +466,14 @@ class QRangeSlider(QSlider):
             sliderLength = handle_rect.height()
             sliderMin = groove_rect.y()
             sliderMax = groove_rect.bottom() - sliderLength + 1
-        return QStyle.sliderValueFromPosition(
-            self.minimum(),
-            self.maximum(),
+        v = QStyle.sliderValueFromPosition(
+            opt.minimum,
+            opt.maximum,
             pos - sliderMin,
             sliderMax - sliderMin,
             opt.upsideDown,
         )
+        return self._post_get_hook(v)
 
     def _pick(self, pt: QPoint) -> int:
         return pt.x() if self.orientation() == Qt.Horizontal else pt.y()
@@ -550,10 +552,9 @@ class QRangeSlider(QSlider):
         _prev_value = self.value()
 
         if modifiers & Qt.AltModifier:
-
             self._spreadAllPositions(shrink=steps_to_scroll < 0)
         else:
-            self._offsetAllPositions(steps_to_scroll)
+            self._offsetAllPositions(self._post_get_hook(steps_to_scroll))
         self.triggerAction(QSlider.SliderMove)
 
         if _prev_value == self.value():
