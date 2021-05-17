@@ -46,8 +46,8 @@ class QRangeSlider(_HookedSlider, QSlider):
 
     _NULL_CTRL = ("None", -1)
 
-    def __init__(self, *args):
-        super().__init__(*args)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         # list of values
         self._value: List[int] = [20, 80]

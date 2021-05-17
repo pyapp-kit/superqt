@@ -13,8 +13,8 @@ class QDoubleSlider(_HookedSlider):
     sliderMoved = Signal(float)
     _multiplier = 1
 
-    def __init__(self, *args):
-        super().__init__(*args)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self._multiplier = 10 ** 2
         self.setMinimum(0)
         self.setMaximum(99)

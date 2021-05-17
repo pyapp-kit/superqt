@@ -70,20 +70,37 @@ class SliderProxy:
         self._slider.setRange(min, max)
 
 
+def _handle_overloaded_slider_sig(args, kwargs):
+    parent = None
+    orientation = Qt.Vertical
+    errmsg = (
+        "TypeError: arguments did not match any overloaded call:\n"
+        "  QSlider(parent: QWidget = None)\n"
+        "  QSlider(Qt.Orientation, parent: QWidget = None)"
+    )
+    if len(args) > 2:
+        raise TypeError(errmsg)
+    elif len(args) == 2:
+        if kwargs:
+            raise TypeError(errmsg)
+        orientation, parent = args
+    elif args:
+        if isinstance(args[0], QWidget):
+            if kwargs:
+                raise TypeError(errmsg)
+            parent = args[0]
+        else:
+            orientation = args[0]
+    parent = kwargs.get("parent", parent)
+    return parent, orientation
+
+
 class QLabeledSlider(SliderProxy, QAbstractSlider):
     _slider_class = QSlider
     _slider: QSlider
 
-    def __init__(self, *args) -> None:
-        parent = None
-        orientation = Qt.Horizontal
-        if len(args) == 2:
-            orientation, parent = args
-        elif args:
-            if isinstance(args[0], QWidget):
-                parent = args[0]
-            else:
-                orientation = args[0]
+    def __init__(self, *args, **kwargs) -> None:
+        parent, orientation = _handle_overloaded_slider_sig(args, kwargs)
 
         super().__init__(parent)
 
@@ -129,8 +146,8 @@ class QLabeledDoubleSlider(QLabeledSlider):
     valueChanged = Signal(float)
     rangeChanged = Signal(float, float)
 
-    def __init__(self, *args) -> None:
-        super().__init__(*args)
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
         self.setDecimals(2)
 
     def decimals(self) -> int:
@@ -148,17 +165,8 @@ class QLabeledRangeSlider(SliderProxy, QAbstractSlider):
     _slider_class = QRangeSlider
     _slider: QRangeSlider
 
-    def __init__(self, *args) -> None:
-        parent = None
-        orientation = Qt.Horizontal
-        if len(args) == 2:
-            orientation, parent = args
-        elif args:
-            if isinstance(args[0], QWidget):
-                parent = args[0]
-            else:
-                orientation = args[0]
-
+    def __init__(self, *args, **kwargs) -> None:
+        parent, orientation = _handle_overloaded_slider_sig(args, kwargs)
         super().__init__(parent)
         self.setAttribute(Qt.WA_ShowWithoutActivating)
         self._handle_labels = []
@@ -354,8 +362,8 @@ class QLabeledDoubleRangeSlider(QLabeledRangeSlider):
     _slider: QDoubleRangeSlider
     rangeChanged = Signal(float, float)
 
-    def __init__(self, *args) -> None:
-        super().__init__(*args)
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
         self.setDecimals(2)
 
     def decimals(self) -> int:
