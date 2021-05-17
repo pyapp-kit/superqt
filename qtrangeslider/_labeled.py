@@ -105,15 +105,12 @@ class QLabeledSlider(SliderProxy, QAbstractSlider):
         super().__init__(parent)
 
         self._slider = self._slider_class()
-        self._slider.valueChanged.connect(self.valueChanged.emit)
+        self._label = SliderLabel(self._slider, connect=self._slider.setValue)
+
         self._slider.rangeChanged.connect(self.rangeChanged.emit)
-        self._label = SliderLabel(self._slider, connect=self.setValue)
+        self._slider.valueChanged.connect(self.valueChanged.emit)
+        self._slider.valueChanged.connect(self._label.setValue)
 
-        self.valueChanged.connect(self._label.setValue)
-        self.valueChanged.connect(self._slider.setValue)
-        self.rangeChanged.connect(self._slider.setRange)
-
-        self._slider.valueChanged.connect(self.setValue)
         self.setOrientation(orientation)
 
     def setOrientation(self, orientation):
@@ -130,7 +127,7 @@ class QLabeledSlider(SliderProxy, QAbstractSlider):
             layout.addWidget(self._slider)
             layout.addWidget(self._label)
             self._label.setAlignment(Qt.AlignRight)
-            layout.setSpacing(10)
+            layout.setSpacing(6)
 
         old_layout = self.layout()
         if old_layout is not None:
@@ -409,15 +406,14 @@ class SliderLabel(QDoubleSpinBox):
 
         if self._mode == EdgeLabelMode.LabelIsValue:
             # determine width based on min/max/specialValue
-            s = self.textFromValue(self.minimum())[:18] + fixed_content
-            w = max(0, fm.horizontalAdvance(s))
-            s = self.textFromValue(self.maximum())[:18] + fixed_content
-            w = max(w, fm.horizontalAdvance(s))
+            mintext = self.textFromValue(self.minimum())[:18] + fixed_content
+            maxtext = self.textFromValue(self.maximum())[:18] + fixed_content
+            w = max(0, _fm_width(fm, mintext))
+            w = max(w, _fm_width(fm, maxtext))
             if self.specialValueText():
-                w = max(w, fm.horizontalAdvance(self.specialValueText()))
+                w = max(w, _fm_width(fm, self.specialValueText()))
         else:
-            s = self.textFromValue(self.value())
-            w = max(0, fm.horizontalAdvance(s)) + 3
+            w = max(0, _fm_width(fm, self.textFromValue(self.value()))) + 3
 
         w += 3  # cursor blinking space
         # get the final size hint
@@ -463,3 +459,9 @@ class SliderLabel(QDoubleSpinBox):
         if "." in input and self.decimals() < 1:
             return QValidator.Invalid, input, len(input)
         return super().validate(input, pos)
+
+
+def _fm_width(fm, text):
+    if hasattr(fm, "horizontalAdvance"):
+        return fm.horizontalAdvance(text)
+    return fm.width(text)
