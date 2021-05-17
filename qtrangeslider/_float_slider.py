@@ -63,7 +63,7 @@ class QDoubleSlider(_HookedSlider):
         return self.value() * p
 
     def _post_get_hook(self, value: int) -> float:
-        return value / self._multiplier
+        return float(value / self._multiplier)
 
     def _pre_set_hook(self, value: float) -> int:
         return int(value * self._multiplier)

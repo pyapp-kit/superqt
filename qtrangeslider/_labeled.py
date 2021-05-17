@@ -235,6 +235,7 @@ class QLabeledRangeSlider(SliderProxy, QAbstractSlider):
         horizontal = self.orientation() == Qt.Horizontal
         labels_above = self._handle_label_position == LabelPosition.LabelsAbove
 
+        last_edge = None
         for label, rect in zip(self._handle_labels, self._slider._handleRects()):
             dx = -label.width() / 2
             dy = -label.height() / 2
@@ -250,7 +251,14 @@ class QLabeledRangeSlider(SliderProxy, QAbstractSlider):
                     dx *= 3
             pos = self._slider.mapToParent(rect.center())
             pos += QPoint(int(dx + self.label_shift_x), int(dy + self.label_shift_y))
+            if last_edge is not None:
+                # prevent label overlap
+                if horizontal:
+                    pos.setX(int(max(pos.x(), last_edge.x() + label.width() / 2 + 12)))
+                else:
+                    pos.setY(int(min(pos.y(), last_edge.y() - label.height() / 2 - 4)))
             label.move(pos)
+            last_edge = pos
             label.clearFocus()
 
     def _min_label_edited(self, val):
