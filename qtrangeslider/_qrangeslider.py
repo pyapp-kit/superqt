@@ -501,9 +501,7 @@ class QRangeSlider(_HookedSlider, QSlider):
         if self._scrollByDelta(orientation, e.modifiers(), delta):
             e.accept()
 
-    def _scrollByDelta(
-        self, orientation, modifiers: Qt.KeyboardModifiers, delta: int
-    ) -> bool:
+    def _scrollByDelta(self, orientation, modifiers, delta: int) -> bool:
         steps_to_scroll = 0
         pg_step = self.pageStep()
 
