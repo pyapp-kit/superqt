@@ -227,7 +227,7 @@ Where/whether labels are shown adjacent to slider handles.
 
 **type:** `QLabeledRangeSlider.EdgeLabelMode`
 
-**default:** `EdgeLabelMode.LabelsAbove`
+**default:** `EdgeLabelMode.LabelIsRange`
 
 *options:*
 
