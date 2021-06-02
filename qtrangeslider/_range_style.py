@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import platform
 import re
 from dataclasses import dataclass, replace
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
 from .qtcompat import PYQT_VERSION
 from .qtcompat.QtCore import Qt
@@ -16,23 +18,23 @@ from .qtcompat.QtGui import (
 from .qtcompat.QtWidgets import QApplication, QSlider, QStyleOptionSlider
 
 if TYPE_CHECKING:
-    from ._qrangeslider import QRangeSlider
+    from ._generic_range_slider import _GenericRangeSlider
 
 
 @dataclass
 class RangeSliderStyle:
-    brush_active: str = None
-    brush_inactive: str = None
-    brush_disabled: str = None
-    pen_active: str = None
-    pen_inactive: str = None
-    pen_disabled: str = None
-    vertical_thickness: float = None
-    horizontal_thickness: float = None
-    tick_offset: float = None
-    tick_bar_alpha: float = None
-    v_offset: float = None
-    h_offset: float = None
+    brush_active: str | None = None
+    brush_inactive: str | None = None
+    brush_disabled: str | None = None
+    pen_active: str | None = None
+    pen_inactive: str | None = None
+    pen_disabled: str | None = None
+    vertical_thickness: float | None = None
+    horizontal_thickness: float | None = None
+    tick_offset: float | None = None
+    tick_bar_alpha: float | None = None
+    v_offset: float | None = None
+    h_offset: float | None = None
     has_stylesheet: bool = False
 
     def brush(self, opt: QStyleOptionSlider) -> QBrush:
@@ -70,7 +72,7 @@ class RangeSliderStyle:
 
         return QBrush(val)
 
-    def pen(self, opt: QStyleOptionSlider) -> Union[Qt.PenStyle, QColor]:
+    def pen(self, opt: QStyleOptionSlider) -> Qt.PenStyle | QColor:
         cg = opt.palette.currentColorGroup()
         attr = {
             QPalette.Active: "pen_active",  # 0
@@ -226,7 +228,7 @@ rgba_pattern = re.compile(
 )
 
 
-def parse_color(color: str, default_attr) -> Union[QColor, QGradient]:
+def parse_color(color: str, default_attr) -> QColor | QGradient:
     qc = QColor(color)
     if qc.isValid():
         return qc
@@ -256,7 +258,7 @@ def parse_color(color: str, default_attr) -> Union[QColor, QGradient]:
     return QColor(getattr(SYSTEM_STYLE, default_attr))
 
 
-def update_styles_from_stylesheet(obj: "QRangeSlider"):
+def update_styles_from_stylesheet(obj: _GenericRangeSlider):
     qss = obj.styleSheet()
 
     parent = obj.parent()

@@ -1,8 +1,7 @@
 from enum import IntEnum
 from functools import partial
 
-from ._float_slider import QDoubleRangeSlider, QDoubleSlider
-from ._qrangeslider import QRangeSlider
+from ._sliders import QDoubleRangeSlider, QDoubleSlider, QRangeSlider
 from .qtcompat.QtCore import QPoint, QSize, Qt, Signal
 from .qtcompat.QtGui import QFontMetrics, QValidator
 from .qtcompat.QtWidgets import (
@@ -34,13 +33,19 @@ class EdgeLabelMode(IntEnum):
 
 
 class SliderProxy:
-    _slider: QAbstractSlider
+    _slider: QSlider
 
     def value(self):
         return self._slider.value()
 
     def setValue(self, value) -> None:
         self._slider.setValue(value)
+
+    def sliderPosition(self):
+        return self._slider.sliderPosition()
+
+    def setSliderPosition(self, pos) -> None:
+        self._slider.setSliderPosition(pos)
 
     def minimum(self):
         return self._slider.minimum()
@@ -68,6 +73,18 @@ class SliderProxy:
 
     def setRange(self, min, max) -> None:
         self._slider.setRange(min, max)
+
+    def tickInterval(self):
+        return self._slider.tickInterval()
+
+    def setTickInterval(self, interval) -> None:
+        self._slider.setTickInterval(interval)
+
+    def tickPosition(self):
+        return self._slider.tickPosition()
+
+    def setTickPosition(self, pos) -> None:
+        self._slider.setTickPosition(pos)
 
 
 def _handle_overloaded_slider_sig(args, kwargs):
@@ -148,10 +165,9 @@ class QLabeledDoubleSlider(QLabeledSlider):
         self.setDecimals(2)
 
     def decimals(self) -> int:
-        return self._slider.decimals()
+        return self._label.decimals()
 
     def setDecimals(self, prec: int):
-        self._slider.setDecimals(prec)
         self._label.setDecimals(prec)
 
 
@@ -236,7 +252,8 @@ class QLabeledRangeSlider(SliderProxy, QAbstractSlider):
         labels_above = self._handle_label_position == LabelPosition.LabelsAbove
 
         last_edge = None
-        for label, rect in zip(self._handle_labels, self._slider._handleRects()):
+        for i, label in enumerate(self._handle_labels):
+            rect = self._slider._handleRect(i)
             dx = -label.width() / 2
             dy = -label.height() / 2
             if labels_above:
@@ -260,6 +277,7 @@ class QLabeledRangeSlider(SliderProxy, QAbstractSlider):
             label.move(pos)
             last_edge = pos
             label.clearFocus()
+        self.update()
 
     def _min_label_edited(self, val):
         if self._edge_label_mode == EdgeLabelMode.LabelIsRange:
@@ -290,7 +308,7 @@ class QLabeledRangeSlider(SliderProxy, QAbstractSlider):
                 lbl.deleteLater()
             self._handle_labels.clear()
             for n, val in enumerate(self._slider.value()):
-                _cb = partial(self._slider._setSliderPositionAt, n)
+                _cb = partial(self._slider.setSliderPosition, index=n)
                 s = SliderLabel(self._slider, parent=self, connect=_cb)
                 s.setValue(val)
                 self._handle_labels.append(s)
@@ -300,7 +318,8 @@ class QLabeledRangeSlider(SliderProxy, QAbstractSlider):
         self._reposition_labels()
 
     def _on_range_changed(self, min, max):
-        self._slider.setRange(min, max)
+        if (min, max) != (self._slider.minimum(), self._slider.maximum()):
+            self._slider.setRange(min, max)
         for lbl in self._handle_labels:
             lbl.setRange(min, max)
         if self._edge_label_mode == EdgeLabelMode.LabelIsRange:
@@ -372,10 +391,9 @@ class QLabeledDoubleRangeSlider(QLabeledRangeSlider):
         self.setDecimals(2)
 
     def decimals(self) -> int:
-        return self._slider.decimals()
+        return self._min_label.decimals()
 
     def setDecimals(self, prec: int):
-        self._slider.setDecimals(prec)
         self._min_label.setDecimals(prec)
         self._max_label.setDecimals(prec)
         for lbl in self._handle_labels:
@@ -406,7 +424,7 @@ class SliderLabel(QDoubleSpinBox):
         super().setDecimals(prec)
         self._update_size()
 
-    def _update_size(self):
+    def _update_size(self, *_):
         # fontmetrics to measure the width of text
         fm = QFontMetrics(self.font())
         h = self.sizeHint().height()

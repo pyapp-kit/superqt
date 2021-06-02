@@ -62,15 +62,13 @@ def test_double_sliders(ds):
     ds.assert_val_eq((20, 40))
     assert ds.singleStep() == 1
 
-    ds.setDecimals(2)
     ds.assert_val_eq((20, 40))
     ds.assert_val_type()
 
-    ds.setValue((20.23435, 40.2342))
-    ds.assert_val_eq((20.23, 40.23))  # because of decimals
+    ds.setValue((20.23, 40.23))
+    ds.assert_val_eq((20.23, 40.23))
     ds.assert_val_type()
 
-    ds.setDecimals(4)
     assert ds.minimum() == 10
     assert ds.maximum() == 99
     assert ds.singleStep() == 1
@@ -78,15 +76,10 @@ def test_double_sliders(ds):
     ds.setValue((20.2343, 40.2342))
     ds.assert_val_eq((20.2343, 40.2342))
 
-    ds.setDecimals(6)
     ds.assert_val_eq((20.2343, 40.2342))
     assert ds.minimum() == 10
     assert ds.maximum() == 99
     assert ds.singleStep() == 1
-
-    with pytest.raises(OverflowError) as err:
-        ds.setDecimals(8)
-        assert "open a feature request" in str(err)
 
     ds.assert_val_eq((20.2343, 40.2342))
     assert ds.minimum() == 10
@@ -96,7 +89,6 @@ def test_double_sliders(ds):
 
 def test_double_sliders_small(ds):
     ds.setMaximum(1)
-    ds.setDecimals(8)
     ds.setValue((0.5, 0.9))
     assert ds.minimum() == 0
     assert ds.maximum() == 1
@@ -108,8 +100,6 @@ def test_double_sliders_small(ds):
 
 def test_double_sliders_big(ds):
     ds.setValue((20, 80))
-    ds.setDecimals(-6)
-    assert ds.decimals() == -6
     ds.setMaximum(5e14)
     assert ds.minimum() == 0
     assert ds.maximum() == 5e14

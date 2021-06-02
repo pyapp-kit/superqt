@@ -66,6 +66,15 @@ jobs:
           - python-version: 3.6
             platform: windows-2016
             backend: pyqt5
+
+          # legacy Qt
+          - python-version: 3.7
+            platform: ubuntu-latest
+            backend: pyqt511
+          - python-version: 3.7
+            platform: ubuntu-latest
+            backend: pyside511
+
     steps:
       - uses: actions/checkout@v2
 
@@ -106,11 +115,11 @@ jobs:
         if: runner.os == 'Linux' && matrix.screenshot
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: python examples/demo_widget.py
+          run: python examples/demo_widget.py -snap
 
       - name: Screenshots
         if: runner.os != 'Linux' && matrix.screenshot
-        run: python examples/demo_widget.py
+        run: python examples/demo_widget.py -snap
 
       - uses: actions/upload-artifact@v2
         if: matrix.screenshot

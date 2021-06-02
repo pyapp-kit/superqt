@@ -112,10 +112,10 @@ if __name__ == "__main__":
     app = QtW.QApplication([])
     demo = DemoWidget()
 
-    if "-x" in sys.argv:
-        app.exec_()
-    else:
+    if "-snap" in sys.argv:
         import platform
 
         QtW.QApplication.processEvents()
         demo.grab().save(str(dest / f"demo_{platform.system().lower()}.png"))
+    else:
+        app.exec_()

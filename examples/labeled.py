@@ -30,12 +30,13 @@ qlds.setValue(0.5)
 qlds.setSingleStep(0.1)
 
 qlrs = QLabeledRangeSlider(ORIENTATION)
-qlrs.valueChanged.connect(lambda e: print("qlrs valueChanged", e))
+qlrs.valueChanged.connect(lambda e: print("QLabeledRangeSlider valueChanged", e))
 qlrs.setValue((20, 60))
 
 qldrs = QLabeledDoubleRangeSlider(ORIENTATION)
 qldrs.valueChanged.connect(lambda e: print("qlrs valueChanged", e))
 qldrs.setRange(0, 1)
+qldrs.setSingleStep(0.01)
 qldrs.setValue((0.2, 0.7))
 
 
