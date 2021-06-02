@@ -1,0 +1,11 @@
+[report]
+exclude_lines =
+    pragma: no cover
+    if TYPE_CHECKING:
+    \.\.\.
+    except ImportError*
+    raise NotImplementedError()
+omit =
+    qtrangeslider/_version.py
+    qtrangeslider/qtcompat/*
+    *_tests*

@@ -1,14 +1,16 @@
 ignore:
   - qtrangeslider/_version.py
+  - qtrangeslider/qtcompat/*
+  - '*_tests*'
 coverage:
   status:
     project:
       default:
         target: auto
-        threshold: 1% # coverage can drop by up to 1% while still posting success
+        threshold: 1%  # PR will fail if it drops coverage on the project by >1%
     patch:
       default:
         target: auto
-        threshold: 40% # coverage can drop by up to 40% while still posting success
+        threshold: 40%  # A given PR will fail if >40% is untested
 comment:
   require_changes: true # if true: only post the PR comment if coverage changes
