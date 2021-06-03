@@ -1,6 +1,5 @@
-# QRangeSlider
+# Sliders
 
-**The missing multi-handle range slider widget for PyQt & PySide**
 
 ![slider](images/slider.png)
 
@@ -13,9 +12,7 @@
 
 ------
 
-## API
-
-To create a slider:
+## Range Slider
 
 ```python
 from qwidgets import QRangeSlider
@@ -86,7 +83,7 @@ These options are in addition to the Qt QSlider API, and control the behavior of
 | `barIsRigid`         | `setBarIsRigid`                             | `bool` | `True`  | <small>Whether bar length is constant or "elastic" when dragging the bar beyond min/max.</small> |
 ------
 
-## Examples
+### Examples
 
 These screenshots show `QRangeSlider` (multiple handles) next to the native `QSlider`
 (single handle). With no styles applied, `QRangeSlider` will match the native OS
@@ -148,22 +145,23 @@ QRangeSlider {
 
 </details>
 
-### macOS
+#### macOS
 
 ##### Catalina
+
 ![mac10](images/demo_darwin10.png)
 
 ##### Big Sur
+
 ![mac11](images/demo_darwin11.png)
 
-### Windows
+#### Windows
 
 ![window](images/demo_windows.png)
 
-### Linux
+#### Linux
 
 ![linux](images/demo_linux.png)
-
 
 ## Labeled Sliders
 
@@ -195,7 +193,6 @@ Where/whether labels are shown adjacent to slider handles.
 - `LabelPosition.LabelsRight` (alias for `LabelPosition.LabelsAbove`)
 - `LabelPosition.LabelsLeft` (alias for `LabelPosition.LabelsBelow`)
 
-
 #### `edgeLabelMode`/`setEdgeLabelMode`
 
 **type:** `QLabeledRangeSlider.EdgeLabelMode`
@@ -208,7 +205,6 @@ Where/whether labels are shown adjacent to slider handles.
 - `EdgeLabelMode.LabelIsRange`: edge labels shown the min/max values
 - `EdgeLabelMode.LabelIsValue`: edge labels shown the slider range
 
-
 #### fine tuning position of labels:
 
 If you find that you need to fine tune the position of the handle labels:
@@ -217,7 +213,6 @@ If you find that you need to fine tune the position of the handle labels:
 - `QLabeledRangeSlider.label_shift_y`: adjust vertical label position
 
 ### `QLabeledSlider`
-
 
 ![labeled_range](images/labeled_qslider.png)
 
@@ -233,3 +228,11 @@ If you encounter any problems, please [file an issue] along with a detailed
 description.
 
 [file an issue]: https://github.com/napari/qwidgets/issues
+
+## Float Slider
+
+just like QSlider, but supports float values
+
+```python
+from qwidgets import QDoubleSlider
+```
