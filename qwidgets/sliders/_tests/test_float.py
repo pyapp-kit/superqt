@@ -2,13 +2,13 @@ import os
 
 import pytest
 
-from qtrangeslider import (
+from qwidgets import (
     QDoubleRangeSlider,
     QDoubleSlider,
     QLabeledDoubleRangeSlider,
     QLabeledDoubleSlider,
 )
-from qtrangeslider.qtcompat import API_NAME
+from qwidgets.qtcompat import API_NAME
 
 range_types = {QDoubleRangeSlider, QLabeledDoubleRangeSlider}
 

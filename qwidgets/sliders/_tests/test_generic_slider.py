@@ -2,10 +2,10 @@ import math
 
 import pytest
 
-from qtrangeslider._generic_slider import _GenericSlider
-from qtrangeslider.qtcompat.QtCore import QEvent, QPoint, QPointF, Qt
-from qtrangeslider.qtcompat.QtGui import QHoverEvent
-from qtrangeslider.qtcompat.QtWidgets import QStyle, QStyleOptionSlider
+from qwidgets.qtcompat.QtCore import QEvent, QPoint, QPointF, Qt
+from qwidgets.qtcompat.QtGui import QHoverEvent
+from qwidgets.qtcompat.QtWidgets import QStyle, QStyleOptionSlider
+from qwidgets.sliders._generic_slider import _GenericSlider
 
 from ._testutil import _linspace, _mouse_event, _wheel_event, skip_on_linux_qt6
 

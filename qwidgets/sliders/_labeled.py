@@ -1,10 +1,9 @@
 from enum import IntEnum
 from functools import partial
 
-from ._sliders import QDoubleRangeSlider, QDoubleSlider, QRangeSlider
-from .qtcompat.QtCore import QPoint, QSize, Qt, Signal
-from .qtcompat.QtGui import QFontMetrics, QValidator
-from .qtcompat.QtWidgets import (
+from ..qtcompat.QtCore import QPoint, QSize, Qt, Signal
+from ..qtcompat.QtGui import QFontMetrics, QValidator
+from ..qtcompat.QtWidgets import (
     QAbstractSlider,
     QApplication,
     QDoubleSpinBox,
@@ -16,6 +15,7 @@ from .qtcompat.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
+from ._sliders import QDoubleRangeSlider, QDoubleSlider, QRangeSlider
 
 
 class LabelPosition(IntEnum):
@@ -32,7 +32,7 @@ class EdgeLabelMode(IntEnum):
     LabelIsValue = 2
 
 
-class SliderProxy:
+class _SliderProxy:
     _slider: QSlider
 
     def value(self):
@@ -112,7 +112,7 @@ def _handle_overloaded_slider_sig(args, kwargs):
     return parent, orientation
 
 
-class QLabeledSlider(SliderProxy, QAbstractSlider):
+class QLabeledSlider(_SliderProxy, QAbstractSlider):
     _slider_class = QSlider
     _slider: QSlider
 
@@ -171,7 +171,7 @@ class QLabeledDoubleSlider(QLabeledSlider):
         self._label.setDecimals(prec)
 
 
-class QLabeledRangeSlider(SliderProxy, QAbstractSlider):
+class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
     valueChanged = Signal(tuple)
     LabelPosition = LabelPosition
     EdgeLabelMode = EdgeLabelMode

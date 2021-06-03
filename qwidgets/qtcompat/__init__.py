@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright © 2009- The Spyder Development Team
 # Copyright © 2014-2015 Colin Duquesnoy
@@ -147,7 +146,7 @@ if API in PYSIDE6_API:
 if API is None:
     raise PythonQtError(
         "No Qt bindings could be found.\nYou must install one of the following packages "
-        "to use QtRangeSlider: PyQt5, PyQt6, PySide2, or PySide6"
+        "to use qwidgets: PyQt5, PyQt6, PySide2, or PySide6"
     )
 
 # If a correct API name is passed to QT_API and it could not be found,

@@ -1,9 +1,7 @@
 from typing import Generic, List, Sequence, Tuple, TypeVar, Union
 
-from ._generic_slider import CC_SLIDER, SC_GROOVE, SC_HANDLE, SC_NONE, _GenericSlider
-from ._range_style import RangeSliderStyle, update_styles_from_stylesheet
-from .qtcompat import QtGui
-from .qtcompat.QtCore import (
+from ..qtcompat import QtGui
+from ..qtcompat.QtCore import (
     Property,
     QEvent,
     QPoint,
@@ -13,7 +11,9 @@ from .qtcompat.QtCore import (
     Qt,
     Signal,
 )
-from .qtcompat.QtWidgets import QSlider, QStyle, QStyleOptionSlider, QStylePainter
+from ..qtcompat.QtWidgets import QSlider, QStyle, QStyleOptionSlider, QStylePainter
+from ._generic_slider import CC_SLIDER, SC_GROOVE, SC_HANDLE, SC_NONE, _GenericSlider
+from ._range_style import RangeSliderStyle, update_styles_from_stylesheet
 
 _T = TypeVar("_T")
 

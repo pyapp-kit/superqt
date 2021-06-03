@@ -5,9 +5,9 @@ import re
 from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING
 
-from .qtcompat import PYQT_VERSION
-from .qtcompat.QtCore import Qt
-from .qtcompat.QtGui import (
+from ..qtcompat import PYQT_VERSION
+from ..qtcompat.QtCore import Qt
+from ..qtcompat.QtGui import (
     QBrush,
     QColor,
     QGradient,
@@ -15,7 +15,7 @@ from .qtcompat.QtGui import (
     QPalette,
     QRadialGradient,
 )
-from .qtcompat.QtWidgets import QApplication, QSlider, QStyleOptionSlider
+from ..qtcompat.QtWidgets import QApplication, QSlider, QStyleOptionSlider
 
 if TYPE_CHECKING:
     from ._generic_range_slider import _GenericRangeSlider
@@ -241,7 +241,7 @@ def parse_color(color: str, default_attr) -> QColor | QGradient:
     # try linear gradient:
     match = qlineargrad_pattern.search(color)
     if match:
-        grad = QLinearGradient(*[float(i) for i in match.groups()[:4]])
+        grad = QLinearGradient(*(float(i) for i in match.groups()[:4]))
         grad.setColorAt(0, QColor(match.groupdict()["stop0"]))
         grad.setColorAt(1, QColor(match.groupdict()["stop1"]))
         return grad
@@ -249,7 +249,7 @@ def parse_color(color: str, default_attr) -> QColor | QGradient:
     # try linear gradient:
     match = qradial_pattern.search(color)
     if match:
-        grad = QRadialGradient(*[float(i) for i in match.groups()[:5]])
+        grad = QRadialGradient(*(float(i) for i in match.groups()[:5]))
         grad.setColorAt(0, QColor(match.groupdict()["stop0"]))
         grad.setColorAt(1, QColor(match.groupdict()["stop1"]))
         return grad

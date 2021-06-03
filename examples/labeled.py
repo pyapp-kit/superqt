@@ -1,16 +1,11 @@
-from qtrangeslider._labeled import (
+from qwidgets import (
     QLabeledDoubleRangeSlider,
     QLabeledDoubleSlider,
     QLabeledRangeSlider,
     QLabeledSlider,
 )
-from qtrangeslider.qtcompat.QtCore import Qt
-from qtrangeslider.qtcompat.QtWidgets import (
-    QApplication,
-    QHBoxLayout,
-    QVBoxLayout,
-    QWidget,
-)
+from qwidgets.qtcompat.QtCore import Qt
+from qwidgets.qtcompat.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout, QWidget
 
 app = QApplication([])
 

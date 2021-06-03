@@ -1,6 +1,6 @@
 ignore:
-  - qtrangeslider/_version.py
-  - qtrangeslider/qtcompat/*
+  - qwidgets/_version.py
+  - qwidgets/qtcompat/*
   - '*_tests*'
 coverage:
   status:

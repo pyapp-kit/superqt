@@ -1,6 +1,6 @@
-from qtrangeslider import QRangeSlider
-from qtrangeslider.qtcompat import QtCore
-from qtrangeslider.qtcompat import QtWidgets as QtW
+from qwidgets import QRangeSlider
+from qwidgets.qtcompat import QtCore
+from qwidgets.qtcompat import QtWidgets as QtW
 
 QSS = """
 QSlider {

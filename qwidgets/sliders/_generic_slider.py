@@ -22,9 +22,9 @@ QRangeSlider.
 
 from typing import Generic, TypeVar
 
-from .qtcompat import QtGui
-from .qtcompat.QtCore import QEvent, QPoint, QPointF, QRect, Qt, Signal
-from .qtcompat.QtWidgets import (
+from ..qtcompat import QtGui
+from ..qtcompat.QtCore import QEvent, QPoint, QPointF, QRect, Qt, Signal
+from ..qtcompat.QtWidgets import (
     QApplication,
     QSlider,
     QStyle,

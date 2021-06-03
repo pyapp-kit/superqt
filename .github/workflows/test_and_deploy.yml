@@ -89,6 +89,7 @@ jobs:
           sudo apt-get install -y libdbus-1-3 libxkbcommon-x11-0 libxcb-icccm4 \
             libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 \
             libxcb-xinerama0 libxcb-xfixes0
+
       - name: Linux opengl
         if: runner.os == 'Linux' && ( matrix.backend == 'pyside6' || matrix.backend == 'pyqt6' )
         run: sudo apt-get install -y libopengl0 libegl1-mesa libxcb-xinput0
@@ -111,13 +112,13 @@ jobs:
         if: matrix.screenshot
         run: pip install . ${{ matrix.backend }}
 
-      - name: Screenshots
+      - name: Screenshots (Linux)
         if: runner.os == 'Linux' && matrix.screenshot
         uses: GabrielBB/xvfb-action@v1
         with:
           run: python examples/demo_widget.py -snap
 
-      - name: Screenshots
+      - name: Screenshots (macOS/Win)
         if: runner.os != 'Linux' && matrix.screenshot
         run: python examples/demo_widget.py -snap
 
@@ -133,8 +134,8 @@ jobs:
     # and requires that you have put your twine API key in your
     # github secrets (see readme for details)
     needs: [test]
+    if: ${{ github.repository == 'napari/qwidgets' && contains(github.ref, 'tags') }}
     runs-on: ubuntu-latest
-    if: contains(github.ref, 'tags')
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python

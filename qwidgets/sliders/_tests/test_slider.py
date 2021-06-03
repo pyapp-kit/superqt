@@ -2,10 +2,10 @@ import platform
 
 import pytest
 
-from qtrangeslider import QRangeSlider
-from qtrangeslider._generic_range_slider import SC_BAR, SC_HANDLE, SC_NONE
-from qtrangeslider.qtcompat import API_NAME
-from qtrangeslider.qtcompat.QtCore import Qt
+from qwidgets import QRangeSlider
+from qwidgets.qtcompat import API_NAME
+from qwidgets.qtcompat.QtCore import Qt
+from qwidgets.sliders._generic_range_slider import SC_BAR, SC_HANDLE, SC_NONE
 
 NOT_LINUX = platform.system() != "Linux"
 NOT_PYSIDE2 = API_NAME != "PySide2"
