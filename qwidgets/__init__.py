@@ -14,6 +14,7 @@ from .sliders import (
     QLabeledSlider,
     QRangeSlider,
 )
+from .spinbox import QLargeIntSpinBox
 
 __all__ = [
     "QDoubleRangeSlider",
@@ -22,5 +23,6 @@ __all__ = [
     "QLabeledDoubleSlider",
     "QLabeledRangeSlider",
     "QLabeledSlider",
+    "QLargeIntSpinBox",
     "QRangeSlider",
 ]
