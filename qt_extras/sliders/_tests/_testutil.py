@@ -4,9 +4,9 @@ from platform import system
 
 import pytest
 
-from qwidgets.qtcompat import QT_VERSION
-from qwidgets.qtcompat.QtCore import QEvent, QPoint, QPointF, Qt
-from qwidgets.qtcompat.QtGui import QMouseEvent, QWheelEvent
+from qt_extras.qtcompat import QT_VERSION
+from qt_extras.qtcompat.QtCore import QEvent, QPoint, QPointF, Qt
+from qt_extras.qtcompat.QtGui import QMouseEvent, QWheelEvent
 
 QT_VERSION = LooseVersion(QT_VERSION)
 

@@ -1,11 +1,11 @@
-from qwidgets import (
+from qt_extras import (
     QLabeledDoubleRangeSlider,
     QLabeledDoubleSlider,
     QLabeledRangeSlider,
     QLabeledSlider,
 )
-from qwidgets.qtcompat.QtCore import Qt
-from qwidgets.qtcompat.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout, QWidget
+from qt_extras.qtcompat.QtCore import Qt
+from qt_extras.qtcompat.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout, QWidget
 
 app = QApplication([])
 

@@ -1,5 +1,5 @@
-from qwidgets.qtcompat.QtCore import Qt
-from qwidgets.spinbox import QLargeIntSpinBox
+from qt_extras.qtcompat.QtCore import Qt
+from qt_extras.spinbox import QLargeIntSpinBox
 
 
 def test_large_spinbox(qtbot):

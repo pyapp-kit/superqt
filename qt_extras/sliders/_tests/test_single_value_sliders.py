@@ -4,11 +4,11 @@ from distutils.version import LooseVersion
 
 import pytest
 
-from qwidgets import QDoubleSlider, QLabeledDoubleSlider, QLabeledSlider
-from qwidgets.qtcompat.QtCore import QEvent, QPoint, QPointF, Qt
-from qwidgets.qtcompat.QtGui import QHoverEvent
-from qwidgets.qtcompat.QtWidgets import QSlider, QStyle, QStyleOptionSlider
-from qwidgets.sliders._generic_slider import _GenericSlider
+from qt_extras import QDoubleSlider, QLabeledDoubleSlider, QLabeledSlider
+from qt_extras.qtcompat.QtCore import QEvent, QPoint, QPointF, Qt
+from qt_extras.qtcompat.QtGui import QHoverEvent
+from qt_extras.qtcompat.QtWidgets import QSlider, QStyle, QStyleOptionSlider
+from qt_extras.sliders._generic_slider import _GenericSlider
 
 from ._testutil import (
     QT_VERSION,

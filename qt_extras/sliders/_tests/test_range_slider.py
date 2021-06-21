@@ -2,10 +2,10 @@ import math
 
 import pytest
 
-from qwidgets import QDoubleRangeSlider, QRangeSlider
-from qwidgets.qtcompat.QtCore import QEvent, QPoint, QPointF, Qt
-from qwidgets.qtcompat.QtGui import QHoverEvent
-from qwidgets.qtcompat.QtWidgets import QStyle, QStyleOptionSlider
+from qt_extras import QDoubleRangeSlider, QRangeSlider
+from qt_extras.qtcompat.QtCore import QEvent, QPoint, QPointF, Qt
+from qt_extras.qtcompat.QtGui import QHoverEvent
+from qt_extras.qtcompat.QtWidgets import QStyle, QStyleOptionSlider
 
 from ._testutil import _linspace, _mouse_event, _wheel_event, skip_on_linux_qt6
 

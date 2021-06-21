@@ -9,8 +9,8 @@ To get started fork this repository, and clone your fork:
 
 ```bash
 # clone your fork
-git clone https://github.com/<your_organization>/qwidgets
-cd qwidgets
+git clone https://github.com/<your_organization>/qt-extras
+cd qt-extras
 
 # install pre-commit hooks
 pre-commit install
@@ -32,7 +32,7 @@ All widgets must be well-tested, and should work on:
 - macOS, Windows, & Linux
 
 Until [qtpy](https://github.com/spyder-ide/qtpy) supports PyQt6/PySide6, imports
-should use (and modify if necessary) `qwidgets.qtcompat`.
+should use (and modify if necessary) `qt_extras.qtcompat`.
 
 ## Style Guide
 

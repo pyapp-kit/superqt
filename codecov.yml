@@ -1,6 +1,6 @@
 ignore:
-  - qwidgets/_version.py
-  - qwidgets/qtcompat/*
+  - qt_extras/_version.py
+  - qt_extras/qtcompat/*
   - '*_tests*'
 coverage:
   status:

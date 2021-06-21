@@ -1,4 +1,4 @@
-"""qwidgets is a collection of QtWidgets for python."""
+"""qt_extras is a collection of QtWidgets for python."""
 try:
     from ._version import version as __version__
 except ImportError:
