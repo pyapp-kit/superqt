@@ -1,12 +1,12 @@
-# ![tiny](https://user-images.githubusercontent.com/1609449/120636353-8c3f3800-c43b-11eb-8732-a14dec578897.png)  extra-qt!
+# ![tiny](https://user-images.githubusercontent.com/1609449/120636353-8c3f3800-c43b-11eb-8732-a14dec578897.png)  superqt!
 
 
-[![License](https://img.shields.io/pypi/l/qwidgets.svg?color=green)](https://github.com/napari/qwidgets/raw/master/LICENSE)
-[![PyPI](https://img.shields.io/pypi/v/qwidgets.svg?color=green)](https://pypi.org/project/qwidgets)
+[![License](https://img.shields.io/pypi/l/superqt.svg?color=green)](https://github.com/napari/superqt/raw/master/LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/superqt.svg?color=green)](https://pypi.org/project/superqt)
 [![Python
-Version](https://img.shields.io/pypi/pyversions/qwidgets.svg?color=green)](https://python.org)
-[![Test](https://github.com/napari/qwidgets/actions/workflows/test_and_deploy.yml/badge.svg)](https://github.com/napari/qwidgets/actions/workflows/test_and_deploy.yml)
-[![codecov](https://codecov.io/gh/napari/qwidgets/branch/master/graph/badge.svg)](https://codecov.io/gh/napari/qwidgets)
+Version](https://img.shields.io/pypi/pyversions/superqt.svg?color=green)](https://python.org)
+[![Test](https://github.com/napari/superqt/actions/workflows/test_and_deploy.yml/badge.svg)](https://github.com/napari/superqt/actions/workflows/test_and_deploy.yml)
+[![codecov](https://codecov.io/gh/napari/superqt/branch/master/graph/badge.svg)](https://codecov.io/gh/napari/superqt)
 
 ###  "missing" widgets and components for PyQt/PySide
 
@@ -20,7 +20,6 @@ Components are tested on:
 - PyQt5 (5.11 and above) & PyQt6
 - PySide2 (5.11 and above) & PySide6
 
-
 ## Widgets
 
 Widgets include:
@@ -29,16 +28,16 @@ Widgets include:
 
 - [Range Slider](docs/sliders.md#range-slider) (multi-handle slider)
 
-<img src="https://raw.githubusercontent.com/napari/extra-qt/main/docs/images/demo_darwin10.png" alt="range sliders" width=680>
+<img src="https://raw.githubusercontent.com/napari/superqt/main/docs/images/demo_darwin10.png" alt="range sliders" width=680>
 
 
 - [Labeled Sliders](docs/sliders.md#labeled-sliders) (sliders with linked
   spinboxes)
-  
-<img src="https://raw.githubusercontent.com/napari/extra-qt/main/docs/images/labeled_qslider.png" alt="range sliders" width=680>
 
-<img src="https://raw.githubusercontent.com/napari/extra-qt/main/docs/images/labeled_range.png" alt="range sliders" width=680>
-  
+<img src="https://raw.githubusercontent.com/napari/superqt/main/docs/images/labeled_qslider.png" alt="range sliders" width=680>
+
+<img src="https://raw.githubusercontent.com/napari/superqt/main/docs/images/labeled_range.png" alt="range sliders" width=680>
+
 - Unbound Integer SpinBox (backed by python `int`)
 
 ## Contributing

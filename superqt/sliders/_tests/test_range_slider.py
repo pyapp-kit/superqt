@@ -2,68 +2,100 @@ import math
 
 import pytest
 
-from qwidgets.qtcompat.QtCore import QEvent, QPoint, QPointF, Qt
-from qwidgets.qtcompat.QtGui import QHoverEvent
-from qwidgets.qtcompat.QtWidgets import QStyle, QStyleOptionSlider
-from qwidgets.sliders._generic_slider import _GenericSlider
+from superqt import QDoubleRangeSlider, QRangeSlider
+from superqt.qtcompat.QtCore import QEvent, QPoint, QPointF, Qt
+from superqt.qtcompat.QtGui import QHoverEvent
+from superqt.qtcompat.QtWidgets import QStyle, QStyleOptionSlider
 
 from ._testutil import _linspace, _mouse_event, _wheel_event, skip_on_linux_qt6
 
 
 @pytest.fixture(params=[Qt.Horizontal, Qt.Vertical])
 def gslider(qtbot, request):
-    slider = _GenericSlider(request.param)
+    slider = QDoubleRangeSlider(request.param)
     qtbot.addWidget(slider)
-    assert slider.value() == 0
+    assert slider.value() == (20, 80)
     assert slider.minimum() == 0
     assert slider.maximum() == 99
     yield slider
     slider.initStyleOption(QStyleOptionSlider())
 
 
-def test_change_floatslider_range(gslider: _GenericSlider, qtbot):
+def test_change_floatslider_range(gslider: QRangeSlider, qtbot):
     with qtbot.waitSignals([gslider.rangeChanged, gslider.valueChanged]):
-        gslider.setMinimum(10)
+        gslider.setMinimum(30)
 
-    assert gslider.value() == 10 == gslider.minimum()
+    assert gslider.value()[0] == 30 == gslider.minimum()
     assert gslider.maximum() == 99
 
     with qtbot.waitSignal(gslider.rangeChanged):
-        gslider.setMaximum(90)
-    assert gslider.value() == 10 == gslider.minimum()
-    assert gslider.maximum() == 90
+        gslider.setMaximum(70)
+    assert gslider.value()[0] == 30 == gslider.minimum()
+    assert gslider.value()[1] == 70 == gslider.maximum()
 
     with qtbot.waitSignals([gslider.rangeChanged, gslider.valueChanged]):
-        gslider.setRange(20, 40)
-    assert gslider.value() == 20 == gslider.minimum()
-    assert gslider.maximum() == 40
+        gslider.setRange(40, 60)
+    assert gslider.value()[0] == 40 == gslider.minimum()
+    assert gslider.maximum() == 60
 
     with qtbot.waitSignal(gslider.valueChanged):
-        gslider.setValue(30)
-    assert gslider.value() == 30
+        gslider.setValue([40, 50])
+    assert gslider.value()[0] == 40 == gslider.minimum()
+    assert gslider.value()[1] == 50
 
     with qtbot.waitSignals([gslider.rangeChanged, gslider.valueChanged]):
-        gslider.setMaximum(25)
-    assert gslider.value() == 25 == gslider.maximum()
-    assert gslider.minimum() == 20
+        gslider.setMaximum(45)
+    assert gslider.value()[0] == 40 == gslider.minimum()
+    assert gslider.value()[1] == 45 == gslider.maximum()
 
 
-def test_float_values(gslider: _GenericSlider, qtbot):
+def test_float_values(gslider: QRangeSlider, qtbot):
     with qtbot.waitSignal(gslider.rangeChanged):
-        gslider.setRange(0.25, 0.75)
-    assert gslider.minimum() == 0.25
-    assert gslider.maximum() == 0.75
+        gslider.setRange(0.1, 0.9)
+    assert gslider.minimum() == 0.1
+    assert gslider.maximum() == 0.9
 
     with qtbot.waitSignal(gslider.valueChanged):
-        gslider.setValue(0.55)
-    assert gslider.value() == 0.55
+        gslider.setValue([0.4, 0.6])
+    assert gslider.value() == (0.4, 0.6)
 
     with qtbot.waitSignal(gslider.valueChanged):
-        gslider.setValue(1.55)
-    assert gslider.value() == 0.75 == gslider.maximum()
+        gslider.setValue([0, 1.9])
+    assert gslider.value()[0] == 0.1 == gslider.minimum()
+    assert gslider.value()[1] == 0.9 == gslider.maximum()
 
 
-def test_ticks(gslider: _GenericSlider, qtbot):
+def test_position(gslider: QRangeSlider, qtbot):
+    gslider.setSliderPosition([10, 80])
+    assert gslider.sliderPosition() == (10, 80)
+
+
+def test_steps(gslider: QRangeSlider, qtbot):
+    gslider.setSingleStep(0.1)
+    assert gslider.singleStep() == 0.1
+
+    gslider.setSingleStep(1.5e20)
+    assert gslider.singleStep() == 1.5e20
+
+    gslider.setPageStep(0.2)
+    assert gslider.pageStep() == 0.2
+
+    gslider.setPageStep(1.5e30)
+    assert gslider.pageStep() == 1.5e30
+
+
+@pytest.mark.parametrize("mag", list(range(4, 37, 4)) + list(range(-4, -37, -4)))
+def test_slider_extremes(gslider: QRangeSlider, mag, qtbot):
+    _mag = 10 ** mag
+    with qtbot.waitSignal(gslider.rangeChanged):
+        gslider.setRange(-_mag, _mag)
+    for i in _linspace(-_mag, _mag, 10):
+        gslider.setValue((i, _mag))
+        assert math.isclose(gslider.value()[0], i, rel_tol=1e-8)
+        gslider.initStyleOption(QStyleOptionSlider())
+
+
+def test_ticks(gslider: QRangeSlider, qtbot):
     gslider.setTickInterval(0.3)
     assert gslider.tickInterval() == 0.3
     gslider.setTickPosition(gslider.TicksAbove)
@@ -74,7 +106,7 @@ def test_show(gslider, qtbot):
     gslider.show()
 
 
-def test_press_move_release(gslider: _GenericSlider, qtbot):
+def test_press_move_release(gslider: QRangeSlider, qtbot):
     assert gslider._pressedControl == QStyle.SubControl.SC_None
 
     opt = QStyleOptionSlider()
@@ -103,12 +135,9 @@ def test_press_move_release(gslider: _GenericSlider, qtbot):
 
 
 @skip_on_linux_qt6
-def test_hover(gslider: _GenericSlider):
+def test_hover(gslider: QRangeSlider):
 
-    opt = QStyleOptionSlider()
-    gslider.initStyleOption(opt)
-    style = gslider.style()
-    hrect = style.subControlRect(QStyle.CC_Slider, opt, QStyle.SC_SliderHandle)
+    hrect = gslider._handleRect(0)
     handle_pos = QPointF(gslider.mapToGlobal(hrect.center()))
 
     assert gslider._hoverControl == QStyle.SubControl.SC_None
@@ -120,38 +149,8 @@ def test_hover(gslider: _GenericSlider):
     assert gslider._hoverControl == QStyle.SubControl.SC_None
 
 
-def test_wheel(gslider: _GenericSlider, qtbot):
+def test_wheel(gslider: QRangeSlider, qtbot):
     with qtbot.waitSignal(gslider.valueChanged):
         gslider.wheelEvent(_wheel_event(120))
 
     gslider.wheelEvent(_wheel_event(0))
-
-
-def test_position(gslider: _GenericSlider, qtbot):
-    gslider.setSliderPosition(21.2)
-    assert gslider.sliderPosition() == 21.2
-
-
-def test_steps(gslider: _GenericSlider, qtbot):
-    gslider.setSingleStep(0.1)
-    assert gslider.singleStep() == 0.1
-
-    gslider.setSingleStep(1.5e20)
-    assert gslider.singleStep() == 1.5e20
-
-    gslider.setPageStep(0.2)
-    assert gslider.pageStep() == 0.2
-
-    gslider.setPageStep(1.5e30)
-    assert gslider.pageStep() == 1.5e30
-
-
-@pytest.mark.parametrize("mag", list(range(4, 37, 4)) + list(range(-4, -37, -4)))
-def test_slider_extremes(gslider: _GenericSlider, mag, qtbot):
-    _mag = 10 ** mag
-    with qtbot.waitSignal(gslider.rangeChanged):
-        gslider.setRange(-_mag, _mag)
-    for i in _linspace(-_mag, _mag, 10):
-        gslider.setValue(i)
-        assert math.isclose(gslider.value(), i, rel_tol=1e-8)
-        gslider.initStyleOption(QStyleOptionSlider())

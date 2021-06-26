@@ -15,7 +15,7 @@
 ## Range Slider
 
 ```python
-from qwidgets import QRangeSlider
+from superqt import QRangeSlider
 
 # as usual:
 # you must create a QApplication before create a widget.
@@ -172,7 +172,7 @@ This package also includes two "labeled" slider variants. One for `QRangeSlider`
 ![labeled_range](images/labeled_range.png)
 
 ```python
-from qwidgets import QLabeledRangeSlider
+from superqt import QLabeledRangeSlider
 ```
 
 This has the same API as `QRangeSlider` with the following additional options:
@@ -217,7 +217,7 @@ If you find that you need to fine tune the position of the handle labels:
 ![labeled_range](images/labeled_qslider.png)
 
 ```python
-from qwidgets import QLabeledSlider
+from superqt import QLabeledSlider
 ```
 
 (no additional options at this point)
@@ -227,12 +227,12 @@ from qwidgets import QLabeledSlider
 If you encounter any problems, please [file an issue] along with a detailed
 description.
 
-[file an issue]: https://github.com/napari/qwidgets/issues
+[file an issue]: https://github.com/napari/superqt/issues
 
 ## Float Slider
 
 just like QSlider, but supports float values
 
 ```python
-from qwidgets import QDoubleSlider
+from superqt import QDoubleSlider
 ```
