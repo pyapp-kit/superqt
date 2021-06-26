@@ -1,6 +1,6 @@
-from qwidgets import QDoubleSlider
-from qwidgets.qtcompat.QtCore import Qt
-from qwidgets.qtcompat.QtWidgets import QApplication
+from superqt import QDoubleSlider
+from superqt.qtcompat.QtCore import Qt
+from superqt.qtcompat.QtWidgets import QApplication
 
 app = QApplication([])
 
