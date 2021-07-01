@@ -44,7 +44,7 @@ def test_basic_signal_blocked(emitter):
     mock.assert_called_once_with(1)
 
 
-def test_basic_signal_with_sender(emitter, receiver: Receiver):
+def test_basic_signal_with_sender(emitter, receiver):
     """standard Qt usage, as class attribute"""
     receiver.expect_sender = emitter
 
