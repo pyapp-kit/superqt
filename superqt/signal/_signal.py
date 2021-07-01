@@ -4,17 +4,19 @@ import weakref
 from collections.abc import Sequence
 from contextlib import contextmanager
 from inspect import Parameter, Signature, ismethod
-from typing import Any, Callable, Union, overload
+from typing import TYPE_CHECKING, Any, Callable, Union, overload
 
-CallbackType = Callable[..., None]
-SlotRef = Union[CallbackType, "weakref.WeakKeyDictionary[object, CallbackType]"]
+if TYPE_CHECKING:
+    CallbackType = Callable[..., None]
+    SlotRef = Union[CallbackType, weakref.WeakKeyDictionary[object, CallbackType]]
 
 
 class Signal:
 
     # valid callback signatures for this signal.
-    signatures: tuple[Signature, ...]
-    _signal_instances: dict[int, SignalInstance]
+    if TYPE_CHECKING:
+        signatures: tuple[Signature, ...]
+        _signal_instances: dict[Signal, weakref.WeakKeyDictionary[Any, SignalInstance]]
 
     def __init__(self, *types: Any) -> None:
         self._signal_instances = {}
@@ -28,7 +30,7 @@ class Signal:
         else:
             # multiple signatures
             _signatures: list[Signature] = []
-            for t in enumerate(types):
+            for t in types:
                 if isinstance(t, Signature):
                     _signatures.append(t)
                 elif isinstance(t, (list, tuple)):
@@ -67,7 +69,7 @@ class Signal:
     def __get__(self, instance: Any, owner: type | None = None) -> SignalInstance:
         ...
 
-    def __get__(self, instance: Any, owner: type) -> Signal | SignalInstance:
+    def __get__(self, instance: Any, owner: type = None) -> Signal | SignalInstance:
         # if instance is not None, we're being accessed on an instance of `owner`
         # otherwise we're being accessed on the `owner` itself
         if instance is None:
@@ -81,9 +83,9 @@ class SignalInstance:
         self, signatures: tuple[Signature, ...] = (), instance: Any = None
     ) -> None:
         self.signatures = signatures
-        self._instance = instance
-        self._slots = []
-        self._blocked = False
+        self._instance: object = instance
+        self._slots: list[SlotRef] = []
+        self._blocked: bool = False
 
     def __getitem__(self, key: object) -> SignalInstance:
         # used to return a version of self that accepts a specific signature
@@ -131,7 +133,7 @@ class SignalInstance:
 
     def _normalize_slot(self, slot: CallbackType) -> SlotRef:
         if ismethod(slot):
-            return weakref.WeakKeyDictionary({slot.__self__: slot.__func__})
+            return weakref.WeakKeyDictionary({slot.__self__: slot.__func__})  # type: ignore
         # XXX: could consider doing weakref if we know its a function (but not lambda!)
         return slot
 
