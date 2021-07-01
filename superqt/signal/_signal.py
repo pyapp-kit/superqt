@@ -1,0 +1,180 @@
+from __future__ import annotations
+
+import weakref
+from collections.abc import Sequence
+from inspect import Parameter, Signature, ismethod
+from typing import Any, Callable, List, Optional, Tuple, Union, overload
+from contextlib import contextmanager
+
+
+CallbackType = Callable[..., None]
+SlotRef = Union[CallbackType, weakref.WeakKeyDictionary[object, CallbackType]]
+
+
+class Signal:
+
+    # valid callback signatures for this signal.
+    signatures: Tuple[Signature, ...]
+    _signal_instances: dict[int, SignalInstance]
+
+    def __init__(self, *types: Any) -> None:
+        self._signal_instances = {}
+
+        if not types:
+            # single signature, no parameters
+            self.signatures = (Signature(),)
+        elif not isinstance(types[0], (list, tuple, Signature)):
+            # single signature, with parameters
+            self.signatures = (Signal._build_signature(types),)
+        else:
+            # multiple signatures
+            _signatures: List[Signature] = []
+            for t in enumerate(types):
+                if isinstance(t, Signature):
+                    _signatures.append(t)
+                elif isinstance(t, (list, tuple)):
+                    _signatures.append(Signal._build_signature(t))
+                else:
+                    raise TypeError(
+                        "each signature in a multi-signature sequence must be "
+                        "experessed as a Signature, list, or tuple"
+                    )
+            self.signatures = tuple(_signatures)
+
+    @staticmethod
+    def _build_signature(types: Sequence[type]) -> Signature:
+        return Signature(
+            [
+                Parameter(name=f"a{i}", kind=Parameter.POSITIONAL_ONLY, annotation=t)
+                for i, t in enumerate(types)
+            ]
+        )
+
+    def __getattr__(self, name):
+        if name == "connect":
+            name = self.__class__.__name__
+            raise AttributeError(
+                f"{name!r} object has no attribute 'connect'. You can connect to the "
+                "signal on the *instance* of a class with a Signal() class attribute. "
+                "Or create a signal instance directly with SignalInstance."
+            )
+        return self.__getattribute__(name)
+
+    @overload
+    def __get__(self, instance: None, owner: Optional[type] = None) -> Signal:
+        ...
+
+    @overload
+    def __get__(self, instance: Any, owner: Optional[type] = None) -> SignalInstance:
+        ...
+
+    def __get__(self, instance: Any, owner: type) -> Union[Signal, SignalInstance]:
+        # if instance is not None, we're being accessed on an instance of `owner`
+        # otherwise we're being accessed on the `owner` itself
+        if instance is None:
+            return self
+        d = self._signal_instances.setdefault(self, weakref.WeakKeyDictionary())
+        return d.setdefault(instance, SignalInstance(self.signatures, instance))
+
+
+class SignalInstance:
+    def __init__(
+        self, signatures: Tuple[Signature, ...] = (), instance: Any = None
+    ) -> None:
+        self.signatures = signatures
+        self._instance = instance
+        self._slots = []
+        self._blocked = False
+
+    def __getitem__(self, key: object) -> SignalInstance:
+        # used to return a version of self that accepts a specific signature
+        pass
+
+    # could return handle to the connection?
+    def connect(self, slot: CallbackType) -> None:
+        if not callable(slot):
+            raise TypeError(f"Cannot connect to non-callable object: {slot}")
+
+        # TODO: check signature against self._signal.signatures
+        # Qt would just append... allowing for multiple connections of the same func?
+        self._slots.append(self._normalize_slot(slot))
+
+    def disconnect(self, slot: Optional[CallbackType] = None) -> None:
+        if slot is None:
+            # NOTE: clearing an empty list is actually a RuntimeError in Qt
+            self._slots.clear()
+            return
+
+        # Qt behavior:
+        # if the same object is connected multiple times,
+        # this only removes the first one it finds...
+        # Or raises a ValueError if not in the list
+        try:
+            self._slots.remove(self._normalize_slot(slot))
+        except KeyError as e:
+            raise KeyError(f"slot is not connected: {slot}") from e
+
+    def emit(self, *args: Any) -> None:
+        if self._blocked:
+            return
+
+        # get sender?
+
+        for slot in self._slots:
+            self._call_slot(slot, *args)
+
+    def block(self, should_block: bool = True):
+        """Sets blocking of the signal"""
+        self._block = bool(should_block)
+
+    def blocked(self):
+        return SignalBlocker(self)
+
+    def _normalize_slot(self, slot: CallbackType) -> SlotRef:
+        if ismethod(slot):
+            return weakref.WeakKeyDictionary({slot.__self__: slot.__func__})
+        # XXX: could consider doing weakref if we know its a function (but not lambda!)
+        return slot
+
+    def _call_slot(self, slot: SlotRef, *args: Any) -> None:
+        if isinstance(slot, weakref.WeakKeyDictionary):
+            for obj, func in slot.items():
+                with receiver_sender(obj, self._instance):
+                    func(obj, *args)
+        else:
+            slot(*args)
+
+    def __call__(self, *args):
+        self.emit(*args)
+
+
+class SignalBlocker:
+    def __init__(self, target):
+        self.target = target
+
+    def __enter__(self):
+        self.target.block(True)
+
+    def __exit__(self, *args):
+        self.target.block(False)
+
+
+class Receiver:
+    def get_sender(self):
+        return getattr(self, "_sender", None)
+
+    def _set_sender(self, sender):
+        self._sender = sender
+
+
+@contextmanager
+def receiver_sender(rcv, sender):
+    if not isinstance(rcv, Receiver):
+        yield
+        return
+
+    rcv._set_sender(sender)
+    try:
+        yield
+    finally:
+        rcv._set_sender(None)
