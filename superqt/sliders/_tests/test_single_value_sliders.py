@@ -9,8 +9,7 @@ from superqt.qtcompat.QtCore import QEvent, QPoint, QPointF, Qt
 from superqt.qtcompat.QtGui import QHoverEvent
 from superqt.qtcompat.QtWidgets import QSlider, QStyle, QStyleOptionSlider
 from superqt.sliders._generic_slider import _GenericSlider
-
-from ._testutil import (
+from superqt.sliders._tests._utils import (
     QT_VERSION,
     SYS_DARWIN,
     _linspace,

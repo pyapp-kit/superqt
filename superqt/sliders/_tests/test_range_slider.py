@@ -6,8 +6,12 @@ from superqt import QDoubleRangeSlider, QRangeSlider
 from superqt.qtcompat.QtCore import QEvent, QPoint, QPointF, Qt
 from superqt.qtcompat.QtGui import QHoverEvent
 from superqt.qtcompat.QtWidgets import QStyle, QStyleOptionSlider
-
-from ._testutil import _linspace, _mouse_event, _wheel_event, skip_on_linux_qt6
+from superqt.sliders._tests._utils import (
+    _linspace,
+    _mouse_event,
+    _wheel_event,
+    skip_on_linux_qt6,
+)
 
 
 @pytest.fixture(params=[Qt.Horizontal, Qt.Vertical])

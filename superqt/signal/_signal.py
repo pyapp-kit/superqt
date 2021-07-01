@@ -2,19 +2,18 @@ from __future__ import annotations
 
 import weakref
 from collections.abc import Sequence
-from inspect import Parameter, Signature, ismethod
-from typing import Any, Callable, List, Optional, Tuple, Union, overload
 from contextlib import contextmanager
-
+from inspect import Parameter, Signature, ismethod
+from typing import Any, Callable, Union, overload
 
 CallbackType = Callable[..., None]
-SlotRef = Union[CallbackType, weakref.WeakKeyDictionary[object, CallbackType]]
+SlotRef = Union[CallbackType, "weakref.WeakKeyDictionary[object, CallbackType]"]
 
 
 class Signal:
 
     # valid callback signatures for this signal.
-    signatures: Tuple[Signature, ...]
+    signatures: tuple[Signature, ...]
     _signal_instances: dict[int, SignalInstance]
 
     def __init__(self, *types: Any) -> None:
@@ -28,7 +27,7 @@ class Signal:
             self.signatures = (Signal._build_signature(types),)
         else:
             # multiple signatures
-            _signatures: List[Signature] = []
+            _signatures: list[Signature] = []
             for t in enumerate(types):
                 if isinstance(t, Signature):
                     _signatures.append(t)
@@ -61,14 +60,14 @@ class Signal:
         return self.__getattribute__(name)
 
     @overload
-    def __get__(self, instance: None, owner: Optional[type] = None) -> Signal:
+    def __get__(self, instance: None, owner: type | None = None) -> Signal:
         ...
 
     @overload
-    def __get__(self, instance: Any, owner: Optional[type] = None) -> SignalInstance:
+    def __get__(self, instance: Any, owner: type | None = None) -> SignalInstance:
         ...
 
-    def __get__(self, instance: Any, owner: type) -> Union[Signal, SignalInstance]:
+    def __get__(self, instance: Any, owner: type) -> Signal | SignalInstance:
         # if instance is not None, we're being accessed on an instance of `owner`
         # otherwise we're being accessed on the `owner` itself
         if instance is None:
@@ -79,7 +78,7 @@ class Signal:
 
 class SignalInstance:
     def __init__(
-        self, signatures: Tuple[Signature, ...] = (), instance: Any = None
+        self, signatures: tuple[Signature, ...] = (), instance: Any = None
     ) -> None:
         self.signatures = signatures
         self._instance = instance
@@ -99,7 +98,7 @@ class SignalInstance:
         # Qt would just append... allowing for multiple connections of the same func?
         self._slots.append(self._normalize_slot(slot))
 
-    def disconnect(self, slot: Optional[CallbackType] = None) -> None:
+    def disconnect(self, slot: CallbackType | None = None) -> None:
         if slot is None:
             # NOTE: clearing an empty list is actually a RuntimeError in Qt
             self._slots.clear()
