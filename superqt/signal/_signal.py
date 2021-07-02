@@ -3,7 +3,7 @@ from __future__ import annotations
 import weakref
 from contextlib import contextmanager
 from inspect import Parameter, Signature, ismethod, signature
-from typing import TYPE_CHECKING, Any, Callable, Sequence, Union, overload
+from typing import TYPE_CHECKING, Any, Callable, Union, overload
 
 if TYPE_CHECKING:
     CallbackType = Callable[..., None]
@@ -25,7 +25,7 @@ class Signal:
             self.signatures = (Signature(),)
         elif not isinstance(types[0], (list, tuple, Signature)):
             # single signature, with parameters
-            self.signatures = (Signal._build_signature(types),)
+            self.signatures = (Signal._build_signature(*types),)
         else:
             # multiple signatures
             _signatures: list[Signature] = []
@@ -33,7 +33,7 @@ class Signal:
                 if isinstance(t, Signature):
                     _signatures.append(t)
                 elif isinstance(t, (list, tuple)):
-                    _signatures.append(Signal._build_signature(t))
+                    _signatures.append(Signal._build_signature(*t))
                 else:
                     raise TypeError(
                         "each signature in a multi-signature sequence must be "
@@ -42,13 +42,12 @@ class Signal:
             self.signatures = tuple(_signatures)
 
     @staticmethod
-    def _build_signature(types: Sequence[type]) -> Signature:
-        return Signature(
-            [
-                Parameter(name=f"a{i}", kind=Parameter.POSITIONAL_ONLY, annotation=t)
-                for i, t in enumerate(types)
-            ]
-        )
+    def _build_signature(*types: type) -> Signature:
+        params = [
+            Parameter(name=f"a{i}", kind=Parameter.POSITIONAL_ONLY, annotation=t)
+            for i, t in enumerate(types)
+        ]
+        return Signature(params)
 
     def __getattr__(self, name):
         if name == "connect":
@@ -96,11 +95,10 @@ class SignalInstance:
             raise TypeError(f"Cannot connect to non-callable object: {slot}")
 
         # TODO: this only checks the number of args not the type
-        slot_sig = signature(slot)
-        if not any(sigs_compatible(slot_sig, s) for s in self.signatures):
+        if not any(sigs_compatible(slot, s) for s in self.signatures):
             accepted = ",".join(str(x) for x in self.signatures)
             raise TypeError(
-                f"incompatible slot signature: {slot_sig}. Accepted: {accepted}"
+                f"incompatible slot signature: {signature(slot)}. Accepted: {accepted}"
             )
 
         # TODO: check signature against self._signal.signatures
@@ -186,9 +184,64 @@ def receiver_sender(rcv, sender):
         rcv._set_sender(None)
 
 
-def sigs_compatible(sig1: Signature, sig2: Signature):
-    try:
-        sig1.bind(*sig2.parameters)
-        return True
-    except TypeError:
+# These __code__ inspection methods are faster and more direct than using
+# inspect module but probably more error prone.  If bugs pop up, consider switching
+
+
+def _get_code(obj):
+    func_code = getattr(obj, "__code__", None)
+    if not func_code and hasattr(obj, "__call__"):
+        func_code = getattr(obj.__call__, "__code__", None)
+    return func_code
+
+
+def _arg_count_compatible(func: Callable[..., None], sig: Signature):
+    """Return True if func accepts equal or less positional args than sig"""
+    if not callable(func):
         return False
+
+    func_code = _get_code(func)
+    if not func_code:
+        return False
+
+    defaults = getattr(func, "__defaults__", None)
+    argcount = func_code.co_argcount
+
+    if not defaults:
+        defaults = getattr(func.__call__, "defaults", ())
+        # hacky... test performance against just using inspect directly
+        if "self" in func_code.co_varnames:
+            argcount -= 1
+
+    n_defaults = len(defaults) if defaults else 0
+    non_default_count = argcount - n_defaults
+
+    return non_default_count <= len(sig.parameters)
+
+
+def _arg_types_compatible(func, sig: Signature, strict_length=False):
+    func_code = _get_code(func)
+    pos_arg_names = func_code.co_varnames[: func_code.co_argcount]
+
+    if strict_length and len(pos_arg_names) != len(sig.parameters):
+        return False
+
+    f_annotations = getattr(func, "__annotations__", {})
+    if not f_annotations and hasattr(func, "__call__"):
+        f_annotations = getattr(func.__call__, "__annotations__", {})
+    if not f_annotations:
+        return True
+
+    for name, param in zip(pos_arg_names, sig.parameters.values()):
+        annotation = f_annotations.get(name)
+        if not annotation or param.annotation is Parameter.empty:
+            continue
+        if annotation != param.annotation:
+            return False
+    return True
+
+
+def sigs_compatible(func, sig, check_types=True):
+    if _arg_count_compatible(func, sig):
+        return _arg_types_compatible(func, sig) if check_types else True
+    return False
