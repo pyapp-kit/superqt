@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import weakref
-from collections.abc import Sequence
 from contextlib import contextmanager
-from inspect import Parameter, Signature, ismethod
-from typing import TYPE_CHECKING, Any, Callable, Union, overload
+from inspect import Parameter, Signature, ismethod, signature
+from typing import TYPE_CHECKING, Any, Callable, Sequence, Union, overload
 
 if TYPE_CHECKING:
     CallbackType = Callable[..., None]
@@ -80,12 +79,12 @@ class Signal:
 
 class SignalInstance:
     def __init__(
-        self, signatures: tuple[Signature, ...] = (), instance: Any = None
+        self, signatures: tuple[Signature, ...] = (Signature(),), instance: Any = None
     ) -> None:
         self.signatures = signatures
         self._instance: object = instance
         self._slots: list[SlotRef] = []
-        self._blocked: bool = False
+        self._is_blocked: bool = False
 
     def __getitem__(self, key: object) -> SignalInstance:
         # used to return a version of self that accepts a specific signature
@@ -95,6 +94,14 @@ class SignalInstance:
     def connect(self, slot: CallbackType) -> None:
         if not callable(slot):
             raise TypeError(f"Cannot connect to non-callable object: {slot}")
+
+        # TODO: this only checks the number of args not the type
+        slot_sig = signature(slot)
+        if not any(sigs_compatible(slot_sig, s) for s in self.signatures):
+            accepted = ",".join(str(x) for x in self.signatures)
+            raise TypeError(
+                f"incompatible slot signature: {slot_sig}. Accepted: {accepted}"
+            )
 
         # TODO: check signature against self._signal.signatures
         # Qt would just append... allowing for multiple connections of the same func?
@@ -112,21 +119,19 @@ class SignalInstance:
         # Or raises a ValueError if not in the list
         try:
             self._slots.remove(self._normalize_slot(slot))
-        except KeyError as e:
-            raise KeyError(f"slot is not connected: {slot}") from e
+        except ValueError as e:
+            raise ValueError(f"slot is not connected: {slot}") from e
 
     def emit(self, *args: Any) -> None:
-        if self._blocked:
+        if self._is_blocked:
             return
-
-        # get sender?
 
         for slot in self._slots:
             self._call_slot(slot, *args)
 
     def block(self, should_block: bool = True):
         """Sets blocking of the signal"""
-        self._block = bool(should_block)
+        self._is_blocked = bool(should_block)
 
     def blocked(self):
         return SignalBlocker(self)
@@ -150,7 +155,7 @@ class SignalInstance:
 
 
 class SignalBlocker:
-    def __init__(self, target):
+    def __init__(self, target: SignalInstance):
         self.target = target
 
     def __enter__(self):
@@ -179,3 +184,11 @@ def receiver_sender(rcv, sender):
         yield
     finally:
         rcv._set_sender(None)
+
+
+def sigs_compatible(sig1: Signature, sig2: Signature):
+    try:
+        sig1.bind(*sig2.parameters)
+        return True
+    except TypeError:
+        return False
