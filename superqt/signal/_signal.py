@@ -1,14 +1,16 @@
 from __future__ import annotations
 
+import warnings
 import weakref
 from contextlib import contextmanager
-from functools import wraps
 from inspect import Parameter, Signature, ismethod, signature
-from typing import TYPE_CHECKING, Any, Callable, Union, overload
+from typing import TYPE_CHECKING, Any, Callable, Tuple, Union, overload
 
 if TYPE_CHECKING:
     CallbackType = Callable[..., None]
-    SlotRef = Union[CallbackType, weakref.WeakKeyDictionary[object, CallbackType]]
+    MethodRef = Tuple[weakref.ReferenceType[object], str]
+    NormedCallback = Union[MethodRef, CallbackType]
+    StoredSlot = Tuple[NormedCallback, int]
 
 
 class Signal:
@@ -45,7 +47,7 @@ class Signal:
     @staticmethod
     def _build_signature(*types: type) -> Signature:
         params = [
-            Parameter(name=f"a{i}", kind=Parameter.POSITIONAL_ONLY, annotation=t)
+            Parameter(name=f"p{i}", kind=Parameter.POSITIONAL_ONLY, annotation=t)
             for i, t in enumerate(types)
         ]
         return Signature(params)
@@ -83,32 +85,79 @@ class SignalInstance:
     ) -> None:
         self.signatures = signatures
         self._instance: object = instance
-        self._slots: list[SlotRef] = []
+        self._slots: list[StoredSlot] = []
         self._is_blocked: bool = False
 
     def __getitem__(self, key: object) -> SignalInstance:
         # used to return a version of self that accepts a specific signature
         pass
 
-    # could return handle to the connection?
-    def connect(self, slot: CallbackType) -> None:
+    def connect(self, slot: CallbackType, check_types=False) -> None:
+        """Connect a callback ("slot") to this signal.
+
+        `slot` is compatible if:
+            - it has equal or less required positional arguments
+            - it has no required keyword arguments
+            - if `check_types` is True, all provided types must match
+
+        Parameters
+        ----------
+        slot : Callable
+            A callable to connect to this signal.
+        check_types : bool, optional
+            If true, An additional check will be performed to make sure that types
+            declared in the slot signature are compatible with at least one of the
+            signatures provided by this slot, by default False.
+
+        Raises
+        ------
+        TypeError
+            If a non-callable object is provided.
+        ValueError
+            If the provided slot fails validation, either due to mismatched positional
+            argument requirements, or failed type checking.
+        """
         if not callable(slot):
             raise TypeError(f"Cannot connect to non-callable object: {slot}")
 
-        for s in sorted(self.signatures, key=lambda x: len(x.parameters), reverse=True):
-            if sigs_compatible(slot, s):
-                break
+        # make sure we have a matching signature
+        errors = []
+        slot_sig = signature(slot)
+        for spec in sorted(
+            self.signatures, key=lambda x: len(x.parameters), reverse=True
+        ):
+            try:
+                # get the maximum number of arguments that we can pass to the slot
+                minargs, maxargs = acceptable_posarg_range(slot_sig)
+                n_spec_params = len(spec.parameters)
+
+                if minargs > n_spec_params:
+                    raise ValueError(
+                        f"Slot requires at least {minargs} positional "
+                        f"arguments, but spec only provides {n_spec_params}"
+                    )
+
+                if check_types and not parameter_types_match(slot, spec, slot_sig):
+                    raise ValueError(
+                        f"Slot types {slot_sig} do not match types in {spec}"
+                    )
+
+                break  # if we made it here, we're good
+            except ValueError as e:
+                errors.append(e)
+                continue
         else:
+            name = getattr(slot, "__name__", str(slot))
             accepted = ",".join(str(x) for x in self.signatures)
-            raise TypeError(
-                f"incompatible slot signature: {signature(slot)}. Accepted: {accepted}"
-            )
+            msg = f"Cannot connect slot {name!r} with signature: {signature(slot)}:"
+            for err in errors:
+                msg += f"\n - {err}"
+            msg += f"\n\nAccepted signatures: {accepted}"
+            raise ValueError(msg)
 
-        # TODO: check signature against self._signal.signatures
-        # Qt would just append... allowing for multiple connections of the same func?
-        self._slots.append(self._normalize_slot(slot))
+        self._slots.append((self._normalize_slot(slot), maxargs))
 
-    def disconnect(self, slot: CallbackType | None = None) -> None:
+    def disconnect(self, slot: NormedCallback | None = None, missing_ok=True) -> None:
         if slot is None:
             # NOTE: clearing an empty list is actually a RuntimeError in Qt
             self._slots.clear()
@@ -119,25 +168,41 @@ class SignalInstance:
         # this only removes the first one it finds...
         # Or raises a ValueError if not in the list
         try:
-            self._slots.remove(self._normalize_slot(slot))
+            normed = self._normalize_slot(slot)
+            _slots = [s[0] for s in self._slots]
+            idx = _slots.index(normed)
+            self._slots.pop(idx)
         except ValueError as e:
-            raise ValueError(f"slot is not connected: {slot}") from e
+            if not missing_ok:
+                raise ValueError(f"slot is not connected: {slot}") from e
 
     def emit(self, *args: Any) -> None:
+        """Emit this signal with arguments `args`."""
         if self._is_blocked:
             return
 
-        for slot in self._slots:
-            if isinstance(slot, weakref.WeakKeyDictionary):
-                for obj, func in slot.items():
-                    # TODO: can we cleanup dead dicts?
-                    with receiver_sender(obj, self._instance):
-                        func(obj, *args[: _get_code(func).co_argcount])
+        rem: list[NormedCallback] = []
+        for (slot, max_args) in self._slots:
+            receiver = None
+            if isinstance(slot, tuple):
+                _ref, method_name = slot
+                receiver = _ref()
+                if receiver is None:
+                    rem.append(slot)  # add dead weakref
+                    continue
+                cb = getattr(receiver, method_name, None)
+                if cb is None:  # pragma: no cover
+                    rem.append(slot)  # object has changed?
+                    continue
             else:
-                # FIXME: for performance reasons, this "argument eating" should be done
-                # at connection time, not here, but that makes it a bit harder
-                # to know if a given slot is in the list
-                slot(*args[: _get_code(slot).co_argcount])
+                cb = slot
+
+            with receiver_sender(receiver, self._instance):
+                # TODO: add better exception handling
+                cb(*args[:max_args])
+
+        for slot in rem:
+            self.disconnect(slot)
 
     def block(self, should_block: bool = True):
         """Sets blocking of the signal"""
@@ -146,14 +211,13 @@ class SignalInstance:
     def blocked(self):
         return SignalBlocker(self)
 
-    def _normalize_slot(self, slot: CallbackType) -> SlotRef:
+    def _normalize_slot(self, slot: NormedCallback) -> NormedCallback:
         if ismethod(slot):
-            return weakref.WeakKeyDictionary({slot.__self__: slot.__func__})  # type: ignore
-        # XXX: could consider doing weakref if we know its a function (but not lambda!)
+            return (weakref.ref(slot.__self__), slot.__name__)  # type: ignore
+        if isinstance(slot, tuple) and not isinstance(slot[0], weakref.ref):
+            s0, s1, *_ = slot
+            return (weakref.ref(s0), s1)
         return slot
-
-    def __call__(self, *args):
-        self.emit(*args)
 
 
 class SignalBlocker:
@@ -188,76 +252,97 @@ def receiver_sender(rcv, sender):
         rcv._set_sender(None)
 
 
-# These __code__ inspection methods are faster and more direct than using
-# inspect module but probably more error prone.  If bugs pop up, consider switching
+# def f(a, /, b, c=None, *d, f=None, **g): print(locals())
+#
+# a: kind=POSITIONAL_ONLY,       default=Parameter.empty    # 1 required posarg
+# b: kind=POSITIONAL_OR_KEYWORD, default=Parameter.empty    # 1 requires posarg
+# c: kind=POSITIONAL_OR_KEYWORD, default=None               # 1 optional posarg
+# d: kind=VAR_POSITIONAL,        default=Parameter.empty    # N optional posargs
+# e: kind=KEYWORD_ONLY,          default=Parameter.empty    # 1 REQUIRED kwarg
+# f: kind=KEYWORD_ONLY,          default=None               # 1 optional kwarg
+# g: kind=VAR_KEYWORD,           default=Parameter.empty    # N optional kwargs
 
 
-def safe_wrap(func):
-    """create function that throws out positional arguments that `func` cannot take."""
-    max_args = _get_code(func).co_argcount
+def acceptable_posarg_range(
+    sig: Signature, forbid_required_kwarg=True
+) -> tuple[int, int]:
+    """Returns tuple of (min, max) accepted positional arguments.
 
-    @wraps(func)
-    def _inner(*args):
-        return func(*args[:max_args])
+    Parameters
+    ----------
+    sig : Signature
+        Signature object to evaluate
+    no_required_kwarg : bool, optional
+        Whether to allow required KEYWORD_ONLY parameters.
 
-    return _inner
+    Returns
+    -------
+    arg_range : Tuple[int, int]
+        minimum, maximum number of acceptable positional arguments
 
-
-def _get_code(obj):
-    func_code = getattr(obj, "__code__", None)
-    if not func_code and hasattr(obj, "__call__"):
-        func_code = getattr(obj.__call__, "__code__", None)
-    return func_code
-
-
-def _pos_arg_count(func):
-    func_code = _get_code(func)
-    if not func_code:
-        return False
-
-    defaults = getattr(func, "__defaults__", None)
-    argcount = func_code.co_argcount
-
-    if not defaults:
-        defaults = getattr(func.__call__, "defaults", ())
-        # XXX: HACK... test performance against just using inspect directly
-        if "self" in func_code.co_varnames or "_mock_self" in func_code.co_varnames:
-            argcount -= 1
-
-    n_defaults = len(defaults) if defaults else 0
-    return argcount - n_defaults
-
-
-def _arg_count_compatible(func: Callable[..., None], sig: Signature):
-    """Return True if func accepts equal or less positional args than sig"""
-    if not callable(func):
-        return False
-    return _pos_arg_count(func) <= len(sig.parameters)
+    Raises
+    ------
+    ValueError
+        If the signature has a required keyword_only parameter and `no_required_kwarg`
+        is `True`.
+    """
+    required = 0
+    optional = 0
+    for param in sig.parameters.values():
+        if param.kind in {Parameter.POSITIONAL_ONLY, Parameter.POSITIONAL_OR_KEYWORD}:
+            if param.default is Parameter.empty:
+                required += 1
+            else:
+                optional += 1
+        elif param.kind is Parameter.VAR_POSITIONAL:
+            optional += 10 ** 10  # could use math.inf, but need an int for indexing.
+        elif (
+            param.kind is Parameter.KEYWORD_ONLY
+            and param.default is Parameter.empty
+            and forbid_required_kwarg
+        ):
+            raise ValueError("Required KEYWORD_ONLY parameters not allowed")
+    return (required, required + optional)
 
 
-def _arg_types_compatible(func, sig: Signature, strict_length=False):
-    func_code = _get_code(func)
-    pos_arg_names = func_code.co_varnames[: func_code.co_argcount]
+def parameter_types_match(
+    function: Callable, spec: Signature, func_sig: Signature | None = None
+):
+    fsig = func_sig or signature(function)
 
-    if strict_length and len(pos_arg_names) != len(sig.parameters):
-        return False
-
-    f_annotations = getattr(func, "__annotations__", {})
-    if not f_annotations and hasattr(func, "__call__"):
-        f_annotations = getattr(func.__call__, "__annotations__", {})
-    if not f_annotations:
-        return True
-
-    for name, param in zip(pos_arg_names, sig.parameters.values()):
-        annotation = f_annotations.get(name)
-        if not annotation or param.annotation is Parameter.empty:
+    func_hints = None
+    for f_param, spec_param in zip(fsig.parameters.values(), spec.parameters.values()):
+        f_anno = f_param.annotation
+        if f_anno is fsig.empty:
+            # if function parameter is not type annotated, allow it.
             continue
-        if annotation != param.annotation:
+
+        if isinstance(f_anno, str):
+            if func_hints is None:
+                from typing_extensions import get_type_hints
+
+                func_hints = get_type_hints(function)
+            f_anno = func_hints.get(f_param.name)
+
+        if not _is_subclass(f_anno, spec_param.annotation):
             return False
     return True
 
 
-def sigs_compatible(func, sig, check_types=True):
-    if _arg_count_compatible(func, sig):
-        return _arg_types_compatible(func, sig) if check_types else True
-    return False
+def _is_subclass(left: Any, right: type) -> bool:
+    from inspect import isclass
+
+    from typing_extensions import get_args, get_origin
+
+    if not isclass(left):
+        # look for Optional[Type], which manifests as Union[Type, None]
+        origin = get_origin(left)
+        args = get_args(left)
+        if origin is Union and len(args) == 2 and type(None) in args:
+            left = next(i for i in args if not issubclass(i, type(None)))
+
+    try:
+        return issubclass(left, right)
+    except TypeError as e:  # pragma: no cover
+        warnings.warn(f"failed to check type for annotation {left}: {e}")
+        return False

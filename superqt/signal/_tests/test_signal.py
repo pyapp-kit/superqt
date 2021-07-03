@@ -1,129 +1,179 @@
 import gc
 import weakref
-from inspect import Signature
 from types import FunctionType
+from typing import Optional
 from unittest.mock import MagicMock
 
 import pytest
 
 from superqt.signal import Receiver, Signal, SignalInstance
-from superqt.signal._signal import (
-    _arg_count_compatible,
-    _arg_types_compatible,
-    sigs_compatible,
-)
 
 
+# fmt: off
 class Emitter:
-    changed = Signal(int)
+    no_arg = Signal()
+    one_int = Signal(int)
+    two_int = Signal(int, int)
+    str_int = Signal(str, int)
 
 
-@pytest.fixture
-def emitter():
-    return Emitter()
+class MyObj:
+    def f_no_arg(self): ...
+    def f_str_int_vararg(self, a: str, b: int, *c): ...
+    def f_str_int_any(self, a: str, b: int, c): ...
+    def f_str_int_kwarg(self, a: str, b: int, c=None): ...
+    def f_str_int(self, a: str, b: int): ...
+    def f_str_any(self, a: str, b): ...
+    def f_str(self, a: str): ...
+    def f_int(self, a: int): ...
+    def f_any(self, a): ...
+    def f_int_int(self, a: int, b: int): ...
+    def f_str_str(self, a: str, b: str): ...
+    def f_arg_kwarg(self, a, b=None): ...
+    def f_vararg(self, *a): ...
+    def f_vararg_varkwarg(self, *a, **b): ...
+    def f_vararg_kwarg(self, *a, b=None): ...
 
 
-@pytest.fixture
-def receiver():
-    class R(Receiver):
-        expect_sender = None
+def f_no_arg(): ...
+def f_str_int_vararg(a: str, b: int, *c): ...
+def f_str_int_any(a: str, b: int, c): ...
+def f_str_int_kwarg(a: str, b: int, c=None): ...
+def f_str_int(a: str, b: int): ...
+def f_str_any(a: str, b): ...
+def f_str(a: str): ...
+def f_int(a: int): ...
+def f_any(a): ...
+def f_int_int(a: int, b: int): ...
+def f_str_str(a: str, b: str): ...
+def f_arg_kwarg(a, b=None): ...
+def f_vararg(*a): ...
+def f_vararg_varkwarg(*a, **b): ...
+def f_vararg_kwarg(*a, b=None): ...
 
-        def assert_sender(self, *a):
-            assert self.get_sender() is self.expect_sender
 
-        def assert_not_sender(self, *a):
-            # just to make sure we're actually calling it
-            assert self.get_sender() is not self.expect_sender
+class MyReceiver(MyObj, Receiver):
+    expect_sender = None
 
-    return R()
+    def assert_sender(self, *a):
+        assert self.get_sender() is self.expect_sender
+
+    def assert_not_sender(self, *a):
+        # just to make sure we're actually calling it
+        assert self.get_sender() is not self.expect_sender
+# fmt: on
 
 
-def test_basic_signal(emitter):
+def test_basic_signal():
     """standard Qt usage, as class attribute"""
+    emitter = Emitter()
     mock = MagicMock()
-    emitter.changed.connect(mock)
-    emitter.changed.emit(1)
+    emitter.one_int.connect(mock)
+    emitter.one_int.emit(1)
     mock.assert_called_once_with(1)
 
 
-def test_basic_signal_blocked(emitter: Emitter):
-    """standard Qt usage, as class attribute"""
-    mock = MagicMock()
-    emitter.changed.connect(mock)
+def test_misc():
+    emitter = Emitter()
+    assert isinstance(Emitter.one_int, Signal)
+    assert isinstance(emitter.one_int, SignalInstance)
 
-    emitter.changed.emit(1)
+    with pytest.raises(AttributeError):
+        emitter.one_int.asdf
+
+    with pytest.raises(AttributeError):
+        emitter.one_int.asdf
+
+
+def test_basic_signal_blocked():
+    """standard Qt usage, as class attribute"""
+    emitter = Emitter()
+    mock = MagicMock()
+
+    emitter.one_int.connect(mock)
+    emitter.one_int.emit(1)
     mock.assert_called_once_with(1)
 
     mock.reset_mock()
-    with emitter.changed.blocked():
-        emitter.changed.emit(1)
+    with emitter.one_int.blocked():
+        emitter.one_int.emit(1)
     mock.assert_not_called()
 
 
-def test_disconnect(emitter: Emitter):
+def test_disconnect():
+    emitter = Emitter()
     mock = MagicMock()
     with pytest.raises(ValueError) as e:
-        emitter.changed.disconnect(mock)
+        emitter.one_int.disconnect(mock, missing_ok=False)
     assert "slot is not connected" in str(e)
+    emitter.one_int.disconnect(mock)
 
-    emitter.changed.connect(mock)
-    emitter.changed.emit(1)
+    emitter.one_int.connect(mock)
+    emitter.one_int.emit(1)
     mock.assert_called_once_with(1)
 
     mock.reset_mock()
-    emitter.changed.disconnect(mock)
-    emitter.changed.emit(1)
+    emitter.one_int.disconnect(mock)
+    emitter.one_int.emit(1)
     mock.assert_not_called()
 
 
-def test_slot_types(emitter: Emitter, receiver):
-    assert len(emitter.changed._slots) == 0
-    emitter.changed.connect(lambda x: None)
-    assert len(emitter.changed._slots) == 1
+def test_slot_types():
+    emitter = Emitter()
+    assert len(emitter.one_int._slots) == 0
+    emitter.one_int.connect(lambda x: None)
+    assert len(emitter.one_int._slots) == 1
 
-    def f(x):
-        pass
-
-    emitter.changed.connect(f)
-    assert len(emitter.changed._slots) == 2
+    emitter.one_int.connect(f_int)
+    assert len(emitter.one_int._slots) == 2
     # connecting same function twice is (currently) OK
-    emitter.changed.connect(f)
-    assert len(emitter.changed._slots) == 3
-    assert isinstance(emitter.changed._slots[-1], FunctionType)
+    emitter.one_int.connect(f_int)
+    assert len(emitter.one_int._slots) == 3
+    assert isinstance(emitter.one_int._slots[-1][0], FunctionType)
 
     # bound methods
-    emitter.changed.connect(receiver.assert_sender)
-    assert len(emitter.changed._slots) == 4
-    assert isinstance(emitter.changed._slots[-1], weakref.WeakKeyDictionary)
-
-    class T:
-        def x(self):
-            pass
-
-    emitter.changed.connect(T.x)
-    assert len(emitter.changed._slots) == 5
-    assert type(emitter.changed._slots[-1]) == FunctionType
+    obj = MyObj()
+    emitter.one_int.connect(obj.f_int)
+    assert len(emitter.one_int._slots) == 4
+    assert isinstance(emitter.one_int._slots[-1][0], tuple)
+    assert isinstance(emitter.one_int._slots[-1][0][0], weakref.ref)
 
     with pytest.raises(TypeError):
-        emitter.changed.connect("not a callable")  # type: ignore
+        emitter.one_int.connect("not a callable")  # type: ignore
 
 
-def test_basic_signal_with_sender(emitter, receiver):
+def test_basic_signal_with_sender_receiver():
     """standard Qt usage, as class attribute"""
+    emitter = Emitter()
+    receiver = MyReceiver()
     receiver.expect_sender = emitter
 
     assert receiver.get_sender() is None
-    emitter.changed.connect(receiver.assert_sender)
-    emitter.changed.emit()
+    emitter.one_int.connect(receiver.assert_sender)
+    emitter.one_int.emit()
 
     # back to none after the call is over.
     assert receiver.get_sender() is None
-    emitter.changed.disconnect()
+    emitter.one_int.disconnect()
 
     # sanity check... to make sure that methods are in fact being called.
-    emitter.changed.connect(receiver.assert_not_sender)
+    emitter.one_int.connect(receiver.assert_not_sender)
     with pytest.raises(AssertionError):
-        emitter.changed.emit()
+        emitter.one_int.emit()
+
+
+def test_basic_signal_with_sender_nonreceiver():
+    """standard Qt usage, as class attribute"""
+
+    emitter = Emitter()
+    nr = MyObj()
+
+    emitter.one_int.connect(nr.f_no_arg)
+    emitter.one_int.connect(nr.f_int)
+    emitter.one_int.connect(nr.f_vararg_varkwarg)
+    emitter.one_int.emit(1)
+
+    # emitter.one_int.connect(nr.two_int)
 
 
 def test_signal_instance():
@@ -144,138 +194,143 @@ def test_signal_instance_error():
     assert "Signal() class attribute" in str(e)
 
 
-def test_signature_validation(emitter: Emitter):
+def test_weakrefs():
+    """Test that connect an instance method doesn't hold strong ref."""
+    emitter = Emitter()
+    obj = MyObj()
 
-    # a slot may have a shorter signature than the signal it receives
-    # because it can ignore extra arguments.
+    assert len(emitter.one_int._slots) == 0
+    emitter.one_int.connect(obj.f_no_arg)
+    assert len(emitter.one_int._slots) == 1
+    del obj
+    gc.collect()
+    emitter.one_int.emit(1)  # this should trigger deletion
+    assert len(emitter.one_int._slots) == 0
 
-    class Emitter:
-        no_arg = Signal()
-        one_arg = Signal(int)
-        two_arg = Signal(int, int)
 
-    # fmt: off
-    def no_arg(): ...
-    def one_arg(a): ...
-    def two_arg(a, b): ...
-    def arg_kwarg(a, b=None): ...
-    def any_arg(*a, **b): ...
-    # fmt: on
+ALL = {n for n, f in locals().items() if callable(f) and n.startswith("f_")}
+SIG = Signal._build_signature(str, int)
+COUNT_INCOMPATIBLE = {
+    "no_arg": ALL - {"f_no_arg", "f_vararg", "f_vararg_varkwarg", "f_vararg_kwarg"},
+    "one_int": {
+        "f_int_int",
+        "f_str_any",
+        "f_str_int_any",
+        "f_str_int_kwarg",
+        "f_str_int_vararg",
+        "f_str_int",
+        "f_str_str",
+    },
+    "str_int": {"f_str_int_any"},
+}
 
+SIG_INCOMPATIBLE = {
+    "no_arg": {"f_int_int", "f_int", "f_str_int_any", "f_str_str"},
+    "one_int": {
+        "f_int_int",
+        "f_str_int_any",
+        "f_str_int_vararg",
+        "f_str_str",
+        "f_str_str",
+        "f_str",
+    },
+    "str_int": {"f_int_int", "f_int", "f_str_int_any", "f_str_str"},
+}
+
+
+@pytest.mark.parametrize("typed", ["typed", "untyped"])
+@pytest.mark.parametrize("func_name", ALL)
+@pytest.mark.parametrize("sig_name", ["no_arg", "one_int", "str_int"])
+@pytest.mark.parametrize("mode", ["func", "meth"])
+def test_connect_validation(func_name, sig_name, mode, typed):
+    func = getattr(MyObj(), func_name) if mode == "meth" else globals()[func_name]
     e = Emitter()
 
-    e.no_arg.connect(no_arg)
-    e.no_arg.connect(any_arg)
-    with pytest.raises(TypeError) as err:
-        e.no_arg.connect(one_arg)
-    assert "Accepted: ()" in str(err)
-    e.no_arg.emit()
+    check_types = typed == "typed"
+    signal: SignalInstance = getattr(e, sig_name)
+    bad_count = COUNT_INCOMPATIBLE[sig_name]
+    bad_sig = SIG_INCOMPATIBLE[sig_name]
+    if func_name in bad_count or check_types and func_name in bad_sig:
+        with pytest.raises(ValueError) as er:
+            signal.connect(func, check_types=check_types)
+        assert "Accepted signatures:" in str(er)
+        return
 
-    e.one_arg.connect(one_arg)
-    e.one_arg.connect(arg_kwarg)
-    e.one_arg.connect(any_arg)
-    e.one_arg.connect(no_arg)
-    with pytest.raises(TypeError):
-        e.one_arg.connect(two_arg)
-    e.one_arg.emit(1)
+    signal.connect(func, check_types=check_types)
 
-    e.two_arg.connect(two_arg)
-    e.two_arg.connect(arg_kwarg)
-    e.two_arg.connect(any_arg)
-    e.two_arg.connect(one_arg)
-    e.two_arg.emit(1, 1)
+    for sig in signal.signatures:
+        args = (p.annotation() for p in sig.parameters.values())
+        signal.emit(*args)
 
 
-def test_arg_count_compatible():
-    sig = Signal._build_signature(str, str)  # what this signal will emit
+def test_connect_lambdas():
+    e = Emitter()
+    assert len(e.two_int._slots) == 0
+    e.two_int.connect(lambda: None, SIG)
+    e.two_int.connect(lambda x: None, SIG)
+    assert len(e.two_int._slots) == 2
+    e.two_int.connect(lambda x, y: None, SIG)
+    e.two_int.connect(lambda x, y, z=None: None, SIG)
+    assert len(e.two_int._slots) == 4
+    e.two_int.connect(lambda x, y, *z: None, SIG)
+    e.two_int.connect(lambda *z: None, SIG)
+    assert len(e.two_int._slots) == 6
+    e.two_int.connect(lambda *z, **k: None, SIG)
+    assert len(e.two_int._slots) == 7
 
-    # a slot may have a shorter signature than the signal it receives
-    # because it can ignore extra arguments.
-    assert _arg_count_compatible(lambda x, y: None, sig)
-    assert _arg_count_compatible(lambda x, y, z=None: None, sig)
-    assert _arg_count_compatible(lambda x: None, sig)
-    assert _arg_count_compatible(lambda *x: None, sig)
-    assert _arg_count_compatible(lambda *x, z=None: None, sig)
-    assert _arg_count_compatible(lambda: None, sig)
-    # but not more
-    assert not _arg_count_compatible(lambda x, y, z: None, sig)
-    # unless they are optional or have defaults
-    assert _arg_count_compatible(lambda x, y, *z: None, sig)
-    assert _arg_count_compatible(lambda x, y, z=None: None, sig)
-
-    assert _arg_count_compatible(MagicMock(), sig)
-
-
-def test_arg_type_compatible():
-    sig = Signal._build_signature(str, int)  # what this signal will emit
-
-    # fmt: off
-    def f_str_int(a: str, b: int): ...
-    def f_str_none(a: str, b): ...  # missing annotations are ok
-    def f_str_str(a: str, b: str): ...  # b is wrong
-    def f_str(a: str): ...  # fails if strict_length is True
-    def f_int_int(a: int, b: int): ...
-    def f(): ...  # fails if strict_length is True
-    # fmt: on
-
-    assert _arg_types_compatible(f_str_int, sig)
-    assert _arg_types_compatible(f_str_none, sig)
-    assert not _arg_types_compatible(f_str_str, sig)
-    assert not _arg_types_compatible(f_int_int, sig)
-    assert not _arg_types_compatible(f_str, sig, strict_length=True)
-    assert _arg_types_compatible(f_str, sig)
-    assert not _arg_types_compatible(f, sig, strict_length=True)
-    assert _arg_types_compatible(f, sig)
-
-    assert _arg_types_compatible(MagicMock(), sig)
+    with pytest.raises(ValueError):
+        e.two_int.connect(lambda x, y, z: None, SIG)
 
 
-def test_sigs_compatible():
-    """Test that"""
-    sig = Signal._build_signature(str, int)  # what this signal will emit
-
-    # a slot may have a shorter signature than the signal it receives
-    # because it can ignore extra arguments.
-
-    # fmt: off
-    def f_str_int(a: str, b: int, *c): ...
-    def f_str_str(a: str, b: str): ...  # b is wrong
-    def f_str_int_none(a: str, b: int, c): ...  # too many
-    def f_str_none(a: str, b): ...  # missing annotations ok
-    def f_str(a: str): ...  # less ok
-    def f_int(a: int): ...  # but not if wrong annotation
-    def f(): ...
-    # fmt: on
-
-    assert sigs_compatible(f_str_int, sig)
-    assert not sigs_compatible(f_str_str, sig)
-    assert sigs_compatible(f_str_str, sig, check_types=False)
-    assert not sigs_compatible(f_str_int_none, sig)
-    assert sigs_compatible(f_str_none, sig)
-    assert sigs_compatible(f_str, sig)
-    assert not sigs_compatible(f_int, sig)
-    assert sigs_compatible(f, sig)
-
-    assert sigs_compatible(MagicMock(), Signature())
+def test_mock_connect():
+    e = Emitter()
+    e.one_int.connect(MagicMock())
 
 
-def test_weakrefs(emitter: Emitter):
-    """Test that connect an instance method doesn't hold strong ref."""
+# fmt: off
+class TypeA: ...
+class TypeB(TypeA): ...
+class TypeC(TypeB): ...
+class Rcv:
+    def methodA(self, obj: TypeA): ...
+    def methodA_ref(self, obj: 'TypeA'): ...
+    def methodB(self, obj: TypeB): ...
+    def methodB_ref(self, obj: 'TypeB'): ...
+    def methodOptB(self, obj: Optional[TypeB]): ...
+    def methodOptB_ref(self, obj: 'Optional[TypeB]'): ...
+    def methodC(self, obj: TypeC): ...
+    def methodC_ref(self, obj: 'TypeC'): ...
+class Emt:
+    signal = Signal(TypeB)
+# fmt: on
 
-    def _nslots():
-        gc.collect()
-        for slot in emitter.changed._slots:
-            # should kill dead weakrefs
-            return len(list(slot.items()))
-        return 0
 
-    class T:
-        def cb(self):
-            ...
+def test_forward_refs_type_checking():
+    e = Emt()
+    r = Rcv()
+    e.signal.connect(r.methodB, check_types=True)
+    e.signal.connect(r.methodB_ref, check_types=True)
+    e.signal.connect(r.methodOptB, check_types=True)
+    e.signal.connect(r.methodOptB_ref, check_types=True)
+    e.signal.connect(r.methodC, check_types=True)
+    e.signal.connect(r.methodC_ref, check_types=True)
 
-    t = T()
-    assert _nslots() == 0
-    emitter.changed.connect(t.cb)
-    assert _nslots() == 1
-    del t
-    assert _nslots() == 0
+    # signal is emitting a TypeB, but method is expecting a typeA
+    assert not issubclass(TypeA, TypeB)
+    # typeA is not a TypeB, so we get an error
+
+    with pytest.raises(ValueError):
+        e.signal.connect(r.methodA, check_types=True)
+    with pytest.raises(ValueError):
+        e.signal.connect(r.methodA_ref, check_types=True)
+
+
+def test_keyword_only_not_allowed():
+    e = Emitter()
+
+    def f(a: int, *, b: int):
+        ...
+
+    with pytest.raises(ValueError) as er:
+        e.two_int.connect(f)
+    assert "Required KEYWORD_ONLY parameters not allowed" in str(er)
