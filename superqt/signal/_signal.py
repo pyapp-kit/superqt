@@ -215,7 +215,6 @@ def _arg_count_compatible(func: Callable[..., None], sig: Signature):
 
     n_defaults = len(defaults) if defaults else 0
     non_default_count = argcount - n_defaults
-    print(non_default_count, len(sig.parameters))
     return non_default_count <= len(sig.parameters)
 
 
