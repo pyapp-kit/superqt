@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import weakref
 from contextlib import contextmanager
+from functools import wraps
 from inspect import Parameter, Signature, ismethod, signature
 from typing import TYPE_CHECKING, Any, Callable, Union, overload
 
@@ -94,8 +95,10 @@ class SignalInstance:
         if not callable(slot):
             raise TypeError(f"Cannot connect to non-callable object: {slot}")
 
-        # TODO: this only checks the number of args not the type
-        if not any(sigs_compatible(slot, s) for s in self.signatures):
+        for s in sorted(self.signatures, key=lambda x: len(x.parameters), reverse=True):
+            if sigs_compatible(slot, s):
+                break
+        else:
             accepted = ",".join(str(x) for x in self.signatures)
             raise TypeError(
                 f"incompatible slot signature: {signature(slot)}. Accepted: {accepted}"
@@ -125,7 +128,15 @@ class SignalInstance:
             return
 
         for slot in self._slots:
-            self._call_slot(slot, *args)
+            if isinstance(slot, weakref.WeakKeyDictionary):
+                for obj, func in slot.items():
+                    with receiver_sender(obj, self._instance):
+                        func(obj, *args[: _get_code(func).co_argcount])
+            else:
+                # FIXME: for performance reasons, this "argument eating" should be done
+                # at connection time, not here, but that makes it a bit harder
+                # to know if a given slot is in the list
+                slot(*args[: _get_code(slot).co_argcount])
 
     def block(self, should_block: bool = True):
         """Sets blocking of the signal"""
@@ -139,14 +150,6 @@ class SignalInstance:
             return weakref.WeakKeyDictionary({slot.__self__: slot.__func__})  # type: ignore
         # XXX: could consider doing weakref if we know its a function (but not lambda!)
         return slot
-
-    def _call_slot(self, slot: SlotRef, *args: Any) -> None:
-        if isinstance(slot, weakref.WeakKeyDictionary):
-            for obj, func in slot.items():
-                with receiver_sender(obj, self._instance):
-                    func(obj, *args)
-        else:
-            slot(*args)
 
     def __call__(self, *args):
         self.emit(*args)
@@ -188,6 +191,17 @@ def receiver_sender(rcv, sender):
 # inspect module but probably more error prone.  If bugs pop up, consider switching
 
 
+def safe_wrap(func):
+    """create function that throws out positional arguments that `func` cannot take."""
+    max_args = _get_code(func).co_argcount
+
+    @wraps(func)
+    def _inner(*args):
+        return func(*args[:max_args])
+
+    return _inner
+
+
 def _get_code(obj):
     func_code = getattr(obj, "__code__", None)
     if not func_code and hasattr(obj, "__call__"):
@@ -195,11 +209,7 @@ def _get_code(obj):
     return func_code
 
 
-def _arg_count_compatible(func: Callable[..., None], sig: Signature):
-    """Return True if func accepts equal or less positional args than sig"""
-    if not callable(func):
-        return False
-
+def _pos_arg_count(func):
     func_code = _get_code(func)
     if not func_code:
         return False
@@ -214,8 +224,14 @@ def _arg_count_compatible(func: Callable[..., None], sig: Signature):
             argcount -= 1
 
     n_defaults = len(defaults) if defaults else 0
-    non_default_count = argcount - n_defaults
-    return non_default_count <= len(sig.parameters)
+    return argcount - n_defaults
+
+
+def _arg_count_compatible(func: Callable[..., None], sig: Signature):
+    """Return True if func accepts equal or less positional args than sig"""
+    if not callable(func):
+        return False
+    return _pos_arg_count(func) <= len(sig.parameters)
 
 
 def _arg_types_compatible(func, sig: Signature, strict_length=False):

@@ -77,7 +77,7 @@ def test_disconnect(emitter: Emitter):
 
 def test_slot_types(emitter: Emitter, receiver):
     assert len(emitter.changed._slots) == 0
-    emitter.changed.connect(lambda x: print("hi"))
+    emitter.changed.connect(lambda x: None)
     assert len(emitter.changed._slots) == 1
 
     def f(x):
@@ -168,6 +168,7 @@ def test_signature_validation(emitter: Emitter):
     with pytest.raises(TypeError) as err:
         e.no_arg.connect(one_arg)
     assert "Accepted: ()" in str(err)
+    e.no_arg.emit()
 
     e.one_arg.connect(one_arg)
     e.one_arg.connect(arg_kwarg)
@@ -175,11 +176,13 @@ def test_signature_validation(emitter: Emitter):
     e.one_arg.connect(no_arg)
     with pytest.raises(TypeError):
         e.one_arg.connect(two_arg)
+    e.one_arg.emit(1)
 
     e.two_arg.connect(two_arg)
     e.two_arg.connect(arg_kwarg)
     e.two_arg.connect(any_arg)
     e.two_arg.connect(one_arg)
+    e.two_arg.emit(1, 1)
 
 
 def test_arg_count_compatible():
