@@ -1,4 +1,5 @@
 import weakref
+from inspect import Signature
 from types import FunctionType
 from unittest.mock import MagicMock
 
@@ -251,6 +252,4 @@ def test_sigs_compatible():
     assert not sigs_compatible(f_int, sig)
     assert sigs_compatible(f, sig)
 
-    from inspect import Signature
-
-    assert _arg_count_compatible(MagicMock(), Signature())
+    assert sigs_compatible(MagicMock(), Signature())

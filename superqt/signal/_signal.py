@@ -209,13 +209,13 @@ def _arg_count_compatible(func: Callable[..., None], sig: Signature):
 
     if not defaults:
         defaults = getattr(func.__call__, "defaults", ())
-        # hacky... test performance against just using inspect directly
-        if "self" in func_code.co_varnames:
+        # XXX: HACK... test performance against just using inspect directly
+        if "self" in func_code.co_varnames or "_mock_self" in func_code.co_varnames:
             argcount -= 1
 
     n_defaults = len(defaults) if defaults else 0
     non_default_count = argcount - n_defaults
-
+    print(non_default_count, len(sig.parameters))
     return non_default_count <= len(sig.parameters)
 
 
