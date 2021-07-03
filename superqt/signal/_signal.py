@@ -130,6 +130,7 @@ class SignalInstance:
         for slot in self._slots:
             if isinstance(slot, weakref.WeakKeyDictionary):
                 for obj, func in slot.items():
+                    # TODO: can we cleanup dead dicts?
                     with receiver_sender(obj, self._instance):
                         func(obj, *args[: _get_code(func).co_argcount])
             else:

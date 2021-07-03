@@ -1,3 +1,4 @@
+import gc
 import weakref
 from inspect import Signature
 from types import FunctionType
@@ -256,3 +257,25 @@ def test_sigs_compatible():
     assert sigs_compatible(f, sig)
 
     assert sigs_compatible(MagicMock(), Signature())
+
+
+def test_weakrefs(emitter: Emitter):
+    """Test that connect an instance method doesn't hold strong ref."""
+
+    def _nslots():
+        gc.collect()
+        for slot in emitter.changed._slots:
+            # should kill dead weakrefs
+            return len(list(slot.items()))
+        return 0
+
+    class T:
+        def cb(self):
+            ...
+
+    t = T()
+    assert _nslots() == 0
+    emitter.changed.connect(t.cb)
+    assert _nslots() == 1
+    del t
+    assert _nslots() == 0
