@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import warnings
 import weakref
 from contextlib import contextmanager
 from inspect import Parameter, Signature, ismethod, signature
@@ -92,7 +91,7 @@ class SignalInstance:
         # used to return a version of self that accepts a specific signature
         pass
 
-    def connect(self, slot: CallbackType, check_types=False) -> None:
+    def connect(self, slot: CallbackType, check_types=False, unique=False) -> None:
         """Connect a callback ("slot") to this signal.
 
         `slot` is compatible if:
@@ -105,9 +104,12 @@ class SignalInstance:
         slot : Callable
             A callable to connect to this signal.
         check_types : bool, optional
-            If true, An additional check will be performed to make sure that types
+            If `True`, An additional check will be performed to make sure that types
             declared in the slot signature are compatible with at least one of the
-            signatures provided by this slot, by default False.
+            signatures provided by this slot, by default `False`.
+        unique : bool, optional
+            If `True`, raises `ValueError` if the slot has already been connected,
+            by default `False`.
 
         Raises
         ------
@@ -116,9 +118,17 @@ class SignalInstance:
         ValueError
             If the provided slot fails validation, either due to mismatched positional
             argument requirements, or failed type checking.
+        ValueError
+            If `unique` is `True` and `slot` has already been connected.
         """
         if not callable(slot):
             raise TypeError(f"Cannot connect to non-callable object: {slot}")
+
+        if unique and (slot in self):
+            raise ValueError(
+                "Slot already connect. Use `connect(..., unique=False)` "
+                "to allow duplicate connections"
+            )
 
         # make sure we have a matching signature
         errors = []
@@ -155,6 +165,7 @@ class SignalInstance:
             msg += f"\n\nAccepted signatures: {accepted}"
             raise ValueError(msg)
 
+        # TODO: if unique is True, don't connect if it already exists
         self._slots.append((self._normalize_slot(slot), maxargs))
 
     def disconnect(self, slot: NormedCallback | None = None, missing_ok=True) -> None:
@@ -167,19 +178,28 @@ class SignalInstance:
         # if the same object is connected multiple times,
         # this only removes the first one it finds...
         # Or raises a ValueError if not in the list
-        try:
-            normed = self._normalize_slot(slot)
-            _slots = [s[0] for s in self._slots]
-            idx = _slots.index(normed)
+        idx = self._slot_index(slot)
+        if idx >= 0:
             self._slots.pop(idx)
-        except ValueError as e:
-            if not missing_ok:
-                raise ValueError(f"slot is not connected: {slot}") from e
+        elif not missing_ok:
+            raise ValueError(f"slot is not connected: {slot}")
+
+    def _slot_index(self, slot) -> int:
+        normed = self._normalize_slot(slot)
+        for i, (s, m) in enumerate(self._slots):
+            if s == normed:
+                return i
+        return -1
+
+    def __contains__(self, slot) -> bool:
+        return self._slot_index(slot) >= 0
 
     def emit(self, *args: Any) -> None:
         """Emit this signal with arguments `args`."""
         if self._is_blocked:
             return
+
+        # TODO: add signature checking on emit?  Qt has it...
 
         rem: list[NormedCallback] = []
         for (slot, max_args) in self._slots:
@@ -197,7 +217,7 @@ class SignalInstance:
             else:
                 cb = slot
 
-            with receiver_sender(receiver, self._instance):
+            with _receiver_set(receiver, self._instance):
                 # TODO: add better exception handling
                 cb(*args[:max_args])
 
@@ -221,6 +241,8 @@ class SignalInstance:
 
 
 class SignalBlocker:
+    """Context manager that blocks emission from `target`."""
+
     def __init__(self, target: SignalInstance):
         self.target = target
 
@@ -232,6 +254,8 @@ class SignalBlocker:
 
 
 class Receiver:
+    """Mixin that enables an object to detect the source of a signal."""
+
     def get_sender(self):
         return getattr(self, "_sender", None)
 
@@ -240,14 +264,15 @@ class Receiver:
 
 
 @contextmanager
-def receiver_sender(rcv, sender):
+def _receiver_set(rcv, sender):
+    """Context that sets the sender on a receiver object while emitting a signal."""
     if not isinstance(rcv, Receiver):
         yield
         return
 
     rcv._set_sender(sender)
     try:
-        yield
+        yield  # emit signal during this time.
     finally:
         rcv._set_sender(None)
 
@@ -307,7 +332,8 @@ def acceptable_posarg_range(
 
 def parameter_types_match(
     function: Callable, spec: Signature, func_sig: Signature | None = None
-):
+) -> bool:
+    """Return True if types in `function` signature match `spec`."""
     fsig = func_sig or signature(function)
 
     func_hints = None
@@ -335,14 +361,8 @@ def _is_subclass(left: Any, right: type) -> bool:
     from typing_extensions import get_args, get_origin
 
     if not isclass(left):
-        # look for Optional[Type], which manifests as Union[Type, None]
+        # look for Union
         origin = get_origin(left)
-        args = get_args(left)
-        if origin is Union and len(args) == 2 and type(None) in args:
-            left = next(i for i in args if not issubclass(i, type(None)))
-
-    try:
-        return issubclass(left, right)
-    except TypeError as e:  # pragma: no cover
-        warnings.warn(f"failed to check type for annotation {left}: {e}")
-        return False
+        if origin is Union:
+            return any(issubclass(i, right) for i in get_args(left))
+    return issubclass(left, right)

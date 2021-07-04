@@ -334,3 +334,15 @@ def test_keyword_only_not_allowed():
     with pytest.raises(ValueError) as er:
         e.two_int.connect(f)
     assert "Required KEYWORD_ONLY parameters not allowed" in str(er)
+
+
+def test_unique_connections():
+    e = Emitter()
+    assert len(e.one_int._slots) == 0
+    e.one_int.connect(f_no_arg, unique=True)
+    assert len(e.one_int._slots) == 1
+    with pytest.raises(ValueError):
+        e.one_int.connect(f_no_arg, unique=True)
+    assert len(e.one_int._slots) == 1
+    e.one_int.connect(f_no_arg)
+    assert len(e.one_int._slots) == 2
