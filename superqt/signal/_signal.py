@@ -19,8 +19,11 @@ class Signal:
         signatures: tuple[Signature, ...]
         _signal_instances: dict[Signal, weakref.WeakKeyDictionary[Any, SignalInstance]]
 
-    def __init__(self, *types: Any) -> None:
+    _current_emitter: SignalInstance | None = None
+
+    def __init__(self, *types: Any, name: str | None = None) -> None:
         self._signal_instances = {}
+        self._name = None
 
         if not types:
             # single signature, no parameters
@@ -42,6 +45,10 @@ class Signal:
                         "experessed as a Signature, list, or tuple"
                     )
             self.signatures = tuple(_signatures)
+
+    def __set_name__(self, owner: type, name):
+        if self._name is None:
+            self._name = name
 
     @staticmethod
     def _build_signature(*types: type) -> Signature:
@@ -75,23 +82,52 @@ class Signal:
         if instance is None:
             return self
         d = self._signal_instances.setdefault(self, weakref.WeakKeyDictionary())
-        return d.setdefault(instance, SignalInstance(self.signatures, instance))
+        return d.setdefault(
+            instance, SignalInstance(self.signatures, instance, name=self._name)
+        )
+
+    @classmethod
+    @contextmanager
+    def _emitting(cls, emitter: SignalInstance):
+        """Context that sets the sender on a receiver object while emitting a signal."""
+        previous, cls._current_emitter = cls._current_emitter, emitter
+        try:
+            yield
+        finally:
+            cls._current_emitter = previous
+
+    @classmethod
+    def current_emitter(cls) -> SignalInstance | None:
+        return cls._current_emitter
 
 
 class SignalInstance:
     def __init__(
-        self, signatures: tuple[Signature, ...] = (Signature(),), instance: Any = None
+        self,
+        signatures: tuple[Signature, ...] = (Signature(),),
+        instance: Any = None,
+        name: str | None = None,
     ) -> None:
         self.signatures = signatures
-        self._instance: object = instance
+        self._instance: Any = instance
         self._slots: list[StoredSlot] = []
         self._is_blocked: bool = False
+        self._name = name
+
+    @property
+    def instance(self) -> Any:
+        return self._instance
+
+    def __repr__(self) -> str:
+        return f"<{type(self).__name__} {self._name!r} on {self.instance!r}>"
 
     def __getitem__(self, key: object) -> SignalInstance:
         # used to return a version of self that accepts a specific signature
         pass
 
-    def connect(self, slot: CallbackType, check_types=False, unique=False) -> None:
+    def connect(
+        self, slot: CallbackType, check_types=False, unique: bool | str = False
+    ) -> None:
         """Connect a callback ("slot") to this signal.
 
         `slot` is compatible if:
@@ -107,9 +143,11 @@ class SignalInstance:
             If `True`, An additional check will be performed to make sure that types
             declared in the slot signature are compatible with at least one of the
             signatures provided by this slot, by default `False`.
-        unique : bool, optional
-            If `True`, raises `ValueError` if the slot has already been connected,
-            by default `False`.
+        unique : bool or str, optional
+            If `True`, returns without connecting if the slot has already been
+            connected.  If the literal string "raise" is passed to `unique`, then a
+            `ValueError` will be raised if the slot is already connected.
+            By default `False`.
 
         Raises
         ------
@@ -125,10 +163,12 @@ class SignalInstance:
             raise TypeError(f"Cannot connect to non-callable object: {slot}")
 
         if unique and (slot in self):
-            raise ValueError(
-                "Slot already connect. Use `connect(..., unique=False)` "
-                "to allow duplicate connections"
-            )
+            if unique == "raise":
+                raise ValueError(
+                    "Slot already connect. Use `connect(..., unique=False)` "
+                    "to allow duplicate connections"
+                )
+            return
 
         # make sure we have a matching signature
         errors = []
@@ -202,22 +242,23 @@ class SignalInstance:
         # TODO: add signature checking on emit?  Qt has it...
 
         rem: list[NormedCallback] = []
-        for (slot, max_args) in self._slots:
-            receiver = None
-            if isinstance(slot, tuple):
-                _ref, method_name = slot
-                receiver = _ref()
-                if receiver is None:
-                    rem.append(slot)  # add dead weakref
-                    continue
-                cb = getattr(receiver, method_name, None)
-                if cb is None:  # pragma: no cover
-                    rem.append(slot)  # object has changed?
-                    continue
-            else:
-                cb = slot
 
-            with _receiver_set(receiver, self._instance):
+        # allow receiver to query sender with Signal.current_emitter()
+        with Signal._emitting(self):
+            for (slot, max_args) in self._slots:
+                if isinstance(slot, tuple):
+                    _ref, method_name = slot
+                    obj = _ref()
+                    if obj is None:
+                        rem.append(slot)  # add dead weakref
+                        continue
+                    cb = getattr(obj, method_name, None)
+                    if cb is None:  # pragma: no cover
+                        rem.append(slot)  # object has changed?
+                        continue
+                else:
+                    cb = slot
+
                 # TODO: add better exception handling
                 cb(*args[:max_args])
 
@@ -251,30 +292,6 @@ class SignalBlocker:
 
     def __exit__(self, *args):
         self.target.block(False)
-
-
-class Receiver:
-    """Mixin that enables an object to detect the source of a signal."""
-
-    def get_sender(self):
-        return getattr(self, "_sender", None)
-
-    def _set_sender(self, sender):
-        self._sender = sender
-
-
-@contextmanager
-def _receiver_set(rcv, sender):
-    """Context that sets the sender on a receiver object while emitting a signal."""
-    if not isinstance(rcv, Receiver):
-        yield
-        return
-
-    rcv._set_sender(sender)
-    try:
-        yield  # emit signal during this time.
-    finally:
-        rcv._set_sender(None)
 
 
 # def f(a, /, b, c=None, *d, f=None, **g): print(locals())

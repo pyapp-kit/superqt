@@ -1,3 +1,3 @@
-from ._signal import Receiver, Signal, SignalInstance
+from ._signal import Signal, SignalInstance
 
-__all__ = ["Signal", "SignalInstance", "Receiver"]
+__all__ = ["Signal", "SignalInstance"]

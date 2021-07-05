@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from superqt.signal import Receiver, Signal, SignalInstance
+from superqt.signal import Signal, SignalInstance
 
 
 # fmt: off
@@ -52,15 +52,19 @@ def f_vararg_varkwarg(*a, **b): ...
 def f_vararg_kwarg(*a, b=None): ...
 
 
-class MyReceiver(MyObj, Receiver):
+class MyReceiver:
+    expect_signal = None
     expect_sender = None
+    expect_name = None
 
     def assert_sender(self, *a):
-        assert self.get_sender() is self.expect_sender
+        assert Signal.current_emitter() is self.expect_signal
+        assert Signal.current_emitter().instance is self.expect_sender
+        assert Signal.current_emitter()._name is self.expect_name
 
     def assert_not_sender(self, *a):
         # just to make sure we're actually calling it
-        assert self.get_sender() is not self.expect_sender
+        assert Signal.current_emitter().instance is not self.expect_sender
 # fmt: on
 
 
@@ -147,13 +151,15 @@ def test_basic_signal_with_sender_receiver():
     emitter = Emitter()
     receiver = MyReceiver()
     receiver.expect_sender = emitter
+    receiver.expect_signal = emitter.one_int
+    receiver.expect_name = "one_int"
 
-    assert receiver.get_sender() is None
+    assert Signal.current_emitter() is None
     emitter.one_int.connect(receiver.assert_sender)
     emitter.one_int.emit()
 
     # back to none after the call is over.
-    assert receiver.get_sender() is None
+    assert Signal.current_emitter() is None
     emitter.one_int.disconnect()
 
     # sanity check... to make sure that methods are in fact being called.
@@ -339,10 +345,16 @@ def test_keyword_only_not_allowed():
 def test_unique_connections():
     e = Emitter()
     assert len(e.one_int._slots) == 0
+
     e.one_int.connect(f_no_arg, unique=True)
     assert len(e.one_int._slots) == 1
-    with pytest.raises(ValueError):
-        e.one_int.connect(f_no_arg, unique=True)
+
+    e.one_int.connect(f_no_arg, unique=True)
     assert len(e.one_int._slots) == 1
+
+    with pytest.raises(ValueError):
+        e.one_int.connect(f_no_arg, unique="raise")
+    assert len(e.one_int._slots) == 1
+
     e.one_int.connect(f_no_arg)
     assert len(e.one_int._slots) == 2
