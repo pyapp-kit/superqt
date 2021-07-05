@@ -100,6 +100,10 @@ class Signal:
     def current_emitter(cls) -> SignalInstance | None:
         return cls._current_emitter
 
+    @classmethod
+    def sender(cls) -> Any:
+        return getattr(cls._current_emitter, "instance", None)
+
 
 class SignalInstance:
     def __init__(
@@ -110,16 +114,21 @@ class SignalInstance:
     ) -> None:
         self.signatures = signatures
         self._instance: Any = instance
+        self._name = name
         self._slots: list[StoredSlot] = []
         self._is_blocked: bool = False
-        self._name = name
 
     @property
     def instance(self) -> Any:
         return self._instance
 
+    @property
+    def name(self) -> Any:
+        return self._name
+
     def __repr__(self) -> str:
-        return f"<{type(self).__name__} {self._name!r} on {self.instance!r}>"
+        name = f"{self.name!r} " if self.name else ""
+        return f"<{type(self).__name__} {name}on {self.instance!r}>"
 
     def __getitem__(self, key: object) -> SignalInstance:
         # used to return a version of self that accepts a specific signature
