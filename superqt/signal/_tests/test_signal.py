@@ -59,6 +59,7 @@ class MyReceiver:
 
     def assert_sender(self, *a):
         assert Signal.current_emitter() is self.expect_signal
+        assert self.expect_name in repr(Signal.current_emitter())
         assert Signal.current_emitter().instance is self.expect_sender
         assert Signal.sender() is self.expect_sender
         assert Signal.current_emitter()._name is self.expect_name
