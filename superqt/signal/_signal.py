@@ -3,7 +3,7 @@ from __future__ import annotations
 import weakref
 from contextlib import contextmanager
 from inspect import Parameter, Signature, ismethod, signature
-from typing import TYPE_CHECKING, Any, Callable, Tuple, Union, overload
+from typing import TYPE_CHECKING, Any, Callable, Optional, Tuple, Union, overload
 
 if TYPE_CHECKING:
     CallbackType = Callable[..., None]
@@ -19,9 +19,9 @@ class Signal:
         signatures: tuple[Signature, ...]
         _signal_instances: dict[Signal, weakref.WeakKeyDictionary[Any, SignalInstance]]
 
-    _current_emitter: SignalInstance | None = None
+    _current_emitter: Optional[SignalInstance] = None
 
-    def __init__(self, *types: Any, name: str | None = None) -> None:
+    def __init__(self, *types: Any, name: Optional[str] = None) -> None:
         self._signal_instances = {}
         self._name = None
 
@@ -69,14 +69,16 @@ class Signal:
         return self.__getattribute__(name)
 
     @overload
-    def __get__(self, instance: None, owner: type | None = None) -> Signal:
+    def __get__(self, instance: None, owner: Optional[type] = None) -> Signal:
         ...
 
     @overload
-    def __get__(self, instance: Any, owner: type | None = None) -> SignalInstance:
+    def __get__(self, instance: Any, owner: Optional[type] = None) -> SignalInstance:
         ...
 
-    def __get__(self, instance: Any, owner: type = None) -> Signal | SignalInstance:
+    def __get__(
+        self, instance: Any, owner: type = None
+    ) -> Union[Signal, SignalInstance]:
         # if instance is not None, we're being accessed on an instance of `owner`
         # otherwise we're being accessed on the `owner` itself
         if instance is None:
@@ -97,7 +99,7 @@ class Signal:
             cls._current_emitter = previous
 
     @classmethod
-    def current_emitter(cls) -> SignalInstance | None:
+    def current_emitter(cls) -> Optional[SignalInstance]:
         return cls._current_emitter
 
     @classmethod
@@ -110,7 +112,7 @@ class SignalInstance:
         self,
         signatures: tuple[Signature, ...] = (Signature(),),
         instance: Any = None,
-        name: str | None = None,
+        name: Optional[str] = None,
     ) -> None:
         self.signatures = signatures
         self._instance: Any = instance
@@ -135,7 +137,7 @@ class SignalInstance:
         pass
 
     def connect(
-        self, slot: CallbackType, check_types=False, unique: bool | str = False
+        self, slot: CallbackType, check_types=False, unique: Union[bool, str] = False
     ) -> None:
         """Connect a callback ("slot") to this signal.
 
@@ -187,7 +189,7 @@ class SignalInstance:
         ):
             try:
                 # get the maximum number of arguments that we can pass to the slot
-                minargs, maxargs = acceptable_posarg_range(slot_sig)
+                minargs, maxargs = _acceptable_posarg_range(slot_sig)
                 n_spec_params = len(spec.parameters)
 
                 if minargs > n_spec_params:
@@ -196,7 +198,7 @@ class SignalInstance:
                         f"arguments, but spec only provides {n_spec_params}"
                     )
 
-                if check_types and not parameter_types_match(slot, spec, slot_sig):
+                if check_types and not _parameter_types_match(slot, spec, slot_sig):
                     raise ValueError(
                         f"Slot types {slot_sig} do not match types in {spec}"
                     )
@@ -217,7 +219,24 @@ class SignalInstance:
         # TODO: if unique is True, don't connect if it already exists
         self._slots.append((self._normalize_slot(slot), maxargs))
 
-    def disconnect(self, slot: NormedCallback | None = None, missing_ok=True) -> None:
+    def _normalize_slot(self, slot: NormedCallback) -> NormedCallback:
+        if ismethod(slot):
+            return (weakref.ref(slot.__self__), slot.__name__)  # type: ignore
+        if isinstance(slot, tuple) and not isinstance(slot[0], weakref.ref):
+            s0, s1, *_ = slot
+            return (weakref.ref(s0), s1)
+        return slot
+
+    def _slot_index(self, slot) -> int:
+        normed = self._normalize_slot(slot)
+        for i, (s, m) in enumerate(self._slots):
+            if s == normed:
+                return i
+        return -1
+
+    def disconnect(
+        self, slot: Optional[NormedCallback] = None, missing_ok=True
+    ) -> None:
         if slot is None:
             # NOTE: clearing an empty list is actually a RuntimeError in Qt
             self._slots.clear()
@@ -233,15 +252,11 @@ class SignalInstance:
         elif not missing_ok:
             raise ValueError(f"slot is not connected: {slot}")
 
-    def _slot_index(self, slot) -> int:
-        normed = self._normalize_slot(slot)
-        for i, (s, m) in enumerate(self._slots):
-            if s == normed:
-                return i
-        return -1
-
     def __contains__(self, slot) -> bool:
         return self._slot_index(slot) >= 0
+
+    def __len__(self) -> int:
+        return len(self._slots)
 
     def emit(self, *args: Any) -> None:
         """Emit this signal with arguments `args`."""
@@ -281,14 +296,6 @@ class SignalInstance:
     def blocked(self):
         return SignalBlocker(self)
 
-    def _normalize_slot(self, slot: NormedCallback) -> NormedCallback:
-        if ismethod(slot):
-            return (weakref.ref(slot.__self__), slot.__name__)  # type: ignore
-        if isinstance(slot, tuple) and not isinstance(slot[0], weakref.ref):
-            s0, s1, *_ = slot
-            return (weakref.ref(s0), s1)
-        return slot
-
 
 class SignalBlocker:
     """Context manager that blocks emission from `target`."""
@@ -298,6 +305,7 @@ class SignalBlocker:
 
     def __enter__(self):
         self.target.block(True)
+        return self
 
     def __exit__(self, *args):
         self.target.block(False)
@@ -314,7 +322,7 @@ class SignalBlocker:
 # g: kind=VAR_KEYWORD,           default=Parameter.empty    # N optional kwargs
 
 
-def acceptable_posarg_range(
+def _acceptable_posarg_range(
     sig: Signature, forbid_required_kwarg=True
 ) -> tuple[int, int]:
     """Returns tuple of (min, max) accepted positional arguments.
@@ -356,8 +364,8 @@ def acceptable_posarg_range(
     return (required, required + optional)
 
 
-def parameter_types_match(
-    function: Callable, spec: Signature, func_sig: Signature | None = None
+def _parameter_types_match(
+    function: Callable, spec: Signature, func_sig: Optional[Signature] = None
 ) -> bool:
     """Return True if types in `function` signature match `spec`."""
     fsig = func_sig or signature(function)
