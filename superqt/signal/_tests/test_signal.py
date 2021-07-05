@@ -249,9 +249,16 @@ SIG_INCOMPATIBLE = {
 @pytest.mark.parametrize("typed", ["typed", "untyped"])
 @pytest.mark.parametrize("func_name", ALL)
 @pytest.mark.parametrize("sig_name", ["no_arg", "one_int", "str_int"])
-@pytest.mark.parametrize("mode", ["func", "meth"])
+@pytest.mark.parametrize("mode", ["func", "meth", "partial"])
 def test_connect_validation(func_name, sig_name, mode, typed):
-    func = getattr(MyObj(), func_name) if mode == "meth" else globals()[func_name]
+    from functools import partial
+
+    if mode == "meth":
+        func = getattr(MyObj(), func_name)
+    elif mode == "partial":
+        func = partial(globals()[func_name])
+    else:
+        func = globals()[func_name]
     e = Emitter()
 
     check_types = typed == "typed"
