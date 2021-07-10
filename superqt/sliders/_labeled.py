@@ -1,5 +1,6 @@
 from enum import IntEnum
 from functools import partial
+from typing import Any
 
 from ..qtcompat.QtCore import QPoint, QSize, Qt, Signal
 from ..qtcompat.QtGui import QFontMetrics, QValidator
@@ -85,6 +86,9 @@ class _SliderProxy:
 
     def setTickPosition(self, pos) -> None:
         self._slider.setTickPosition(pos)
+
+    def __getattr__(self, name) -> Any:
+        return getattr(self._slider, name)
 
 
 def _handle_overloaded_slider_sig(args, kwargs):
