@@ -5,7 +5,7 @@ import pytest
 from superqt.qtcompat.QtCore import QEvent, QPoint, QPointF, Qt
 from superqt.qtcompat.QtGui import QHoverEvent
 from superqt.qtcompat.QtWidgets import QStyle, QStyleOptionSlider
-from superqt.sliders._generic_slider import _GenericSlider
+from superqt.sliders._generic_slider import _GenericSlider, _sliderValueFromPosition
 
 from ._testutil import _linspace, _mouse_event, _wheel_event, skip_on_linux_qt6
 
@@ -155,3 +155,28 @@ def test_slider_extremes(gslider: _GenericSlider, mag, qtbot):
         gslider.setValue(i)
         assert math.isclose(gslider.value(), i, rel_tol=1e-8)
         gslider.initStyleOption(QStyleOptionSlider())
+
+
+# args are (min: float, max: float, position: int, span: int, upsideDown: bool)
+@pytest.mark.parametrize(
+    "args, result",
+    [
+        # (min, max, pos, span[, inverted]), expectation
+        # data range (1, 2)
+        ((1, 2, 50, 100), 1.5),
+        ((1, 2, 70, 100), 1.7),
+        ((1, 2, 70, 100, True), 1.3),  # inverted appearance
+        ((1, 2, 170, 100), 2),
+        ((1, 2, 100, 100), 2),
+        ((1, 2, -30, 100), 1),
+        # data range (-2, 2)
+        ((-2, 2, 50, 100), 0),
+        ((-2, 2, 75, 100), 1),
+        ((-2, 2, 75, 100, True), -1),  # inverted appearance
+        ((-2, 2, 170, 100), 2),
+        ((-2, 2, 100, 100), 2),
+        ((-2, 2, -30, 100), -2),
+    ],
+)
+def test_slider_value_from_position(args, result):
+    assert math.isclose(_sliderValueFromPosition(*args), result)

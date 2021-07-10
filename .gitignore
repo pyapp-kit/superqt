@@ -79,3 +79,5 @@ target/
 */_version.py
 .vscode/settings.json
 screenshots
+
+.mypy_cache

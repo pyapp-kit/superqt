@@ -481,8 +481,8 @@ def _sliderValueFromPosition(
 
     if span <= 0 or position <= 0:
         return max if upsideDown else min
-    if position >= span:
+    elif position >= span:
         return min if upsideDown else max
-    range = max - min
-    tmp = min + position * range / span
-    return max - tmp if upsideDown else tmp + min
+    else:
+        tmp = (max - min) * (position / span)
+        return (max - tmp) if upsideDown else tmp + min
