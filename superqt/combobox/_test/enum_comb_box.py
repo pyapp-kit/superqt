@@ -51,8 +51,10 @@ def test_replace(qtbot):
     enum = EnumComboBox(enum=Enum1)
     qtbot.addWidget(enum)
     assert enum.count() == 3
+    assert enum.enum() == Enum1
     assert isinstance(enum.currentValue(), Enum1)
     enum.setEnum(Enum2)
+    assert enum.enum() == Enum2
     assert isinstance(enum.currentValue(), Enum2)
     assert enum.count() == 4
     assert [enum.itemText(i) for i in range(enum.count())] == ["d", "e", "f", "g"]
@@ -81,6 +83,7 @@ def test_change_value(qtbot):
 
 def test_no_enum(qtbot):
     enum = EnumComboBox()
+    assert enum.enum() is None
     qtbot.addWidget(enum)
     with pytest.raises(RuntimeError):
         enum.currentValue()

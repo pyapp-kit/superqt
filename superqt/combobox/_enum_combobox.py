@@ -27,7 +27,7 @@ class EnumComboBox(QComboBox):
 
     def __init__(self, parent=None, enum:Optional[Type[EnumType]] = None):
         super().__init__(parent)
-        self.enum = enum
+        self._enum = enum
         if enum is not None:
             self.setEnum(enum)
         self.currentIndexChanged.connect(self._emit_signal)
@@ -37,18 +37,21 @@ class EnumComboBox(QComboBox):
         Set enum class from which members value should be selected
         """
         self.clear()
-        self.enum = enum
+        self._enum = enum
         super().addItems(list(map(_get_name, enum.__members__.values())))
 
+    def enum(self) -> Optional[Type[EnumType]]:
+        return self._enum
+
     def clear(self):
-        self.enum = None
+        self._enum = None
         super().clear()
 
     def currentValue(self) -> EnumType:
         """current value as Enum member"""
-        if self.enum is None:
+        if self._enum is None:
             raise RuntimeError("Enum value is None")
-        return list(self.enum.__members__.values())[self.currentIndex()]
+        return list(self._enum.__members__.values())[self.currentIndex()]
 
     def setValue(self, value: Union[EnumType, int]):
         """Set value with Enum or int"""
