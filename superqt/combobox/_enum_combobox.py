@@ -19,51 +19,51 @@ def _get_name(enum_value: Enum):
 
 class EnumComboBox(QComboBox):
     """
-    This is implementation of variant of EnumComboBox for select enum value.
-    If enum class does not provide own __str__ implementation
-    then human readable name is provide using name of item
-    replacing underscores with spaces.
-    """
-    currentValueChanged = Signal(enum_type)
+    ComboBox presenting options from a python Enum.
 
-    def __init__(self, parent=None, enum:Optional[Type[EnumType]] = None):
+    If the Enum class does not implement `__str__` then a human readable name
+    is created from the name of the enum member, replacing underscores with spaces.
+    """
+    currentEnumChanged = Signal(enum_type)
+
+    def __init__(self, parent=None, enum_class:Optional[Type[EnumType]] = None):
         super().__init__(parent)
-        self._enum = enum
-        if enum is not None:
-            self.setEnum(enum)
+        self._enum_class = None
+        if enum_class is not None:
+            self.setEnumClass(enum_class)
         self.currentIndexChanged.connect(self._emit_signal)
 
-    def setEnum(self, enum: Type[EnumType]):
+    def setEnumClass(self, enum: Type[EnumType]):
         """
         Set enum class from which members value should be selected
         """
         self.clear()
-        self._enum = enum
+        self._enum_class = enum
         super().addItems(list(map(_get_name, enum.__members__.values())))
 
-    def enum(self) -> Optional[Type[EnumType]]:
+    def enumClass(self) -> Optional[Type[EnumType]]:
         """return current Enum class"""
-        return self._enum
+        return self._enum_class
 
     def clear(self):
-        self._enum = None
+        self._enum_class = None
         super().clear()
 
-    def currentValue(self) -> EnumType:
+    def currentEnum(self) -> EnumType:
         """current value as Enum member"""
-        if self._enum is None:
+        if self._enum_class is None:
             raise RuntimeError("Enum value is None")
-        return list(self._enum.__members__.values())[self.currentIndex()]
+        return list(self._enum_class.__members__.values())[self.currentIndex()]
 
-    def setValue(self, value: EnumType) -> None:
+    def setCurrentEnum(self, value: EnumType) -> None:
         """Set value with Enum."""
         if not isinstance(value, Enum):
             raise TypeError(f'setValue(self, Enum): argument 1 has unexpected type {type(value).__name__!r}')
         self.setCurrentText(_get_name(value))
 
     def _emit_signal(self):
-        if self._enum is not None:
-            self.currentValueChanged.emit(self.currentValue())
+        if self._enum_class is not None:
+            self.currentEnumChanged.emit(self.currentEnum())
 
     def insertItems(self, *_, **__):
         raise RuntimeError("EnumComboBox does not allow to insert items")

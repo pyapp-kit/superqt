@@ -32,7 +32,7 @@ class Enum4(Enum):
     c_3 = 3
 
 def test_simple_create(qtbot):
-    enum = EnumComboBox(enum=Enum1)
+    enum = EnumComboBox(enum_class=Enum1)
     qtbot.addWidget(enum)
     assert enum.count() == 3
     assert [enum.itemText(i) for i in range(enum.count())] == ["a", "b", "c"]
@@ -42,54 +42,54 @@ def test_simple_create2(qtbot):
     enum = EnumComboBox()
     qtbot.addWidget(enum)
     assert enum.count() == 0
-    enum.setEnum(Enum1)
+    enum.setEnumClass(Enum1)
     assert enum.count() == 3
     assert [enum.itemText(i) for i in range(enum.count())] == ["a", "b", "c"]
 
 
 def test_replace(qtbot):
-    enum = EnumComboBox(enum=Enum1)
+    enum = EnumComboBox(enum_class=Enum1)
     qtbot.addWidget(enum)
     assert enum.count() == 3
-    assert enum.enum() == Enum1
-    assert isinstance(enum.currentValue(), Enum1)
-    enum.setEnum(Enum2)
-    assert enum.enum() == Enum2
-    assert isinstance(enum.currentValue(), Enum2)
+    assert enum.enumClass() == Enum1
+    assert isinstance(enum.currentEnum(), Enum1)
+    enum.setEnumClass(Enum2)
+    assert enum.enumClass() == Enum2
+    assert isinstance(enum.currentEnum(), Enum2)
     assert enum.count() == 4
     assert [enum.itemText(i) for i in range(enum.count())] == ["d", "e", "f", "g"]
 
 
 def test_str_replace(qtbot):
-    enum = EnumComboBox(enum=Enum3)
+    enum = EnumComboBox(enum_class=Enum3)
     qtbot.addWidget(enum)
     assert enum.count() == 3
     assert [enum.itemText(i) for i in range(enum.count())] == ["a1", "b1", "c1"]
 
 def test_underscore_replace(qtbot):
-    enum = EnumComboBox(enum=Enum4)
+    enum = EnumComboBox(enum_class=Enum4)
     qtbot.addWidget(enum)
     assert enum.count() == 3
     assert [enum.itemText(i) for i in range(enum.count())] == ["a 1", "b 2", "c 3"]
 
 
 def test_change_value(qtbot):
-    enum = EnumComboBox(enum=Enum1)
+    enum = EnumComboBox(enum_class=Enum1)
     qtbot.addWidget(enum)
-    assert enum.currentValue() == Enum1.a
-    with qtbot.waitSignal(enum.currentValueChanged):
-        enum.setValue(Enum1.c)
-    assert enum.currentValue() == Enum1.c
+    assert enum.currentEnum() == Enum1.a
+    with qtbot.waitSignal(enum.currentEnumChanged):
+        enum.setCurrentEnum(Enum1.c)
+    assert enum.currentEnum() == Enum1.c
 
 def test_no_enum(qtbot):
     enum = EnumComboBox()
-    assert enum.enum() is None
+    assert enum.enumClass() is None
     qtbot.addWidget(enum)
     with pytest.raises(RuntimeError):
-        enum.currentValue()
+        enum.currentEnum()
 
 def test_prohibited_methods(qtbot):
-    enum = EnumComboBox(enum=Enum1)
+    enum = EnumComboBox(enum_class=Enum1)
     qtbot.addWidget(enum)
     with pytest.raises(RuntimeError):
         enum.addItem("aaa")
