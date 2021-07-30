@@ -20,7 +20,8 @@ def _get_name(enum_value: Enum):
 class EnumComboBox(QComboBox):
     """
     This is implementation of variant of EnumComboBox for select enum value.
-    If enum class does not provide own __str__ implementation then human readable name is provide using name of item
+    If enum class does not provide own __str__ implementation
+    then human readable name is provide using name of item
     replacing underscores with spaces.
     """
     currentValueChanged = Signal(enum_type)
@@ -41,6 +42,7 @@ class EnumComboBox(QComboBox):
         super().addItems(list(map(_get_name, enum.__members__.values())))
 
     def enum(self) -> Optional[Type[EnumType]]:
+        """return current Enum class"""
         return self._enum
 
     def clear(self):
@@ -60,10 +62,8 @@ class EnumComboBox(QComboBox):
         self.setCurrentText(_get_name(value))
 
     def _emit_signal(self):
-        try:
+        if self._enum is not None:
             self.currentValueChanged.emit(self.currentValue())
-        except RuntimeError:
-            pass
 
     def insertItems(self, *_, **__):
         raise RuntimeError("EnumComboBox does not allow to insert items")
