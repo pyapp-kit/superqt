@@ -53,14 +53,11 @@ class EnumComboBox(QComboBox):
             raise RuntimeError("Enum value is None")
         return list(self._enum.__members__.values())[self.currentIndex()]
 
-    def setValue(self, value: Union[EnumType, int]):
-        """Set value with Enum or int"""
-        if not isinstance(value, (Enum, int)):
-            return
-        if isinstance(value, Enum):
-            self.setCurrentText(_get_name(value))
-        else:
-            self.setCurrentIndex(value)
+    def setValue(self, value: EnumType) -> None:
+        """Set value with Enum."""
+        if not isinstance(value, Enum):
+            raise TypeError(f'setValue(self, Enum): argument 1 has unexpected type {type(value).__name__!r}')
+        self.setCurrentText(_get_name(value))
 
     def _emit_signal(self):
         try:
