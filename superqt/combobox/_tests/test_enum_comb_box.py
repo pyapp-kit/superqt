@@ -85,8 +85,7 @@ def test_no_enum(qtbot):
     enum = EnumComboBox()
     assert enum.enumClass() is None
     qtbot.addWidget(enum)
-    with pytest.raises(RuntimeError):
-        enum.currentEnum()
+    assert enum.currentEnum() is None
 
 def test_prohibited_methods(qtbot):
     enum = EnumComboBox(enum_class=Enum1)
