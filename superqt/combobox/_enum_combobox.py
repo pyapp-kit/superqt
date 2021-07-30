@@ -57,7 +57,9 @@ class EnumComboBox(QComboBox):
 
     def setCurrentEnum(self, value: EnumType) -> None:
         """Set value with Enum."""
-        if not isinstance(value, Enum):
+        if self._enum_class is None:
+            raise RuntimeError("Uninitialized enum class. Use `setEnumClass` before `setCurrentEnum`.")
+        if not isinstance(value, self._enum_class):
             raise TypeError(f'setValue(self, Enum): argument 1 has unexpected type {type(value).__name__!r}')
         self.setCurrentText(_get_name(value))
 
