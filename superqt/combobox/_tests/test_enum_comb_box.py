@@ -77,8 +77,10 @@ def test_change_value(qtbot):
     enum = EnumComboBox(enum_class=Enum1)
     qtbot.addWidget(enum)
     assert enum.currentEnum() == Enum1.a
-    with qtbot.waitSignal(enum.currentEnumChanged):
-        enum.setCurrentEnum(Enum1.c)
+    with qtbot.waitSignal(
+        enum.currentValueChanged, check_params_cb=lambda x: isinstance(x, Enum)
+    ):
+        enum.setValue(Enum1.c)
     assert enum.currentEnum() == Enum1.c
 
 def test_no_enum(qtbot):
