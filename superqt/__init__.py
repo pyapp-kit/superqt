@@ -15,6 +15,7 @@ from .sliders import (
     QRangeSlider,
 )
 from .spinbox import QLargeIntSpinBox
+from .combobox import EnumComboBox
 
 __all__ = [
     "QDoubleRangeSlider",
@@ -25,4 +26,5 @@ __all__ = [
     "QLabeledSlider",
     "QLargeIntSpinBox",
     "QRangeSlider",
+    "EnumComboBox"
 ]
