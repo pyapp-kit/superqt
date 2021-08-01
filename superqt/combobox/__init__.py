@@ -1,3 +1,3 @@
-from ._enum_combobox import EnumComboBox
+from ._enum_combobox import QEnumComboBox
 
-__all__ = ("EnumComboBox",)
+__all__ = ("QEnumComboBox",)

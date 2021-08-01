@@ -5,7 +5,7 @@ except ImportError:
     __version__ = "unknown"
 
 
-from .combobox import EnumComboBox
+from .combobox import QEnumComboBox
 from .sliders import (
     QDoubleRangeSlider,
     QDoubleSlider,
@@ -26,5 +26,5 @@ __all__ = [
     "QLabeledSlider",
     "QLargeIntSpinBox",
     "QRangeSlider",
-    "EnumComboBox",
+    "QEnumComboBox",
 ]

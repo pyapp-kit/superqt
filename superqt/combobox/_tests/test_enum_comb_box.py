@@ -2,7 +2,7 @@ from enum import Enum
 
 import pytest
 
-from superqt.combobox import EnumComboBox
+from superqt.combobox import QEnumComboBox
 
 
 class Enum1(Enum):
@@ -34,14 +34,14 @@ class Enum4(Enum):
 
 
 def test_simple_create(qtbot):
-    enum = EnumComboBox(enum_class=Enum1)
+    enum = QEnumComboBox(enum_class=Enum1)
     qtbot.addWidget(enum)
     assert enum.count() == 3
     assert [enum.itemText(i) for i in range(enum.count())] == ["a", "b", "c"]
 
 
 def test_simple_create2(qtbot):
-    enum = EnumComboBox()
+    enum = QEnumComboBox()
     qtbot.addWidget(enum)
     assert enum.count() == 0
     enum.setEnumClass(Enum1)
@@ -50,7 +50,7 @@ def test_simple_create2(qtbot):
 
 
 def test_replace(qtbot):
-    enum = EnumComboBox(enum_class=Enum1)
+    enum = QEnumComboBox(enum_class=Enum1)
     qtbot.addWidget(enum)
     assert enum.count() == 3
     assert enum.enumClass() == Enum1
@@ -63,21 +63,21 @@ def test_replace(qtbot):
 
 
 def test_str_replace(qtbot):
-    enum = EnumComboBox(enum_class=Enum3)
+    enum = QEnumComboBox(enum_class=Enum3)
     qtbot.addWidget(enum)
     assert enum.count() == 3
     assert [enum.itemText(i) for i in range(enum.count())] == ["a1", "b1", "c1"]
 
 
 def test_underscore_replace(qtbot):
-    enum = EnumComboBox(enum_class=Enum4)
+    enum = QEnumComboBox(enum_class=Enum4)
     qtbot.addWidget(enum)
     assert enum.count() == 3
     assert [enum.itemText(i) for i in range(enum.count())] == ["a 1", "b 2", "c 3"]
 
 
 def test_change_value(qtbot):
-    enum = EnumComboBox(enum_class=Enum1)
+    enum = QEnumComboBox(enum_class=Enum1)
     qtbot.addWidget(enum)
     assert enum.currentEnum() == Enum1.a
     with qtbot.waitSignal(
@@ -88,14 +88,14 @@ def test_change_value(qtbot):
 
 
 def test_no_enum(qtbot):
-    enum = EnumComboBox()
+    enum = QEnumComboBox()
     assert enum.enumClass() is None
     qtbot.addWidget(enum)
     assert enum.currentEnum() is None
 
 
 def test_prohibited_methods(qtbot):
-    enum = EnumComboBox(enum_class=Enum1)
+    enum = QEnumComboBox(enum_class=Enum1)
     qtbot.addWidget(enum)
     with pytest.raises(RuntimeError):
         enum.addItem("aaa")

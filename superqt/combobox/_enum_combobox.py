@@ -18,7 +18,7 @@ def _get_name(enum_value: Enum):
     return name
 
 
-class EnumComboBox(QComboBox):
+class QEnumComboBox(QComboBox):
     """
     ComboBox presenting options from a python Enum.
 
