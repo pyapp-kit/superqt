@@ -78,7 +78,7 @@ def test_change_value(qtbot):
     qtbot.addWidget(enum)
     assert enum.currentEnum() == Enum1.a
     with qtbot.waitSignal(
-        enum.currentValueChanged, check_params_cb=lambda x: isinstance(x, Enum)
+        enum.currentEnumChanged, check_params_cb=lambda x: isinstance(x, Enum)
     ):
         enum.setValue(Enum1.c)
     assert enum.currentEnum() == Enum1.c
