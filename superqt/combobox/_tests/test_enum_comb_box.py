@@ -26,10 +26,12 @@ class Enum3(Enum):
     def __str__(self):
         return self.name + "1"
 
+
 class Enum4(Enum):
     a_1 = 1
     b_2 = 2
     c_3 = 3
+
 
 def test_simple_create(qtbot):
     enum = EnumComboBox(enum_class=Enum1)
@@ -66,6 +68,7 @@ def test_str_replace(qtbot):
     assert enum.count() == 3
     assert [enum.itemText(i) for i in range(enum.count())] == ["a1", "b1", "c1"]
 
+
 def test_underscore_replace(qtbot):
     enum = EnumComboBox(enum_class=Enum4)
     qtbot.addWidget(enum)
@@ -83,11 +86,13 @@ def test_change_value(qtbot):
         enum.setValue(Enum1.c)
     assert enum.currentEnum() == Enum1.c
 
+
 def test_no_enum(qtbot):
     enum = EnumComboBox()
     assert enum.enumClass() is None
     qtbot.addWidget(enum)
     assert enum.currentEnum() is None
+
 
 def test_prohibited_methods(qtbot):
     enum = EnumComboBox(enum_class=Enum1)
@@ -95,7 +100,7 @@ def test_prohibited_methods(qtbot):
     with pytest.raises(RuntimeError):
         enum.addItem("aaa")
     with pytest.raises(RuntimeError):
-        enum.addItems( ["aaa", "bbb"])
+        enum.addItems(["aaa", "bbb"])
     with pytest.raises(RuntimeError):
         enum.insertItem(0, "aaa")
     with pytest.raises(RuntimeError):

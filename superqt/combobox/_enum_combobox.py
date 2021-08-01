@@ -1,11 +1,12 @@
-from typing import Optional, Type, TypeVar, Union
 from enum import Enum
+from typing import Optional, Type, TypeVar
 
+from ..qtcompat.QtCore import PYQT5, Signal
 from ..qtcompat.QtWidgets import QComboBox
-from ..qtcompat.QtCore import Signal, PYQT5
 
 EnumType = TypeVar("EnumType", bound=Enum)
 enum_type = Enum if PYQT5 else object
+
 
 def _get_name(enum_value: Enum):
     """Create human readable name if user does not provide own implementation of __str__"""
@@ -24,9 +25,10 @@ class EnumComboBox(QComboBox):
     If the Enum class does not implement `__str__` then a human readable name
     is created from the name of the enum member, replacing underscores with spaces.
     """
+
     currentEnumChanged = Signal(enum_type)
 
-    def __init__(self, parent=None, enum_class:Optional[Type[EnumType]] = None):
+    def __init__(self, parent=None, enum_class: Optional[Type[EnumType]] = None):
         super().__init__(parent)
         self._enum_class = None
         if enum_class is not None:
@@ -58,9 +60,13 @@ class EnumComboBox(QComboBox):
     def setCurrentEnum(self, value: EnumType) -> None:
         """Set value with Enum."""
         if self._enum_class is None:
-            raise RuntimeError("Uninitialized enum class. Use `setEnumClass` before `setCurrentEnum`.")
+            raise RuntimeError(
+                "Uninitialized enum class. Use `setEnumClass` before `setCurrentEnum`."
+            )
         if not isinstance(value, self._enum_class):
-            raise TypeError(f'setValue(self, Enum): argument 1 has unexpected type {type(value).__name__!r}')
+            raise TypeError(
+                f"setValue(self, Enum): argument 1 has unexpected type {type(value).__name__!r}"
+            )
         self.setCurrentText(_get_name(value))
 
     def _emit_signal(self):
