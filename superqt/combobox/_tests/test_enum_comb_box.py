@@ -123,6 +123,7 @@ def test_optional(qtbot):
     enum.setCurrentEnum(Enum1.a)
     assert enum.currentText() == "a"
     assert enum.currentEnum() == Enum1.a
+    assert enum.enumClass() is Enum1
     enum.setCurrentEnum(None)
     assert enum.currentText() == NONE_STRING
     assert enum.currentEnum() is None

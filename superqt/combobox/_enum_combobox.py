@@ -1,5 +1,5 @@
-from enum import Enum
-from typing import Optional, Type, TypeVar
+from enum import Enum, EnumMeta
+from typing import Optional, TypeVar
 
 from ..qtcompat.QtCore import Signal
 from ..qtcompat.QtWidgets import QComboBox
@@ -31,7 +31,7 @@ class QEnumComboBox(QComboBox):
     currentEnumChanged = Signal(object)
 
     def __init__(
-        self, parent=None, enum_class: Type[EnumType] = None, allow_none=False
+        self, parent=None, enum_class: Optional[EnumMeta] = None, allow_none=False
     ):
         super().__init__(parent)
         self._enum_class = None
@@ -40,18 +40,18 @@ class QEnumComboBox(QComboBox):
             self.setEnumClass(enum_class, allow_none)
         self.currentIndexChanged.connect(self._emit_signal)
 
-    def setEnumClass(self, enum: Type[EnumType], allow_none=False):
+    def setEnumClass(self, enum: Optional[EnumMeta], allow_none=False):
         """
         Set enum class from which members value should be selected
         """
         self.clear()
         self._enum_class = enum
-        self._allow_none = allow_none
+        self._allow_none = allow_none and enum is not None
         if allow_none:
             super().addItem(NONE_STRING)
         super().addItems(list(map(_get_name, self._enum_class.__members__.values())))
 
-    def enumClass(self) -> Optional[Type[EnumType]]:
+    def enumClass(self) -> Optional[EnumMeta]:
         """return current Enum class"""
         return self._enum_class
 
