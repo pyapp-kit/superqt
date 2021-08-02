@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import Optional
 
 import pytest
 
@@ -85,7 +84,7 @@ def test_change_value(qtbot):
     with qtbot.waitSignal(
         enum.currentEnumChanged, check_params_cb=lambda x: isinstance(x, Enum)
     ):
-        enum.setValue(Enum1.c)
+        enum.setCurrentEnum(Enum1.c)
     assert enum.currentEnum() == Enum1.c
 
 
@@ -111,7 +110,7 @@ def test_prohibited_methods(qtbot):
 
 
 def test_optional(qtbot):
-    enum = QEnumComboBox(enum_class=Optional[Enum1])
+    enum = QEnumComboBox(enum_class=Enum1, allow_none=True)
     qtbot.addWidget(enum)
     assert [enum.itemText(i) for i in range(enum.count())] == [
         NONE_STRING,

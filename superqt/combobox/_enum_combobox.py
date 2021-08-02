@@ -1,7 +1,5 @@
 from enum import Enum
-from typing import Optional, Type, TypeVar, Union
-
-from typing_extensions import get_args, get_origin
+from typing import Optional, Type, TypeVar
 
 from ..qtcompat.QtCore import Signal
 from ..qtcompat.QtWidgets import QComboBox
@@ -32,29 +30,25 @@ class QEnumComboBox(QComboBox):
 
     currentEnumChanged = Signal(object)
 
-    def __init__(self, parent=None, enum_class: Optional[Type[EnumType]] = None):
+    def __init__(
+        self, parent=None, enum_class: Type[EnumType] = None, allow_none=False
+    ):
         super().__init__(parent)
         self._enum_class = None
-        self._optional = False
+        self._allow_none = False
         if enum_class is not None:
-            self.setEnumClass(enum_class)
+            self.setEnumClass(enum_class, allow_none)
         self.currentIndexChanged.connect(self._emit_signal)
 
-    def setEnumClass(self, enum: Type[EnumType]):
+    def setEnumClass(self, enum: Type[EnumType], allow_none=False):
         """
         Set enum class from which members value should be selected
         """
         self.clear()
-        if get_origin(enum) is Union:
-            args = get_args(enum)
-            if len(args) != 2:
-                raise ValueError(f"QEnumComboBox does not support type {enum!r}")
-            self._enum_class = next(i for i in args if not issubclass(i, type(None)))
-            self._optional = True
+        self._enum_class = enum
+        self._allow_none = allow_none
+        if allow_none:
             super().addItem(NONE_STRING)
-        else:
-            self._enum_class = enum
-            self._optional = False
         super().addItems(list(map(_get_name, self._enum_class.__members__.values())))
 
     def enumClass(self) -> Optional[Type[EnumType]]:
@@ -63,17 +57,17 @@ class QEnumComboBox(QComboBox):
 
     def isOptional(self) -> bool:
         """return if current enum is with optional annotation"""
-        return self._optional
+        return self._allow_none
 
     def clear(self):
         self._enum_class = None
-        self._optional = False
+        self._allow_none = False
         super().clear()
 
     def currentEnum(self) -> Optional[EnumType]:
         """current value as Enum member"""
         if self._enum_class is not None:
-            if self._optional:
+            if self._allow_none:
                 if self.currentText() == NONE_STRING:
                     return None
                 else:
@@ -89,7 +83,7 @@ class QEnumComboBox(QComboBox):
             raise RuntimeError(
                 "Uninitialized enum class. Use `setEnumClass` before `setCurrentEnum`."
             )
-        if value is None and self._optional:
+        if value is None and self._allow_none:
             self.setCurrentIndex(0)
             return
         if not isinstance(value, self._enum_class):
