@@ -1,8 +1,10 @@
 from enum import Enum
+from typing import Optional
 
 import pytest
 
 from superqt.combobox import QEnumComboBox
+from superqt.combobox._enum_combobox import NONE_STRING
 
 
 class Enum1(Enum):
@@ -106,3 +108,22 @@ def test_prohibited_methods(qtbot):
     with pytest.raises(RuntimeError):
         enum.insertItems(0, ["aaa", "bbb"])
     assert enum.count() == 3
+
+
+def test_optional(qtbot):
+    enum = QEnumComboBox(enum_class=Optional[Enum1])
+    qtbot.addWidget(enum)
+    assert [enum.itemText(i) for i in range(enum.count())] == [
+        NONE_STRING,
+        "a",
+        "b",
+        "c",
+    ]
+    assert enum.currentText() == NONE_STRING
+    assert enum.currentEnum() is None
+    enum.setCurrentEnum(Enum1.a)
+    assert enum.currentText() == "a"
+    assert enum.currentEnum() == Enum1.a
+    enum.setCurrentEnum(None)
+    assert enum.currentText() == NONE_STRING
+    assert enum.currentEnum() is None
