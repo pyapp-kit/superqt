@@ -3,6 +3,12 @@
 
 ## Enum Combo Box
 
+`QEnumComboBox` is a variant of [`QComboBox`](https://doc.qt.io/qt-5/qcombobox.html) 
+that populates the items in the combobox based on a python `Enum` class.  In addition to all 
+of the methods provided by `QComboBox`, this subclass adds the methods 
+`enumClass`/`setEnumClass` to get/set the current `Enum` class represented by the combobox, 
+and `currentEnum`/`setCurrentEnum` to get/set the current `Enum` member in the combobox
+
 ```python
 from enum import Enum
 
