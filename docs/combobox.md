@@ -39,12 +39,11 @@ combo = QEnumComboBox(enum_class=SampleEnum)
 ```
 
 
-### Optional annotation
+### Allow `None`
 `QEnumComboBox` allow using Optional type annotation:
 
 ```python
 from enum import Enum
-from typing import Optional
 
 from superqt import QEnumComboBox
 
@@ -57,7 +56,7 @@ class SampleEnum(Enum):
 # you must create a QApplication before create a widget.
 
 combo = QEnumComboBox()
-combo.setEnumClass(Optional[SampleEnum])
+combo.setEnumClass(SampleEnum, allow_none=True)
 ```
 
 In this case there is added option `----` and `currentEnum` will return `None` for it.
