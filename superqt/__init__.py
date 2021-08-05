@@ -1,9 +1,16 @@
-"""superqt is a collection of QtWidgets for python."""
+"""superqt is a collection of Qt components for python."""
+from typing import TYPE_CHECKING
+
 try:
     from ._version import version as __version__
 except ImportError:
     __version__ = "unknown"
 
+if TYPE_CHECKING:
+    try:
+        from .compound._quantity import QQuantity
+    except ImportError:
+        pass
 
 from .sliders import (
     QDoubleRangeSlider,
@@ -24,5 +31,14 @@ __all__ = [
     "QLabeledRangeSlider",
     "QLabeledSlider",
     "QLargeIntSpinBox",
+    "QQuantity",
     "QRangeSlider",
 ]
+
+
+def __getattr__(name):
+    if name == "QQuantity":
+        from .compound._quantity import QQuantity
+
+        return QQuantity
+    raise ImportError(f"cannot import name {name!r} from {__name__!r}")
