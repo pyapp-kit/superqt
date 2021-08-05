@@ -5,9 +5,10 @@
 
 `QEnumComboBox` is a variant of [`QComboBox`](https://doc.qt.io/qt-5/qcombobox.html)
 that populates the items in the combobox based on a python `Enum` class.  In addition to all
-of the methods provided by `QComboBox`, this subclass adds the methods
+the methods provided by `QComboBox`, this subclass adds the methods
 `enumClass`/`setEnumClass` to get/set the current `Enum` class represented by the combobox,
-and `currentEnum`/`setCurrentEnum` to get/set the current `Enum` member in the combobox
+and `currentEnum`/`setCurrentEnum` to get/set the current `Enum` member in the combobox.
+There is also a new signal `currentEnumChanged(enum)` analogous to `currentIndexChanged` and `currentTextChanged`.
 
 Method like `insertItem` and `addItem` are blocked and try of its usage will end with `RuntimeError`
 
