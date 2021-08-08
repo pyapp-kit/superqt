@@ -4,6 +4,28 @@ from enum import Enum, EnumMeta
 from typing_extensions import Protocol, runtime_checkable
 
 
+@runtime_checkable
+class FontEnumProtocol(Protocol):
+    """Basic protocol that FontEnums must follow to work with superqt.fonticons"""
+
+    @classmethod
+    def _font_file(cls) -> str:
+        ...
+
+    @classmethod
+    def _font_family(cls) -> str:
+        ...
+
+    @classmethod
+    def _font_style(cls) -> str:
+        ...
+
+
+def is_font_enum_type(obj) -> bool:
+    """Return True if `obj` is a font enum capable of creating icons."""
+    return isinstance(obj, FontEnumProtocol) and isinstance(obj, EnumMeta)
+
+
 class ABCEnumMeta(EnumMeta, ABCMeta):
     def __dir__(self):
         return (
@@ -61,23 +83,3 @@ class FontEnum(Enum, metaclass=ABCEnumMeta):
 
     def __int__(self):
         return ord(self.value)
-
-
-@runtime_checkable
-class FontEnumProtocol(Protocol):
-    @classmethod
-    def _font_file(cls) -> str:
-        ...
-
-    @classmethod
-    def _font_family(cls) -> str:
-        ...
-
-    @classmethod
-    def _font_style(cls) -> str:
-        ...
-
-
-def is_font_enum_type(obj) -> bool:
-    """Return True if `obj` is a font enum capable of creating icons."""
-    return isinstance(obj, FontEnumProtocol) and isinstance(obj, EnumMeta)
