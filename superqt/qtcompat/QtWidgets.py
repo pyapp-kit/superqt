@@ -16,6 +16,12 @@ if PYQT5:
     from PyQt5.QtWidgets import *
 elif PYSIDE2:
     from PySide2.QtWidgets import *
+
+    def exec(self):
+        self.exec_()
+
+    QApplication.exec = exec
+
 elif PYQT6:
     from PyQt6.QtWidgets import *
 
