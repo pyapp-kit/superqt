@@ -9,12 +9,12 @@ if TYPE_CHECKING:
     from superqt.qtcompat.QtGui import QFont, QIcon
 
     try:
-        pass
+        from qtfi_mi4 import MI4Outlined, MI4Round, MI4Sharp, MI4TwoTone  # noqa
     except ImportError:
         pass
 
     try:
-        pass
+        from qtfi_fa5 import FA5Brands, FA5Regular, FA5Solid  # noqa
     except ImportError:
         pass
 
