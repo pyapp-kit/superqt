@@ -1,32 +1,29 @@
-__all__ = ["FontEnum", "is_font_enum_type", "icon", "font", "ENTRY_POINT"]
+__all__ = [
+    "is_font_enum_type",
+    "is_font_enum_member",
+    "icon",
+    "font",
+    "ENTRY_POINT",
+]
 
-from typing import TYPE_CHECKING, Dict, Tuple
+from enum import Enum
+from typing import TYPE_CHECKING, Dict
 
-from ._font_enum import FontEnum, is_font_enum_type
-from ._qfont_icon import QFontIcon
+from ._qfont_icon import QFontIcon, is_font_enum_member, is_font_enum_type
 
 if TYPE_CHECKING:
     from superqt.qtcompat.QtGui import QFont, QIcon
 
-    try:
-        from qtfi_mi4 import MI4Outlined, MI4Round, MI4Sharp, MI4TwoTone  # noqa
-    except ImportError:
-        pass
-
-    try:
-        from qtfi_fa5 import FA5Brands, FA5Regular, FA5Solid  # noqa
-    except ImportError:
-        pass
+    # just here for type checking...
 
 
 ENTRY_POINT = "superqt.fonticon"
-
-
 _INSTANCE = None
-_FONT_LIBRARY: Dict[str, Tuple[FontEnum, str]] = {}
+_FONT_LIBRARY: Dict[str, Enum] = {}
+_FONT_KEYS: Dict[str, Enum] = {}
 
 
-def _instance() -> QFontIcon:
+def _qfont_instance() -> QFontIcon:
     global _INSTANCE
     if _INSTANCE is None:
         _INSTANCE = QFontIcon()
@@ -34,11 +31,11 @@ def _instance() -> QFontIcon:
 
 
 def icon(*args, **kwargs) -> "QIcon":
-    return _instance().icon(*args, **kwargs)
+    return _qfont_instance().icon(*args, **kwargs)
 
 
 def font(*args, **kwargs) -> "QFont":
-    return _instance().font(*args, **kwargs)
+    return _qfont_instance().font(*args, **kwargs)
 
 
 def font_list():
@@ -52,13 +49,12 @@ def discover_fonts():
         from importlib_metadata import entry_points
     for ep in entry_points().get(ENTRY_POINT, {}):
         try:
-            module = ep.load()
+            cls = ep.load()
         except ImportError:
             continue
-        for attr in dir(module):
-            obj = getattr(module, attr)
-            if is_font_enum_type(obj):
-                _FONT_LIBRARY[attr] = obj
+        if is_font_enum_type(cls):
+            _FONT_LIBRARY[cls.__name__] = cls
+            _FONT_KEYS[ep.name] = cls
 
 
 def __getattr__(name):

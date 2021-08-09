@@ -1,64 +1,20 @@
 from abc import ABCMeta, abstractmethod
 from enum import Enum, EnumMeta
 
-from typing_extensions import Protocol, runtime_checkable
-
-
-@runtime_checkable
-class FontEnumProtocol(Protocol):
-    """Basic protocol that FontEnums must follow to work with superqt.fonticons"""
-
-    @classmethod
-    def _font_file(cls) -> str:
-        ...
-
-    @classmethod
-    def _font_family(cls) -> str:
-        ...
-
-    @classmethod
-    def _font_style(cls) -> str:
-        ...
-
-
-def is_font_enum_type(obj) -> bool:
-    """Return True if `obj` is a font enum capable of creating icons."""
-    return isinstance(obj, FontEnumProtocol) and isinstance(obj, EnumMeta)
-
 
 class ABCEnumMeta(EnumMeta, ABCMeta):
-    def __dir__(self):
-        return (
-            [
-                "__class__",
-                "__doc__",
-                "__members__",
-                "__module__",
-            ]
-            + self._member_names_
-            + [
-                i
-                for i in ("_font_file", "_font_family", "_font_style")
-                if hasattr(self, i)
-            ]
-        )
+    ...
 
 
+# This class isn't actually used internally anywhere, but it makes for a good
+# FontEnum template.  The one critical method is _font_file()... which must return
+# a string path to the OTF or TTF file containing the fonts.
 class FontEnum(Enum, metaclass=ABCEnumMeta):
     @classmethod
     @abstractmethod
     def _font_file(cls) -> str:
         """The path location of an OTF or TTF font file."""
-
-    @classmethod
-    @abstractmethod
-    def _font_family(cls) -> str:
-        "Return the font family."
-
-    @classmethod
-    @abstractmethod
-    def _font_style(cls) -> str:
-        "Return the font style.."
+        ...
 
     def __str__(self):
         return self.value
