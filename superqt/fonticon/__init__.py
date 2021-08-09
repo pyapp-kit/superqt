@@ -8,8 +8,18 @@ from ._qfont_icon import QFontIcon
 if TYPE_CHECKING:
     from superqt.qtcompat.QtGui import QFont, QIcon
 
+    try:
+        pass
+    except ImportError:
+        pass
 
-ENTRY_POINT = "superqt_fonticon"
+    try:
+        pass
+    except ImportError:
+        pass
+
+
+ENTRY_POINT = "superqt.fonticon"
 
 
 _INSTANCE = None
@@ -36,21 +46,26 @@ def font_list():
 
 
 def discover_fonts():
-    import entrypoints
-
-    for ep_name, ep in entrypoints.get_group_named(ENTRY_POINT).items():
-        module = ep.load()
+    try:
+        from importlib.metadata import entry_points
+    except ImportError:
+        from importlib_metadata import entry_points
+    for ep in entry_points().get(ENTRY_POINT, {}):
+        try:
+            module = ep.load()
+        except ImportError:
+            continue
         for attr in dir(module):
             obj = getattr(module, attr)
             if is_font_enum_type(obj):
-                _FONT_LIBRARY[attr] = (obj, ep_name)
+                _FONT_LIBRARY[attr] = obj
 
 
 def __getattr__(name):
     if name not in _FONT_LIBRARY:
         discover_fonts()
     if name in _FONT_LIBRARY:
-        return _FONT_LIBRARY[name][0]
+        return _FONT_LIBRARY[name]
     msg = f"module {__name__!r} has no attribute {name!r}."
     if _FONT_LIBRARY:
         msg += f" Available FontEnums include: {set(_FONT_LIBRARY)}"
