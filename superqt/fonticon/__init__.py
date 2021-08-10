@@ -3,18 +3,25 @@ __all__ = [
     "is_font_enum_member",
     "icon",
     "font",
-    "spin" "ENTRY_POINT",
+    "spin",
+    "step",
+    "ENTRY_POINT",
 ]
 
+import warnings
 from enum import Enum
 from typing import TYPE_CHECKING, Dict
 
-from ._qfont_icon import QFontIcon, is_font_enum_member, is_font_enum_type
+from ._qfont_icon import QFontIcon, is_font_enum_member, is_font_enum_type, spin, step
 
 if TYPE_CHECKING:
-    from superqt.qtcompat.QtGui import QFont, QIcon
+    # Plugins
+    from fonticon_fa5 import FA5Brands, FA5Regular, FA5Solid  # type: ignore # noqa
+    from fonticon_lnr import Linearicons  # type: ignore # noqa
+    from fonticon_mdi5 import MDI5  # type: ignore # noqa
 
-    # just here for type checking...
+    from superqt.qtcompat.QtGui import QFont, QIcon
+    from superqt.qtcompat.QtWidgets import QWidget
 
 
 ENTRY_POINT = "superqt.fonticon"
@@ -34,6 +41,10 @@ def icon(*args, **kwargs) -> "QIcon":
     return _qfont_instance().icon(*args, **kwargs)
 
 
+def setTextIcon(wdg: "QWidget", font, size=None):
+    return _qfont_instance().setTextIcon(wdg, font, size)
+
+
 def font(*args, **kwargs) -> "QFont":
     return _qfont_instance().font(*args, **kwargs)
 
@@ -46,11 +57,12 @@ def discover_fonts():
     try:
         from importlib.metadata import entry_points
     except ImportError:
-        from importlib_metadata import entry_points
+        from importlib_metadata import entry_points  # type: ignore
     for ep in entry_points().get(ENTRY_POINT, {}):
         try:
             cls = ep.load()
-        except ImportError:
+        except ImportError as e:
+            warnings.warn(f"failed to load fonticon entrypoint: {ep.value}. {e}")
             continue
         if is_font_enum_type(cls):
             _FONT_LIBRARY[cls.__name__] = cls

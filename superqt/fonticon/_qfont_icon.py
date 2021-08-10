@@ -31,11 +31,11 @@ from superqt.qtcompat.QtGui import (
     QPalette,
     QPixmap,
 )
-from superqt.qtcompat.QtWidgets import QApplication
+from superqt.qtcompat.QtWidgets import QApplication, QWidget
 
 
 class Animation:
-    def __init__(self, parent_widget, interval=10, step=1):
+    def __init__(self, parent_widget, interval=8, step=1):
         self.parent_widget = parent_widget
         self.timer = QTimer(self.parent_widget)
         self.timer.timeout.connect(self._update)
@@ -86,7 +86,7 @@ def is_font_enum_member(obj) -> bool:
     )
 
 
-def ensure_font_enum_type(obj) -> Enum:
+def ensure_font_enum_type(obj) -> EnumMeta:
     if is_font_enum_member(obj):
         return type(obj)
     if not is_font_enum_type(obj):
@@ -300,6 +300,50 @@ class QFontIcon(QObject):
         """Return icon."""
         ...
 
+    def icon(
+        self,
+        key_or_enum: Union[str, Enum],
+        style: str = "",
+        glyph: str = "",
+        **options: Any,
+    ) -> QIcon:
+        family, style, glyph = self._get_family_and_glpyh(key_or_enum)
+        icon_opts = IconOptions(family, style, glyph, **(options or {}))
+        return QIcon(QFontIconEngine(icon_opts))
+
+    def setTextIcon(self, wdg: QWidget, key, size=None):
+        """Sets text on a widgetto a specific font & glyph"""
+        if not hasattr(wdg, "setText"):
+            raise TypeError(f"Object does not a setText method: {wdg}")
+
+        family, style, glyph = self._get_family_and_glpyh(key)
+        font = QFont()
+        font.setFamily(family)
+        if style:
+            font.setStyleName(style)
+        if size:
+            font.setPixelSize(size)
+        wdg.setFont(font)
+        wdg.setText(glyph)
+
+    def _get_family_and_glpyh(self, key_or_enum):
+        if isinstance(key_or_enum, str):
+            family, style, glyph = self._parse_key(key_or_enum)
+        else:
+            if not is_font_enum_member(key_or_enum):
+                raise TypeError(
+                    "The first argument to `icon` must be an icon key or "
+                    "a FontEnum member"
+                )
+            glyph = key_or_enum.value
+            fontenum = type(key_or_enum)
+
+            if fontenum not in self._registered_enums:
+                self.addFont(fontenum)
+            _, family, styles = self._registered_enums[fontenum]
+            style = styles[0]
+        return family, style, glyph
+
     def _parse_key(self, key: str):
         from . import _FONT_KEYS, discover_fonts
 
@@ -318,32 +362,6 @@ class QFontIcon(QObject):
         glyph = find_glyphname(fontenum, glyph).value
         _, _family, styles = self._registered_enums[fontenum]
         return _family, styles[0], glyph
-
-    def icon(
-        self,
-        key_or_enum: Union[str, Enum],
-        style: str = "",
-        glyph: str = "",
-        **options: Any,
-    ) -> QIcon:
-        if isinstance(key_or_enum, str):
-            _family, style, glyph = self._parse_key(key_or_enum)
-        else:
-            if not is_font_enum_member(key_or_enum):
-                raise TypeError(
-                    "The first argument to `icon` must be an icon key or "
-                    "a FontEnum member"
-                )
-            glyph = key_or_enum.value
-            fontenum = type(key_or_enum)
-
-            if fontenum not in self._registered_enums:
-                self.addFont(fontenum)
-            _, _family, styles = self._registered_enums[fontenum]
-            style = styles[0]
-
-        icon_opts = IconOptions(_family, style, glyph, **(options or {}))
-        return QIcon(QFontIconEngine(icon_opts))
 
     def font(self, family, style: str = None, size: int = None) -> QFont:
         raise NotImplementedError()
