@@ -1,4 +1,4 @@
-from superqt.fonticon import icon
+from superqt.fonticon import icon, step
 from superqt.qtcompat.QtCore import QSize
 from superqt.qtcompat.QtWidgets import QApplication, QPushButton
 
@@ -10,8 +10,8 @@ app = QApplication([])
 # btn.show()
 
 btn2 = QPushButton()
-btn2.setIcon(icon("mdi5.ab-testing"))
-btn2.setIconSize(QSize(512, 512))
+btn2.setIcon(icon("fa5s.spinner", animation=step(btn2)))
+btn2.setIconSize(QSize(225, 225))
 btn2.show()
 
 app.exec()

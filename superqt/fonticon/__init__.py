@@ -3,7 +3,7 @@ __all__ = [
     "is_font_enum_member",
     "icon",
     "font",
-    "ENTRY_POINT",
+    "spin" "ENTRY_POINT",
 ]
 
 from enum import Enum

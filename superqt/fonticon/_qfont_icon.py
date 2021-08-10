@@ -17,8 +17,10 @@ from typing import (
     overload,
 )
 
+from qtpy.QtCore import QTimer
+
 from superqt.qtcompat import QT_VERSION
-from superqt.qtcompat.QtCore import QObject, QPoint, QRect, QSize, Qt
+from superqt.qtcompat.QtCore import QObject, QPoint, QRect, QRectF, QSize, Qt
 from superqt.qtcompat.QtGui import (
     QColor,
     QFont,
@@ -30,6 +32,40 @@ from superqt.qtcompat.QtGui import (
     QPixmap,
 )
 from superqt.qtcompat.QtWidgets import QApplication
+
+
+class Animation:
+    def __init__(self, parent_widget, interval=10, step=1):
+        self.parent_widget = parent_widget
+        self.timer = QTimer(self.parent_widget)
+        self.timer.timeout.connect(self._update)
+        self.timer.setInterval(interval)
+        self._angle = 0
+        self._step = step
+
+    def _update(self):
+        if self.timer.isActive():
+            self._angle += self._step
+            self.parent_widget.update()
+
+    def setup(self, painter: QPainter, rect: QRect):
+        raise NotImplementedError("please subclass Animation")
+
+
+class spin(Animation):
+    def setup(self, painter: QPainter, rect: QRect):
+        if self.timer.isActive():
+            mid = QRectF(rect).center()
+            painter.translate(mid)
+            painter.rotate(self._angle % 360)
+            painter.translate(-mid)
+        else:
+            self.timer.start()
+
+
+class step(spin):
+    def __init__(self, parent_widget):
+        super().__init__(parent_widget, interval=200, step=45)
 
 
 def is_font_enum_type(obj) -> bool:
@@ -83,7 +119,9 @@ def find_glyphname(enumclass: EnumMeta, glyphname: str) -> Enum:
     if member is not None:
         return member
 
-    raise ValueError(f"FontEnum {enumclass} has no member: {_glyph} or {glyphname}")
+    if glyphname != _glyph:
+        _glyph += f" or {glyphname}"
+    raise ValueError(f"FontEnum {enumclass} has no member: {_glyph}")
 
 
 @dataclass
@@ -114,6 +152,7 @@ class IconOptions:
     )
     scaleFactor: float = 0.85
     scaleFactorOn: float = 0
+    animation: Optional[Animation] = None
 
 
 class QFontIconEngine(QIconEngine):
@@ -125,7 +164,7 @@ class QFontIconEngine(QIconEngine):
         return QFontIconEngine(self._opt)
 
     def _parse_options(
-        self, rect: QRect, mode: QIcon.Mode, state: QIcon.State
+        self, painter: QPainter, rect: QRect, mode: QIcon.Mode, state: QIcon.State
     ) -> Tuple[QFont, QColor, str]:
         _fIcon = self._opt
         if state == QIcon.State.On:
@@ -159,6 +198,11 @@ class QFontIconEngine(QIconEngine):
         elif mode == QIcon.Mode.Selected:
             penColor = _fIcon.colorSelected
 
+        # Animation setup hook
+        animation = _fIcon.animation
+        if animation is not None:
+            animation.setup(painter, rect)
+
         font = QFont()
         font.setFamily(fontFamily)
         if fontStyle:
@@ -173,7 +217,7 @@ class QFontIconEngine(QIconEngine):
         mode: QIcon.Mode,
         state: QIcon.State,
     ) -> None:
-        font, penColor, glyph = self._parse_options(rect, mode, state)
+        font, penColor, glyph = self._parse_options(painter, rect, mode, state)
         painter.save()
         painter.setPen(penColor)
         painter.setFont(font)
