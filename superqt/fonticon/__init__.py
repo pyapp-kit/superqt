@@ -9,13 +9,15 @@ __all__ = [
 ]
 
 import warnings
-from enum import Enum
+from enum import EnumMeta
 from typing import TYPE_CHECKING, Dict
 
-from ._qfont_icon import QFontIcon, is_font_enum_member, is_font_enum_type, spin, step
+from ._animations import spin, step
+from ._qfont_icon import QFontIconFactory
+from ._utils import is_font_enum_member, is_font_enum_type
 
 if TYPE_CHECKING:
-    # Plugins
+    # known Plugins (here for IDE autocompletion when importing from superqt)
     from fonticon_fa5 import FA5Brands, FA5Regular, FA5Solid  # type: ignore # noqa
     from fonticon_fthr4 import Feather4  # type: ignore # noqa
     from fonticon_lnr import Linearicons  # type: ignore # noqa
@@ -26,28 +28,28 @@ if TYPE_CHECKING:
 
 
 ENTRY_POINT = "superqt.fonticon"
-_INSTANCE = None
-_FONT_LIBRARY: Dict[str, Enum] = {}
-_FONT_KEYS: Dict[str, Enum] = {}
+_FONT_LIBRARY: Dict[str, EnumMeta] = {}
+_FONT_KEYS: Dict[str, EnumMeta] = {}
+_FACTORY_INSTANCE = None
 
 
-def _qfont_instance() -> QFontIcon:
-    global _INSTANCE
-    if _INSTANCE is None:
-        _INSTANCE = QFontIcon()
-    return _INSTANCE
+def _font_factory() -> QFontIconFactory:
+    global _FACTORY_INSTANCE
+    if _FACTORY_INSTANCE is None:
+        _FACTORY_INSTANCE = QFontIconFactory()
+    return _FACTORY_INSTANCE
 
 
 def icon(*args, **kwargs) -> "QIcon":
-    return _qfont_instance().icon(*args, **kwargs)
-
-
-def setTextIcon(wdg: "QWidget", font, size=None):
-    return _qfont_instance().setTextIcon(wdg, font, size)
+    return _font_factory().icon(*args, **kwargs)
 
 
 def font(*args, **kwargs) -> "QFont":
-    return _qfont_instance().font(*args, **kwargs)
+    return _font_factory().font(*args, **kwargs)
+
+
+def setTextIcon(wdg: "QWidget", font, size=None) -> None:
+    return _font_factory().setTextIcon(wdg, font, size)
 
 
 def font_list():
@@ -68,14 +70,19 @@ def discover_fonts():
         if is_font_enum_type(cls):
             _FONT_LIBRARY[cls.__name__] = cls
             _FONT_KEYS[ep.name] = cls
+        else:
+            warnings.warn(
+                f"Object {cls} loaded from plugin {ep.value!r} is not a valid font enum"
+            )
 
 
 def __getattr__(name):
     if name not in _FONT_LIBRARY:
         discover_fonts()
-    if name in _FONT_LIBRARY:
+    try:
         return _FONT_LIBRARY[name]
-    msg = f"module {__name__!r} has no attribute {name!r}."
-    if _FONT_LIBRARY:
-        msg += f" Available FontEnums include: {set(_FONT_LIBRARY)}"
-    raise AttributeError(msg)
+    except KeyError:
+        msg = f"module {__name__!r} has no attribute {name!r}. You may need to install it."
+        if _FONT_LIBRARY:
+            msg += f" Available FontEnums include: {set(_FONT_LIBRARY)}"
+        raise AttributeError(msg)

@@ -1,25 +1,11 @@
 import warnings
-from abc import ABC, abstractmethod
-from collections import defaultdict
-from dataclasses import dataclass, field
-from enum import Enum, EnumMeta
-from inspect import ismethod
+from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
-from typing import (
-    Any,
-    DefaultDict,
-    Dict,
-    List,
-    Optional,
-    Set,
-    Tuple,
-    Type,
-    Union,
-    overload,
-)
+from typing import Any, DefaultDict, Dict, List, Optional, Set, Tuple, Type, Union
 
 from superqt.qtcompat import QT_VERSION
-from superqt.qtcompat.QtCore import QObject, QPoint, QRect, QRectF, QSize, Qt, QTimer
+from superqt.qtcompat.QtCore import QObject, QPoint, QRect, QSize, Qt
 from superqt.qtcompat.QtGui import (
     QColor,
     QFont,
@@ -29,189 +15,93 @@ from superqt.qtcompat.QtGui import (
     QPainter,
     QPalette,
     QPixmap,
+    QTransform,
 )
 from superqt.qtcompat.QtWidgets import QApplication, QWidget
 
+from ._animations import Animation
+from ._utils import (
+    ensure_font_enum_type,
+    is_font_enum_member,
+    is_font_enum_type,
+    str2enum,
+)
 
-class Animation(ABC):
-    def __init__(self, parent_widget, interval=8, step=1):
-        self.parent_widget = parent_widget
-        self.timer = QTimer(self.parent_widget)
-        self.timer.timeout.connect(self._update)
-        self.timer.setInterval(interval)
-        self._angle = 0
-        self._step = step
-
-    def _update(self):
-        if self.timer.isActive():
-            self._angle += self._step
-            self.parent_widget.update()
-
-    @abstractmethod
-    def setup(self, painter: QPainter, rect: QRect):
-        ...
-
-
-class spin(Animation):
-    def setup(self, painter: QPainter, rect: QRect):
-        if self.timer.isActive():
-            mid = QRectF(rect).center()
-            painter.translate(mid)
-            painter.rotate(self._angle % 360)
-            painter.translate(-mid)
-        else:
-            self.timer.start()
-
-
-class step(spin):
-    def __init__(self, parent_widget):
-        super().__init__(parent_widget, interval=200, step=45)
-
-
-def is_font_enum_type(obj) -> bool:
-    """Return True if `obj` is a font enum capable of creating icons."""
-    return (
-        hasattr(obj, "_font_file")
-        and ismethod(obj._font_file)
-        and isinstance(obj, EnumMeta)
-    )
-
-
-def is_font_enum_member(obj) -> bool:
-    """Return True if `obj` is a font enum member of creating icons."""
-    return (
-        hasattr(obj, "_font_file")
-        and ismethod(obj._font_file)
-        and isinstance(obj, Enum)
-    )
-
-
-def ensure_font_enum_type(obj) -> EnumMeta:
-    if is_font_enum_member(obj):
-        return type(obj)
-    if not is_font_enum_type(obj):
-        raise TypeError(
-            "must be either a string, or an Enum object with a "
-            "'_font_file' method that returns a file path to a font file. "
-            f"got: {type(obj)}"
-        )
-    return obj
-
-
-def find_glyphname(enumclass: EnumMeta, glyphname: str) -> Enum:
-    """Given a font enum class, find a glyph name that may be canonicalized"""
-    import keyword
-
-    member = getattr(enumclass, glyphname, None)
-    if member is not None:
-        return member
-
-    _glyph = glyphname
-    if glyphname[0].isdigit():
-        glyphname = "_" + glyphname
-
-    if keyword.iskeyword(glyphname):
-        glyphname += "_"
-
-    glyphname = glyphname.replace("-", "_")
-
-    member = getattr(enumclass, glyphname, None)
-    if member is not None:
-        return member
-
-    if glyphname != _glyph:
-        _glyph += f" or {glyphname}"
-    raise ValueError(f"FontEnum {enumclass} has no member: {_glyph}")
-
-
-DEFAULT_SCALING_FACTOR = 0.85
+# A 16 pixel-high icon yields a font size of 14, which is pixel perfect
+# for font-awesome. 16 * 0.875 = 14
+# The reason why the glyph size is smaller than the icon size is to
+# account for font bearing.
+DEFAULT_SCALING_FACTOR = 0.875
+StringOrEnum = Union[str, Type[Enum]]
 
 
 @dataclass
 class IconOptions:
-    fontFamily: str
-    fontStyle: str
     glyph: str
-    fontFamilyOn: str = ""
-    fontStyleOn: str = ""
-    glyphOn: str = ""
-    color: QColor = field(
-        default_factory=lambda: QApplication.palette().color(
-            QPalette.Normal, QPalette.ButtonText
-        )
-    )
-    colorOn: QColor = QColor()
-    colorActive: QColor = QColor()
-    colorActiveOn: QColor = QColor()
-    colorDisabled: QColor = field(
-        default_factory=lambda: QApplication.palette().color(
-            QPalette.Disabled, QPalette.ButtonText
-        )
-    )
-    colorSelected: QColor = field(
-        default_factory=lambda: QApplication.palette().color(
-            QPalette.Active, QPalette.ButtonText
-        )
-    )
-    scaleFactor: float = DEFAULT_SCALING_FACTOR
-    scaleFactorOn: float = 0
+    font_family: str
+    font_style: Optional[str] = None
+    scale_factor: float = DEFAULT_SCALING_FACTOR
+    color: Union[
+        QColor,
+        int,
+        str,
+        Qt.GlobalColor,
+        Tuple[int, int, int, int],
+        Tuple[int, int, int],
+        None,
+    ] = None
+    opacity: float = 1
     animation: Optional[Animation] = None
+    transform: Optional[QTransform] = None
 
 
-class QFontIconEngine(QIconEngine):
+valid_options = [
+    "on_normal",  # == "normal" == "on"
+    "on_active",  # == "active"
+    "on_selected",  # == "selected"
+    "on_disabled",  # == "disabled"
+    "off_normal",  # == "off"
+    "off_active",
+    "off_selected",
+    "off_disabled",
+]
+
+
+class _QFontIconEngine(QIconEngine):
     def __init__(self, options: IconOptions):
         super().__init__()
-        self._opt = options
+        self._default_opts = options
+        self._opts: Dict[QIcon.State, Dict[QIcon.Mode, Optional[IconOptions]]] = {
+            QIcon.State.On: {
+                QIcon.Mode.Normal: None,
+                QIcon.Mode.Disabled: None,
+                QIcon.Mode.Active: None,
+                QIcon.Mode.Selected: None,
+            },
+            QIcon.State.Off: {
+                QIcon.Mode.Normal: None,
+                QIcon.Mode.Disabled: None,
+                QIcon.Mode.Active: None,
+                QIcon.Mode.Selected: None,
+            },
+        }
 
     def clone(self) -> QIconEngine:
-        return QFontIconEngine(self._opt)
+        ico = _QFontIconEngine(None)  # type: ignore
+        ico._opts = self._opts.copy()
+        return ico
 
-    def _parse_options(
-        self, painter: QPainter, rect: QRect, mode: QIcon.Mode, state: QIcon.State
-    ) -> Tuple[QFont, QColor, str]:
-        _fIcon = self._opt
-        if state == QIcon.State.On:
-            fontFamily = _fIcon.fontFamilyOn or _fIcon.fontFamily
-            fontStyle = _fIcon.fontStyleOn or _fIcon.fontStyle
-            glyph = _fIcon.glyphOn or _fIcon.glyph
-            scalefactor = _fIcon.scaleFactorOn or _fIcon.scaleFactor
-        else:
-            fontFamily = _fIcon.fontFamily
-            fontStyle = _fIcon.fontStyle
-            glyph = _fIcon.glyph
-            scalefactor = _fIcon.scaleFactor
-
-        penColor = _fIcon.color
-        colorOn = QColor(_fIcon.colorOn)
-        colorActive = QColor(_fIcon.colorActive)
-        colorActiveOn = QColor(_fIcon.colorActiveOn)
-        if mode == QIcon.Mode.Normal:
-            if state == QIcon.State.On and colorOn.isValid():
-                penColor = colorOn
-        elif mode == QIcon.Mode.Active:
-            if state == QIcon.State.Off and colorActive.isValid():
-                penColor = colorActive
-            elif state == QIcon.State.On:
-                if colorActiveOn.isValid():
-                    penColor = colorActiveOn
-                elif colorOn.isValid():
-                    penColor = colorOn
-        elif mode == QIcon.Mode.Disabled:
-            penColor = _fIcon.colorDisabled
-        elif mode == QIcon.Mode.Selected:
-            penColor = _fIcon.colorSelected
-
-        # Animation setup hook
-        animation = _fIcon.animation
-        if animation is not None:
-            animation.setup(painter, rect)
-
-        font = QFont()
-        font.setFamily(fontFamily)
-        if fontStyle:
-            font.setStyleName(fontStyle)
-        font.setPixelSize(int(round(rect.height() * scalefactor)))
-        return font, penColor, glyph
+    def _get_opts(self, state, mode: QIcon.Mode) -> IconOptions:
+        opts = self._opts[state][mode] or self._default_opts
+        if opts.color is None:
+            role = {
+                QIcon.Mode.Disabled: QPalette.ColorGroup.Disabled,
+                QIcon.Mode.Selected: QPalette.ColorGroup.Current,
+                QIcon.Mode.Normal: QPalette.ColorGroup.Normal,
+                QIcon.Mode.Active: QPalette.ColorGroup.Active,
+            }
+            opts.color = QApplication.palette().color(role[mode], QPalette.ButtonText)
+        return opts
 
     def paint(
         self,
@@ -220,11 +110,27 @@ class QFontIconEngine(QIconEngine):
         mode: QIcon.Mode,
         state: QIcon.State,
     ) -> None:
-        font, penColor, glyph = self._parse_options(painter, rect, mode, state)
+        opts = self._get_opts(state, mode)
+
+        # font
+        font = QFont()
+        font.setFamily(opts.font_family)
+        font.setPixelSize(round(rect.height() * opts.scale_factor))
+        if opts.font_style:
+            font.setStyleName(opts.font_style)
+
+        # color
+        c_args = opts.color if isinstance(opts.color, tuple) else (opts.color,)
+
+        # animation
+        if opts.animation is not None:
+            opts.animation.animate(painter, rect, mode)  # TODO
+
         painter.save()
-        painter.setPen(penColor)
+        painter.setPen(QColor(*c_args))
+        painter.setOpacity(opts.opacity)
         painter.setFont(font)
-        painter.drawText(rect, Qt.AlignmentFlag.AlignCenter, glyph)
+        painter.drawText(rect, Qt.AlignmentFlag.AlignCenter, opts.glyph)
         painter.restore()
 
     def pixmap(self, size: QSize, mode: QIcon.Mode, state: QIcon.State) -> QPixmap:
@@ -235,14 +141,50 @@ class QFontIconEngine(QIconEngine):
         return pixmap
 
 
-StringOrEnum = Union[str, Type[Enum]]
+class QFontIcon(QIcon):
+    def __init__(self, options):
+        self._engine = _QFontIconEngine(options)
+        super().__init__(self._engine)
+
+    def addState(
+        self,
+        glyph: str,
+        font_family: str,
+        state: QIcon.State = QIcon.State.On,
+        mode: QIcon.Mode = QIcon.Mode.Normal,
+        font_style: Optional[str] = None,
+        scale_factor: float = DEFAULT_SCALING_FACTOR,
+        color: Union[
+            QColor,
+            int,
+            str,
+            Qt.GlobalColor,
+            Tuple[int, int, int, int],
+            Tuple[int, int, int],
+            None,
+        ] = None,
+        opacity: float = 1,
+        animation: Optional[Animation] = None,
+        transform: Optional[QTransform] = None,
+    ):
+        """Set icon options for a specific mode/state."""
+        self._engine._opts[state][mode] = IconOptions(
+            glyph,
+            font_family,
+            font_style,
+            scale_factor,
+            color,
+            opacity,
+            animation,
+            transform,
+        )
 
 
-class QFontIcon(QObject):
+class QFontIconFactory(QObject):
     def __init__(self, parent: Optional[QObject] = None) -> None:
         super().__init__(parent=parent)
-        QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
-        self._registered_fonts: DefaultDict[str, Set[str]] = defaultdict(set)
+        QApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
+        self._registered_fonts: DefaultDict[str, Set[str]] = DefaultDict(set)
         self._registered_enums: Dict[Enum, Tuple[int, str, List[str]]] = dict()
 
     def addFont(self, font: StringOrEnum) -> bool:
@@ -287,35 +229,21 @@ class QFontIcon(QObject):
         self._registered_fonts[font_family].update(styles)
         return True
 
-    @overload
-    def icon(self, key_or_enum: Enum, **options: Any) -> QIcon:
-        """Return icon."""
-        ...
-
-    @overload
-    def icon(
-        self,
-        key_or_enum: str,
-        style: str,
-        glyph: str,
-        **options: Any,
-    ) -> QIcon:
-        """Return icon."""
-        ...
-
     def icon(
         self,
         key_or_enum: Union[str, Enum],
-        style: str = "",
-        glyph: str = "",
-        **options: Any,
-    ) -> QIcon:
+        **options: Any,  # TODO
+    ) -> QFontIcon:
         family, style, glyph = self._get_family_and_glpyh(key_or_enum)
-        icon_opts = IconOptions(family, style, glyph, **(options or {}))
-        return QIcon(QFontIconEngine(icon_opts))
+        default_opts = IconOptions(glyph, family, style, **(options or {}))
+        return QFontIcon(default_opts)
 
-    def setTextIcon(self, wdg: QWidget, key, size=None):
-        """Sets text on a widgetto a specific font & glyph"""
+    def setTextIcon(self, wdg: QWidget, key, size=None) -> None:
+        """Sets text on a widget to a specific font & glyph.
+
+        This is an alternative to setting a QIcon with a pixmap.  It may
+        be easier to combine with dynamic stylesheets.
+        """
         if not hasattr(wdg, "setText"):
             raise TypeError(f"Object does not a setText method: {wdg}")
 
@@ -325,47 +253,24 @@ class QFontIcon(QObject):
         if style:
             font.setStyleName(style)
         size = size or DEFAULT_SCALING_FACTOR
-        size = size if size > 1 else wdg.height() * size
-        font.setPixelSize(size)
+        font.setPixelSize(size if size > 1 else wdg.height() * size)
         wdg.setFont(font)
         wdg.setText(glyph)
 
     def _get_family_and_glpyh(self, key_or_enum):
-        if isinstance(key_or_enum, str):
-            family, style, glyph = self._parse_key(key_or_enum)
-        else:
-            if not is_font_enum_member(key_or_enum):
-                raise TypeError(
-                    "The first argument to `icon` must be an icon key or "
-                    "a FontEnum member"
-                )
-            glyph = key_or_enum.value
-            fontenum = type(key_or_enum)
-
-            if fontenum not in self._registered_enums:
-                self.addFont(fontenum)
-            _, family, styles = self._registered_enums[fontenum]
-            style = styles[0]
-        return family, style, glyph
-
-    def _parse_key(self, key: str):
-        from . import _FONT_KEYS, discover_fonts
-
-        key, glyph = key.split(".")
-        if key not in _FONT_KEYS:
-            discover_fonts()
-        try:
-            fontenum = _FONT_KEYS[key]
-        except KeyError:
-            raise ValueError(
-                f"Unrecognized font key: {key}. Registered keys: {list(_FONT_KEYS)}"
+        enum = str2enum(key_or_enum) if isinstance(key_or_enum, str) else key_or_enum
+        if not is_font_enum_member(enum):
+            raise TypeError(
+                f"{key_or_enum} must be a string (icon key) or a FontEnum member"
             )
+        glyph = enum.value
+        fontenum = type(enum)
+
         if fontenum not in self._registered_enums:
             self.addFont(fontenum)
-
-        glyph = find_glyphname(fontenum, glyph).value
-        _, _family, styles = self._registered_enums[fontenum]
-        return _family, styles[0], glyph
+        _, family, styles = self._registered_enums[fontenum]
+        style = styles[0]
+        return family, style, glyph
 
     def font(self, family, style: str = None, size: int = None) -> QFont:
         raise NotImplementedError()
