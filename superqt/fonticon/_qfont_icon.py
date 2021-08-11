@@ -1,4 +1,5 @@
 import warnings
+from abc import ABC, abstractmethod
 from collections import defaultdict
 from dataclasses import dataclass, field
 from enum import Enum, EnumMeta
@@ -17,10 +18,8 @@ from typing import (
     overload,
 )
 
-from qtpy.QtCore import QTimer
-
 from superqt.qtcompat import QT_VERSION
-from superqt.qtcompat.QtCore import QObject, QPoint, QRect, QRectF, QSize, Qt
+from superqt.qtcompat.QtCore import QObject, QPoint, QRect, QRectF, QSize, Qt, QTimer
 from superqt.qtcompat.QtGui import (
     QColor,
     QFont,
@@ -34,7 +33,7 @@ from superqt.qtcompat.QtGui import (
 from superqt.qtcompat.QtWidgets import QApplication, QWidget
 
 
-class Animation:
+class Animation(ABC):
     def __init__(self, parent_widget, interval=8, step=1):
         self.parent_widget = parent_widget
         self.timer = QTimer(self.parent_widget)
@@ -48,8 +47,9 @@ class Animation:
             self._angle += self._step
             self.parent_widget.update()
 
+    @abstractmethod
     def setup(self, painter: QPainter, rect: QRect):
-        raise NotImplementedError("please subclass Animation")
+        ...
 
 
 class spin(Animation):
@@ -124,6 +124,9 @@ def find_glyphname(enumclass: EnumMeta, glyphname: str) -> Enum:
     raise ValueError(f"FontEnum {enumclass} has no member: {_glyph}")
 
 
+DEFAULT_SCALING_FACTOR = 0.85
+
+
 @dataclass
 class IconOptions:
     fontFamily: str
@@ -150,7 +153,7 @@ class IconOptions:
             QPalette.Active, QPalette.ButtonText
         )
     )
-    scaleFactor: float = 0.85
+    scaleFactor: float = DEFAULT_SCALING_FACTOR
     scaleFactorOn: float = 0
     animation: Optional[Animation] = None
 
@@ -321,8 +324,9 @@ class QFontIcon(QObject):
         font.setFamily(family)
         if style:
             font.setStyleName(style)
-        if size:
-            font.setPixelSize(size)
+        size = size or DEFAULT_SCALING_FACTOR
+        size = size if size > 1 else wdg.height() * size
+        font.setPixelSize(size)
         wdg.setFont(font)
         wdg.setText(glyph)
 

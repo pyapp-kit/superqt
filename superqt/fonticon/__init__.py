@@ -17,6 +17,7 @@ from ._qfont_icon import QFontIcon, is_font_enum_member, is_font_enum_type, spin
 if TYPE_CHECKING:
     # Plugins
     from fonticon_fa5 import FA5Brands, FA5Regular, FA5Solid  # type: ignore # noqa
+    from fonticon_fthr4 import Feather4  # type: ignore # noqa
     from fonticon_lnr import Linearicons  # type: ignore # noqa
     from fonticon_mdi5 import MDI5  # type: ignore # noqa
 
