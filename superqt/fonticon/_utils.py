@@ -1,6 +1,16 @@
+from __future__ import annotations
+
 from enum import Enum, EnumMeta
 from inspect import ismethod
-from typing import cast
+from typing import TYPE_CHECKING, cast
+
+if TYPE_CHECKING:
+    # a FontEnum is an Enum with a classmethod called `_font_file`
+    # (it's hard to use typing.Protocol combined with Enum)
+    class FontEnum(Enum):
+        @classmethod
+        def _font_file(cls) -> str:
+            ...
 
 
 def is_font_enum_type(obj) -> bool:
@@ -12,18 +22,9 @@ def is_font_enum_type(obj) -> bool:
     )
 
 
-def is_font_enum_member(obj) -> bool:
-    """Return True if `obj` is a font enum member of creating icons."""
-    return (
-        hasattr(obj, "_font_file")
-        and ismethod(obj._font_file)
-        and isinstance(obj, Enum)
-    )
-
-
-def ensure_font_enum_type(obj) -> EnumMeta:
-    if is_font_enum_member(obj):
-        return type(cast(Enum, obj))
+def ensure_font_enum_type(obj) -> type[FontEnum]:
+    if is_font_enum_type(type(obj)):
+        return type(cast("FontEnum", obj))
     if not is_font_enum_type(obj):
         raise TypeError(
             "must be either a string, or an Enum object with a "
@@ -33,22 +34,27 @@ def ensure_font_enum_type(obj) -> EnumMeta:
     return obj
 
 
-def str2enum(key: str) -> Enum:
-    from . import _FONT_KEYS, discover_fonts
+def str2enum(key: str) -> FontEnum:
+    """Get a registered FontEnum member for a given string key.
+
+    For instance, if the fonticon_fa5 package is installed:
+    'fa5s.bath' -> fonticon_fa5.FA5Solid.bath
+    """
+    from . import _FONT_KEYS, _discover_fonts
 
     key, glyph = key.split(".")
     if key not in _FONT_KEYS:
-        discover_fonts()
+        _discover_fonts()
     try:
         fontenum = _FONT_KEYS[key]
     except KeyError:
         raise ValueError(
             f"Unrecognized font key: {key}. Registered keys: {list(_FONT_KEYS)}"
         )
-    return find_glyphname(fontenum, glyph)
+    return _find_glyphname(fontenum, glyph)
 
 
-def find_glyphname(enumclass: EnumMeta, glyphname: str) -> Enum:
+def _find_glyphname(enumclass: EnumMeta, glyphname: str) -> FontEnum:
     """Given a font enum class, find a glyph name that may be canonicalized"""
     import keyword
 
