@@ -60,12 +60,11 @@ class QElidingLabel(QLabel):
         super().setText(self._elidedText())
 
     def sizeHint(self):
+        if not self.wordWrap():
+            return super().sizeHint()
         fm = QFontMetrics(self.font())
-        r = fm.boundingRect(
-            QRect(QPoint(0, 0), self.size()),
-            self.alignment() | Qt.TextFlag.TextWordWrap,
-            self._text,
-        )
+        flags = self.alignment() | Qt.Text.TextWordWrap
+        r = fm.boundingRect(QRect(QPoint(0, 0), self.size()), flags, self._text)
         return QSize(self.width(), r.height())
 
     # private implementation methods
