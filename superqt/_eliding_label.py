@@ -8,7 +8,8 @@ from superqt.qtcompat.QtWidgets import QLabel
 class QElidingLabel(QLabel):
     """A QLabel variant that will elide text (add '…') to fit width.
 
-    QElidingLabel(parent: Optional[QWidget] = None, f: Qt.WindowFlags = ...)
+    QElidingLabel()
+    QElidingLabel(parent: Optional[QWidget], f: Qt.WindowFlags = ...)
     QElidingLabel(text: str, parent: Optional[QWidget] = None, f: Qt.WindowFlags = ...)
 
     For a multiline eliding label, use `setWordWrap(True)`.  In this case, text
@@ -18,11 +19,9 @@ class QElidingLabel(QLabel):
     """
 
     def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
+        self._text = args[0] if args and isinstance(args[0], str) else ""
         self._elide_mode = Qt.TextElideMode.ElideRight
-        self._text = ""
-        if args and isinstance(args[0], str):
-            self._text = args[0]
+        super().__init__(*args, **kwargs)
 
     # New Public methods
 
@@ -34,10 +33,6 @@ class QElidingLabel(QLabel):
         """Set the elide mode to a Qt.TextElideMode."""
         self._elide_mode = Qt.TextElideMode(mode)  # type: ignore
         super().setText(self._elidedText())
-
-    def text(self) -> str:
-        """Return the full un-elided text."""
-        return self._text
 
     @staticmethod
     def wrapText(text, width, font=None) -> List[str]:
@@ -60,13 +55,25 @@ class QElidingLabel(QLabel):
 
     # Reimplemented QT methods
 
-    def setText(self, txt):
+    def text(self) -> str:
+        """This property holds the label's text.
+
+        If no text has been set this will return an empty string.
+        """
+        return self._text
+
+    def setText(self, txt: str):
+        """Set the label's text.
+
+        Setting the text clears any previous content.
+        NOTE: we set the QLabel private text to the elided version
+        """
         self._text = txt
         super().setText(self._elidedText())
 
     def resizeEvent(self, ev: QResizeEvent):
-        super().setText(self._elidedText(ev.size().width()))
         ev.accept()
+        super().setText(self._elidedText(ev.size().width()))
 
     def setWordWrap(self, wrap: bool) -> None:
         super().setWordWrap(wrap)
