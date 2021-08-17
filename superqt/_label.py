@@ -1,14 +1,30 @@
-from typing import List
+from typing import List, Optional, overload
 
 from superqt.qtcompat.QtCore import QPoint, QRect, QSize, Qt
 from superqt.qtcompat.QtGui import QFont, QFontMetrics, QResizeEvent, QTextLayout
-from superqt.qtcompat.QtWidgets import QLabel
+from superqt.qtcompat.QtWidgets import QLabel, QWidget
 
 
 class QElidingLabel(QLabel):
-    """A single-line eliding QLabel."""
+    """A QLabel variant that will elide text (add '…') to fit width.
+
+    QElidingLabel(parent: Optional[QWidget] = None, f: Qt.WindowFlags = ...)
+    QElidingLabel(text: str, parent: Optional[QWidget] = None, f: Qt.WindowFlags = ...)
+
+    For a multiline eliding label, use `setWordWrap(True)`.  In this case, text
+    will wrap to fit the width, and only the last line will be elided.
+    When `wordWrap()` is True, `sizeHint()` will return the size required to fit the
+    full text.
+    """
 
     ELIDE_STRING = "…"
+
+    # fmt: off
+    @overload
+    def __init__(self, parent: Optional[QWidget] = ..., f: Qt.WindowFlags = ...) -> None: ...  # noqa
+    @overload
+    def __init__(self, text: str, parent: Optional[QWidget] = ..., f: Qt.WindowFlags = ...) -> None: ...  # noqa
+    # fmt: on
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -20,18 +36,24 @@ class QElidingLabel(QLabel):
     # New Public methods
 
     def elideMode(self) -> Qt.TextElideMode:
+        """The current Qt.TextElideMode."""
         return self._elide_mode
 
     def setElideMode(self, mode: Qt.TextElideMode):
+        """Set the elide mode to a Qt.TextElideMode."""
         self._elide_mode = Qt.TextElideMode(mode)  # type: ignore
         super().setText(self._elidedText())
 
     def fullText(self) -> str:
+        """Return the full un-elided text."""
         return self._text
 
     @staticmethod
     def wrapText(text, width, font=QFont()) -> List[str]:
-        """Returns `text`, split as it would be wrapped for `width`, given `font`."""
+        """Returns `text`, split as it would be wrapped for `width`, given `font`.
+
+        Static method.
+        """
         tl = QTextLayout(text, font)
         tl.beginLayout()
         lines = []
