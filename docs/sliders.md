@@ -95,8 +95,7 @@ then you can also target it directly in your style sheet.  The one "special"
 property for QRangeSlider is `qproperty-barColor`, which sets the color of the
 bar between the handles.
 
-> The code for these example widgets is [here](examples/demo_widget.py)
-
+> The code for these example widgets is [here](../examples/demo_widget.py)
 <details>
 
 <summary><em>See style sheet used for this example</em></summary>
