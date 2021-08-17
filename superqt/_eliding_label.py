@@ -1,8 +1,8 @@
-from typing import List, Optional, overload
+from typing import List
 
 from superqt.qtcompat.QtCore import QPoint, QRect, QSize, Qt
 from superqt.qtcompat.QtGui import QFont, QFontMetrics, QResizeEvent, QTextLayout
-from superqt.qtcompat.QtWidgets import QLabel, QWidget
+from superqt.qtcompat.QtWidgets import QLabel
 
 
 class QElidingLabel(QLabel):
@@ -18,13 +18,6 @@ class QElidingLabel(QLabel):
     """
 
     ELIDE_STRING = "…"
-
-    # fmt: off
-    @overload
-    def __init__(self, parent: Optional[QWidget] = ..., f: Qt.WindowFlags = ...) -> None: ...  # noqa
-    @overload
-    def __init__(self, text: str, parent: Optional[QWidget] = ..., f: Qt.WindowFlags = ...) -> None: ...  # noqa
-    # fmt: on
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
