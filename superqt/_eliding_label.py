@@ -19,9 +19,9 @@ class QElidingLabel(QLabel):
     """
 
     def __init__(self, *args, **kwargs) -> None:
-        self._text = args[0] if args and isinstance(args[0], str) else ""
         self._elide_mode = Qt.TextElideMode.ElideRight
         super().__init__(*args, **kwargs)
+        self.setText(args[0] if args and isinstance(args[0], str) else "")
 
     # New Public methods
 
@@ -31,7 +31,7 @@ class QElidingLabel(QLabel):
 
     def setElideMode(self, mode: Qt.TextElideMode):
         """Set the elide mode to a Qt.TextElideMode."""
-        self._elide_mode = Qt.TextElideMode(mode)  # type: ignore
+        self._elide_mode = Qt.TextElideMode(mode)
         super().setText(self._elidedText())
 
     @staticmethod
