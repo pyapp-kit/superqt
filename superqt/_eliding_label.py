@@ -17,8 +17,6 @@ class QElidingLabel(QLabel):
     full text.
     """
 
-    ELIDE_STRING = "…"
-
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self._elide_mode = Qt.TextElideMode.ElideRight
@@ -37,17 +35,17 @@ class QElidingLabel(QLabel):
         self._elide_mode = Qt.TextElideMode(mode)  # type: ignore
         super().setText(self._elidedText())
 
-    def fullText(self) -> str:
+    def text(self) -> str:
         """Return the full un-elided text."""
         return self._text
 
     @staticmethod
-    def wrapText(text, width, font=QFont()) -> List[str]:
+    def wrapText(text, width, font=None) -> List[str]:
         """Returns `text`, split as it would be wrapped for `width`, given `font`.
 
         Static method.
         """
-        tl = QTextLayout(text, font)
+        tl = QTextLayout(text, font or QFont())
         tl.beginLayout()
         lines = []
         while True:
@@ -66,9 +64,9 @@ class QElidingLabel(QLabel):
         self._text = txt
         super().setText(self._elidedText())
 
-    def resizeEvent(self, rEvent: QResizeEvent):
-        super().setText(self._elidedText(rEvent.size().width()))
-        rEvent.accept()
+    def resizeEvent(self, ev: QResizeEvent):
+        super().setText(self._elidedText(ev.size().width()))
+        ev.accept()
 
     def setWordWrap(self, wrap: bool) -> None:
         super().setWordWrap(wrap)
