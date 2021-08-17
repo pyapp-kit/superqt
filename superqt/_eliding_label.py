@@ -14,8 +14,8 @@ class QElidingLabel(QLabel):
 
     For a multiline eliding label, use `setWordWrap(True)`.  In this case, text
     will wrap to fit the width, and only the last line will be elided.
-    When `wordWrap()` is True, `sizeHint()` will return the size required to fit the
-    full text.
+    When `wordWrap()` is True, `sizeHint()` will return the size required to fit
+    the full text.
     """
 
     def __init__(self, *args, **kwargs) -> None:
@@ -71,30 +71,30 @@ class QElidingLabel(QLabel):
         self._text = txt
         super().setText(self._elidedText())
 
-    def resizeEvent(self, ev: QResizeEvent):
+    def resizeEvent(self, ev: QResizeEvent) -> None:
         ev.accept()
-        super().setText(self._elidedText(ev.size().width()))
+        super().setText(self._elidedText())
 
     def setWordWrap(self, wrap: bool) -> None:
         super().setWordWrap(wrap)
         super().setText(self._elidedText())
 
-    def sizeHint(self):
+    def sizeHint(self) -> QSize:
         if not self.wordWrap():
             return super().sizeHint()
         fm = QFontMetrics(self.font())
-        flags = self.alignment() | Qt.Text.TextWordWrap
+        flags = self.alignment() | Qt.TextFlag.TextWordWrap
         r = fm.boundingRect(QRect(QPoint(0, 0), self.size()), flags, self._text)
         return QSize(self.width(), r.height())
 
     # private implementation methods
 
-    def _elidedText(self, width=None):
+    def _elidedText(self) -> str:
         """Return `self._text` elided to `width`"""
         fm = QFontMetrics(self.font())
         # the 2 is a magic number that prevents the ellipses from going missing
         # in certain cases (?)
-        width = (width or self.width()) - 2
+        width = self.width() - 2
         if not self.wordWrap():
             return fm.elidedText(self._text, self._elide_mode, width)
 
@@ -106,5 +106,5 @@ class QElidingLabel(QLabel):
         # join them
         return "".join(text[:nlines] + [last_line])
 
-    def _wrappedText(self):
+    def _wrappedText(self) -> List[str]:
         return QElidingLabel.wrapText(self._text, self.width(), self.font())
