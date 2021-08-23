@@ -5,6 +5,8 @@ except ImportError:
     __version__ = "unknown"
 
 
+from ._eliding_label import QElidingLabel
+from .combobox import QEnumComboBox
 from .sliders import (
     QDoubleRangeSlider,
     QDoubleSlider,
@@ -19,10 +21,12 @@ from .spinbox import QLargeIntSpinBox
 __all__ = [
     "QDoubleRangeSlider",
     "QDoubleSlider",
+    "QElidingLabel",
     "QLabeledDoubleRangeSlider",
     "QLabeledDoubleSlider",
     "QLabeledRangeSlider",
     "QLabeledSlider",
     "QLargeIntSpinBox",
     "QRangeSlider",
+    "QEnumComboBox",
 ]
