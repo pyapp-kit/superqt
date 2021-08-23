@@ -1,4 +1,6 @@
-from superqt.fonticon import FA5Solid, icon, pulse, setTextIcon, spin
+from fonticon_fa5 import FA5S
+
+from superqt.fonticon import icon, pulse, setTextIcon, spin
 from superqt.qtcompat.QtCore import QSize
 from superqt.qtcompat.QtWidgets import QApplication, QPushButton
 
@@ -14,11 +16,11 @@ app = QApplication([])
 btn = QPushButton()
 btn.setIcon(
     icon(
-        FA5Solid.ambulance,
+        FA5S.ambulance,
         color="blue",
         states={
             "active": {
-                "glyph": FA5Solid.bath,
+                "glyph": FA5S.bath,
                 "color": "red",
                 "scale_factor": 0.5,
                 "animation": pulse(btn),
@@ -37,7 +39,7 @@ btn.show()
 
 btn3 = QPushButton()
 btn3.resize(275, 275)
-setTextIcon(btn3, "fthr4.activity")
+setTextIcon(btn3, FA5S.air_freshener)
 btn3.show()
 
 

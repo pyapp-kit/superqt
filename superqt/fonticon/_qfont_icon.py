@@ -2,10 +2,8 @@ from __future__ import annotations
 
 import warnings
 from dataclasses import dataclass
-from enum import Enum, EnumMeta
-from importlib.metadata import EntryPoint
 from pathlib import Path
-from typing import TYPE_CHECKING, DefaultDict, Tuple, Type, Union
+from typing import DefaultDict, Dict, Optional, Tuple, Type, Union
 
 from superqt.qtcompat import QT_VERSION
 from superqt.qtcompat.QtCore import QObject, QPoint, QRect, QSize, Qt
@@ -22,20 +20,7 @@ from superqt.qtcompat.QtGui import (
 )
 from superqt.qtcompat.QtWidgets import QApplication, QWidget
 
-try:
-    from importlib.metadata import EntryPoint, entry_points
-except ImportError:
-    from importlib_metadata import entry_points, EntryPoint  # type: ignore
-
 from ._animations import Animation
-from ._utils import is_font_enum_type, str2enum
-
-if TYPE_CHECKING:
-    from ._utils import FontEnum
-
-    FontEnumType = Type[FontEnum]
-    GlyphKey = Union[str, FontEnum]
-
 
 # A 16 pixel-high icon yields a font size of 14, which is pixel perfect
 # for font-awesome. 16 * 0.875 = 14
@@ -54,7 +39,7 @@ ValidColor = Union[
 ]
 Unset = object()
 _DEFAULT_STATE = (QIcon.State.Off, QIcon.Mode.Normal)
-_states: dict[frozenset, tuple[QIcon.State, QIcon.Mode]] = {
+_states: Dict[frozenset, tuple[QIcon.State, QIcon.Mode]] = {
     frozenset(["on"]): (QIcon.State.On, QIcon.Mode.Normal),
     frozenset(["off"]): _DEFAULT_STATE,
     frozenset(["normal"]): _DEFAULT_STATE,
@@ -76,33 +61,26 @@ _states: dict[frozenset, tuple[QIcon.State, QIcon.Mode]] = {
 class IconOptions:
     """The set of options needed to render a font in a single State/Mode."""
 
-    glyph: GlyphKey
+    glyph: str
     scale_factor: float = DEFAULT_SCALING_FACTOR
     color: ValidColor = None
     opacity: float = DEFAULT_OPACITY
-    animation: Animation | None = None
-    transform: QTransform | None = None
+    animation: Optional[Animation] = None
+    transform: Optional[QTransform] = None
 
     @classmethod
     def _from_kwargs(
-        cls, kwargs: dict, defaults: IconOptions | None = None
+        cls, kwargs: dict, defaults: Optional[IconOptions] = None
     ) -> IconOptions:
+        defaults = defaults or DEFAULT_OPTS
         kwargs = {
-            f: getattr(defaults, f) if kwargs[f] is Unset else kwargs[f]
+            f: getattr(defaults, f) if kwargs[f] is None else kwargs[f]
             for f in IconOptions.__dataclass_fields__  # type: ignore
         }
         return IconOptions(**kwargs)
 
 
-def key2glyph(glyph: GlyphKey) -> tuple[str, str, str | None]:
-    """Return char, family, style given a GlyphKey"""
-    if isinstance(glyph, str):
-        font_key, char = glyph.split(".")
-        family, style = QFontIconStore._key2family(font_key)
-    elif isinstance(glyph, Enum):
-        family, style = QFontIconStore._key2family(glyph)
-        char = glyph.value
-    return char, family, style
+DEFAULT_OPTS = IconOptions("")
 
 
 class _QFontIconEngine(QIconEngine):
@@ -110,7 +88,7 @@ class _QFontIconEngine(QIconEngine):
         super().__init__()
         self._default_opts = options
         self._opts: DefaultDict[
-            QIcon.State, dict[QIcon.Mode, IconOptions | None]
+            QIcon.State, Dict[QIcon.Mode, Optional[IconOptions]]
         ] = DefaultDict(dict)
 
     def clone(self) -> QIconEngine:
@@ -140,7 +118,7 @@ class _QFontIconEngine(QIconEngine):
     ) -> None:
         opts = self._get_opts(state, mode)
 
-        char, family, style = key2glyph(opts.glyph)
+        char, family, style = QFontIconStore.key2glyph(opts.glyph)
 
         # font
         font = QFont()
@@ -180,14 +158,14 @@ class QFontIcon(QIcon):
         self,
         state: QIcon.State = QIcon.State.Off,
         mode: QIcon.Mode = QIcon.Mode.Normal,
-        glyph: str | None = None,
-        font_family: str | None = None,
-        font_style: str | None = None,
+        glyph: Optional[str] = None,
+        font_family: Optional[str] = None,
+        font_style: Optional[str] = None,
         scale_factor: float = DEFAULT_SCALING_FACTOR,
         color: ValidColor = None,
         opacity: float = DEFAULT_OPACITY,
-        animation: Animation | None = None,
-        transform: QTransform | None = None,
+        animation: Optional[Animation] = None,
+        transform: Optional[QTransform] = None,
     ):
         """Set icon options for a specific mode/state."""
         opts = IconOptions._from_kwargs(locals(), self._engine._default_opts)
@@ -195,80 +173,72 @@ class QFontIcon(QIcon):
 
 
 class QFontIconStore(QObject):
-    ENTRY_POINT = "superqt.fonticon"
-    _FONT_LIBRARY: dict[str, EnumMeta] = {}
-    _PLUGIN_KEYS: dict[str, EntryPoint] = {}
 
     # map of key -> (font_family, font_style)
-    _LOADED_KEYS: dict[str, tuple[str, str | None]] = dict()
-    # map of FontEnumType -> (font_family, font_style)
-    _LOADED_ENUMS: dict[FontEnumType, tuple[str, str | None]] = dict()
+    _LOADED_KEYS: Dict[str, Tuple[str, Optional[str]]] = dict()
+    _CHARMAPS: Dict[Tuple[str, Optional[str]], Dict[str, str]] = dict()
 
-    def __init__(self, parent: QObject | None = None) -> None:
+    def __init__(self, parent: Optional[QObject] = None) -> None:
         super().__init__(parent=parent)
         QApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
         self._registered_fonts: DefaultDict[str, set[str]] = DefaultDict(set)
-        self._registered_enums: dict[EnumMeta, tuple[int, str, list[str]]] = dict()
 
     @classmethod
-    def _key2family(cls, key: GlyphKey) -> tuple[str, str | None]:
+    def _key2family(cls, key: str) -> Tuple[str, Optional[str]]:
         """Return (family, style) given a font key"""
+        if key not in cls._LOADED_KEYS:
+            from . import _plugins
 
-        if isinstance(key, str):
-            if key in cls._LOADED_KEYS:
-                return cls._LOADED_KEYS[key]
-        else:
-            enum_type = type(key) if isinstance(key, Enum) else key
-            if enum_type in cls._LOADED_ENUMS:
-                return cls._LOADED_ENUMS[enum_type]
-            assert isinstance(enum_type, EnumMeta)
+            try:
+                font_cls = _plugins._get_font_class(key)
+                result = cls.addFont(
+                    font_cls.__font_file__, key, charmap=font_cls.__dict__
+                )
+                if not result:
+                    raise Exception("Invalid font file")
+                cls._LOADED_KEYS[key] = result
+            except Exception as e:
+                raise ValueError(
+                    f"Unrecognized font key: {key}.\n"
+                    f"Known plugin keys include: {list(_plugins._PLUGINS)}.\n"
+                    f"Loaded keys include: {list(cls._LOADED_KEYS)}."
+                ) from e
+        return cls._LOADED_KEYS[key]
 
-            # we have an unloaded enum
-            # see if it comes from a plugin
-            for _key, ep in cls._PLUGIN_KEYS.items():
-                if ep.value == f"{enum_type.__module__}:{enum_type.__name__}":
-                    key = _key
-                    break
-
-        cls._try_load_plugin(key)
-
+    @classmethod
+    def _ensure_char(cls, char, family, style) -> str:
+        """make sure that char is provided by family and style"""
+        if len(char) == 1 and ord(char) > 256:
+            return char
         try:
-            return cls._LOADED_KEYS[key]
+            charmap = cls._CHARMAPS[(family, style)]
         except KeyError:
-            raise ValueError(
-                f"Unrecognized font key: {key}.\n"
-                f"Known plugin keys include: {list(cls._PLUGIN_KEYS)}.\n"
-                f"Loaded keys include: {list(cls._LOADED_KEYS)}."
-                f"Loaded enums include: {list(cls._LOADED_ENUMS)}."
-            )
+            raise KeyError(f"No charmap registered for {family} ({style})")
+
+        if char in charmap:
+            return charmap[char]
+
+        from ._utils import ensure_identifier
+
+        ident = ensure_identifier(char)
+        if char in charmap:
+            return charmap[char]
+
+        ident = f"{char!r} or {ident!r}" if char != ident else repr(ident)
+        raise ValueError(f"{family} ({style}) has no char with the key {ident}")
 
     @classmethod
-    def _try_load_plugin(cls, key: str) -> tuple[str, str | None] | None:
-        if key not in cls._PLUGIN_KEYS:
-            cls._discover_fonts()
-
-        if key not in cls._PLUGIN_KEYS:
-            return None
-
-        ep = cls._PLUGIN_KEYS[key]
-        font_enum: FontEnumType = ep.load()
-
-        if not is_font_enum_type(font_enum):
-            warnings.warn(
-                f"Object {cls} loaded from plugin {ep.value!r} is not a valid font enum"
-            )
-            # TODO: pop key from _PLUGIN_KEYS and block future discovery
-            return None
-
-        filepath = font_enum._font_file()
-        loaded = cls.addFont(filepath, key)
-        if loaded:
-            cls._LOADED_ENUMS[font_enum] = loaded
-            return loaded
-        return None
+    def key2glyph(cls, glyph: str) -> tuple[str, str, Optional[str]]:
+        """Return char, family, style given a GlyphKey"""
+        font_key, char = glyph.split(".")
+        family, style = QFontIconStore._key2family(font_key)
+        char = cls._ensure_char(char, family, style)
+        return char, family, style
 
     @classmethod
-    def addFont(cls, filepath: str, key: str) -> tuple[str, str] | None:
+    def addFont(
+        cls, filepath: str, key: str, charmap=None
+    ) -> Optional[Tuple[str, str]]:
         """Add font at `filepath` to registry under `key`."""
         assert key not in cls._LOADED_KEYS, f"Key {key} already loaded"
         assert Path(filepath).exists(), f"Font file doesn't exist: {filepath}"
@@ -286,7 +256,7 @@ class QFontIconStore(QObject):
         family = families[0]
 
         # in Qt6, everything becomes a static member
-        QFd: QFontDatabase | type[QFontDatabase] = (
+        QFd: Union[QFontDatabase, Type[QFontDatabase]] = (
             QFontDatabase()
             if tuple(QT_VERSION.split(".")) < ("6", "0")
             else QFontDatabase
@@ -301,22 +271,22 @@ class QFontIconStore(QObject):
             )
 
         cls._LOADED_KEYS[key] = (family, style)
+        if charmap:
+            cls._CHARMAPS[(family, style)] = charmap
         return (family, style)
 
     def icon(
         self,
-        glyph: GlyphKey,
+        glyph: str,
         *,
         scale_factor: float = DEFAULT_SCALING_FACTOR,
         color: ValidColor = None,
         opacity: float = 1,
-        animation: Animation | None = None,
-        transform: QTransform | None = None,
-        states: dict[str, dict] = {},
+        animation: Optional[Animation] = None,
+        transform: Optional[QTransform] = None,
+        states: Dict[str, dict] = {},
     ) -> QFontIcon:
-        default_opts = IconOptions(
-            glyph, scale_factor, color, opacity, animation, transform
-        )
+        default_opts = IconOptions._from_kwargs(locals())
 
         icon = QFontIcon(default_opts)
         for kw, options in states.items():
@@ -339,7 +309,8 @@ class QFontIconStore(QObject):
         if not hasattr(wdg, "setText"):
             raise TypeError(f"Object does not a setText method: {wdg}")
 
-        family, style, glyph = self._get_family_and_glpyh(key)
+        glyph, family, style = self.key2glyph(key)
+
         font = QFont()
         font.setFamily(family)
         if style:
@@ -348,19 +319,6 @@ class QFontIconStore(QObject):
         font.setPixelSize(size if size > 1 else wdg.height() * size)
         wdg.setFont(font)
         wdg.setText(glyph)
-
-    def _get_family_and_glpyh(self, glyph: GlyphKey):
-        enum = str2enum(glyph) if isinstance(glyph, str) else glyph
-        if not is_font_enum_type(type(enum)):
-            raise TypeError(f"{enum} must be a string (icon key) or a FontEnum member")
-        glyph = enum.value
-        fontenum = type(enum)
-
-        if fontenum not in self._registered_enums:
-            self.addFont(fontenum)
-        _, family, styles = self._registered_enums[fontenum]
-        style = styles[0]
-        return family, style, glyph
 
     def font(self, family, style: str = None, size: int = None) -> QFont:
         raise NotImplementedError()
@@ -380,7 +338,7 @@ class QFontIconStore(QObject):
         #     font.setPixelSize(size)
         # return font
 
-    def registeredFonts(self) -> dict[str, set[str]]:
+    def registeredFonts(self) -> Dict[str, set[str]]:
         """Return registered font list (family and styles)."""
         return dict(self._registered_fonts)
 
@@ -392,11 +350,3 @@ class QFontIconStore(QObject):
     #     if isinstance(font, str):
     #         return any(font.lower() == key.lower() for key in self._registered_fonts)
     #     return ensure_font_enum_type(font) in self._registered_enums
-
-    @classmethod
-    def _discover_fonts(cls):
-        print("discovert")
-
-        for ep in entry_points().get(cls.ENTRY_POINT, {}):
-            print("ep", ep)
-            cls._PLUGIN_KEYS[ep.name] = ep

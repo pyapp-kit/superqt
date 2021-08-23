@@ -29,6 +29,8 @@ class IconFontMeta(type):
     IDE attribute checking and autocompletion easier.
     """
 
+    __font_file__: str
+
     def __new__(mcls, name, bases, namespace, **kwargs):
         # make sure this class provides the __font_file__ interface
         ff = namespace.get(FONTFILE)
