@@ -72,7 +72,7 @@ class IconOptions:
     def _from_kwargs(
         cls, kwargs: dict, defaults: Optional[IconOptions] = None
     ) -> IconOptions:
-        defaults = defaults or DEFAULT_OPTS
+        defaults = defaults or _DEFAULT_ICON_OPTS
         kwargs = {
             f: getattr(defaults, f) if kwargs[f] is None else kwargs[f]
             for f in IconOptions.__dataclass_fields__  # type: ignore
@@ -80,7 +80,7 @@ class IconOptions:
         return IconOptions(**kwargs)
 
 
-DEFAULT_OPTS = IconOptions("")
+_DEFAULT_ICON_OPTS = IconOptions("")
 
 
 class _QFontIconEngine(QIconEngine):
@@ -138,12 +138,12 @@ class _QFontIconEngine(QIconEngine):
         painter.setPen(QColor(*color_args))
         painter.setOpacity(opts.opacity)
         painter.setFont(font)
-        painter.drawText(rect, Qt.AlignmentFlag.AlignCenter, char)
+        painter.drawText(rect, Qt.AlignCenter, char)
         painter.restore()
 
     def pixmap(self, size: QSize, mode: QIcon.Mode, state: QIcon.State) -> QPixmap:
         pixmap = QPixmap(size)
-        pixmap.fill(Qt.GlobalColor.transparent)
+        pixmap.fill(Qt.transparent)
         painter = QPainter(pixmap)
         self.paint(painter, QRect(QPoint(0, 0), size), mode, state)
         return pixmap
@@ -176,16 +176,17 @@ class QFontIconStore(QObject):
 
     # map of key -> (font_family, font_style)
     _LOADED_KEYS: Dict[str, Tuple[str, Optional[str]]] = dict()
+    # map of (font_family, font_style) -> character (char may include key)
     _CHARMAPS: Dict[Tuple[str, Optional[str]], Dict[str, str]] = dict()
 
     def __init__(self, parent: Optional[QObject] = None) -> None:
         super().__init__(parent=parent)
         QApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
-        self._registered_fonts: DefaultDict[str, set[str]] = DefaultDict(set)
 
     @classmethod
     def _key2family(cls, key: str) -> Tuple[str, Optional[str]]:
         """Return (family, style) given a font key"""
+        key = key.split(".", maxsplit=1)[0]
         if key not in cls._LOADED_KEYS:
             from . import _plugins
 
@@ -207,22 +208,22 @@ class QFontIconStore(QObject):
 
     @classmethod
     def _ensure_char(cls, char, family, style) -> str:
-        """make sure that char is provided by family and style"""
+        """make sure that char is provided by family and style."""
         if len(char) == 1 and ord(char) > 256:
             return char
         try:
             charmap = cls._CHARMAPS[(family, style)]
         except KeyError:
             raise KeyError(f"No charmap registered for {family} ({style})")
-
         if char in charmap:
-            return charmap[char]
+            # in case the charmap includes the key
+            return charmap[char].split(".", maxsplit=1)[-1]
 
         from ._utils import ensure_identifier
 
         ident = ensure_identifier(char)
-        if char in charmap:
-            return charmap[char]
+        if ident in charmap:
+            return charmap[ident].split(".", maxsplit=1)[-1]
 
         ident = f"{char!r} or {ident!r}" if char != ident else repr(ident)
         raise ValueError(f"{family} ({style}) has no char with the key {ident}")
@@ -230,8 +231,8 @@ class QFontIconStore(QObject):
     @classmethod
     def key2glyph(cls, glyph: str) -> tuple[str, str, Optional[str]]:
         """Return char, family, style given a GlyphKey"""
-        font_key, char = glyph.split(".")
-        family, style = QFontIconStore._key2family(font_key)
+        font_key, char = glyph.split(".", maxsplit=1)
+        family, style = cls._key2family(font_key)
         char = cls._ensure_char(char, family, style)
         return char, family, style
 

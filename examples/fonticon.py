@@ -32,10 +32,10 @@ btn.setIcon(
 btn.setIconSize(QSize(256, 256))
 btn.show()
 
-# btn2 = QPushButton()
-# btn2.setIcon(icon("fa5b.500px", animation=pulse(btn2)))
-# btn2.setIconSize(QSize(225, 225))
-# btn2.show()
+btn2 = QPushButton()
+btn2.setIcon(icon("fa5b.500px", animation=pulse(btn2)))
+btn2.setIconSize(QSize(225, 225))
+btn2.show()
 
 btn3 = QPushButton()
 btn3.resize(275, 275)
