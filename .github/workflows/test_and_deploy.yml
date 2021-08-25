@@ -67,10 +67,10 @@ jobs:
           # legacy Qt
           - python-version: 3.7
             platform: ubuntu-latest
-            backend: pyqt511
+            backend: pyside511
           - python-version: 3.7
             platform: ubuntu-latest
-            backend: pyside511
+            backend: pyqt511
           - python-version: 3.7
             platform: ubuntu-latest
             backend: pyqt512
