@@ -74,6 +74,15 @@ jobs:
           - python-version: 3.7
             platform: ubuntu-latest
             backend: pyside511
+          - python-version: 3.7
+            platform: ubuntu-latest
+            backend: pyqt512
+          - python-version: 3.7
+            platform: ubuntu-latest
+            backend: pyqt513
+          - python-version: 3.8
+            platform: ubuntu-latest
+            backend: pyqt514
 
     steps:
       - uses: actions/checkout@v2
