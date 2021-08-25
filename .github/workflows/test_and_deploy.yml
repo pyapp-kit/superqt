@@ -67,19 +67,19 @@ jobs:
           # legacy Qt
           - python-version: 3.7
             platform: ubuntu-latest
-            toxenv: py37-linux-pyqt511
+            backend: pyqt511
           - python-version: 3.7
             platform: ubuntu-latest
-            toxenv: py37-linux-pyside511
+            backend: pyside511
           - python-version: 3.7
             platform: ubuntu-latest
-            toxenv: py37-linux-pyqt512
+            backend: pyqt512
           - python-version: 3.7
             platform: ubuntu-latest
-            toxenv: py37-linux-pyqt513
+            backend: pyqt513
           - python-version: 3.7
             platform: ubuntu-latest
-            toxenv: py37-linux-pyqt514
+            backend: pyqt514
 
     steps:
       - uses: actions/checkout@v2
@@ -107,7 +107,6 @@ jobs:
         env:
           PLATFORM: ${{ matrix.platform }}
           BACKEND: ${{ matrix.backend }}
-          TOXENV: ${{ matrix.toxenv }}
 
       - name: Coverage
         uses: codecov/codecov-action@v1
