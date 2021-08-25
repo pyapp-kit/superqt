@@ -61,9 +61,6 @@ jobs:
             platform: ubuntu-18.04
             backend: pyside2
           - python-version: 3.6
-            platform: ubuntu-16.04
-            backend: pyqt5
-          - python-version: 3.6
             platform: windows-2016
             backend: pyqt5
 
