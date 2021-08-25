@@ -83,7 +83,7 @@ class QElidingLabel(QLabel):
         if not self.wordWrap():
             return super().sizeHint()
         fm = QFontMetrics(self.font())
-        flags = self.alignment() | Qt.TextFlag.TextWordWrap
+        flags = int(self.alignment() | Qt.TextFlag.TextWordWrap)
         r = fm.boundingRect(QRect(QPoint(0, 0), self.size()), flags, self._text)
         return QSize(self.width(), r.height())
 
