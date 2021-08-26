@@ -166,43 +166,16 @@ API_NAME = {
 }[API]
 
 
-__all__ = [
-    "API_NAME",
-    "QT_VERSION",
-    "QtBluetooth",
-    "QtCore",
-    "QtDBus",
-    "QtDesigner",
-    "QtGui",
-    "QtHelp",
-    "QtLocation",
-    "QtMacExtras",
-    "QtMultimedia",
-    "QtMultimediaWidgets",
-    "QtNetwork",
-    "QtNetworkAuth",
-    "QtNfc",
-    "QtOpenGL",
-    "QtPositioning",
-    "QtPrintSupport",
-    "QtQml",
-    "QtQuick",
-    "QtQuickWidgets",
-    "QtRemoteObjects",
-    "QtSensors",
-    "QtSerialPort",
-    "QtSql",
-    "QtSvg",
-    "QtTest",
-    "QtWebChannel",
-    "QtWebSockets",
-    "QtWidgets",
-    "QtXml",
-    "QtXmlPatterns",
-]
-
-
-def __getattr__(modname):
+def _submodule(name):
     import importlib
 
-    return importlib.import_module(f"{API_NAME}.{modname}")
+    mdl = importlib.import_module(f"{API_NAME}.{name}")
+
+    # is there an __all__?  if so respect it
+    if "__all__" in mdl.__dict__:
+        names = mdl.__dict__["__all__"]
+    else:
+        # otherwise we import all names that don't begin with _
+        names = [x for x in mdl.__dict__ if not x.startswith("_")]
+
+    return mdl, names
