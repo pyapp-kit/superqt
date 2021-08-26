@@ -164,3 +164,45 @@ API_NAME = {
     "pyside2": "PySide2",
     "pyside6": "PySide6",
 }[API]
+
+
+__all__ = [
+    "API_NAME",
+    "QT_VERSION",
+    "QtBluetooth",
+    "QtCore",
+    "QtDBus",
+    "QtDesigner",
+    "QtGui",
+    "QtHelp",
+    "QtLocation",
+    "QtMacExtras",
+    "QtMultimedia",
+    "QtMultimediaWidgets",
+    "QtNetwork",
+    "QtNetworkAuth",
+    "QtNfc",
+    "QtOpenGL",
+    "QtPositioning",
+    "QtPrintSupport",
+    "QtQml",
+    "QtQuick",
+    "QtQuickWidgets",
+    "QtRemoteObjects",
+    "QtSensors",
+    "QtSerialPort",
+    "QtSql",
+    "QtSvg",
+    "QtTest",
+    "QtWebChannel",
+    "QtWebSockets",
+    "QtWidgets",
+    "QtXml",
+    "QtXmlPatterns",
+]
+
+
+def __getattr__(modname):
+    import importlib
+
+    return importlib.import_module(f"{API_NAME}.{modname}")

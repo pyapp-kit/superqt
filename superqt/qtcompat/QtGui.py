@@ -1,10 +1,3 @@
-#
-# Copyright © 2014-2015 Colin Duquesnoy
-# Copyright © 2009- The Spyder Development Team
-#
-# Licensed under the terms of the MIT License
-# (see LICENSE.txt for details)
-
 """
 Modified from qtpy.QtGui
 Provides QtGui classes and functions.
