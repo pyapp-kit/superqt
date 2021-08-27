@@ -10,6 +10,7 @@ if PYQT5:
 elif PYSIDE2:
     from PySide2.QtWidgets import *
 elif PYQT6:
+    from PyQt6.QtGui import QAction  # noqa TODO: warn?
     from PyQt6.QtWidgets import *
 
     # backwards compat with PyQt5
@@ -29,6 +30,7 @@ elif PYQT6:
     QApplication.exec_ = exec_
 
 elif PYSIDE6:
+    from PySide6.QtGui import QAction  # noqa  TODO: warn?
     from PySide6.QtWidgets import *  # noqa
 
 else:
