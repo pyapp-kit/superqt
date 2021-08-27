@@ -112,13 +112,13 @@ class QLargeIntSpinBox(QAbstractSpinBox):
         self._setValue(self._bound(self._value + (step * steps)), e)
 
     def stepEnabled(self):
-        flags = QAbstractSpinBox.StepNone
+        flags = QAbstractSpinBox.StepEnabledFlag.StepNone
         if self.isReadOnly():
             return flags
         if self._value < self._maximum:
-            flags |= QAbstractSpinBox.StepUpEnabled
+            flags |= QAbstractSpinBox.StepEnabledFlag.StepUpEnabled
         if self._value > self._minimum:
-            flags |= QAbstractSpinBox.StepDownEnabled
+            flags |= QAbstractSpinBox.StepEnabledFlag.StepDownEnabled
         return flags
 
     def sizeHint(self):
