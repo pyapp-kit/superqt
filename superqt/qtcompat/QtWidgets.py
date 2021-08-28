@@ -13,21 +13,6 @@ elif PYQT6:
     from PyQt6.QtGui import QAction  # noqa TODO: warn?
     from PyQt6.QtWidgets import *
 
-    # backwards compat with PyQt5
-    # namespace moves:
-    for cls in (QStyle, QSlider, QSizePolicy, QSpinBox):
-        for attr in dir(cls):
-            if not attr[0].isupper():
-                continue
-            ns = getattr(cls, attr)
-            for name, val in vars(ns).items():
-                if not name.startswith("_"):
-                    setattr(cls, name, val)
-
-    def exec_(self):
-        self.exec()
-
-    QApplication.exec_ = exec_
 
 elif PYSIDE6:
     from PySide6.QtGui import QAction  # noqa  TODO: warn?
@@ -35,3 +20,10 @@ elif PYSIDE6:
 
 else:
     raise PythonQtError("No Qt bindings could be found")
+
+
+def exec_(self):
+    self.exec()
+
+
+QApplication.exec_ = exec_

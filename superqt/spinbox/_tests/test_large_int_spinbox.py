@@ -62,7 +62,7 @@ def test_keyboard_tracking(qtbot):
     assert sb._pending_emit is True
 
     with qtbot.waitSignal(sb.valueChanged) as sgnl:
-        qtbot.keyPress(sb, Qt.Key_Enter)
+        qtbot.keyPress(sb, Qt.Key.Key_Enter)
     assert sgnl.args == [20]
     assert sb._pending_emit is False
 

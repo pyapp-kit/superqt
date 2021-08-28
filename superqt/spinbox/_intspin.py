@@ -93,7 +93,7 @@ class QLargeIntSpinBox(QAbstractSpinBox):
         return super().closeEvent(e)
 
     def keyPressEvent(self, e) -> None:
-        if e.key() in (Qt.Key_Enter, Qt.Key_Return):
+        if e.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):
             self._interpret(
                 _EmitPolicy.AlwaysEmit
                 if self.keyboardTracking()
@@ -134,7 +134,9 @@ class QLargeIntSpinBox(QAbstractSpinBox):
         opt = QStyleOptionSpinBox()
         self.initStyleOption(opt)
         hint = QSize(w, h)
-        return self.style().sizeFromContents(QStyle.CT_SpinBox, opt, hint, self)
+        return self.style().sizeFromContents(
+            QStyle.ContentsType.CT_SpinBox, opt, hint, self
+        )
 
     # ###############  Implementation Details  #######################
 

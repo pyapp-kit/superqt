@@ -20,7 +20,10 @@ from ._testutil import (
 )
 
 
-@pytest.fixture(params=[Qt.Horizontal, Qt.Vertical], ids=["horizontal", "vertical"])
+@pytest.fixture(
+    params=[Qt.Orientation.Horizontal, Qt.Orientation.Vertical],
+    ids=["horizontal", "vertical"],
+)
 def orientation(request):
     return request.param
 
@@ -97,7 +100,7 @@ def test_float_values(sld: _GenericSlider, qtbot):
 def test_ticks(sld: _GenericSlider, qtbot):
     sld.setTickInterval(3)
     assert sld.tickInterval() == 3
-    sld.setTickPosition(QSlider.TicksAbove)
+    sld.setTickPosition(QSlider.TickPosition.TicksAbove)
     sld.show()
 
 
@@ -113,11 +116,13 @@ def test_press_move_release(sld: _GenericSlider, qtbot):
     opt = QStyleOptionSlider()
     _real_sld.initStyleOption(opt)
     style = _real_sld.style()
-    hrect = style.subControlRect(QStyle.CC_Slider, opt, QStyle.SC_SliderHandle)
+    hrect = style.subControlRect(
+        QStyle.ComplexControl.CC_Slider, opt, QStyle.SubControl.SC_SliderHandle
+    )
     handle_pos = _real_sld.mapToGlobal(hrect.center())
 
     with qtbot.waitSignal(_real_sld.sliderPressed, timeout=300):
-        qtbot.mousePress(_real_sld, Qt.LeftButton, pos=handle_pos)
+        qtbot.mousePress(_real_sld, Qt.MouseButton.LeftButton, pos=handle_pos)
 
     with suppress(AttributeError):
         assert sld._pressedControl == QStyle.SubControl.SC_SliderHandle
@@ -126,19 +131,21 @@ def test_press_move_release(sld: _GenericSlider, qtbot):
         [_real_sld.sliderMoved, _real_sld.valueChanged], timeout=300
     ):
         shift = (
-            QPoint(0, -8) if _real_sld.orientation() == Qt.Vertical else QPoint(8, 0)
+            QPoint(0, -8)
+            if _real_sld.orientation() == Qt.Orientation.Vertical
+            else QPoint(8, 0)
         )
         _real_sld.mouseMoveEvent(_mouse_event(handle_pos + shift))
 
     with qtbot.waitSignal(_real_sld.sliderReleased, timeout=300):
-        qtbot.mouseRelease(_real_sld, Qt.LeftButton, pos=handle_pos)
+        qtbot.mouseRelease(_real_sld, Qt.MouseButton.LeftButton, pos=handle_pos)
 
     with suppress(AttributeError):
         assert _real_sld._pressedControl == QStyle.SubControl.SC_None
 
     sld.show()
     with qtbot.waitSignal(_real_sld.sliderPressed, timeout=300):
-        qtbot.mousePress(_real_sld, Qt.LeftButton, pos=handle_pos)
+        qtbot.mousePress(_real_sld, Qt.MouseButton.LeftButton, pos=handle_pos)
 
 
 @skip_on_linux_qt6
@@ -149,18 +156,20 @@ def test_hover(sld: _GenericSlider):
     opt = QStyleOptionSlider()
     _real_sld.initStyleOption(opt)
     hrect = _real_sld.style().subControlRect(
-        QStyle.CC_Slider, opt, QStyle.SC_SliderHandle
+        QStyle.ComplexControl.CC_Slider, opt, QStyle.SubControl.SC_SliderHandle
     )
     handle_pos = QPointF(sld.mapToGlobal(hrect.center()))
 
     with suppress(AttributeError):  # for QSlider
         assert _real_sld._hoverControl == QStyle.SubControl.SC_None
 
-    _real_sld.event(QHoverEvent(QEvent.HoverEnter, handle_pos, QPointF()))
+    _real_sld.event(QHoverEvent(QEvent.Type.HoverEnter, handle_pos, QPointF()))
     with suppress(AttributeError):  # for QSlider
         assert _real_sld._hoverControl == QStyle.SubControl.SC_SliderHandle
 
-    _real_sld.event(QHoverEvent(QEvent.HoverLeave, QPointF(-1000, -1000), handle_pos))
+    _real_sld.event(
+        QHoverEvent(QEvent.Type.HoverLeave, QPointF(-1000, -1000), handle_pos)
+    )
     with suppress(AttributeError):  # for QSlider
         assert _real_sld._hoverControl == QStyle.SubControl.SC_None
 
