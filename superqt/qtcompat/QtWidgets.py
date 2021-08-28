@@ -1,28 +1,13 @@
-"""
-Modified from qtpy.QtWidgets
-Provides widget classes and functions.
-"""
+from . import API_NAME, _get_submodule
 
-from . import PYQT5, PYQT6, PYSIDE2, PYSIDE6, QtMissingError
-
-if PYQT5:
-    from PyQt5.QtWidgets import *
-elif PYSIDE2:
-    from PySide2.QtWidgets import *
-elif PYQT6:
-    from PyQt6.QtGui import QAction  # noqa TODO: warn?
-    from PyQt6.QtWidgets import *
-
-elif PYSIDE6:
-    from PySide6.QtGui import QAction  # noqa  TODO: warn?
-    from PySide6.QtWidgets import *  # noqa
-
-else:
-    raise QtMissingError("No Qt bindings could be found")
+globals().update(_get_submodule(__name__).__dict__)
 
 
 def exec_(self):
     self.exec()
 
 
-QApplication.exec_ = exec_
+globals()["QApplication"].exec_ = exec_
+
+if "6" in API_NAME:
+    globals()["QAction"] = getattr(_get_submodule("QtGui"), "QAction")

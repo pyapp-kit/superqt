@@ -36,6 +36,7 @@ if _requested_api and _requested_api not in VALID_APIS:
 
 # TODO: FORCE_QT_API requires also using QT_API ... does that make sense?
 
+
 _QtCore: ModuleType | None = None
 if not _forced_api:
     # If `FORCE_QT_API` is not set, we first look for previously imported bindings
@@ -90,7 +91,8 @@ class SuperQtImporter(abc.MetaPathFinder):
 
 
 def _get_submodule(mod_name: str):
-    return import_module(f"{API_NAME}.{mod_name.rsplit('.', maxsplit=  1)[-1]}")
+    _mod = mod_name.rsplit(".", maxsplit=1)[-1]
+    return import_module(f"{API_NAME}.{_mod}")
 
 
 sys.meta_path.append(SuperQtImporter())

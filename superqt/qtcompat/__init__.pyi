@@ -1,3 +1,16 @@
+import types
+from typing import Callable
+
+API_NAME: str
+QT_VERSION: str
+API_NAME: str
+PYSIDE2: bool
+PYSIDE6: bool
+PYQT5: bool
+PYQT6: bool
+
+_get_submodule: Callable[[str, types.ModuleType]]
+
 from PyQt5 import (
     QtBluetooth,
     QtCore,
