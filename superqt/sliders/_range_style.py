@@ -40,9 +40,9 @@ class RangeSliderStyle:
     def brush(self, opt: QStyleOptionSlider) -> QBrush:
         cg = opt.palette.currentColorGroup()
         attr = {
-            QPalette.Active: "brush_active",  # 0
-            QPalette.Disabled: "brush_disabled",  # 1
-            QPalette.Inactive: "brush_inactive",  # 2
+            QPalette.ColorGroup.Active: "brush_active",  # 0
+            QPalette.ColorGroup.Disabled: "brush_disabled",  # 1
+            QPalette.ColorGroup.Inactive: "brush_inactive",  # 2
         }[cg]
         _val = getattr(self, attr)
         if not _val:
@@ -75,9 +75,9 @@ class RangeSliderStyle:
     def pen(self, opt: QStyleOptionSlider) -> Qt.PenStyle | QColor:
         cg = opt.palette.currentColorGroup()
         attr = {
-            QPalette.Active: "pen_active",  # 0
-            QPalette.Disabled: "pen_disabled",  # 1
-            QPalette.Inactive: "pen_inactive",  # 2
+            QPalette.ColorGroup.Active: "pen_active",  # 0
+            QPalette.ColorGroup.Disabled: "pen_disabled",  # 1
+            QPalette.ColorGroup.Inactive: "pen_inactive",  # 2
         }[cg]
         val = getattr(self, attr) or getattr(SYSTEM_STYLE, attr)
         if not val:
