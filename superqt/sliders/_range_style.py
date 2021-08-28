@@ -5,7 +5,7 @@ import re
 from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING
 
-from ..qtcompat import PYQT_VERSION
+from ..qtcompat import QT_VERSION
 from ..qtcompat.QtCore import Qt
 from ..qtcompat.QtGui import (
     QBrush,
@@ -139,7 +139,7 @@ CATALINA_STYLE = replace(
     tick_offset=4,
 )
 
-if PYQT_VERSION and int(PYQT_VERSION.split(".")[0]) == 6:
+if QT_VERSION and int(QT_VERSION.split(".")[0]) == 6:
     CATALINA_STYLE = replace(CATALINA_STYLE, tick_offset=2)
 
 BIG_SUR_STYLE = replace(
@@ -154,7 +154,7 @@ BIG_SUR_STYLE = replace(
     tick_bar_alpha=0.2,
 )
 
-if PYQT_VERSION and int(PYQT_VERSION.split(".")[0]) == 6:
+if QT_VERSION and int(QT_VERSION.split(".")[0]) == 6:
     BIG_SUR_STYLE = replace(BIG_SUR_STYLE, tick_offset=-3)
 
 WINDOWS_STYLE = replace(
