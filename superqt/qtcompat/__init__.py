@@ -26,6 +26,7 @@ VALID_APIS = {
 _requested_api = os.getenv("QT_API", "").lower()
 _forced_api = os.getenv("FORCE_QT_API")
 
+# warn if an invalid API has been requested
 if _requested_api and _requested_api not in VALID_APIS:
     warnings.warn(
         f"invalid QT_API specified: {_requested_api}. "
@@ -36,19 +37,22 @@ if _requested_api and _requested_api not in VALID_APIS:
 
 # TODO: FORCE_QT_API requires also using QT_API ... does that make sense?
 
-
+# now we'll try to import QtCore
 _QtCore: ModuleType | None = None
+
+# If `FORCE_QT_API` is not set, we first look for previously imported bindings
 if not _forced_api:
-    # If `FORCE_QT_API` is not set, we first look for previously imported bindings
     for api_name, module_name in VALID_APIS.items():
         if module_name in sys.modules:
             _QtCore = import_module(f"{module_name}.QtCore")
             break
 
 if _QtCore is None:
+    # try the requested API first, and if _forced_api is True,
+    # raise an ImportError if it doesn't work.
+    # Otherwise go through the list of Valid APIs until something imports
     requested = VALID_APIS.get(_requested_api)
-    mod_names = sorted(VALID_APIS.values(), key=lambda x: x != requested)
-    for module_name in mod_names:
+    for module_name in sorted(VALID_APIS.values(), key=lambda x: x != requested):
         try:
             _QtCore = import_module(f"{module_name}.QtCore")
             break
@@ -58,22 +62,29 @@ if _QtCore is None:
                     "FORCE_QT_API set and unable to import requested QT_API: {e}"
                 )
 
+# didn't find one...  not going to work
 if _QtCore is None:
     raise QtMissingError(f"No QtCore could be found. Tried: {VALID_APIS.values()}")
 
-QT_VERSION = getattr(_QtCore, "QT_VERSION_STR", None) or getattr(_QtCore, "__version__")
-API_NAME = _QtCore.__name__.split(".", maxsplit=1)[0]
+# load variables based on what we found.
+if not _QtCore.__package__:
+    raise RuntimeError("QtCore does not declare __package__?")
+
+API_NAME = _QtCore.__package__
 PYSIDE2 = API_NAME == "PySide2"
 PYSIDE6 = API_NAME == "PySide6"
 PYQT5 = API_NAME == "PyQt5"
 PYQT6 = API_NAME == "PyQt6"
+QT_VERSION = getattr(_QtCore, "QT_VERSION_STR", "") or getattr(_QtCore, "__version__")
 
+# lastly, emit a warning if we ended up with an API other than the one requested
 if _requested_api and API_NAME != VALID_APIS[_requested_api]:
     warnings.warn(
         f"Selected binding {_requested_api!r} could not be found, using {API_NAME!r}"
     )
 
 
+# Setup the meta path finder that lets us import anything using `superqt.qtcompat.Mod`
 class SuperQtImporter(abc.MetaPathFinder):
     def find_spec(
         self,
@@ -90,9 +101,23 @@ class SuperQtImporter(abc.MetaPathFinder):
         return None
 
 
-def _get_submodule(mod_name: str):
-    _mod = mod_name.rsplit(".", maxsplit=1)[-1]
-    return import_module(f"{API_NAME}.{_mod}")
+def _get_submodule(mod_name: str, globals=None, name_changes=None):
+    """Convenience to get a submodule from the current QT_API"""
+    _mod_name = mod_name.rsplit(".", maxsplit=1)[-1]
+    mod = import_module(f"{API_NAME}.{_mod_name}")
+    if globals is not None:
+        globals.update(mod.__dict__)
+    if name_changes is not None:
+        _update_ns(name_changes, globals)
+    return mod
+
+
+def _update_ns(name_changes: dict[str, dict[str, str]], globals) -> None:
+
+    for ns, changes in name_changes.items():
+        if ns in API_NAME:
+            for new, old in changes.items():
+                globals[new] = getattr(_QtCore, old)
 
 
 sys.meta_path.append(SuperQtImporter())
