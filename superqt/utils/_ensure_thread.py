@@ -81,6 +81,9 @@ def _run_in_thread(
     func: Callable, thread: QThread, no_return: bool, timeout: int, *args, **kwargs
 ):
     if thread is QThread.currentThread():
+        if no_return:
+            func(*args, **kwargs)
+            return
         return func(*args, **kwargs)
     f = CallCallable(func, *args, **kwargs)
     f.moveToThread(thread)
