@@ -32,7 +32,15 @@ class CallCallable(QObject):
         self.finished.emit(res)
 
 
-def ensure_main_thread(no_return=True, timeout=1000):
+def ensure_main_thread(no_return: bool = True, timeout: int = 1000):
+    """
+    This is decorator which move function call to main thread (Thread in which QApplication was created).
+    It could be applied to functions and methods.
+
+    :param bool no_return: if wait on result of function result, default True
+    :param int timeout: timeout for waiting on result
+    """
+
     def _out_func(func):
         def _func(*args, **kwargs):
             return _run_in_thread(
@@ -49,7 +57,15 @@ def ensure_main_thread(no_return=True, timeout=1000):
     return _out_func
 
 
-def ensure_object_thread(no_return=True, timeout=1000):
+def ensure_object_thread(no_return: bool = True, timeout: int = 1000):
+    """
+    This is decorator which move function call to object thread.
+    It could be applied to methods of QObject instances.
+
+    :param bool no_return: if wait on result of function result, default True
+    :param int timeout: timeout for waiting on result
+    """
+
     def _out_func(func):
         def _func(self, *args, **kwargs):
             return _run_in_thread(
