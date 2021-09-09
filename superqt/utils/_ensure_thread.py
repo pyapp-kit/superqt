@@ -1,5 +1,5 @@
 # https://gist.github.com/FlorianRhiem/41a1ad9b694c14fb9ac3
-from typing import Callable
+from typing import Callable, Optional
 
 from superqt.qtcompat.QtCore import (
     QCoreApplication,
@@ -32,7 +32,9 @@ class CallCallable(QObject):
         self.finished.emit(res)
 
 
-def ensure_main_thread(no_return: bool = True, timeout: int = 1000):
+def ensure_main_thread(
+    func: Optional[Callable] = None, no_return: bool = True, timeout: int = 1000
+):
     """
     This is decorator which move function call to main thread (Thread in which QApplication was created).
     It could be applied to functions and methods.
@@ -54,10 +56,14 @@ def ensure_main_thread(no_return: bool = True, timeout: int = 1000):
 
         return _func
 
-    return _out_func
+    if func is None:
+        return _out_func
+    return _out_func(func)
 
 
-def ensure_object_thread(no_return: bool = True, timeout: int = 1000):
+def ensure_object_thread(
+    func: Optional[Callable] = None, no_return: bool = True, timeout: int = 1000
+):
     """
     This is decorator which move function call to object thread.
     It could be applied to methods of QObject instances.
@@ -74,7 +80,9 @@ def ensure_object_thread(no_return: bool = True, timeout: int = 1000):
 
         return _func
 
-    return _out_func
+    if func is None:
+        return _out_func
+    return _out_func(func)
 
 
 def _run_in_thread(

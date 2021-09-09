@@ -41,14 +41,14 @@ class SampleObject(QObject):
         self.sample_thread_prop_val = value
         self.assigment_done.emit()
 
-    @ensure_main_thread()
+    @ensure_main_thread
     def check_main_thread(self, a, *, b=1):
         if QThread.currentThread() is not QCoreApplication.instance().thread():
             raise RuntimeError("Wrong thread")
         self.main_thread_res = {"a": a, "b": b}
         self.assigment_done.emit()
 
-    @ensure_object_thread()
+    @ensure_object_thread
     def check_object_thread(self, a, *, b=1):
         if QThread.currentThread() is not self.thread():
             raise RuntimeError("Wrong thread")
