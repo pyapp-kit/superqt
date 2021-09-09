@@ -1,5 +1,5 @@
 # https://gist.github.com/FlorianRhiem/41a1ad9b694c14fb9ac3
-from typing import Callable, Optional
+from typing import Callable, List, Optional
 
 from superqt.qtcompat.QtCore import (
     QCoreApplication,
@@ -16,7 +16,7 @@ from superqt.qtcompat.QtCore import (
 
 class CallCallable(QObject):
     finished = Signal(object)
-    instances = []
+    instances: List["CallCallable"] = []
 
     def __init__(self, callable, *args, **kwargs):
         super().__init__()
@@ -33,14 +33,22 @@ class CallCallable(QObject):
 
 
 def ensure_main_thread(
-    func: Optional[Callable] = None, no_return: bool = True, timeout: int = 1000
+    func: Optional[Callable] = None, await_return: bool = False, timeout: int = 1000
 ):
-    """
-    This is decorator which move function call to main thread (Thread in which QApplication was created).
-    It could be applied to functions and methods.
+    """Decorator that ensures a function is called in the main QApplication thread.
 
-    :param bool no_return: if wait on result of function result, default True
-    :param int timeout: timeout for waiting on result
+    It can be applied to functions or methods.
+
+    Parameters
+    ----------
+    func : callable
+        The method to decorate, must be a method on a QObject.
+    await_return : bool, optional
+        Whether to block and wait for the result of the function, or return immediately.
+        by default False
+    timeout : int, optional
+        If `await_return` is `True`, time (in milliseconds) to wait for the result
+        before raising a TimeoutError, by default 1000
     """
 
     def _out_func(func):
@@ -48,7 +56,7 @@ def ensure_main_thread(
             return _run_in_thread(
                 func,
                 QCoreApplication.instance().thread(),
-                no_return,
+                await_return,
                 timeout,
                 *args,
                 **kwargs
@@ -62,20 +70,28 @@ def ensure_main_thread(
 
 
 def ensure_object_thread(
-    func: Optional[Callable] = None, no_return: bool = True, timeout: int = 1000
+    func: Optional[Callable] = None, await_return: bool = False, timeout: int = 1000
 ):
-    """
-    This is decorator which move function call to object thread.
-    It could be applied to methods of QObject instances.
+    """Decorator that ensures a QObject method is called in the object's thread.
 
-    :param bool no_return: if wait on result of function result, default True
-    :param int timeout: timeout for waiting on result
+    It must be applied to methods of QObjects subclasses.
+
+    Parameters
+    ----------
+    func : callable
+        The method to decorate, must be a method on a QObject.
+    await_return : bool, optional
+        Whether to block and wait for the result of the function, or return immediately.
+        by default False
+    timeout : int, optional
+        If `await_return` is `True`, time (in milliseconds) to wait for the result
+        before raising a TimeoutError, by default 1000
     """
 
     def _out_func(func):
         def _func(self, *args, **kwargs):
             return _run_in_thread(
-                func, self.thread(), no_return, timeout, self, *args, **kwargs
+                func, self.thread(), await_return, timeout, self, *args, **kwargs
             )
 
         return _func
@@ -86,17 +102,17 @@ def ensure_object_thread(
 
 
 def _run_in_thread(
-    func: Callable, thread: QThread, no_return: bool, timeout: int, *args, **kwargs
+    func: Callable, thread: QThread, await_return: bool, timeout: int, *args, **kwargs
 ):
     if thread is QThread.currentThread():
-        if no_return:
+        if not await_return:
             func(*args, **kwargs)
             return
         return func(*args, **kwargs)
     f = CallCallable(func, *args, **kwargs)
     f.moveToThread(thread)
-    if no_return:
-        QMetaObject.invokeMethod(f, "call", Qt.QueuedConnection)
+    if not await_return:
+        QMetaObject.invokeMethod(f, "call", Qt.ConnectionType.QueuedConnection)
         return
 
     res = []
@@ -111,7 +127,7 @@ def _run_in_thread(
     f.finished.connect(loop.quit)
     timer.timeout.connect(loop.quit)
     timer.start(timeout)
-    QMetaObject.invokeMethod(f, "call", Qt.QueuedConnection)
+    QMetaObject.invokeMethod(f, "call", Qt.ConnectionType.QueuedConnection)
     loop.exec_()
     if len(res) == 0:
         raise TimeoutError("Not recived value")
