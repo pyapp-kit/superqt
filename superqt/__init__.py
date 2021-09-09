@@ -17,9 +17,11 @@ from .sliders import (
     QRangeSlider,
 )
 from .spinbox import QLargeIntSpinBox
-from .utils import QMessageHandler
+from .utils import QMessageHandler, ensure_main_thread, ensure_object_thread
 
 __all__ = [
+    "ensure_main_thread",
+    "ensure_object_thread",
     "QDoubleRangeSlider",
     "QDoubleSlider",
     "QElidingLabel",
