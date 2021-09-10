@@ -1,14 +1,13 @@
 # https://gist.github.com/FlorianRhiem/41a1ad9b694c14fb9ac3
+from concurrent.futures import Future
 from typing import Callable, List, Optional
 
 from superqt.qtcompat.QtCore import (
     QCoreApplication,
-    QEventLoop,
     QMetaObject,
     QObject,
     Qt,
     QThread,
-    QTimer,
     Signal,
     Slot,
 )
@@ -59,7 +58,7 @@ def ensure_main_thread(
                 await_return,
                 timeout,
                 *args,
-                **kwargs
+                **kwargs,
             )
 
         return _func
@@ -102,33 +101,22 @@ def ensure_object_thread(
 
 
 def _run_in_thread(
-    func: Callable, thread: QThread, await_return: bool, timeout: int, *args, **kwargs
+    func: Callable,
+    thread: QThread,
+    await_return: bool,
+    timeout: int,
+    *args,
+    **kwargs,
 ):
+    future = Future()
     if thread is QThread.currentThread():
+        result = func(*args, **kwargs)
         if not await_return:
-            func(*args, **kwargs)
-            return
-        return func(*args, **kwargs)
+            future.set_result(result)
+            return future
+        return result
     f = CallCallable(func, *args, **kwargs)
     f.moveToThread(thread)
-    if not await_return:
-        QMetaObject.invokeMethod(f, "call", Qt.ConnectionType.QueuedConnection)
-        return
-
-    res = []
-
-    def set_res(data):
-        res.append(data)
-
-    f.finished.connect(set_res)
-    timer = QTimer()
-    timer.setSingleShot(True)
-    loop = QEventLoop()
-    f.finished.connect(loop.quit)
-    timer.timeout.connect(loop.quit)
-    timer.start(timeout)
-    QMetaObject.invokeMethod(f, "call", Qt.ConnectionType.QueuedConnection)
-    loop.exec_()
-    if len(res) == 0:
-        raise TimeoutError("Not recived value")
-    return res[0]
+    f.finished.connect(future.set_result, Qt.ConnectionType.DirectConnection)
+    QMetaObject.invokeMethod(f, "call", Qt.ConnectionType.QueuedConnection)  # type: ignore
+    return future.result(timeout=timeout / 1000) if await_return else future
