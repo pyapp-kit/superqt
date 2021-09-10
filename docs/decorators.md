@@ -10,7 +10,10 @@ running in the desired thread:
   thread in which the instance lives ([qt
   documentation](https://doc.qt.io/qt-5/threads-qobject.html#accessing-qobject-subclasses-from-other-threads)).
 
-By default, functions are executed asynchronously (they return immediately without a result of `None`: see also [Synchronous mode](#synchronous-mode)
+By default, functions are executed asynchronously (they return immediately with
+an instance of
+[`concurrent.futures.Future`](https://docs.python.org/3/library/concurrent.futures.html#concurrent.futures.Future)).
+To block and wait for the result, see [Synchronous mode](#synchronous-mode)
 
 ```python
 from superqt.qtcompat.QtCore import QObject
@@ -25,21 +28,17 @@ class SampleObject(QObject):
     def __init__(self):
         super().__init__()
         self._value = 1
+
     @ensure_main_thread
     def sample_method1(self):
         print("This method will run in main thread")
 
-    @ensure_main_thread()
-    def sample_method2(self):
-        print("This method also will run in main thread")
-
     @ensure_object_thread
     def sample_method3(self):
+        import time
+        print("sleeping")
+        time.sleep(1)
         print("This method will run in object thread")
-
-    @ensure_object_thread()
-    def sample_method4(self):
-        print("This method also will run in object thread")
 
     @property
     def value(self):
@@ -55,14 +54,15 @@ class SampleObject(QObject):
 
 As can be seen in this example these decorators can also be used for setters.
 
-These decorators should not be used as replacement of Qt Signals but rather to interact with Qt objects from non Qt code.
+These decorators should not be used as replacement of Qt Signals but rather to
+interact with Qt objects from non Qt code.
 
 ### Synchronous mode
 
-If you'd like for the program to block and wait for the result of your function call, use the `await_return=True` parameter, and optionally specify a timeout.
+If you'd like for the program to block and wait for the result of your function
+call, use the `await_return=True` parameter, and optionally specify a timeout.
 
 > *Note: Using synchronous mode may significantly impact performance.*
-
 
 ```python
 from superqt import ensure_main_thread
