@@ -11,7 +11,7 @@
 By default, functions are executed in async mode:
 
 ```python
-from PySide2.QtCore import QObject
+from superqt.qtcompat.QtCore import QObject
 from superqt import ensure_main_thread, ensure_object_thread
 
 @ensure_main_thread
