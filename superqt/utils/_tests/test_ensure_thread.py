@@ -123,7 +123,7 @@ def test_object_thread(qtbot):
 def test_main_thread(qtbot):
     ob = SampleObject()
     t = LocalThread(ob)
-    with qtbot.waitSignal(t.finished, timeout=10000000):
+    with qtbot.waitSignal(t.finished):
         t.start()
 
     assert ob.main_thread_res == {"a": 5, "b": 8}
