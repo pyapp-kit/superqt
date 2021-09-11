@@ -1,7 +1,6 @@
 from typing import Mapping, Type, Union
 
-FONTFILE = "__font_file__"
-FONTPREFIX = "__font_prefix__"
+FONTFILE_ATTR = "__font_file__"
 
 
 class IconFontMeta(type):
@@ -31,16 +30,16 @@ class IconFontMeta(type):
 
     __font_file__: str
 
-    def __new__(mcls, name, bases, namespace, **kwargs):
+    def __new__(cls, name, bases, namespace, **kwargs):
         # make sure this class provides the __font_file__ interface
-        ff = namespace.get(FONTFILE)
+        ff = namespace.get(FONTFILE_ATTR)
         if not (ff and isinstance(ff, (str, classmethod))):
             raise TypeError(
-                f"Invalid Font: must declare {FONTFILE!r} attribute or classmethod"
+                f"Invalid Font: must declare {FONTFILE_ATTR!r} attribute or classmethod"
             )
 
         # update all values to be `key.unicode`
-        namespace[FONTPREFIX] = prefix = name.lower()
+        prefix = name.lower()
         for k, v in list(namespace.items()):
             if k.startswith("__"):
                 continue
@@ -53,7 +52,7 @@ class IconFontMeta(type):
                 )
             namespace[k] = f"{prefix}.{char}"
 
-        return super().__new__(mcls, name, bases, namespace, **kwargs)
+        return super().__new__(cls, name, bases, namespace, **kwargs)
 
 
 class IconFont(metaclass=IconFontMeta):
@@ -73,8 +72,11 @@ class IconFont(metaclass=IconFontMeta):
 
 def namespace2font(namespace: Union[Mapping, Type], name: str) -> Type[IconFont]:
     """Convenience to convert a namespace (class, module, dict) into an IconFont."""
-    if isinstance(namespace, Mapping):
-        ns = dict(namespace)
+    if isinstance(namespace, type):
+        assert isinstance(
+            getattr(namespace, FONTFILE_ATTR), str
+        ), "Not a valid font type"
+        return namespace  # type: ignore
     elif hasattr(namespace, "__dict__"):
         ns = dict(namespace.__dict__)
     else:

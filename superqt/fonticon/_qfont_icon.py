@@ -191,7 +191,7 @@ class QFontIconStore(QObject):
             from . import _plugins
 
             try:
-                font_cls = _plugins._get_font_class(key)
+                font_cls = _plugins.get_font_class(key)
                 result = cls.addFont(
                     font_cls.__font_file__, key, charmap=font_cls.__dict__
                 )
@@ -201,7 +201,7 @@ class QFontIconStore(QObject):
             except Exception as e:
                 raise ValueError(
                     f"Unrecognized font key: {key}.\n"
-                    f"Known plugin keys include: {list(_plugins._PLUGINS)}.\n"
+                    f"Known plugin keys include: {_plugins.available()}.\n"
                     f"Loaded keys include: {list(cls._LOADED_KEYS)}."
                 ) from e
         return cls._LOADED_KEYS[key]
@@ -254,7 +254,7 @@ class QFontIconStore(QObject):
         if not families:
             warnings.warn(f"Font file is empty!: {filepath}")
             return None
-        family = families[0]
+        family: str = families[0]
 
         # in Qt6, everything becomes a static member
         QFd: Union[QFontDatabase, Type[QFontDatabase]] = (

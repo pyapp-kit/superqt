@@ -15,8 +15,10 @@ from typing import TYPE_CHECKING
 
 from ._animations import Animation, pulse, spin
 from ._iconfont import IconFont, IconFontMeta
-from ._plugins import ENTRY_POINT
+from ._plugins import FontIconManager as _FIM
 from ._qfont_icon import DEFAULT_SCALING_FACTOR, IconOptions, QFontIconStore
+
+ENTRY_POINT = _FIM.ENTRY_POINT
 
 if TYPE_CHECKING:
 
