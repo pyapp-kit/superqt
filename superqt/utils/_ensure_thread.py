@@ -108,7 +108,7 @@ def _run_in_thread(
     *args,
     **kwargs,
 ):
-    future = Future()
+    future = Future()  # type: ignore
     if thread is QThread.currentThread():
         result = func(*args, **kwargs)
         if not await_return:
