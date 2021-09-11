@@ -1,5 +1,5 @@
 from concurrent.futures import Future
-from typing import Any, Callable, List, Optional, TypeVar, overload
+from typing import Callable, TypeVar, overload
 
 from typing_extensions import Literal, ParamSpec
 
