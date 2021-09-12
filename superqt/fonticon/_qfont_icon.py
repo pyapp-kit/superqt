@@ -139,6 +139,10 @@ class _QFontIconEngine(QIconEngine):
         if opts.animation is not None:
             opts.animation.animate(painter, rect)
 
+        # animation
+        if opts.transform is not None:
+            painter.setTransform(opts.transform, True)
+
         painter.save()
         painter.setPen(QColor(*color_args))
         painter.setOpacity(opts.opacity)
@@ -250,16 +254,16 @@ class QFontIconStore(QObject):
         raise ValueError(f"Font '{family} ({style})' has no glyph with the key {ident}")
 
     @classmethod
-    def key2glyph(cls, key: str) -> tuple[str, str, Optional[str]]:
-        """Return (char, family, style) given a glyph `key`"""
-        font_key, char = key.split(".", maxsplit=1)
+    def key2glyph(cls, glyph_key: str) -> tuple[str, str, Optional[str]]:
+        """Return (char, family, style) given a `glyph_key`"""
+        font_key, char = glyph_key.split(".", maxsplit=1)
         family, style = cls._key2family(font_key)
         char = cls._ensure_char(char, family, style)
         return char, family, style
 
     @classmethod
     def addFont(
-        cls, filepath: str, key: str, charmap: Optional[Dict[str, str]] = None
+        cls, filepath: str, prefix: str, charmap: Optional[Dict[str, str]] = None
     ) -> Optional[Tuple[str, str]]:
         """Add font at `filepath` to the registry under `key`.
 
@@ -285,7 +289,7 @@ class QFontIconStore(QObject):
             font-family and font-style for the file just registered, or None if
             something goes wrong.
         """
-        assert key not in cls._LOADED_KEYS, f"Key {key} already loaded"
+        assert prefix not in cls._LOADED_KEYS, f"Prefix {prefix} already loaded"
         assert Path(filepath).exists(), f"Font file doesn't exist: {filepath}"
         assert QApplication.instance() is not None, "Please create QApplication first."
         # TODO: remember filepath?
@@ -316,7 +320,7 @@ class QFontIconStore(QObject):
                 "Icons may not look attractive."
             )
 
-        cls._LOADED_KEYS[key] = (family, style)
+        cls._LOADED_KEYS[prefix] = (family, style)
         if charmap:
             cls._CHARMAPS[(family, style)] = charmap
         return (family, style)
@@ -348,7 +352,7 @@ class QFontIconStore(QObject):
             icon.addState(state, mode, **options)
         return icon
 
-    def setTextIcon(self, widget: QWidget, key: str, size: float = None) -> None:
+    def setTextIcon(self, widget: QWidget, glyph_key: str, size: float = None) -> None:
         """Sets text on a widget to a specific font & glyph.
 
         This is an alternative to setting a QIcon with a pixmap.  It may
@@ -358,10 +362,10 @@ class QFontIconStore(QObject):
         if not setText:  # pragma: no cover
             raise TypeError(f"Object does not a setText method: {widget}")
 
-        glyph = self.key2glyph(key)[0]
+        glyph = self.key2glyph(glyph_key)[0]
         size = size or DEFAULT_SCALING_FACTOR
         size = size if size > 1 else widget.height() * size
-        widget.setFont(self.font(key, int(size)))
+        widget.setFont(self.font(glyph_key, int(size)))
         setText(glyph)
 
     def font(self, font_prefix: str, size: int = None) -> QFont:
