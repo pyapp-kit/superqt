@@ -41,6 +41,14 @@ def icon(
 ) -> QFontIcon:
     """Create a QIcon for `glyph_key`, with a number of optional settings
 
+    The `glyph_key` (e.g. 'fa5s.smile') represents a Font-family & style, and a glpyh.
+    In most cases, the key should be provided by a plugin in the environment, like:
+
+    https://github.com/tlambert03/fonticon-fontawesome5  ('fa5s' & 'fa5r' prefixes)
+    https://github.com/tlambert03/fonticon-materialdesignicons6  ('mdi6' prefix)
+
+    ...but fonts can also be added manually using :func:`addFont`.
+
     Parameters
     ----------
     glyph_key : str
