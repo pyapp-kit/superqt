@@ -3,7 +3,7 @@ from __future__ import annotations
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
-from typing import DefaultDict, Dict, Optional, Tuple, Type, Union
+from typing import DefaultDict, Dict, FrozenSet, Optional, Tuple, Type, Union
 
 from superqt.qtcompat import QT_VERSION
 from superqt.qtcompat.QtCore import QObject, QPoint, QRect, QSize, Qt
@@ -39,21 +39,21 @@ ValidColor = Union[
 ]
 Unset = object()
 _DEFAULT_STATE = (QIcon.State.Off, QIcon.Mode.Normal)
-_states: Dict[frozenset, tuple[QIcon.State, QIcon.Mode]] = {
-    frozenset(["on"]): (QIcon.State.On, QIcon.Mode.Normal),
-    frozenset(["off"]): _DEFAULT_STATE,
-    frozenset(["normal"]): _DEFAULT_STATE,
-    frozenset(["active"]): (QIcon.State.Off, QIcon.Mode.Active),
-    frozenset(["selected"]): (QIcon.State.Off, QIcon.Mode.Selected),
-    frozenset(["disabled"]): (QIcon.State.Off, QIcon.Mode.Disabled),
-    frozenset(["on", "normal"]): (QIcon.State.On, QIcon.Mode.Normal),
-    frozenset(["on", "active"]): (QIcon.State.On, QIcon.Mode.Active),
-    frozenset(["on", "selected"]): (QIcon.State.On, QIcon.Mode.Selected),
-    frozenset(["on", "disabled"]): (QIcon.State.On, QIcon.Mode.Disabled),
-    frozenset(["off", "normal"]): _DEFAULT_STATE,
-    frozenset(["off", "active"]): (QIcon.State.Off, QIcon.Mode.Active),
-    frozenset(["off", "selected"]): (QIcon.State.Off, QIcon.Mode.Selected),
-    frozenset(["off", "disabled"]): (QIcon.State.Off, QIcon.Mode.Disabled),
+_states: Dict[FrozenSet[str], tuple[QIcon.State, QIcon.Mode]] = {
+    frozenset({"on"}): (QIcon.State.On, QIcon.Mode.Normal),
+    frozenset({"off"}): _DEFAULT_STATE,
+    frozenset({"normal"}): _DEFAULT_STATE,
+    frozenset({"active"}): (QIcon.State.Off, QIcon.Mode.Active),
+    frozenset({"selected"}): (QIcon.State.Off, QIcon.Mode.Selected),
+    frozenset({"disabled"}): (QIcon.State.Off, QIcon.Mode.Disabled),
+    frozenset({"on", "normal"}): (QIcon.State.On, QIcon.Mode.Normal),
+    frozenset({"on", "active"}): (QIcon.State.On, QIcon.Mode.Active),
+    frozenset({"on", "selected"}): (QIcon.State.On, QIcon.Mode.Selected),
+    frozenset({"on", "disabled"}): (QIcon.State.On, QIcon.Mode.Disabled),
+    frozenset({"off", "normal"}): _DEFAULT_STATE,
+    frozenset({"off", "active"}): (QIcon.State.Off, QIcon.Mode.Active),
+    frozenset({"off", "selected"}): (QIcon.State.Off, QIcon.Mode.Selected),
+    frozenset({"off", "disabled"}): (QIcon.State.Off, QIcon.Mode.Disabled),
 }
 
 
@@ -72,15 +72,20 @@ class IconOptions:
     def _from_kwargs(
         cls, kwargs: dict, defaults: Optional[IconOptions] = None
     ) -> IconOptions:
-        defaults = defaults or _DEFAULT_ICON_OPTS
+        defaults = defaults or cls._defaults()
         kwargs = {
             f: getattr(defaults, f) if kwargs[f] is None else kwargs[f]
             for f in IconOptions.__dataclass_fields__  # type: ignore
         }
         return IconOptions(**kwargs)
 
+    __defaults = None
 
-_DEFAULT_ICON_OPTS = IconOptions("")
+    @classmethod
+    def _defaults(cls):
+        if cls.__defaults is None:
+            cls.__defaults = IconOptions("")
+        return cls.__defaults
 
 
 class _QFontIconEngine(QIconEngine):
@@ -176,16 +181,28 @@ class QFontIconStore(QObject):
 
     # map of key -> (font_family, font_style)
     _LOADED_KEYS: Dict[str, Tuple[str, Optional[str]]] = dict()
+
     # map of (font_family, font_style) -> character (char may include key)
     _CHARMAPS: Dict[Tuple[str, Optional[str]], Dict[str, str]] = dict()
 
+    # singleton instance, use `instance()` to retrieve
+    __instance: Optional[QFontIconStore] = None
+
     def __init__(self, parent: Optional[QObject] = None) -> None:
         super().__init__(parent=parent)
-        QApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
+        if hasattr(Qt.ApplicationAttribute, "AA_UseHighDpiPixmaps"):
+            # QT6 drops this
+            QApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
+
+    @classmethod
+    def instance(cls):
+        if cls.__instance is None:
+            cls.__instance = cls()
+        return cls.__instance
 
     @classmethod
     def _key2family(cls, key: str) -> Tuple[str, Optional[str]]:
-        """Return (family, style) given a font key"""
+        """Return (family, style) given a font `key`"""
         key = key.split(".", maxsplit=1)[0]
         if key not in cls._LOADED_KEYS:
             from . import _plugins
@@ -207,8 +224,8 @@ class QFontIconStore(QObject):
         return cls._LOADED_KEYS[key]
 
     @classmethod
-    def _ensure_char(cls, char, family, style) -> str:
-        """make sure that char is provided by family and style."""
+    def _ensure_char(cls, char: str, family: str, style: str) -> str:
+        """make sure that `char` is a glyph provided by `family` and `style`."""
         if len(char) == 1 and ord(char) > 256:
             return char
         try:
@@ -216,7 +233,7 @@ class QFontIconStore(QObject):
         except KeyError:
             raise KeyError(f"No charmap registered for {family} ({style})")
         if char in charmap:
-            # in case the charmap includes the key
+            # split in case the charmap includes the key
             return charmap[char].split(".", maxsplit=1)[-1]
 
         from ._utils import ensure_identifier
@@ -229,18 +246,41 @@ class QFontIconStore(QObject):
         raise ValueError(f"{family} ({style}) has no char with the key {ident}")
 
     @classmethod
-    def key2glyph(cls, glyph: str) -> tuple[str, str, Optional[str]]:
-        """Return char, family, style given a GlyphKey"""
-        font_key, char = glyph.split(".", maxsplit=1)
+    def key2glyph(cls, key: str) -> tuple[str, str, Optional[str]]:
+        """Return (char, family, style) given a glyph `key`"""
+        font_key, char = key.split(".", maxsplit=1)
         family, style = cls._key2family(font_key)
         char = cls._ensure_char(char, family, style)
         return char, family, style
 
     @classmethod
     def addFont(
-        cls, filepath: str, key: str, charmap=None
+        cls, filepath: str, key: str, charmap: Optional[Dict[str, str]] = None
     ) -> Optional[Tuple[str, str]]:
-        """Add font at `filepath` to registry under `key`."""
+        """Add font at `filepath` to the registry under `key`.
+
+        If you'd like to later use a fontkey in the form of `key.some-name`, then
+        `charmap` must be provided and provide a mapping for all of the glyph names
+        to their unicode numbers. If a charmap is not provided, glyphs must be directly
+        accessed with their unicode as something like `key.\uffff`.
+
+        Parameters
+        ----------
+        filepath : str
+            Path to an OTF or TTF file containing the fonts
+        key : str
+            A key that will represent this font file when used for lookup.  For example,
+            'fa5s' for 'Font-Awesome 5 Solid'.
+        charmap : Dict[str, str], optional
+            optional mapping for all of the glyph names to their unicode numbers.
+            See note above.
+
+        Returns
+        -------
+        Tuple[str, str], optional
+            font-family and font-style for the file just registered, or None if
+            something goes wrong.
+        """
         assert key not in cls._LOADED_KEYS, f"Key {key} already loaded"
         assert Path(filepath).exists(), f"Font file doesn't exist: {filepath}"
         # TODO: remember filepath?
@@ -264,7 +304,7 @@ class QFontIconStore(QObject):
         )
 
         styles = QFd.styles(family)  # type: ignore
-        style = styles[-1] if styles else None
+        style: str = styles[-1] if styles else ""
         if not QFd.isSmoothlyScalable(family, style):
             warnings.warn(
                 f"Registered font {family} ({style}) is not smoothly scalable. "
@@ -301,53 +341,30 @@ class QFontIconStore(QObject):
             icon.addState(state, mode, **options)
         return icon
 
-    def setTextIcon(self, wdg: QWidget, key, size=None) -> None:
+    def setTextIcon(self, widget: QWidget, key: str, size: float = None) -> None:
         """Sets text on a widget to a specific font & glyph.
 
         This is an alternative to setting a QIcon with a pixmap.  It may
         be easier to combine with dynamic stylesheets.
         """
-        if not hasattr(wdg, "setText"):
-            raise TypeError(f"Object does not a setText method: {wdg}")
+        setText = getattr(widget, "setText", None)
+        if not setText:
+            raise TypeError(f"Object does not a setText method: {widget}")
 
-        glyph, family, style = self.key2glyph(key)
+        glyph = self.key2glyph(key)[0]
+        size = size or DEFAULT_SCALING_FACTOR
+        size = size if size > 1 else widget.height() * size
+        widget.setFont(self.font(key, int(size)))
+        setText(glyph)
 
+    def font(self, font_prefix: str, size: int = None) -> QFont:
+        """Create QFont for `font_prefix`"""
+        font_key, _ = font_prefix.split(".", maxsplit=1)
+        family, style = self._key2family(font_key)
         font = QFont()
         font.setFamily(family)
         if style:
             font.setStyleName(style)
-        size = size or DEFAULT_SCALING_FACTOR
-        font.setPixelSize(size if size > 1 else wdg.height() * size)
-        wdg.setFont(font)
-        wdg.setText(glyph)
-
-    def font(self, family, style: str = None, size: int = None) -> QFont:
-        raise NotImplementedError()
-        # if is_font_enum_type(type(family)) or is_font_enum_type(family):
-        #     if family not in self:
-        #         self.addFont(family)
-        #     style = family._font_style()
-        #     _family = family._font_family()
-        # else:
-        #     _family = family
-
-        # font = QFont()
-        # font.setFamily(_family)
-        # if style:
-        #     font.setStyleName(style)
-        # if size:
-        #     font.setPixelSize(size)
-        # return font
-
-    def registeredFonts(self) -> Dict[str, set[str]]:
-        """Return registered font list (family and styles)."""
-        return dict(self._registered_fonts)
-
-    # def isRegistered(self, font_family: StringOrEnum) -> bool:
-    #     """Return `True` if `font_family` is registered."""
-    #     return font_family in self
-
-    # def __contains__(self, font: StringOrEnum) -> bool:
-    #     if isinstance(font, str):
-    #         return any(font.lower() == key.lower() for key in self._registered_fonts)
-    #     return ensure_font_enum_type(font) in self._registered_enums
+        if size:
+            font.setPixelSize(int(size))
+        return font

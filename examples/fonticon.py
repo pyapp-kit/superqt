@@ -39,7 +39,7 @@ btn2.setIconSize(QSize(225, 225))
 btn2.show()
 
 btn3 = QPushButton()
-btn3.setIcon(icon(FA5S.spinner, animation=pulse(btn3)))
+btn3.setIcon(icon(FA5S.smile, animation=pulse(btn3)))
 btn3.setIconSize(QSize(225, 225))
 btn3.show()
 
