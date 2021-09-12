@@ -20,7 +20,7 @@ class Animation(ABC):
 
     @abstractmethod
     def animate(self, painter: "QPainter", rect: QRect):
-        ...
+        """Setup and start the timer for the animation."""
 
 
 class spin(Animation):

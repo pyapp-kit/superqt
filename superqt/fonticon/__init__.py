@@ -29,7 +29,7 @@ ENTRY_POINT = _FIM.ENTRY_POINT
 
 
 def icon(
-    glyph: str,
+    glyph_key: str,
     scale_factor: float = DEFAULT_SCALING_FACTOR,
     color: ValidColor = None,
     opacity: float = 1,
@@ -38,7 +38,7 @@ def icon(
     states: dict[str, dict] = {},
 ) -> QFontIcon:
     return _QFIS.instance().icon(
-        glyph,
+        glyph_key,
         scale_factor=scale_factor,
         color=color,
         opacity=opacity,

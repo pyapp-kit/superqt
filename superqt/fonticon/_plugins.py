@@ -1,4 +1,4 @@
-from typing import List, Set
+from typing import Set, Tuple
 
 from ._iconfont import IconFontMeta, namespace2font
 
@@ -75,9 +75,9 @@ manager = FontIconManager()
 get_font_class = manager._get_font_class
 
 
-def available() -> List[str]:
-    return list(manager._PLUGINS)
+def available() -> Tuple[str]:
+    return tuple(manager._PLUGINS)
 
 
-def loaded() -> List[str]:
-    return list(manager._LOADED)
+def loaded() -> Tuple[str]:
+    return tuple(manager._LOADED)

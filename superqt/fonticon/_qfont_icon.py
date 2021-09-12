@@ -61,7 +61,7 @@ _states: Dict[FrozenSet[str], tuple[QIcon.State, QIcon.Mode]] = {
 class IconOptions:
     """The set of options needed to render a font in a single State/Mode."""
 
-    glyph: str
+    glyph_key: str
     scale_factor: float = DEFAULT_SCALING_FACTOR
     color: ValidColor = None
     opacity: float = DEFAULT_OPACITY
@@ -96,7 +96,7 @@ class _QFontIconEngine(QIconEngine):
             QIcon.State, Dict[QIcon.Mode, Optional[IconOptions]]
         ] = DefaultDict(dict)
 
-    def clone(self) -> QIconEngine:
+    def clone(self) -> QIconEngine:  # pragma: no cover
         ico = _QFontIconEngine(None)  # type: ignore
         ico._opts = self._opts.copy()
         return ico
@@ -123,7 +123,7 @@ class _QFontIconEngine(QIconEngine):
     ) -> None:
         opts = self._get_opts(state, mode)
 
-        char, family, style = QFontIconStore.key2glyph(opts.glyph)
+        char, family, style = QFontIconStore.key2glyph(opts.glyph_key)
 
         # font
         font = QFont()
@@ -143,12 +143,12 @@ class _QFontIconEngine(QIconEngine):
         painter.setPen(QColor(*color_args))
         painter.setOpacity(opts.opacity)
         painter.setFont(font)
-        painter.drawText(rect, Qt.AlignCenter, char)
+        painter.drawText(rect, Qt.AlignmentFlag.AlignCenter, char)
         painter.restore()
 
     def pixmap(self, size: QSize, mode: QIcon.Mode, state: QIcon.State) -> QPixmap:
         pixmap = QPixmap(size)
-        pixmap.fill(Qt.transparent)
+        pixmap.fill(Qt.GlobalColor.transparent)
         painter = QPainter(pixmap)
         self.paint(painter, QRect(QPoint(0, 0), size), mode, state)
         return pixmap
@@ -163,7 +163,7 @@ class QFontIcon(QIcon):
         self,
         state: QIcon.State = QIcon.State.Off,
         mode: QIcon.Mode = QIcon.Mode.Normal,
-        glyph: Optional[str] = None,
+        glyph_key: Optional[str] = None,
         font_family: Optional[str] = None,
         font_style: Optional[str] = None,
         scale_factor: float = DEFAULT_SCALING_FACTOR,
@@ -195,10 +195,16 @@ class QFontIconStore(QObject):
             QApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
 
     @classmethod
-    def instance(cls):
+    def instance(cls) -> QFontIconStore:
         if cls.__instance is None:
             cls.__instance = cls()
         return cls.__instance
+
+    @classmethod
+    def clear(cls) -> None:
+        cls._LOADED_KEYS.clear()
+        cls._CHARMAPS.clear()
+        QFontDatabase.removeAllApplicationFonts()
 
     @classmethod
     def _key2family(cls, key: str) -> Tuple[str, Optional[str]]:
@@ -212,12 +218,12 @@ class QFontIconStore(QObject):
                 result = cls.addFont(
                     font_cls.__font_file__, key, charmap=font_cls.__dict__
                 )
-                if not result:
+                if not result:  # pragma: no cover
                     raise Exception("Invalid font file")
                 cls._LOADED_KEYS[key] = result
             except Exception as e:
                 raise ValueError(
-                    f"Unrecognized font key: {key}.\n"
+                    f"Unrecognized font key: {key!r}.\n"
                     f"Known plugin keys include: {_plugins.available()}.\n"
                     f"Loaded keys include: {list(cls._LOADED_KEYS)}."
                 ) from e
@@ -231,19 +237,17 @@ class QFontIconStore(QObject):
         try:
             charmap = cls._CHARMAPS[(family, style)]
         except KeyError:
-            raise KeyError(f"No charmap registered for {family} ({style})")
+            raise KeyError(f"No charmap registered for font '{family} ({style})'")
         if char in charmap:
             # split in case the charmap includes the key
             return charmap[char].split(".", maxsplit=1)[-1]
 
-        from ._utils import ensure_identifier
-
-        ident = ensure_identifier(char)
+        ident = _ensure_identifier(char)
         if ident in charmap:
             return charmap[ident].split(".", maxsplit=1)[-1]
 
         ident = f"{char!r} or {ident!r}" if char != ident else repr(ident)
-        raise ValueError(f"{family} ({style}) has no char with the key {ident}")
+        raise ValueError(f"Font '{family} ({style})' has no glyph with the key {ident}")
 
     @classmethod
     def key2glyph(cls, key: str) -> tuple[str, str, Optional[str]]:
@@ -283,15 +287,16 @@ class QFontIconStore(QObject):
         """
         assert key not in cls._LOADED_KEYS, f"Key {key} already loaded"
         assert Path(filepath).exists(), f"Font file doesn't exist: {filepath}"
+        assert QApplication.instance() is not None, "Please create QApplication first."
         # TODO: remember filepath?
 
         fontId = QFontDatabase.addApplicationFont(str(Path(filepath).absolute()))
-        if fontId < 0:
+        if fontId < 0:  # pragma: no cover
             warnings.warn(f"Cannot load font file: {filepath}")
             return None
 
         families = QFontDatabase.applicationFontFamilies(fontId)
-        if not families:
+        if not families:  # pragma: no cover
             warnings.warn(f"Font file is empty!: {filepath}")
             return None
         family: str = families[0]
@@ -305,7 +310,7 @@ class QFontIconStore(QObject):
 
         styles = QFd.styles(family)  # type: ignore
         style: str = styles[-1] if styles else ""
-        if not QFd.isSmoothlyScalable(family, style):
+        if not QFd.isSmoothlyScalable(family, style):  # pragma: no cover
             warnings.warn(
                 f"Registered font {family} ({style}) is not smoothly scalable. "
                 "Icons may not look attractive."
@@ -318,7 +323,7 @@ class QFontIconStore(QObject):
 
     def icon(
         self,
-        glyph: str,
+        glyph_key: str,
         *,
         scale_factor: float = DEFAULT_SCALING_FACTOR,
         color: ValidColor = None,
@@ -327,6 +332,8 @@ class QFontIconStore(QObject):
         transform: Optional[QTransform] = None,
         states: Dict[str, dict] = {},
     ) -> QFontIcon:
+        self.key2glyph(glyph_key)  # make sure it's a valid glyph_key
+
         default_opts = IconOptions._from_kwargs(locals())
 
         icon = QFontIcon(default_opts)
@@ -348,7 +355,7 @@ class QFontIconStore(QObject):
         be easier to combine with dynamic stylesheets.
         """
         setText = getattr(widget, "setText", None)
-        if not setText:
+        if not setText:  # pragma: no cover
             raise TypeError(f"Object does not a setText method: {widget}")
 
         glyph = self.key2glyph(key)[0]
@@ -368,3 +375,25 @@ class QFontIconStore(QObject):
         if size:
             font.setPixelSize(int(size))
         return font
+
+
+def _ensure_identifier(name: str) -> str:
+    """Normalize string to valid identifier"""
+    import keyword
+
+    if not name:
+        return ""
+
+    # add _ to beginning of names starting with numbers
+    if name[0].isdigit():
+        name = f"_{name}"
+
+    # add _ to end of reserved keywords
+    if keyword.iskeyword(name):
+        name += "_"
+
+    # replace dashes and spaces with underscores
+    name = name.replace("-", "_").replace(" ", "_")
+
+    assert str.isidentifier(name), f"Could not canonicalize name: {name}"
+    return name
