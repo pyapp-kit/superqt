@@ -51,31 +51,31 @@ class EventedList(TypedMutableSequence[_T]):
 
     Events
     ------
-    inserting (index: int)
+    insertingItem (index: int)
         emitted before an item is inserted at ``index``
-    inserted (index: int, value: T)
+    itemInserted (index: int, value: T)
         emitted after ``value`` is inserted at ``index``
-    removing (index: int)
+    removingItem (index: int)
         emitted before an item is removed at ``index``
-    removed (index: int, value: T)
+    itemRemoved (index: int, value: T)
         emitted after ``value`` is removed at ``index``
-    moving (index: int, new_index: int)
+    movingItem (index: int, new_index: int)
         emitted before an item is moved from ``index`` to ``new_index``
-    moved (index: int, new_index: int, value: T)
+    itemMoved (index: int, new_index: int, value: T)
         emitted after ``value`` is moved from ``index`` to ``new_index``
-    changed (index: int, old_value: T, value: T)
+    itemChanged (index: int, old_value: T, value: T)
         emitted when ``index`` is set from ``old_value`` to ``value``
-    changed <OVERLOAD> (index: slice, old_value: List[_T], value: List[_T])
+    itemChanged <OVERLOAD> (index: slice, old_value: List[_T], value: List[_T])
         emitted when ``index`` is set from ``old_value`` to ``value``
     reordered (value: self)
         emitted when the list is reordered (eg. moved/reversed).
     """
 
-    itemInserting = Signal(int)  # idx
+    insertingItem = Signal(int)  # idx
     itemInserted = Signal(Tuple[int, any])  # (idx, value)
-    itemRemoving = Signal(int)  # idx
+    removingItem = Signal(int)  # idx
     itemRemoved = Signal(Tuple[int, any])  # (idx, value)
-    itemMoving = Signal(Tuple[int, int])  # (src_idx, dest_idx)
+    movingItem = Signal(Tuple[int, int])  # (src_idx, dest_idx)
     itemMoved = Signal(
         Tuple[Tuple[int, int], any]
     )  # ((src_idx, dest_idx), value)
@@ -152,7 +152,7 @@ class EventedList(TypedMutableSequence[_T]):
 
     def insert(self, index: int, value: _T):
         """Insert ``value`` before index."""
-        self.itemInserting.emit(index)
+        self.insertingItem.emit(index)
         super().insert(index, value)
         self.itemInserted.emit((index, value))
         # self._connect_child_emitters(value) # TODO: look at this
@@ -193,7 +193,7 @@ class EventedList(TypedMutableSequence[_T]):
             # this is a no-op
             return False
 
-        self.itemMoving.emit((src_index, dest_index))
+        self.movingItem.emit((src_index, dest_index))
         item = self._list.pop(src_index)
         if dest_index > src_index:
             dest_index -= 1
