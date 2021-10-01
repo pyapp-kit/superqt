@@ -79,7 +79,7 @@ class EventedList(TypedMutableSequence[_T]):
     itemMoved = Signal(
         Tuple[Tuple[int, int], any]
     )  # ((src_idx, dest_idx), value)
-    itemChanged = Signal(Tuple[int | any, any, any])  # (idx | key, old, new)
+    itemChanged = Signal(Tuple[Union[int, any], any, any])  # (idx | key, old, new)
     reordered = Signal(None)
 
     def __init__(
@@ -138,15 +138,13 @@ class EventedList(TypedMutableSequence[_T]):
             return [(self, self.index(key))]
 
         valid = {int, slice}.union(set(self._lookup))
-        raise TypeError(
-            f"Deletion index must be {valid!r}, got {type(key)}",
-        )
+        raise TypeError(f"Deletion index must be {valid!r}, got {type(key)}")
 
     def __delitem__(self, key: Index):
         # delete from the end
         for parent, index in sorted(self._delitem_indices(key), reverse=True):
-            parent.events.removing(index=index)
-            self._disconnect_child_emitters(parent[index])
+            parent.removingItem.emit(index)
+            # self._disconnect_child_emitters(parent[index])
             item = parent._list.pop(index)
             self.itemRemoved.emit((index, item))
 
