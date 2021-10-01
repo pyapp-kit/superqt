@@ -116,15 +116,17 @@ class EventedList(TypedMutableSequence[_T]):
                         f"attempt to assign sequence of size {len(value)} to extended slice of size {len(indices)}",
                     )
                 for i, v in zip(indices, value):
-                    self.__setitem__(i, v)
+                    with self.insertingItem.blocked(), self.itemInserted.blocked():
+                        self.__setitem__(i, v)
             else:
                 del self[key]
                 start = key.start or 0
                 for i, v in enumerate(value):
-                    self.insert(start + i, v)
+                    with self.insertingItem.blocked(), self.itemInserted.blocked():
+                        self.insert(start + i, v)
         else:
             super().__setitem__(key, value)
-            self.itemChanged.emit((key, old, value))
+        self.itemChanged.emit((key, old, value))
 
     def _delitem_indices(
             self, key: Index
