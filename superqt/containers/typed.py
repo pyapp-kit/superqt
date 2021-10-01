@@ -13,20 +13,12 @@ from typing import (
     overload,
 )
 
-from ....utils.translations import trans
-
 logger = logging.getLogger(__name__)
-
 
 Index = Union[int, slice]
 
 _T = TypeVar("_T")
 _L = TypeVar("_L")
-
-
-class B(MutableSequence[int]):
-    def __new__(self, data):
-        self._data = data
 
 
 class TypedMutableSequence(MutableSequence[_T]):
@@ -49,11 +41,11 @@ class TypedMutableSequence(MutableSequence[_T]):
     """
 
     def __init__(
-        self,
-        data: Iterable[_T] = (),
-        *,
-        basetype: Union[Type[_T], Sequence[Type[_T]]] = (),
-        lookup: Dict[Type[_L], Callable[[_T], Union[_T, _L]]] = dict(),
+            self,
+            data: Iterable[_T] = (),
+            *,
+            basetype: Union[Type[_T], Sequence[Type[_T]]] = (),
+            lookup: Dict[Type[_L], Callable[[_T], Union[_T, _L]]] = dict(),
     ):
         self._list: List[_T] = []
         self._basetypes = (
@@ -88,10 +80,8 @@ class TypedMutableSequence(MutableSequence[_T]):
         if isinstance(key, slice):
             if not isinstance(value, Iterable):
                 raise TypeError(
-                    trans._(
-                        'Can only assign an iterable to slice',
-                        deferred=True,
-                    )
+                    'Can only assign an iterable to slice',
+                    deferred=True,
                 )
             self._list[key] = [self._type_check(v) for v in value]
         else:
@@ -151,15 +141,13 @@ class TypedMutableSequence(MutableSequence[_T]):
 
     def _type_check(self, e: Any) -> _T:
         if self._basetypes and not any(
-            isinstance(e, t) for t in self._basetypes
+                isinstance(e, t) for t in self._basetypes
         ):
             raise TypeError(
-                trans._(
-                    'Cannot add object with type {dtype!r} to TypedList expecting type {basetypes!r}',
-                    deferred=True,
-                    dtype=type(e),
-                    basetypes=self._basetypes,
-                )
+                'Cannot add object with type {dtype!r} to TypedList expecting type {basetypes!r}',
+                deferred=True,
+                dtype=type(e),
+                basetypes=self._basetypes,
             )
         return e
 
@@ -229,11 +217,9 @@ class TypedMutableSequence(MutableSequence[_T]):
                 return i
 
         raise ValueError(
-            trans._(
-                "{value!r} is not in list",
-                deferred=True,
-                value=value,
-            )
+            f"{value} is not in list",
+            deferred=True,
+            value=value,
         )
 
     def _iter_indices(self, start=0, stop=None, deep=False):
