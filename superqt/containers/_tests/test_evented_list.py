@@ -89,7 +89,7 @@ def test_list_interface_parity(test_list, regular_list, meth):
     # check that emitters were called
     for expected_signal in expected_signals:
         emitter = getattr(test_list, expected_signal).emit
-        emitter.assert_called_once()
+        assert emitter.call_count == expected_signals.count(expected_signal)
 
 
 
