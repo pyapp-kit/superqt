@@ -144,10 +144,7 @@ class TypedMutableSequence(MutableSequence[_T]):
                 isinstance(e, t) for t in self._basetypes
         ):
             raise TypeError(
-                'Cannot add object with type {dtype!r} to TypedList expecting type {basetypes!r}',
-                deferred=True,
-                dtype=type(e),
-                basetypes=self._basetypes,
+                f'Cannot add object with type {type(e)!r} to TypedList expecting type {self._basetypes!r}',
             )
         return e
 
