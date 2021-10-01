@@ -71,10 +71,12 @@ def test_list(request, regular_list):
 )
 def test_list_interface_parity(test_list, regular_list, meth):
     method_name, args, expected_signals = meth
+
     # patch emitters
     for expected_signal in expected_signals:
         signal = getattr(test_list, expected_signal)
         patch.object(signal, 'emit')
+
     test_list_method = getattr(test_list, method_name)
     assert tuple(test_list) == tuple(regular_list)
 
@@ -90,7 +92,6 @@ def test_list_interface_parity(test_list, regular_list, meth):
     for expected_signal in expected_signals:
         emitter = getattr(test_list, expected_signal).emit
         assert emitter.call_count == expected_signals.count(expected_signal)
-
 
 
 def test_hash(test_list):
