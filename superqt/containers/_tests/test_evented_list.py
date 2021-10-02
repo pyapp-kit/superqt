@@ -42,7 +42,7 @@ def test_list(request, regular_list):
             (slice(2),),
             ('removingItem', 'itemRemoved') * 2,
         ),
-        ('__delitem__', (slice(0, 0),), ('removingItem', 'itemRemoved')),
+        ('__delitem__', (slice(0, 0),), ()),
         (
             '__delitem__',
             (slice(-3),),
