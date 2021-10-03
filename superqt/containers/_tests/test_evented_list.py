@@ -138,13 +138,8 @@ def test_copy(test_list, regular_list, signal_names):
         emitter.assert_not_called()
 
 
-
 def test_move(test_list):
     """Test the that we can move objects with the move method"""
-    # test_list.movingItem.emit = Mock(wraps=test_list.movingItem.emit)
-    # test_list.itemMoved.emit = Mock(wraps=test_list.itemMoved.emit)
-    # test_list.reordered.emit = Mock(wraps=test_list.reordered.emit)
-
     def _fail(e):
         raise AssertionError("unexpected event called")
 
@@ -162,7 +157,7 @@ def test_move(test_list):
     assert test_list == expectation
     test_list.movingItem.emit.assert_called_once()
     test_list.itemMoved.emit.assert_called_once()
-    test_list.reordered.emit.assert_called_with(value=expectation)
+    test_list.reordered.emit.assert_called_with(expectation)
 
     # move the other way
     # pop the object at 3 and insert at current position 0
