@@ -270,24 +270,24 @@ def test_slice(test_list, regular_list):
     assert tuple(test_slice) == tuple(regular_slice)
     assert isinstance(test_slice, test_list.__class__)
 
-#
-# NEST = [0, [10, [110, [1110, 1111, 1112], 112], 12], 2]
-#
-#
-# def flatten(container):
-#     """Flatten arbitrarily nested list.
-#     Examples
-#     --------
-#     >>> a = [1, [2, [3], 4], 5]
-#     >>> list(flatten(a))
-#     [1, 2, 3, 4, 5]
-#     """
-#     for i in container:
-#         if isinstance(i, MutableSequence):
-#             yield from flatten(i)
-#         else:
-#             yield i
-#
+
+NEST = [0, [10, [110, [1110, 1111, 1112], 112], 12], 2]
+
+
+def flatten(container):
+    """Flatten arbitrarily nested list.
+    Examples
+    --------
+    >>> a = [1, [2, [3], 4], 5]
+    >>> list(flatten(a))
+    [1, 2, 3, 4, 5]
+    """
+    for i in container:
+        if isinstance(i, MutableSequence):
+            yield from flatten(i)
+        else:
+            yield i
+
 #
 # def test_nested_indexing():
 #     """test that we can index a nested list with nl[1, 2, 3] syntax."""
