@@ -262,14 +262,14 @@ def test_move_multiple_mimics_slice_reorder(signal_names):
     el[:] = list(range(8))
     assert el.move_multiple(new_order) == 7
 
-#
-# def test_slice(test_list, regular_list):
-#     """Slicing an evented list should return a same-class evented list."""
-#     test_slice = test_list[1:3]
-#     regular_slice = regular_list[1:3]
-#     assert tuple(test_slice) == tuple(regular_slice)
-#     assert isinstance(test_slice, test_list.__class__)
-#
+
+def test_slice(test_list, regular_list):
+    """Slicing an evented list should return a same-class evented list."""
+    test_slice = test_list[1:3]
+    regular_slice = regular_list[1:3]
+    assert tuple(test_slice) == tuple(regular_slice)
+    assert isinstance(test_slice, test_list.__class__)
+
 #
 # NEST = [0, [10, [110, [1110, 1111, 1112], 112], 12], 2]
 #
