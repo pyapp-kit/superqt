@@ -192,25 +192,30 @@ MOVING_INDICES = BASIC_INDICES + OTHER_INDICES
 
 
 @pytest.mark.parametrize('sources,dest,expectation', MOVING_INDICES)
-def test_move_multiple(sources, dest, expectation):
+def test_move_multiple(signal_names, sources, dest, expectation):
     """Test the that we can move objects with the move method"""
+    # mock the signals on an 8 element evented list
     el = EventedList(range(8))
-    el.events = Mock(wraps=el.events)
+    for signal_name in signal_names:
+        mock = Mock(wraps=getattr(el, signal_name))
+        setattr(el, signal_name, mock)
+
     assert el == [0, 1, 2, 3, 4, 5, 6, 7]
 
+    # fail if removal/insertion events called
     def _fail(e):
         raise AssertionError("unexpected event called")
 
-    el.events.removing.connect(_fail)
-    el.events.removed.connect(_fail)
-    el.events.inserting.connect(_fail)
-    el.events.inserted.connect(_fail)
+    for signal_name in signal_names:
+        if 'remov' in signal_name.lower() or 'insert' in signal_name.lower():
+            signal = getattr(el, signal_name)
+            signal.connect(_fail)
 
     el.move_multiple(sources, dest)
     assert el == expectation
-    el.events.moving.assert_called()
-    el.events.moved.assert_called()
-    el.events.reordered.assert_called_with(value=expectation)
+    # el.movingItem.assert_called()  # discuss during review
+    # el.itemMoved.assert_called()  # should these signals fire?
+    el.reordered.emit.assert_called_with(expectation)
 
 
 def test_move_multiple_mimics_slice_reorder():
