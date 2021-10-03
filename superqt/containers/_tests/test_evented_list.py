@@ -169,87 +169,87 @@ def test_move(test_list):
     test_list.move(1, -2)
     assert test_list == [3, 2, 0, 1, 4]
 
-#
-# BASIC_INDICES = [
-#     ((2,), 0, [2, 0, 1, 3, 4, 5, 6, 7]),  # move single item
-#     ([0, 2, 3], 6, [1, 4, 5, 0, 2, 3, 6, 7]),  # move back
-#     ([4, 7], 1, [0, 4, 7, 1, 2, 3, 5, 6]),  # move forward
-#     ([0, 5, 6], 3, [1, 2, 0, 5, 6, 3, 4, 7]),  # move in between
-#     ([1, 3, 5, 7], 3, [0, 2, 1, 3, 5, 7, 4, 6]),  # same as above
-#     ([0, 2, 3, 2, 3], 6, [1, 4, 5, 0, 2, 3, 6, 7]),  # strip dupe indices
-# ]
-# OTHER_INDICES = [
-#     ([7, 4], 1, [0, 7, 4, 1, 2, 3, 5, 6]),  # move forward reorder
-#     ([3, 0, 2], 6, [1, 4, 5, 3, 0, 2, 6, 7]),  # move back reorder
-#     ((2, 4), -2, [0, 1, 3, 5, 6, 2, 4, 7]),  # negative indexing
-#     ([slice(None, 3)], 6, [3, 4, 5, 0, 1, 2, 6, 7]),  # move slice back
-#     ([slice(5, 8)], 2, [0, 1, 5, 6, 7, 2, 3, 4]),  # move slice forward
-#     ([slice(1, 8, 2)], 3, [0, 2, 1, 3, 5, 7, 4, 6]),  # move slice between
-#     ([slice(None, 8, 3)], 4, [1, 2, 0, 3, 6, 4, 5, 7]),
-#     ([slice(None, 8, 3), 0, 3, 6], 4, [1, 2, 0, 3, 6, 4, 5, 7]),
-# ]
-# MOVING_INDICES = BASIC_INDICES + OTHER_INDICES
-#
-#
-# @pytest.mark.parametrize('sources,dest,expectation', MOVING_INDICES)
-# def test_move_multiple(sources, dest, expectation):
-#     """Test the that we can move objects with the move method"""
-#     el = EventedList(range(8))
-#     el.events = Mock(wraps=el.events)
-#     assert el == [0, 1, 2, 3, 4, 5, 6, 7]
-#
-#     def _fail(e):
-#         raise AssertionError("unexpected event called")
-#
-#     el.events.removing.connect(_fail)
-#     el.events.removed.connect(_fail)
-#     el.events.inserting.connect(_fail)
-#     el.events.inserted.connect(_fail)
-#
-#     el.move_multiple(sources, dest)
-#     assert el == expectation
-#     el.events.moving.assert_called()
-#     el.events.moved.assert_called()
-#     el.events.reordered.assert_called_with(value=expectation)
-#
-#
-# def test_move_multiple_mimics_slice_reorder():
-#     """Test the that move_multiple provides the same result as slice insertion."""
-#     data = list(range(8))
-#     el = EventedList(data)
-#     el.events = Mock(wraps=el.events)
-#     assert el == data
-#     new_order = [1, 5, 3, 4, 6, 7, 2, 0]
-#     # this syntax
-#     el.move_multiple(new_order, 0)
-#     # is the same as this syntax
-#     data[:] = [data[i] for i in new_order]
-#     assert el == new_order
-#     assert el == data
-#     assert el.events.moving.call_args_list == [
-#         call(index=1, new_index=0),
-#         call(index=5, new_index=1),
-#         call(index=4, new_index=2),
-#         call(index=5, new_index=3),
-#         call(index=6, new_index=4),
-#         call(index=7, new_index=5),
-#         call(index=7, new_index=6),
-#     ]
-#     assert el.events.moved.call_args_list == [
-#         call(index=1, new_index=0, value=1),
-#         call(index=5, new_index=1, value=5),
-#         call(index=4, new_index=2, value=3),
-#         call(index=5, new_index=3, value=4),
-#         call(index=6, new_index=4, value=6),
-#         call(index=7, new_index=5, value=7),
-#         call(index=7, new_index=6, value=2),
-#     ]
-#     el.events.reordered.assert_called_with(value=new_order)
-#
-#     # move_multiple also works omitting the insertion index
-#     el[:] = list(range(8))
-#     el.move_multiple(new_order) == [el[i] for i in new_order]
-#
+
+BASIC_INDICES = [
+    ((2,), 0, [2, 0, 1, 3, 4, 5, 6, 7]),  # move single item
+    ([0, 2, 3], 6, [1, 4, 5, 0, 2, 3, 6, 7]),  # move back
+    ([4, 7], 1, [0, 4, 7, 1, 2, 3, 5, 6]),  # move forward
+    ([0, 5, 6], 3, [1, 2, 0, 5, 6, 3, 4, 7]),  # move in between
+    ([1, 3, 5, 7], 3, [0, 2, 1, 3, 5, 7, 4, 6]),  # same as above
+    ([0, 2, 3, 2, 3], 6, [1, 4, 5, 0, 2, 3, 6, 7]),  # strip dupe indices
+]
+OTHER_INDICES = [
+    ([7, 4], 1, [0, 7, 4, 1, 2, 3, 5, 6]),  # move forward reorder
+    ([3, 0, 2], 6, [1, 4, 5, 3, 0, 2, 6, 7]),  # move back reorder
+    ((2, 4), -2, [0, 1, 3, 5, 6, 2, 4, 7]),  # negative indexing
+    ([slice(None, 3)], 6, [3, 4, 5, 0, 1, 2, 6, 7]),  # move slice back
+    ([slice(5, 8)], 2, [0, 1, 5, 6, 7, 2, 3, 4]),  # move slice forward
+    ([slice(1, 8, 2)], 3, [0, 2, 1, 3, 5, 7, 4, 6]),  # move slice between
+    ([slice(None, 8, 3)], 4, [1, 2, 0, 3, 6, 4, 5, 7]),
+    ([slice(None, 8, 3), 0, 3, 6], 4, [1, 2, 0, 3, 6, 4, 5, 7]),
+]
+MOVING_INDICES = BASIC_INDICES + OTHER_INDICES
+
+
+@pytest.mark.parametrize('sources,dest,expectation', MOVING_INDICES)
+def test_move_multiple(sources, dest, expectation):
+    """Test the that we can move objects with the move method"""
+    el = EventedList(range(8))
+    el.events = Mock(wraps=el.events)
+    assert el == [0, 1, 2, 3, 4, 5, 6, 7]
+
+    def _fail(e):
+        raise AssertionError("unexpected event called")
+
+    el.events.removing.connect(_fail)
+    el.events.removed.connect(_fail)
+    el.events.inserting.connect(_fail)
+    el.events.inserted.connect(_fail)
+
+    el.move_multiple(sources, dest)
+    assert el == expectation
+    el.events.moving.assert_called()
+    el.events.moved.assert_called()
+    el.events.reordered.assert_called_with(value=expectation)
+
+
+def test_move_multiple_mimics_slice_reorder():
+    """Test the that move_multiple provides the same result as slice insertion."""
+    data = list(range(8))
+    el = EventedList(data)
+    el.events = Mock(wraps=el.events)
+    assert el == data
+    new_order = [1, 5, 3, 4, 6, 7, 2, 0]
+    # this syntax
+    el.move_multiple(new_order, 0)
+    # is the same as this syntax
+    data[:] = [data[i] for i in new_order]
+    assert el == new_order
+    assert el == data
+    assert el.events.moving.call_args_list == [
+        call(index=1, new_index=0),
+        call(index=5, new_index=1),
+        call(index=4, new_index=2),
+        call(index=5, new_index=3),
+        call(index=6, new_index=4),
+        call(index=7, new_index=5),
+        call(index=7, new_index=6),
+    ]
+    assert el.events.moved.call_args_list == [
+        call(index=1, new_index=0, value=1),
+        call(index=5, new_index=1, value=5),
+        call(index=4, new_index=2, value=3),
+        call(index=5, new_index=3, value=4),
+        call(index=6, new_index=4, value=6),
+        call(index=7, new_index=5, value=7),
+        call(index=7, new_index=6, value=2),
+    ]
+    el.events.reordered.assert_called_with(value=new_order)
+
+    # move_multiple also works omitting the insertion index
+    el[:] = list(range(8))
+    el.move_multiple(new_order) == [el[i] for i in new_order]
+
 #
 # def test_slice(test_list, regular_list):
 #     """Slicing an evented list should return a same-class evented list."""
