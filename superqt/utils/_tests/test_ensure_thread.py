@@ -184,3 +184,18 @@ def test_main_thread_return(qtbot):
     with qtbot.wait_signal(t.finished):
         t.start()
     assert t.executed
+
+
+def test_names(qtbot):
+    ob = SampleObject()
+    assert ob.check_object_thread.__name__ == "check_object_thread"
+    assert ob.check_object_thread_return.__name__ == "check_object_thread_return"
+    assert (
+        ob.check_object_thread_return_timeout.__name__
+        == "check_object_thread_return_timeout"
+    )
+    assert (
+        ob.check_object_thread_return_future.__name__
+        == "check_object_thread_return_future"
+    )
+    assert ob.check_main_thread_return.__name__ == "check_main_thread_return"

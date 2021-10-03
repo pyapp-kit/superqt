@@ -61,6 +61,9 @@ def ensure_main_thread(
                 **kwargs,
             )
 
+        if hasattr(func, "__name__"):
+            _func.__name__ = func.__name__
+
         return _func
 
     if func is None:
@@ -92,6 +95,9 @@ def ensure_object_thread(
             return _run_in_thread(
                 func, self.thread(), await_return, timeout, self, *args, **kwargs
             )
+
+        if hasattr(func, "__name__"):
+            _func.__name__ = func.__name__
 
         return _func
 
