@@ -12,17 +12,27 @@ def regular_list():
     return list(range(5))
 
 
+@pytest.fixture
+def signal_names():
+    names = (
+        'insertingItem',
+        'itemInserted',
+        'removingItem',
+        'itemRemoved',
+        'movingItem',
+        'itemMoved',
+        'itemChanged',
+        'reordered',
+    )
+    return names
+
+
 @pytest.fixture(params=[EventedList])
-def test_list(request, regular_list):
+def test_list(request, regular_list, signal_names):
     test_list = request.param(regular_list)
-    test_list.insertingItem = Mock(wraps=test_list.insertingItem)
-    test_list.itemInserted = Mock(wraps=test_list.itemInserted)
-    test_list.removingItem = Mock(wraps=test_list.removingItem)
-    test_list.itemRemoved = Mock(wraps=test_list.itemRemoved)
-    test_list.movingItem = Mock(wraps=test_list.movingItem)
-    test_list.itemMoved = Mock(wraps=test_list.itemMoved)
-    test_list.itemChanged = Mock(wraps=test_list.itemChanged)
-    test_list.reordered = Mock(wraps=test_list.reordered)
+    for event_name in signal_names:
+        mock = Mock(wraps=getattr(test_list, event_name))
+        setattr(test_list, event_name, mock)
     return test_list
 
 
@@ -115,21 +125,25 @@ def test_list_interface_exceptions(test_list):
         test_list.insert([bad_index], 0)
 
 
-def test_copy(test_list, regular_list):
+def test_copy(test_list, regular_list, signal_names):
     """Copying an evented list should return a same-class evented list."""
     new_test = test_list.copy()
     new_reg = regular_list.copy()
     assert id(new_test) != id(test_list)
     assert new_test == test_list
     assert tuple(new_test) == tuple(test_list) == tuple(new_reg)
-    test_list.events.assert_not_called()
+    # check no events called
+    for signal_name in signal_names:
+        emitter = getattr(test_list, signal_name).emit
+        emitter.assert_not_called()
+
 
 
 def test_move(test_list):
     """Test the that we can move objects with the move method"""
-    test_list.movingItem.emit = Mock(wraps=test_list.movingItem.emit)
-    test_list.itemMoved.emit = Mock(wraps=test_list.itemMoved.emit)
-    test_list.reordered.emit = Mock(wraps=test_list.reordered.emit)
+    # test_list.movingItem.emit = Mock(wraps=test_list.movingItem.emit)
+    # test_list.itemMoved.emit = Mock(wraps=test_list.itemMoved.emit)
+    # test_list.reordered.emit = Mock(wraps=test_list.reordered.emit)
 
     def _fail(e):
         raise AssertionError("unexpected event called")
