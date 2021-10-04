@@ -63,6 +63,7 @@ def ensure_main_thread(
 
         if hasattr(func, "__name__"):
             _func.__name__ = func.__name__
+        _func.__wrapped__ = func
 
         return _func
 
@@ -98,6 +99,7 @@ def ensure_object_thread(
 
         if hasattr(func, "__name__"):
             _func.__name__ = func.__name__
+        _func.__wrapped__ = func
 
         return _func
 
