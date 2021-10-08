@@ -1,3 +1,4 @@
+import inspect
 import time
 from concurrent.futures import Future, TimeoutError
 
@@ -72,7 +73,8 @@ class SampleObject(QObject):
         return a * 7
 
     @ensure_object_thread(await_return=False)
-    def check_object_thread_return_future(self, a):
+    def check_object_thread_return_future(self, a: int):
+        """sample docstring"""
         if QThread.currentThread() is not self.thread():
             raise RuntimeError("Wrong thread")
         time.sleep(0.4)
@@ -186,7 +188,7 @@ def test_main_thread_return(qtbot):
     assert t.executed
 
 
-def test_names(qtbot):
+def test_names(qapp):
     ob = SampleObject()
     assert ob.check_object_thread.__name__ == "check_object_thread"
     assert ob.check_object_thread_return.__name__ == "check_object_thread_return"
@@ -198,4 +200,9 @@ def test_names(qtbot):
         ob.check_object_thread_return_future.__name__
         == "check_object_thread_return_future"
     )
+    assert ob.check_object_thread_return_future.__doc__ == "sample docstring"
+    signature = inspect.signature(ob.check_object_thread_return_future)
+    assert len(signature.parameters) == 1
+    assert list(signature.parameters.values())[0].name == "a"
+    assert list(signature.parameters.values())[0].annotation == int
     assert ob.check_main_thread_return.__name__ == "check_main_thread_return"
