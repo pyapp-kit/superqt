@@ -12,8 +12,7 @@ repos:
     rev: 3.9.2
     hooks:
       - id: flake8
-        additional_dependencies:
-          [flake8-typing-imports==1.7.0]
+        additional_dependencies: [flake8-typing-imports==1.7.0]
         exclude: examples
   - repo: https://github.com/myint/autoflake
     rev: v1.4
@@ -33,3 +32,9 @@ repos:
     rev: 21.5b2
     hooks:
       - id: black
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v0.910
+    hooks:
+      - id: mypy
+        exclude: examples
+        stages: [manual]

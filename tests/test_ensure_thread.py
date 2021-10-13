@@ -136,7 +136,8 @@ def test_object_thread(qtbot):
 
     assert ob.sample_object_thread_property == "text"
     assert ob.thread() is thread
-    thread.exit(0)
+    with qtbot.waitSignal(thread.finished):
+        thread.exit(0)
 
 
 def test_main_thread(qtbot):
@@ -156,7 +157,8 @@ def test_object_thread_return(qtbot):
     ob.moveToThread(thread)
     assert ob.check_object_thread_return(2) == 14
     assert ob.thread() is thread
-    thread.exit(0)
+    with qtbot.waitSignal(thread.finished):
+        thread.exit(0)
 
 
 def test_object_thread_return_timeout(qtbot):
@@ -166,7 +168,8 @@ def test_object_thread_return_timeout(qtbot):
     ob.moveToThread(thread)
     with pytest.raises(TimeoutError):
         ob.check_object_thread_return_timeout(2)
-    thread.exit(0)
+    with qtbot.waitSignal(thread.finished):
+        thread.exit(0)
 
 
 def test_object_thread_return_future(qtbot):
@@ -177,7 +180,8 @@ def test_object_thread_return_future(qtbot):
     future = ob.check_object_thread_return_future(2)
     assert isinstance(future, Future)
     assert future.result() == 14
-    thread.exit(0)
+    with qtbot.waitSignal(thread.finished):
+        thread.exit(0)
 
 
 def test_main_thread_return(qtbot):
