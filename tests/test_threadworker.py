@@ -4,13 +4,22 @@ import warnings
 from functools import partial
 from operator import eq
 
+import sys
 import pytest
 
 import superqt.utils._qthreading as qthreading
+from superqt.qtcompat import API_NAME
 
 equals_1 = partial(eq, 1)
 equals_3 = partial(eq, 3)
 skip = pytest.mark.skipif(True, reason="testing")
+
+# if (
+#     sys.version_info[:2] == (3, 8)
+#     and sys.platform.startswith("linux")
+#     and API_NAME == "PyQt5"
+# ):
+#     pytest.skip("github always cancels this for some reason", allow_module_level=True)
 
 
 def test_as_generator_function():
