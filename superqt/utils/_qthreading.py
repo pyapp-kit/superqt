@@ -2,7 +2,17 @@ import inspect
 import time
 import warnings
 from functools import partial, wraps
-from typing import Any, Callable, Dict, Optional, Sequence, Set, Type, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    Optional,
+    Sequence,
+    Set,
+    Type,
+    Union,
+)
 
 from ..qtcompat.QtCore import (
     QObject,
@@ -694,13 +704,17 @@ def thread_worker(
 # control over) the QThread itself.  See for example all of the methods
 # provided on the QThread object: https://doc.qt.io/qt-5/qthread.html
 
+if TYPE_CHECKING:
 
-# TODO: potentially remove this altogether, by refactoring the dims
-# AnimationWorker to subclass WorkerBase
+    class WorkerProtocol(QObject):
+        finished = Signal()
+
+        def work(self) -> None:
+            ...
 
 
-def _new_worker_qthread(
-    Worker: Type[QObject],
+def new_worker_qthread(
+    Worker: Type["WorkerProtocol"],
     *args,
     _start_thread: bool = False,
     _connect: Dict[str, Callable] = None,
@@ -740,14 +754,14 @@ def _new_worker_qthread(
     Parameters
     ----------
     Worker : QObject
-        QObject type that implements a work() method.  The Worker should also
+        QObject type that implements a `work()` method.  The Worker should also
         emit a finished signal when the work is done.
     _start_thread : bool
         If True, thread will be started immediately, otherwise, thread must
         be manually started with thread.start().
     _connect : dict, optional
         Optional dictionary of {signal: function} to connect to the new worker.
-        for instance:  connections = {'incremented': myfunc} will result in:
+        for instance:  _connect = {'incremented': myfunc} will result in:
         worker.incremented.connect(myfunc)
     *args
         will be passed to the Worker class on instantiation.
@@ -785,11 +799,11 @@ def _new_worker_qthread(
                     self.increment.emit(i)
                 self.finished.emit()
 
-        worker, thread = _new_worker_qthread(
+        worker, thread = new_worker_qthread(
             Worker,
             'argument',
-            start_thread=True,
-            connections={'increment': print},
+            _start_thread=True,
+            _connect={'increment': print},
         )
 
     """
