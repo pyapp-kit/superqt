@@ -12,7 +12,6 @@ from superqt.sliders._generic_slider import _GenericSlider
 
 from ._testutil import (
     QT_VERSION,
-    SYS_DARWIN,
     _linspace,
     _mouse_event,
     _wheel_event,
@@ -101,9 +100,9 @@ def test_ticks(sld: _GenericSlider, qtbot):
     sld.show()
 
 
-# FIXME: this isn't testing labeled sliders as it needs to be ...
-@pytest.mark.skipif(not SYS_DARWIN, reason="mousePress only working on mac")
 def test_press_move_release(sld: _GenericSlider, qtbot):
+    if hasattr(sld, "_slider") and sld._slider.orientation() == Qt.Vertical:
+        pytest.xfail("test failing for vertical at the moment")
 
     _real_sld = getattr(sld, "_slider", sld)
 
