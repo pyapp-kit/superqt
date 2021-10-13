@@ -76,7 +76,7 @@ target/
 .DS_Store
 
 # written by setuptools_scm
-*/_version.py
+src/superqt/_version.py
 .vscode/settings.json
 screenshots
 
