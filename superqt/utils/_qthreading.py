@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import inspect
 import time
 import warnings
@@ -6,13 +8,14 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Callable,
-    Dict,
-    Optional,
+    Generator,
+    Generic,
     Sequence,
-    Set,
-    Type,
-    Union,
+    TypeVar,
+    overload,
 )
+
+from typing_extensions import Literal, ParamSpec
 
 from ..qtcompat.QtCore import (
     QObject,
@@ -21,22 +24,47 @@ from ..qtcompat.QtCore import (
     QThreadPool,
     QTimer,
     Signal,
+    SignalInstance,
     Slot,
 )
 
+if TYPE_CHECKING:
+    _T = TypeVar("_T")
 
-def as_generator_function(func: Callable) -> Callable:
+    class SigInst(Generic[_T]):
+        @staticmethod
+        def connect(slot: Callable[[_T], Any], type: type | None = ...) -> None:
+            ...
+
+        @staticmethod
+        def disconnect(slot: Callable[[_T], Any] = ...) -> None:
+            ...
+
+        @staticmethod
+        def emit(*args: _T) -> None:
+            ...
+
+
+_Y = TypeVar("_Y")
+_S = TypeVar("_S")
+_R = TypeVar("_R")
+_P = ParamSpec("_P")
+
+
+def as_generator_function(
+    func: Callable[_P, _R]
+) -> Callable[_P, Generator[None, None, _R]]:
     """Turns a regular function (single return) into a generator function."""
 
     @wraps(func)
-    def genwrapper(*args, **kwargs):
+    def genwrapper(*args, **kwargs) -> Generator[None, None, _R]:
         yield
         return func(*args, **kwargs)
 
     return genwrapper
 
 
-class WorkerBaseSignals(QObject):
+class WorkerBaseSignals(QObject, Generic[_R]):
 
     started = Signal()  # emitted when the work is started
     finished = Signal()  # emitted when the work is finished
@@ -46,7 +74,7 @@ class WorkerBaseSignals(QObject):
     warned = Signal(tuple)  # emitted with showwarning args on warning
 
 
-class WorkerBase(QRunnable):
+class WorkerBase(QRunnable, Generic[_R]):
     """Base class for creating a Worker that can run in another thread.
 
     Parameters
@@ -61,20 +89,24 @@ class WorkerBase(QRunnable):
     """
 
     #: A set of Workers.  Add to set using :meth:`WorkerBase.start`
-    _worker_set: Set["WorkerBase"] = set()
+    _worker_set: set[WorkerBase] = set()
+    returned: SigInst[_R]
+    errored: SigInst[Exception]
+    warned: SigInst[tuple]
+    started: SigInst[None]
+    finished: SigInst[None]
 
     def __init__(
         self,
-        *args,
-        SignalsClass: Type[WorkerBaseSignals] = WorkerBaseSignals,
-        **kwargs,
+        func: Callable[_P, _R] | None = None,
+        SignalsClass: type[WorkerBaseSignals] = WorkerBaseSignals,
     ) -> None:
         super().__init__()
         self._abort_requested = False
         self._running = False
         self.signals = SignalsClass()
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str) -> SignalInstance:
         """Pass through attr requests to signals to simplify connection API.
 
         The goal is to enable ``worker.yielded.connect`` instead of
@@ -117,7 +149,7 @@ class WorkerBase(QRunnable):
         return self._running
 
     @Slot()
-    def run(self):
+    def run(self) -> None:
         """Start the worker.
 
         The end-user should never need to call this function.
@@ -168,7 +200,7 @@ class WorkerBase(QRunnable):
         self.finished.emit()
         self._finished.emit(self)
 
-    def work(self) -> Union[Exception, Any]:
+    def work(self) -> Exception | _R:
         """Main method to execute the worker.
 
         The end-user should never need to call this function.
@@ -198,7 +230,7 @@ class WorkerBase(QRunnable):
             f'"{self.__class__.__name__}" failed to define work() method'
         )
 
-    def start(self):
+    def start(self) -> None:
         """Start this worker in a thread and add it to the global threadpool.
 
         The order of method calls when starting a worker is:
@@ -224,11 +256,66 @@ class WorkerBase(QRunnable):
         QTimer.singleShot(10, start_)
 
     @classmethod
-    def _set_discard(cls, obj):
+    def _set_discard(cls, obj: WorkerBase) -> None:
         cls._worker_set.discard(obj)
 
+    @classmethod
+    def await_workers(cls, msecs: int = None) -> None:
+        """Ask all workers to quit, and wait up to `msec` for quit.
 
-class FunctionWorker(WorkerBase):
+        Attempts to clean up all running workers by calling ``worker.quit()``
+        method.  Any workers in the ``WorkerBase._worker_set`` set will have this
+        method.
+
+        By default, this function will block indefinitely, until worker threads
+        finish.  If a timeout is provided, a ``RuntimeError`` will be raised if
+        the workers do not gracefully exit in the time requests, but the threads
+        will NOT be killed.  It is (currently) left to the user to use their OS
+        to force-quit rogue threads.
+
+        .. important::
+
+            If the user does not put any yields in their function, and the function
+            is super long, it will just hang... For instance, there's no graceful
+            way to kill this thread in python:
+
+            .. code-block:: python
+
+                @thread_worker
+                def ZZZzzz():
+                    time.sleep(10000000)
+
+            This is why it's always advisable to use a generator that periodically
+            yields for long-running computations in another thread.
+
+            See `this stack-overflow post
+            <https://stackoverflow.com/questions/323972/is-there-any-way-to-kill-a-thread>`_
+            for a good discussion on the difficulty of killing a rogue python thread:
+
+        Parameters
+        ----------
+        msecs : int, optional
+            Waits up to msecs milliseconds for all threads to exit and removes all
+            threads from the thread pool. If msecs is `None` (the default), the
+            timeout is ignored (waits for the last thread to exit).
+
+        Raises
+        ------
+        RuntimeError
+            If a timeout is provided and workers do not quit successfully within
+            the time allotted.
+        """
+        for worker in cls._worker_set:
+            worker.quit()
+
+        msecs = msecs if msecs is not None else -1
+        if not QThreadPool.globalInstance().waitForDone(msecs):
+            raise RuntimeError(
+                f"Workers did not quit gracefully in the time allotted ({msecs} ms)"
+            )
+
+
+class FunctionWorker(WorkerBase[_R]):
     """QRunnable with signals that wraps a simple long-running function.
 
     .. note::
@@ -253,7 +340,7 @@ class FunctionWorker(WorkerBase):
         If ``func`` is a generator function and not a regular function.
     """
 
-    def __init__(self, func: Callable, *args, **kwargs):
+    def __init__(self, func: Callable[_P, _R], *args, **kwargs):
         if inspect.isgeneratorfunction(func):
             raise TypeError(
                 f"Generator function {func} cannot be used with FunctionWorker, "
@@ -265,7 +352,7 @@ class FunctionWorker(WorkerBase):
         self._args = args
         self._kwargs = kwargs
 
-    def work(self):
+    def work(self) -> _R:
         return self._func(*self._args, **self._kwargs)
 
 
@@ -277,7 +364,7 @@ class GeneratorWorkerSignals(WorkerBaseSignals):
     aborted = Signal()  # emitted when a running job is successfully aborted
 
 
-class GeneratorWorker(WorkerBase):
+class GeneratorWorker(WorkerBase, Generic[_Y, _S, _R]):
     """QRunnable with signals that wraps a long-running generator.
 
     Provides a convenient way to run a generator function in another thread,
@@ -297,11 +384,16 @@ class GeneratorWorker(WorkerBase):
         Will be passed to func on instantiation
     """
 
+    yielded: SigInst[_Y]
+    paused: SigInst[None]
+    resumed: SigInst[None]
+    aborted: SigInst[None]
+
     def __init__(
         self,
-        func: Callable,
+        func: Callable[_P, Generator[_Y, _S | None, _R]],
         *args,
-        SignalsClass: Type[WorkerBaseSignals] = GeneratorWorkerSignals,
+        SignalsClass: type[WorkerBaseSignals] = GeneratorWorkerSignals,
         **kwargs,
     ):
         if not inspect.isgeneratorfunction(func):
@@ -312,15 +404,16 @@ class GeneratorWorker(WorkerBase):
         super().__init__(SignalsClass=SignalsClass)
 
         self._gen = func(*args, **kwargs)
-        self._incoming_value = None
+        self._incoming_value: _S | None = None
         self._pause_requested = False
         self._resume_requested = False
         self._paused = False
+
         # polling interval: ONLY relevant if the user paused a running worker
         self._pause_interval = 0.01
         self.pbar = None
 
-    def work(self):
+    def work(self) -> _R | None | Exception:
         """Core event loop that calls the original function.
 
         Enters a continual loop, yielding and returning from the original
@@ -355,12 +448,13 @@ class GeneratorWorker(WorkerBase):
                 # The worker has probably been deleted.  warning will be
                 # emitted in ``WorkerBase.run``
                 return exc
+        return None
 
-    def send(self, value: Any):
+    def send(self, value: _S):
         """Send a value into the function (if a generator was used)."""
         self._incoming_value = value
 
-    def _next_value(self) -> Any:
+    def _next_value(self) -> _S | None:
         out = None
         if self._incoming_value is not None:
             out = self._incoming_value
@@ -390,99 +484,46 @@ class GeneratorWorker(WorkerBase):
             self._resume_requested = True
 
 
-############################################################################
-
-# public API
-
-# For now, the next three functions simply wrap the QThreadPool API, and allow
-# us to track and cleanup all workers that were started with ``start_worker``,
-# provided that ``wait_for_workers_to_quit`` is called at shutdown.
-# In the future, this could wrap any API, or a pure python threadpool.
-
-
-def set_max_thread_count(num: int):
-    """Set the maximum number of threads used by the thread pool.
-
-    Note: The thread pool will always use at least 1 thread, even if
-    maxThreadCount limit is zero or negative.
-    """
-    QThreadPool.globalInstance().setMaxThreadCount(num)
-
-
-def wait_for_workers_to_quit(msecs: int = None):
-    """Ask all workers to quit, and wait up to `msec` for quit.
-
-    Attempts to clean up all running workers by calling ``worker.quit()``
-    method.  Any workers in the ``WorkerBase._worker_set`` set will have this
-    method.
-
-    By default, this function will block indefinitely, until worker threads
-    finish.  If a timeout is provided, a ``RuntimeError`` will be raised if
-    the workers do not gracefully exit in the time requests, but the threads
-    will NOT be killed.  It is (currently) left to the user to use their OS
-    to force-quit rogue threads.
-
-    .. important::
-
-        If the user does not put any yields in their function, and the function
-        is super long, it will just hang... For instance, there's no graceful
-        way to kill this thread in python:
-
-        .. code-block:: python
-
-            @thread_worker
-            def ZZZzzz():
-                time.sleep(10000000)
-
-        This is why it's always advisable to use a generator that periodically
-        yields for long-running computations in another thread.
-
-        See `this stack-overflow post
-        <https://stackoverflow.com/questions/323972/is-there-any-way-to-kill-a-thread>`_
-        for a good discussion on the difficulty of killing a rogue python thread:
-
-    Parameters
-    ----------
-    msecs : int, optional
-        Waits up to msecs milliseconds for all threads to exit and removes all
-        threads from the thread pool. If msecs is `None` (the default), the
-        timeout is ignored (waits for the last thread to exit).
-
-    Raises
-    ------
-    RuntimeError
-        If a timeout is provided and workers do not quit successfully within
-        the time allotted.
-    """
-    for worker in WorkerBase._worker_set:
-        worker.quit()
-
-    msecs = msecs if msecs is not None else -1
-    if not QThreadPool.globalInstance().waitForDone(msecs):
-        raise RuntimeError(
-            f"Workers did not quit gracefully in the time allotted ({msecs} ms)"
-        )
-
-
-def active_thread_count() -> int:
-    """Return the number of active threads in the global ThreadPool."""
-    return QThreadPool.globalInstance().activeThreadCount()
-
-
 #############################################################################
 
 # convenience functions for creating Worker instances
 
 
+@overload
+def create_worker(
+    func: Callable[_P, Generator[_Y, _S, _R]],
+    *args,
+    _start_thread: bool | None = None,
+    _connect: dict[str, Callable | Sequence[Callable]] | None = None,
+    _worker_class: type[GeneratorWorker] | type[FunctionWorker] | None = None,
+    _ignore_errors: bool = False,
+    **kwargs,
+) -> GeneratorWorker[_Y, _S, _R]:
+    ...
+
+
+@overload
+def create_worker(
+    func: Callable[_P, _R],
+    *args,
+    _start_thread: bool | None = None,
+    _connect: dict[str, Callable | Sequence[Callable]] | None = None,
+    _worker_class: type[GeneratorWorker] | type[FunctionWorker] | None = None,
+    _ignore_errors: bool = False,
+    **kwargs,
+) -> FunctionWorker[_R]:
+    ...
+
+
 def create_worker(
     func: Callable,
     *args,
-    _start_thread: Optional[bool] = None,
-    _connect: Optional[Dict[str, Union[Callable, Sequence[Callable]]]] = None,
-    _worker_class: Optional[Type[WorkerBase]] = None,
+    _start_thread: bool | None = None,
+    _connect: dict[str, Callable | Sequence[Callable]] | None = None,
+    _worker_class: type[GeneratorWorker] | type[FunctionWorker] | None = None,
     _ignore_errors: bool = False,
     **kwargs,
-) -> WorkerBase:
+) -> FunctionWorker | GeneratorWorker:
     """Convenience function to start a function in another thread.
 
     By default, uses :class:`Worker`, but a custom ``WorkerBase`` subclass may
@@ -501,7 +542,7 @@ def create_worker(
         A mapping of ``"signal_name"`` -> ``callable`` or list of ``callable``:
         callback functions to connect to the various signals offered by the
         worker class. by default None
-    _worker_class : Type[WorkerBase], optional
+    _worker_class : type of GeneratorWorker or FunctionWorker, optional
         The :class`WorkerBase` to instantiate, by default
         :class:`FunctionWorker` will be used if ``func`` is a regular function,
         and :class:`GeneratorWorker` will be used if it is a generator.
@@ -537,13 +578,15 @@ def create_worker(
         worker = create_worker(long_function, 10)
 
     """
+    worker: FunctionWorker | GeneratorWorker
+
     if not _worker_class:
         if inspect.isgeneratorfunction(func):
             _worker_class = GeneratorWorker
         else:
             _worker_class = FunctionWorker
 
-    if not (inspect.isclass(_worker_class) and issubclass(_worker_class, WorkerBase)):
+    if not inspect.isclass(_worker_class) and issubclass(_worker_class, WorkerBase):
         raise TypeError(f"Worker {_worker_class} must be a subclass of WorkerBase")
 
     worker = _worker_class(func, *args, **kwargs)
@@ -560,7 +603,7 @@ def create_worker(
             for v in _val:
                 if not callable(v):
                     raise TypeError(
-                        f'"_connect[{key!r}]" must be a function or sequence of functions'
+                        f"_connect[{key!r}] must be a function or sequence of functions"
                     )
                 getattr(worker, key).connect(v)
 
@@ -579,13 +622,46 @@ def create_worker(
     return worker
 
 
+@overload
 def thread_worker(
-    function: Optional[Callable] = None,
-    start_thread: Optional[bool] = None,
-    connect: Optional[Dict[str, Union[Callable, Sequence[Callable]]]] = None,
-    worker_class: Optional[Type[WorkerBase]] = None,
+    function: Callable[_P, Generator[_Y, _S, _R]],
+    start_thread: bool | None = None,
+    connect: dict[str, Callable | Sequence[Callable]] | None = None,
+    worker_class: type[WorkerBase] | None = None,
     ignore_errors: bool = False,
-) -> Callable:
+) -> Callable[_P, GeneratorWorker[_Y, _S, _R]]:
+    ...
+
+
+@overload
+def thread_worker(
+    function: Callable[_P, _R],
+    start_thread: bool | None = None,
+    connect: dict[str, Callable | Sequence[Callable]] | None = None,
+    worker_class: type[WorkerBase] | None = None,
+    ignore_errors: bool = False,
+) -> Callable[_P, FunctionWorker[_R]]:
+    ...
+
+
+@overload
+def thread_worker(
+    function: Literal[None] = None,
+    start_thread: bool | None = None,
+    connect: dict[str, Callable | Sequence[Callable]] | None = None,
+    worker_class: type[WorkerBase] | None = None,
+    ignore_errors: bool = False,
+) -> Callable[[Callable], Callable[_P, FunctionWorker | GeneratorWorker]]:
+    ...
+
+
+def thread_worker(
+    function: Callable | None = None,
+    start_thread: bool | None = None,
+    connect: dict[str, Callable | Sequence[Callable]] | None = None,
+    worker_class: type[WorkerBase] | None = None,
+    ignore_errors: bool = False,
+):
     """Decorator that runs a function in a separate thread when called.
 
     When called, the decorated function returns a :class:`WorkerBase`.  See
@@ -707,17 +783,17 @@ def thread_worker(
 if TYPE_CHECKING:
 
     class WorkerProtocol(QObject):
-        finished = Signal()
+        finished: SigInst[None]
 
         def work(self) -> None:
             ...
 
 
 def new_worker_qthread(
-    Worker: Type["WorkerProtocol"],
+    Worker: type[WorkerProtocol],
     *args,
     _start_thread: bool = False,
-    _connect: Dict[str, Callable] = None,
+    _connect: dict[str, Callable] = None,
     **kwargs,
 ):
     """This is a convenience function to start a worker in a Qthread.
