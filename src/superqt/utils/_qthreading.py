@@ -22,17 +22,10 @@ from typing import (
 
 from typing_extensions import Literal, ParamSpec
 
-from ..qtcompat.QtCore import (
-    QObject,
-    QRunnable,
-    QThread,
-    QThreadPool,
-    QTimer,
-    Signal,
-    SignalInstance,
-)
+from ..qtcompat.QtCore import QObject, QRunnable, QThread, QThreadPool, QTimer, Signal
 
 if TYPE_CHECKING:
+
     _T = TypeVar("_T")
 
     class SigInst(Generic[_T]):
@@ -110,7 +103,7 @@ class WorkerBase(QRunnable, Generic[_R]):
         self._running = False
         self.signals = SignalsClass()
 
-    def __getattr__(self, name: str) -> SignalInstance:
+    def __getattr__(self, name: str) -> SigInst:
         """Pass through attr requests to signals to simplify connection API.
 
         The goal is to enable ``worker.yielded.connect`` instead of
