@@ -1,5 +1,8 @@
 import inspect
 import time
+from concurrent.futures import Future, TimeoutError
+
+import pytest
 
 from superqt.qtcompat.QtCore import QCoreApplication, QObject, QThread, Signal
 from superqt.utils import ensure_main_thread, ensure_object_thread
@@ -119,6 +122,23 @@ def test_only_main_thread(qapp):
     assert ob.sample_object_thread_property == 7
 
 
+def test_object_thread(qtbot):
+    ob = SampleObject()
+    thread = QThread()
+    thread.start()
+    ob.moveToThread(thread)
+    with qtbot.waitSignal(ob.assigment_done):
+        ob.check_object_thread(2, b=4)
+    assert ob.object_thread_res == {"a": 2, "b": 4}
+
+    with qtbot.waitSignal(ob.assigment_done):
+        ob.sample_object_thread_property = "text"
+
+    assert ob.sample_object_thread_property == "text"
+    assert ob.thread() is thread
+    thread.exit(0)
+
+
 def test_main_thread(qtbot):
     ob = SampleObject()
     t = LocalThread(ob)
@@ -129,52 +149,35 @@ def test_main_thread(qtbot):
     assert ob.sample_main_thread_property == "text2"
 
 
-# def test_object_thread(qtbot):
-#     ob = SampleObject()
-#     thread = QThread()
-#     thread.start()
-#     ob.moveToThread(thread)
-#     with qtbot.waitSignal(ob.assigment_done):
-#         ob.check_object_thread(2, b=4)
-#     assert ob.object_thread_res == {"a": 2, "b": 4}
-
-#     with qtbot.waitSignal(ob.assigment_done):
-#         ob.sample_object_thread_property = "text"
-
-#     assert ob.sample_object_thread_property == "text"
-#     assert ob.thread() is thread
-#     thread.exit(0)
+def test_object_thread_return(qtbot):
+    ob = SampleObject()
+    thread = QThread()
+    thread.start()
+    ob.moveToThread(thread)
+    assert ob.check_object_thread_return(2) == 14
+    assert ob.thread() is thread
+    thread.exit(0)
 
 
-# def test_object_thread_return(qtbot):
-#     ob = SampleObject()
-#     thread = QThread()
-#     thread.start()
-#     ob.moveToThread(thread)
-#     assert ob.check_object_thread_return(2) == 14
-#     assert ob.thread() is thread
-#     thread.exit(0)
+def test_object_thread_return_timeout(qtbot):
+    ob = SampleObject()
+    thread = QThread()
+    thread.start()
+    ob.moveToThread(thread)
+    with pytest.raises(TimeoutError):
+        ob.check_object_thread_return_timeout(2)
+    thread.exit(0)
 
 
-# def test_object_thread_return_timeout(qtbot):
-#     ob = SampleObject()
-#     thread = QThread()
-#     thread.start()
-#     ob.moveToThread(thread)
-#     with pytest.raises(TimeoutError):
-#         ob.check_object_thread_return_timeout(2)
-#     thread.exit(0)
-
-
-# def test_object_thread_return_future(qtbot):
-#     ob = SampleObject()
-#     thread = QThread()
-#     thread.start()
-#     ob.moveToThread(thread)
-#     future = ob.check_object_thread_return_future(2)
-#     assert isinstance(future, Future)
-#     assert future.result() == 14
-#     thread.exit(0)
+def test_object_thread_return_future(qtbot):
+    ob = SampleObject()
+    thread = QThread()
+    thread.start()
+    ob.moveToThread(thread)
+    future = ob.check_object_thread_return_future(2)
+    assert isinstance(future, Future)
+    assert future.result() == 14
+    thread.exit(0)
 
 
 def test_main_thread_return(qtbot):
