@@ -30,7 +30,6 @@ from ..qtcompat.QtCore import (
     QTimer,
     Signal,
     SignalInstance,
-    Slot,
 )
 
 if TYPE_CHECKING:
@@ -153,7 +152,6 @@ class WorkerBase(QRunnable, Generic[_R]):
         """Whether the worker has been started"""
         return self._running
 
-    @Slot()
     def run(self) -> None:
         """Start the worker.
 
@@ -788,7 +786,7 @@ def thread_worker(
 if TYPE_CHECKING:
 
     class WorkerProtocol(QObject):
-        finished: SigInst[None]
+        finished: Signal
 
         def work(self) -> None:
             ...
