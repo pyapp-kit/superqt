@@ -69,7 +69,7 @@ def as_generator_function(
     return genwrapper
 
 
-class WorkerBaseSignals(QObject, Generic[_R]):
+class WorkerBaseSignals(QObject):
 
     started = Signal()  # emitted when the work is started
     finished = Signal()  # emitted when the work is finished
