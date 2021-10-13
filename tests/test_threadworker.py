@@ -148,7 +148,7 @@ def test_multiple_connections(qtbot):
         qthreading.thread_worker(func, connect=test1)()
 
 
-def test_create_worker():
+def test_create_worker(qapp):
     """Test directly calling create_worker."""
 
     def func(x, y):
@@ -163,7 +163,7 @@ def test_create_worker():
 
 # note: pytest-cov cannot check coverage of code run in the other thread.
 # this is just for the sake of coverage
-def test_thread_worker_in_main_thread():
+def test_thread_worker_in_main_thread(qapp):
     """Test basic threadworker on a function"""
 
     def func(x):
@@ -179,7 +179,7 @@ def test_thread_worker_in_main_thread():
 
 # note: pytest-cov cannot check coverage of code run in the other thread.
 # this is just for the sake of coverage
-def test_thread_generator_worker_in_main_thread():
+def test_thread_generator_worker_in_main_thread(qapp):
     """Test basic threadworker on a generator in the main thread with methods."""
 
     def func():
@@ -228,7 +228,7 @@ def test_thread_generator_worker_in_main_thread():
     assert worker2.work() == 3
 
 
-def test_worker_base_attribute():
+def test_worker_base_attribute(qapp):
     obj = qthreading.WorkerBase()
     assert obj.started is not None
     assert obj.finished is not None
