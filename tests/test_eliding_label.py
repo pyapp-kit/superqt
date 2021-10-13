@@ -28,21 +28,14 @@ def test_wrapped_eliding_label(qtbot):
     qtbot.addWidget(wdg)
     assert not wdg.wordWrap()
     assert 630 < wdg.sizeHint().width() < 638
-    assert wdg._elidedText() == (
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do "
-        "eiusmod tempor incididunt ut labore et d…"
-    )
+    assert wdg._elidedText().endswith("…")
     wdg.resize(QSize(200, 100))
     assert wdg.text() == TEXT
-    assert wdg._elidedText() == "Lorem ipsum dolor sit amet, co…"
+    assert wdg._elidedText().endswith("…")
     wdg.setWordWrap(True)
     assert wdg.wordWrap()
     assert wdg.text() == TEXT
-    assert wdg._elidedText() == (
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do "
-        "eiusmod tempor incididunt ut labore et dolore magna aliqua. "
-        "Ut enim ad minim ven iam, quis nostrud exercitation ullamco la…"
-    )
+    assert wdg._elidedText().endswith("…")
     assert wdg.sizeHint() == QSize(200, 176)
     wdg.resize(wdg.sizeHint())
     assert wdg._elidedText() == TEXT
