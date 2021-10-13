@@ -13,7 +13,7 @@ equals_3 = partial(eq, 3)
 skip = pytest.mark.skipif(True, reason="testing")
 
 
-@pytest.mark.order(1)
+# @pytest.mark.order(1)
 def test_as_generator_function():
     """Test we can convert a regular function to a generator function."""
 
@@ -29,7 +29,7 @@ def test_as_generator_function():
 
 # qtbot is necessary for qthreading here.
 # note: pytest-cov cannot check coverage of code run in the other thread.
-@pytest.mark.order(2)
+# @pytest.mark.order(2)
 def test_thread_worker(qtbot):
     """Test basic threadworker on a function"""
 
@@ -46,7 +46,7 @@ def test_thread_worker(qtbot):
         wrkr.start()
 
 
-@pytest.mark.order(3)
+# @pytest.mark.order(3)
 def test_thread_generator_worker(qtbot):
     """Test basic threadworker on a generator"""
 
@@ -67,7 +67,7 @@ def test_thread_generator_worker(qtbot):
     qtbot.wait(500)
 
 
-@pytest.mark.order(4)
+# @pytest.mark.order(4)
 def test_thread_raises2(qtbot):
     handle_val = [0]
 
@@ -92,7 +92,7 @@ def test_thread_raises2(qtbot):
     assert handle_val[0] == 1
 
 
-@pytest.mark.order(5)
+# @pytest.mark.order(5)
 def test_thread_warns(qtbot):
     """Test warnings get returned to main thread"""
 
@@ -116,7 +116,7 @@ def test_thread_warns(qtbot):
         wrkr.start()
 
 
-@pytest.mark.order(6)
+# @pytest.mark.order(6)
 def test_multiple_connections(qtbot):
     """Test the connect dict accepts a list of functions, and type checks"""
 
@@ -154,7 +154,7 @@ def test_multiple_connections(qtbot):
         qthreading.thread_worker(func, connect=test1)()
 
 
-@pytest.mark.order(7)
+# @pytest.mark.order(7)
 def test_create_worker():
     """Test directly calling create_worker."""
 
@@ -170,7 +170,7 @@ def test_create_worker():
 
 # note: pytest-cov cannot check coverage of code run in the other thread.
 # this is just for the sake of coverage
-@pytest.mark.order(8)
+# @pytest.mark.order(8)
 def test_thread_worker_in_main_thread():
     """Test basic threadworker on a function"""
 
@@ -187,7 +187,7 @@ def test_thread_worker_in_main_thread():
 
 # note: pytest-cov cannot check coverage of code run in the other thread.
 # this is just for the sake of coverage
-@pytest.mark.order(9)
+# @pytest.mark.order(9)
 def test_thread_generator_worker_in_main_thread():
     """Test basic threadworker on a generator in the main thread with methods."""
 
@@ -237,7 +237,7 @@ def test_thread_generator_worker_in_main_thread():
     assert worker2.work() == 3
 
 
-@pytest.mark.order(10)
+# @pytest.mark.order(10)
 def test_worker_base_attribute():
     obj = qthreading.WorkerBase()
     assert obj.started is not None
@@ -248,7 +248,7 @@ def test_worker_base_attribute():
         obj.aa
 
 
-@pytest.mark.order(11)
+# @pytest.mark.order(11)
 def test_abort_does_not_return(qtbot):
     loop_counter = 0
 
