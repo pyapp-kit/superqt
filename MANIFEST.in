@@ -1,7 +1,17 @@
 include LICENSE
 include README.md
-include superqt/py.typed
-recursive-include superqt *.py
-recursive-include superqt *.pyi
+include CHANGELOG.md
+include src/superqt/py.typed
+recursive-include src/superqt *.py
+recursive-include src/superqt *.pyi
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
+
+recursive-include docs *
+recursive-include examples *
+recursive-include tests *
+exclude tox.ini
+exclude CONTRIBUTING.md
+exclude codecov.yml
+exclude .github_changelog_generator
+exclude .pre-commit-config.yaml
