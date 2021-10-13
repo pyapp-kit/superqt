@@ -67,4 +67,4 @@ def test_wrap_text():
     wrap = QElidingLabel.wrapText(TEXT, 200)
     assert isinstance(wrap, list)
     assert all(isinstance(x, str) for x in wrap)
-    assert 11 <= len(wrap) <= 13
+    assert 10 <= len(wrap) <= 13
