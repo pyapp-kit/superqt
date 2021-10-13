@@ -150,6 +150,7 @@ def test_object_thread(qtbot):
     assert ob.thread() is thread
     with qtbot.waitSignal(thread.finished):
         thread.exit(0)
+    print("test_object_thread done")
 
 
 def test_main_thread(qtbot):
@@ -160,6 +161,7 @@ def test_main_thread(qtbot):
 
     assert ob.main_thread_res == {"a": 5, "b": 8}
     assert ob.sample_main_thread_property == "text2"
+    print("test_main_thread done")
 
 
 def test_object_thread_return(qtbot):
@@ -171,6 +173,7 @@ def test_object_thread_return(qtbot):
     assert ob.thread() is thread
     with qtbot.waitSignal(thread.finished):
         thread.exit(0)
+    print("test_object_thread_return done")
 
 
 def test_object_thread_return_timeout(qtbot):
@@ -182,6 +185,7 @@ def test_object_thread_return_timeout(qtbot):
         ob.check_object_thread_return_timeout(2)
     with qtbot.waitSignal(thread.finished):
         thread.exit(0)
+    print("test_object_thread_return_timeout done")
 
 
 def test_object_thread_return_future(qtbot):
