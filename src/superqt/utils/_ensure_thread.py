@@ -2,7 +2,7 @@
 import weakref
 from concurrent.futures import Future
 from functools import wraps
-from typing import Callable, List, Optional
+from typing import Callable, Optional, Set
 
 from superqt.qtcompat.QtCore import (
     QCoreApplication,
@@ -17,20 +17,24 @@ from superqt.qtcompat.QtCore import (
 
 class CallCallable(QObject):
     finished = Signal(object)
-    instances: List["CallCallable"] = []
+    instances: Set["CallCallable"] = set()
 
     def __init__(self, callable, *args, **kwargs):
         super().__init__()
         self._callable = callable
         self._args = args
         self._kwargs = kwargs
-        CallCallable.instances.append(self)
+        CallCallable.instances.add(self)
 
     @Slot()
     def call(self):
+        print("calling ", self._callable)
         res = self._callable(*self._args, **self._kwargs)
+        print(f"function done, emitting finished... {res=}")
         self.finished.emit(res)
+        print("emitted finished")
         CallCallable.instances.remove(self)
+        print("instance removed")
 
 
 def ensure_main_thread(
@@ -112,6 +116,7 @@ def _run_in_thread(
     *args,
     **kwargs,
 ):
+    print("_run_in_thread", locals())
     future = Future()  # type: ignore
     if thread is QThread.currentThread():
         result = func(*args, **kwargs)
@@ -120,19 +125,26 @@ def _run_in_thread(
             return future
         return result
     f = CallCallable(func, *args, **kwargs)
+    print("moving to thread")
     f.moveToThread(thread)
     wrap_future_set_result(future, f.finished)
     QMetaObject.invokeMethod(f, "call", Qt.ConnectionType.QueuedConnection)  # type: ignore
-    return future.result(timeout=timeout / 1000) if await_return else future
+    if await_return:
+        print("blocking until future done")
+        return future.result(timeout=timeout / 1000)
+    else:
+        return future
 
 
 def wrap_future_set_result(future: Future, signal):
     ref = weakref.ref(future)
 
     def _cb(value):
-        ob = ref()
-        if ob is None:
+        _future = ref()
+        if _future is None:
             return
-        ob.set_result(value)
+        print("setting future result")
+        _future.set_result(value)
+        print("result set")
 
     signal.connect(_cb, Qt.ConnectionType.DirectConnection)
