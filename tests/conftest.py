@@ -1,6 +1,7 @@
 import multiprocessing as mp
 import os
 import signal
+import time
 
 import pytest
 
@@ -11,7 +12,6 @@ def wait_sigint(q: mp.Queue, pid):
     except Exception:
         print("Timeout")
         os.kill(pid, signal.SIGINT)
-        import time
 
         time.sleep(30)
         try:
@@ -24,6 +24,7 @@ def wait_sigint(q: mp.Queue, pid):
 
 @pytest.fixture(scope="session", autouse=True)
 def sigint_after_time():
+    start = time.perf_counter()
     manager = mp.Manager()
     q = manager.Queue()
     p = mp.Process(target=wait_sigint, args=(q, os.getpid()))
@@ -31,3 +32,5 @@ def sigint_after_time():
     yield
     q.put(1)
     p.join()
+    end = time.perf_counter()
+    print("time: ", end - start)
