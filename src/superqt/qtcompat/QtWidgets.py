@@ -1,14 +1,25 @@
-from . import API_NAME, _get_submodule
+from typing import TYPE_CHECKING
 
-globals().update(_get_submodule(__name__).__dict__)
+from . import API_NAME, _get_qtmodule
+
+if TYPE_CHECKING:
+    from PyQt5.QtWidgets import *  # noqa: F401
+    from PyQt6.QtWidgets import *  # noqa: F401
+    from PySide2.QtWidgets import *  # noqa: F401
+    from PySide6.QtWidgets import *  # noqa: F401
+
+
+_QtWidgets = _get_qtmodule(__name__, globals())
 
 
 def exec_(self):
     self.exec()
 
 
-globals()["QApplication"].exec_ = exec_
+_QtWidgets.QApplication.exec_ = exec_
 
+# backwargs compat with qt5
 if "6" in API_NAME:
-    globals()["QAction"] = getattr(_get_submodule("QtGui"), "QAction")
-    globals()["QShortcut"] = getattr(_get_submodule("QtGui"), "QShortcut")
+    _QtGui = _get_qtmodule("QtGui")
+    QAction = _QtGui.QAction  # type: ignore
+    QShortcut = _QtGui.QShortcut  # type: ignore

@@ -4,7 +4,7 @@ import os
 import sys
 import warnings
 from importlib import abc, import_module, util
-from typing import TYPE_CHECKING, Sequence
+from typing import TYPE_CHECKING, Optional, Sequence, Union
 
 if TYPE_CHECKING:
     from importlib.machinery import ModuleSpec
@@ -38,7 +38,7 @@ if _requested_api and _requested_api not in VALID_APIS:
 # TODO: FORCE_QT_API requires also using QT_API ... does that make sense?
 
 # now we'll try to import QtCore
-_QtCore: ModuleType | None = None
+_QtCore: Optional[ModuleType] = None
 
 # If `FORCE_QT_API` is not set, we first look for previously imported bindings
 if not _forced_api:
@@ -89,9 +89,9 @@ class SuperQtImporter(abc.MetaPathFinder):
     def find_spec(
         self,
         fullname: str,
-        path: Sequence[bytes | str] | None,
-        target: ModuleType | None = None,
-    ) -> ModuleSpec | None:
+        path: Optional[Sequence[Union[bytes, str]]],
+        target: Optional[ModuleType] = None,
+    ) -> Optional[ModuleSpec]:
         """Find a spec for the specified module.
 
         See https://docs.python.org/3/reference/import.html#the-meta-path
@@ -101,7 +101,7 @@ class SuperQtImporter(abc.MetaPathFinder):
         return None
 
 
-def _get_submodule(mod_name: str, globals=None, name_changes=None):
+def _get_qtmodule(mod_name: str, globals=None, name_changes=None):
     """Convenience to get a submodule from the current QT_API"""
     _mod_name = mod_name.rsplit(".", maxsplit=1)[-1]
     mod = import_module(f"{API_NAME}.{_mod_name}")
@@ -121,3 +121,36 @@ def _update_ns(name_changes: dict[str, dict[str, str]], globals) -> None:
 
 
 sys.meta_path.append(SuperQtImporter())
+
+# fmt: off
+# isort:skip_file
+if TYPE_CHECKING:
+    from PyQt5 import (  # type: ignore
+        QtBluetooth, QtDBus, QtDesigner, QtHelp, QtLocation, QtMacExtras,
+        QtMultimedia, QtMultimediaWidgets, QtNetwork, QtNfc, QtOpenGL, QtPositioning,
+        QtPrintSupport, QtQml, QtQuick, QtQuick3D, QtQuickWidgets, QtRemoteObjects,
+        QtSensors, QtSerialPort, QtSql, QtSvg, QtTest, QtTextToSpeech, QtWebChannel,
+        QtWebSockets, QtXml, QtXmlPatterns, sip,
+    )
+    from PyQt6 import (  # type: ignore
+        QtDBus, QtDesigner, QtHelp, QtNetwork, QtOpenGL, QtOpenGLWidgets,
+        QtPrintSupport, QtQml, QtQuick, QtQuick3D, QtQuickWidgets, QtSql, QtSvg,
+        QtSvgWidgets, QtTest, QtXml, sip,
+    )
+    from PySide2 import (  # type: ignore
+        Qt3DAnimation, Qt3DCore, Qt3DExtras, Qt3DInput, Qt3DLogic, Qt3DRender, QtCharts,
+        QtConcurrent, QtDataVisualization, QtHelp, QtLocation,
+        QtMacExtras, QtMultimedia, QtMultimediaWidgets, QtNetwork, QtOpenGL,
+        QtOpenGLFunctions, QtPositioning, QtPrintSupport, QtQml, QtQuick,
+        QtQuickControls2, QtQuickWidgets, QtRemoteObjects, QtScript, QtScriptTools,
+        QtScxml, QtSensors, QtSerialPort, QtSql, QtSvg, QtTest, QtTextToSpeech,
+        QtUiTools, QtWebChannel, QtWebEngine, QtWebEngineCore, QtWebEngineWidgets,
+        QtWebSockets, QtXml, QtXmlPatterns,
+    )
+    from PySide6 import (  # type: ignore
+        Qt3DAnimation, Qt3DCore, Qt3DExtras, Qt3DInput, Qt3DLogic, Qt3DRender, QtCharts,
+        QtConcurrent, QtDataVisualization, QtDesigner, QtHelp, QtNetwork,
+        QtOpenGL, QtOpenGLWidgets, QtPrintSupport, QtQml, QtQuick, QtQuickControls2,
+        QtQuickWidgets, QtScxml, QtSql, QtStateMachine, QtSvg, QtSvgWidgets, QtTest,
+        QtUiTools, QtXml,
+    )

@@ -1,6 +1,15 @@
-from . import API_NAME, _get_submodule
+from typing import TYPE_CHECKING
 
-globals().update(_get_submodule(__name__).__dict__)
+from . import API_NAME, _get_qtmodule
+
+if TYPE_CHECKING:
+    from PyQt5.QtGui import *  # noqa: F401
+    from PyQt6.QtGui import *  # noqa: F401
+    from PySide2.QtGui import *  # noqa: F401
+    from PySide6.QtGui import *  # noqa: F401
+
+
+_QtGui = _get_qtmodule(__name__, globals())
 
 
 if "6" in API_NAME:
@@ -9,4 +18,4 @@ if "6" in API_NAME:
         _pos = self.position(*a)
         return _pos.toPoint()
 
-    globals()["QMouseEvent"].pos = pos
+    _QtGui.QMouseEvent.pos = pos

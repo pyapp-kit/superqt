@@ -1,20 +1,26 @@
-from . import _get_submodule
-from ._util import ScopedEnumMeta
+from typing import TYPE_CHECKING
 
-name_changes = {
-    "PyQt": {
-        "Property": "pyqtProperty",
-        "Signal": "pyqtSignal",
-        "SignalInstance": "pyqtBoundSignal",
-        "Slot": "pyqtSlot",
-        "__version__": "QT_VERSION_STR",
-    }
-}
-_QtCore = _get_submodule(__name__, globals(), name_changes)
+from . import API_NAME, _get_qtmodule
+
+if TYPE_CHECKING:
+    from PyQt5.QtCore import *  # noqa: F401
+    from PyQt6.QtCore import *  # noqa: F401
+    from PySide2.QtCore import *  # noqa: F401
+    from PySide6.QtCore import *  # noqa: F401
 
 
-class Qt(metaclass=ScopedEnumMeta):
-    ...
+_QtCore = _get_qtmodule(__name__, globals())
+if "PyQt" in API_NAME:
+    Property = _QtCore.pyqtProperty  # type: ignore
+    Signal = _QtCore.pyqtSignal  # type: ignore
+    SignalInstance = getattr(_QtCore, "pyqtBoundSignal", None)  # type: ignore
+    Slot = _QtCore.pyqtSlot  # type: ignore
+    __version__ = _QtCore.QT_VERSION_STR
 
 
-del _get_submodule, ScopedEnumMeta, name_changes
+# from superqt.qtcompat._util import ScopedEnumMeta
+
+# class Qt(metaclass=ScopedEnumMeta):
+#     ...
+
+# del _get_qtmodule, ScopedEnumMeta
