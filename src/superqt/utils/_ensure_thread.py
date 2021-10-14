@@ -1,7 +1,7 @@
 # https://gist.github.com/FlorianRhiem/41a1ad9b694c14fb9ac3
 from concurrent.futures import Future
 from functools import wraps
-from typing import Callable, Optional, Set
+from typing import Callable, List, Optional
 
 from superqt.qtcompat.QtCore import (
     QCoreApplication,
@@ -16,20 +16,20 @@ from superqt.qtcompat.QtCore import (
 
 class CallCallable(QObject):
     finished = Signal(object)
-    instances: Set["CallCallable"] = set()
+    instances: List["CallCallable"] = []
 
     def __init__(self, callable, *args, **kwargs):
         super().__init__()
         self._callable = callable
         self._args = args
         self._kwargs = kwargs
-        CallCallable.instances.add(self)
+        CallCallable.instances.append(self)
 
     @Slot()
     def call(self):
+        CallCallable.instances.remove(self)
         res = self._callable(*self._args, **self._kwargs)
         self.finished.emit(res)
-        CallCallable.instances.remove(self)
 
 
 def ensure_main_thread(
