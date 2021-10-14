@@ -157,6 +157,7 @@ def test_object_thread_return_timeout(qtbot):
         ob.check_object_thread_return_timeout(2)
     with qtbot.waitSignal(thread.finished):
         thread.quit()
+    print("test_object_thread_return_timeout done")
 
 
 def test_object_thread_return_future(qtbot):
@@ -170,6 +171,7 @@ def test_object_thread_return_future(qtbot):
     assert future.result() == 14
     with qtbot.waitSignal(thread.finished):
         thread.quit()
+    print("test_object_thread_return_future done")
 
 
 def test_main_thread_return(qtbot):
