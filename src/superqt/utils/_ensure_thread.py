@@ -1,5 +1,6 @@
 # https://gist.github.com/FlorianRhiem/41a1ad9b694c14fb9ac3
 from concurrent.futures import Future
+from functools import wraps
 from typing import Callable, List, Optional
 
 from superqt.qtcompat.QtCore import (
@@ -50,10 +51,11 @@ def ensure_main_thread(
         before raising a TimeoutError, by default 1000
     """
 
-    def _out_func(func):
+    def _out_func(func_):
+        @wraps(func_)
         def _func(*args, **kwargs):
             return _run_in_thread(
-                func,
+                func_,
                 QCoreApplication.instance().thread(),
                 await_return,
                 timeout,
@@ -87,10 +89,11 @@ def ensure_object_thread(
         before raising a TimeoutError, by default 1000
     """
 
-    def _out_func(func):
+    def _out_func(func_):
+        @wraps(func_)
         def _func(self, *args, **kwargs):
             return _run_in_thread(
-                func, self.thread(), await_return, timeout, self, *args, **kwargs
+                func_, self.thread(), await_return, timeout, self, *args, **kwargs
             )
 
         return _func

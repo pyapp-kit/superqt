@@ -1,4 +1,5 @@
 import math
+import platform
 
 import pytest
 
@@ -74,6 +75,7 @@ def test_show(gslider, qtbot):
     gslider.show()
 
 
+@pytest.mark.skipif(platform.system() != "Darwin", reason="cross-platform is tricky")
 def test_press_move_release(gslider: _GenericSlider, qtbot):
     assert gslider._pressedControl == QStyle.SubControl.SC_None
 
