@@ -30,7 +30,7 @@ class CallCallable(QObject):
     def call(self):
         print("calling ", self._callable)
         res = self._callable(*self._args, **self._kwargs)
-        print(f"function done, emitting finished... {res=}")
+        print(f"function done, emitting finished... {res}")
         self.finished.emit(res)
         print("emitted finished")
         CallCallable.instances.remove(self)
