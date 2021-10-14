@@ -28,9 +28,9 @@ class CallCallable(QObject):
 
     @Slot()
     def call(self):
-        CallCallable.instances.remove(self)
         res = self._callable(*self._args, **self._kwargs)
         self.finished.emit(res)
+        CallCallable.instances.remove(self)
 
 
 def ensure_main_thread(
