@@ -7,18 +7,6 @@ import pytest
 from superqt.qtcompat.QtCore import QCoreApplication, QObject, QThread, Signal
 from superqt.utils import ensure_main_thread, ensure_object_thread
 
-# import sys
-# from superqt.qtcompat import API_NAME
-# if (
-#     sys.version_info[:2] == (3, 8)
-#     and sys.platform.startswith("linux")
-#     and API_NAME == "PyQt5"
-# ):
-#     pytest.skip(
-#         "For some reason, github hangs on this (in conjunction with test_threadworker)",
-#         allow_module_level=True,
-#     )
-
 
 class SampleObject(QObject):
     assigment_done = Signal()
@@ -132,7 +120,6 @@ def test_only_main_thread(qapp):
     assert ob.sample_main_thread_property == 5
     ob.sample_object_thread_property = 7
     assert ob.sample_object_thread_property == 7
-    print("only main thread done")
 
 
 def test_main_thread(qtbot):
@@ -143,7 +130,6 @@ def test_main_thread(qtbot):
 
     assert ob.main_thread_res == {"a": 5, "b": 8}
     assert ob.sample_main_thread_property == "text2"
-    print("test_main_thread done")
 
 
 def test_object_thread_return(qtbot):
@@ -155,7 +141,6 @@ def test_object_thread_return(qtbot):
     assert ob.thread() is thread
     with qtbot.waitSignal(thread.finished):
         thread.exit(0)
-    print("test_object_thread_return done")
 
 
 def test_object_thread_return_timeout(qtbot):
@@ -167,7 +152,6 @@ def test_object_thread_return_timeout(qtbot):
         ob.check_object_thread_return_timeout(2)
     with qtbot.waitSignal(thread.finished):
         thread.exit(0)
-    print("test_object_thread_return_timeout done")
 
 
 def test_object_thread_return_future(qtbot):
@@ -211,29 +195,18 @@ def test_names(qapp):
 
 
 def test_object_thread(qtbot):
-    print()
     ob = SampleObject()
-    print("ob created")
     thread = QThread()
-    print("thread created")
     thread.start()
-    print("thread started")
     ob.moveToThread(thread)
-    print("thread moved")
     with qtbot.waitSignal(ob.assigment_done):
-        print("waiting assigment_done...")
         ob.check_object_thread(2, b=4)
-    print("assigment_done")
     assert ob.object_thread_res == {"a": 2, "b": 4}
 
     with qtbot.waitSignal(ob.assigment_done):
-        print("waiting assigment_done 2...")
         ob.sample_object_thread_property = "text"
-    print("assigment_done2")
 
     assert ob.sample_object_thread_property == "text"
     assert ob.thread() is thread
     with qtbot.waitSignal(thread.finished):
-        print("waiting thread finished...")
         thread.exit(0)
-    print("test_object_thread done")
