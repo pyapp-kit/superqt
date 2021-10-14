@@ -1,4 +1,5 @@
 # https://gist.github.com/FlorianRhiem/41a1ad9b694c14fb9ac3
+import weakref
 from concurrent.futures import Future
 from functools import wraps
 from typing import Callable, List, Optional
@@ -120,6 +121,18 @@ def _run_in_thread(
         return result
     f = CallCallable(func, *args, **kwargs)
     f.moveToThread(thread)
-    f.finished.connect(future.set_result, Qt.ConnectionType.DirectConnection)
+    wrap_future_set_result(future, f.finished)
     QMetaObject.invokeMethod(f, "call", Qt.ConnectionType.QueuedConnection)  # type: ignore
     return future.result(timeout=timeout / 1000) if await_return else future
+
+
+def wrap_future_set_result(future: Future, signal):
+    ref = weakref.ref(future)
+
+    def _cb(value):
+        ob = ref()
+        if ob is None:
+            return
+        ob.set_result(value)
+
+    signal.connect(_cb, Qt.ConnectionType.DirectConnection)
