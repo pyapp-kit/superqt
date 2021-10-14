@@ -1,8 +1,5 @@
 import inspect
 import time
-from concurrent.futures import Future, TimeoutError
-
-import pytest
 
 from superqt.qtcompat.QtCore import QCoreApplication, QObject, QThread, Signal
 from superqt.utils import ensure_main_thread, ensure_object_thread
@@ -134,44 +131,44 @@ def test_main_thread(qtbot):
     print("test_main_thread done")
 
 
-def test_object_thread_return(qtbot):
-    print("test_object_thread_return start")
-    ob = SampleObject()
-    thread = QThread()
-    thread.start()
-    ob.moveToThread(thread)
-    assert ob.check_object_thread_return(2) == 14
-    assert ob.thread() is thread
-    with qtbot.waitSignal(thread.finished):
-        thread.quit()
-    print("test_object_thread_return done")
+# def test_object_thread_return(qtbot):
+#     print("test_object_thread_return start")
+#     ob = SampleObject()
+#     thread = QThread()
+#     thread.start()
+#     ob.moveToThread(thread)
+#     assert ob.check_object_thread_return(2) == 14
+#     assert ob.thread() is thread
+#     with qtbot.waitSignal(thread.finished):
+#         thread.quit()
+#     print("test_object_thread_return done")
 
 
-def test_object_thread_return_timeout(qtbot):
-    print("test_object_thread_return_timeout start")
-    ob = SampleObject()
-    thread = QThread()
-    thread.start()
-    ob.moveToThread(thread)
-    with pytest.raises(TimeoutError):
-        ob.check_object_thread_return_timeout(2)
-    with qtbot.waitSignal(thread.finished):
-        thread.quit()
-    print("test_object_thread_return_timeout done")
+# def test_object_thread_return_timeout(qtbot):
+#     print("test_object_thread_return_timeout start")
+#     ob = SampleObject()
+#     thread = QThread()
+#     thread.start()
+#     ob.moveToThread(thread)
+#     with pytest.raises(TimeoutError):
+#         ob.check_object_thread_return_timeout(2)
+#     with qtbot.waitSignal(thread.finished):
+#         thread.quit()
+#     print("test_object_thread_return_timeout done")
 
 
-def test_object_thread_return_future(qtbot):
-    print("test_object_thread_return_future start")
-    ob = SampleObject()
-    thread = QThread()
-    thread.start()
-    ob.moveToThread(thread)
-    future = ob.check_object_thread_return_future(2)
-    assert isinstance(future, Future)
-    assert future.result() == 14
-    with qtbot.waitSignal(thread.finished):
-        thread.quit()
-    print("test_object_thread_return_future done")
+# def test_object_thread_return_future(qtbot):
+#     print("test_object_thread_return_future start")
+#     ob = SampleObject()
+#     thread = QThread()
+#     thread.start()
+#     ob.moveToThread(thread)
+#     future = ob.check_object_thread_return_future(2)
+#     assert isinstance(future, Future)
+#     assert future.result() == 14
+#     with qtbot.waitSignal(thread.finished):
+#         thread.quit()
+#     print("test_object_thread_return_future done")
 
 
 def test_main_thread_return(qtbot):
@@ -202,19 +199,19 @@ def test_names(qapp):
     assert ob.check_main_thread_return.__name__ == "check_main_thread_return"
 
 
-def test_object_thread(qtbot):
-    ob = SampleObject()
-    thread = QThread()
-    thread.start()
-    ob.moveToThread(thread)
-    with qtbot.waitSignal(ob.assigment_done):
-        ob.check_object_thread(2, b=4)
-    assert ob.object_thread_res == {"a": 2, "b": 4}
+# def test_object_thread(qtbot):
+#     ob = SampleObject()
+#     thread = QThread()
+#     thread.start()
+#     ob.moveToThread(thread)
+#     with qtbot.waitSignal(ob.assigment_done):
+#         ob.check_object_thread(2, b=4)
+#     assert ob.object_thread_res == {"a": 2, "b": 4}
 
-    with qtbot.waitSignal(ob.assigment_done):
-        ob.sample_object_thread_property = "text"
+#     with qtbot.waitSignal(ob.assigment_done):
+#         ob.sample_object_thread_property = "text"
 
-    assert ob.sample_object_thread_property == "text"
-    assert ob.thread() is thread
-    with qtbot.waitSignal(thread.finished):
-        thread.quit()
+#     assert ob.sample_object_thread_property == "text"
+#     assert ob.thread() is thread
+#     with qtbot.waitSignal(thread.finished):
+#         thread.quit()
