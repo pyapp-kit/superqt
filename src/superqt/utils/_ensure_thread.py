@@ -1,5 +1,4 @@
 # https://gist.github.com/FlorianRhiem/41a1ad9b694c14fb9ac3
-import weakref
 from concurrent.futures import Future
 from functools import wraps
 from typing import Callable, Optional, Set
@@ -28,13 +27,9 @@ class CallCallable(QObject):
 
     @Slot()
     def call(self):
-        print("calling ", self._callable)
         res = self._callable(*self._args, **self._kwargs)
-        print(f"function done, emitting finished... {res}")
         self.finished.emit(res)
-        print("emitted finished")
         CallCallable.instances.remove(self)
-        print("instance removed")
 
 
 def ensure_main_thread(
@@ -116,7 +111,6 @@ def _run_in_thread(
     *args,
     **kwargs,
 ):
-    print("_run_in_thread", locals())
     future = Future()  # type: ignore
     if thread is QThread.currentThread():
         result = func(*args, **kwargs)
@@ -125,26 +119,7 @@ def _run_in_thread(
             return future
         return result
     f = CallCallable(func, *args, **kwargs)
-    print("moving to thread")
     f.moveToThread(thread)
-    wrap_future_set_result(future, f.finished)
+    f.finished.connect(future.set_result, Qt.ConnectionType.DirectConnection)
     QMetaObject.invokeMethod(f, "call", Qt.ConnectionType.QueuedConnection)  # type: ignore
-    if await_return:
-        print("blocking until future done")
-        return future.result(timeout=timeout / 1000)
-    else:
-        return future
-
-
-def wrap_future_set_result(future: Future, signal):
-    ref = weakref.ref(future)
-
-    def _cb(value):
-        _future = ref()
-        if _future is None:
-            return
-        print("setting future result")
-        _future.set_result(value)
-        print("result set")
-
-    signal.connect(_cb, Qt.ConnectionType.DirectConnection)
+    return future.result(timeout=timeout / 1000) if await_return else future
