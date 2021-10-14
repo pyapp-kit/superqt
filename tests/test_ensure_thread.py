@@ -122,24 +122,6 @@ def test_only_main_thread(qapp):
     assert ob.sample_object_thread_property == 7
 
 
-def test_object_thread(qtbot):
-    ob = SampleObject()
-    thread = QThread()
-    thread.start()
-    ob.moveToThread(thread)
-    with qtbot.waitSignal(ob.assigment_done):
-        ob.check_object_thread(2, b=4)
-    assert ob.object_thread_res == {"a": 2, "b": 4}
-
-    with qtbot.waitSignal(ob.assigment_done):
-        ob.sample_object_thread_property = "text"
-
-    assert ob.sample_object_thread_property == "text"
-    assert ob.thread() is thread
-    with qtbot.waitSignal(thread.finished):
-        thread.exit(0)
-
-
 def test_main_thread(qtbot):
     ob = SampleObject()
     t = LocalThread(ob)
@@ -210,3 +192,21 @@ def test_names(qapp):
     assert list(signature.parameters.values())[0].name == "a"
     assert list(signature.parameters.values())[0].annotation == int
     assert ob.check_main_thread_return.__name__ == "check_main_thread_return"
+
+
+def test_object_thread(qtbot):
+    ob = SampleObject()
+    thread = QThread()
+    thread.start()
+    ob.moveToThread(thread)
+    with qtbot.waitSignal(ob.assigment_done):
+        ob.check_object_thread(2, b=4)
+    assert ob.object_thread_res == {"a": 2, "b": 4}
+
+    with qtbot.waitSignal(ob.assigment_done):
+        ob.sample_object_thread_property = "text"
+
+    assert ob.sample_object_thread_property == "text"
+    assert ob.thread() is thread
+    with qtbot.waitSignal(thread.finished):
+        thread.exit(0)
