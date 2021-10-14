@@ -1,6 +1,5 @@
 import inspect
 import os
-import sys
 import time
 from concurrent.futures import Future, TimeoutError
 
@@ -9,9 +8,7 @@ import pytest
 from superqt.qtcompat.QtCore import QCoreApplication, QObject, QThread, Signal
 from superqt.utils import ensure_main_thread, ensure_object_thread
 
-skip_ci_not_mac = pytest.mark.skipif(
-    bool(os.getenv("CI")) and sys.platform != "darwin", reason="github hangs"
-)
+skip_on_ci = pytest.mark.skipif(bool(os.getenv("CI")), reason="github hangs")
 
 
 class SampleObject(QObject):
@@ -168,7 +165,7 @@ def test_names(qapp):
     assert ob.check_main_thread_return.__name__ == "check_main_thread_return"
 
 
-@skip_ci_not_mac
+# @skip_on_ci
 def test_object_thread_return(qtbot):
     ob = SampleObject()
     thread = QThread()
@@ -180,7 +177,7 @@ def test_object_thread_return(qtbot):
         thread.quit()
 
 
-@skip_ci_not_mac
+# @skip_on_ci
 def test_object_thread_return_timeout(qtbot):
     ob = SampleObject()
     thread = QThread()
@@ -192,7 +189,7 @@ def test_object_thread_return_timeout(qtbot):
         thread.quit()
 
 
-@skip_ci_not_mac
+@skip_on_ci
 def test_object_thread_return_future(qtbot):
     ob = SampleObject()
     thread = QThread()
@@ -205,7 +202,7 @@ def test_object_thread_return_future(qtbot):
         thread.quit()
 
 
-@skip_ci_not_mac
+@skip_on_ci
 def test_object_thread(qtbot):
     ob = SampleObject()
     thread = QThread()
