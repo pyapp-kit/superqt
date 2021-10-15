@@ -4,7 +4,7 @@ import os
 import sys
 import warnings
 from importlib import abc, import_module, util
-from typing import TYPE_CHECKING, Optional, Sequence, Union
+from typing import TYPE_CHECKING, Dict, Optional, Sequence, Union
 
 if TYPE_CHECKING:
     from importlib.machinery import ModuleSpec
@@ -101,7 +101,9 @@ class SuperQtImporter(abc.MetaPathFinder):
         return None
 
 
-def _get_qtmodule(mod_name: str, globals=None, name_changes=None):
+def _get_qtmodule(
+    mod_name: str, globals: Optional[dict] = None, name_changes: Optional[dict] = None
+) -> ModuleType:
     """Convenience to get a submodule from the current QT_API"""
     _mod_name = mod_name.rsplit(".", maxsplit=1)[-1]
     mod = import_module(f"{API_NAME}.{_mod_name}")
@@ -112,8 +114,7 @@ def _get_qtmodule(mod_name: str, globals=None, name_changes=None):
     return mod
 
 
-def _update_ns(name_changes: dict[str, dict[str, str]], globals) -> None:
-
+def _update_ns(name_changes: Dict[str, Dict[str, str]], globals) -> None:
     for ns, changes in name_changes.items():
         if ns in API_NAME:
             for new, old in changes.items():
