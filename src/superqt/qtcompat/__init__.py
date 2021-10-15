@@ -123,6 +123,7 @@ def _update_ns(name_changes: Dict[str, Dict[str, str]], globals) -> None:
 
 sys.meta_path.append(SuperQtImporter())
 
+
 # fmt: off
 # isort:skip_file
 if TYPE_CHECKING:
@@ -131,12 +132,12 @@ if TYPE_CHECKING:
         QtMultimedia, QtMultimediaWidgets, QtNetwork, QtNfc, QtOpenGL, QtPositioning,
         QtPrintSupport, QtQml, QtQuick, QtQuick3D, QtQuickWidgets, QtRemoteObjects,
         QtSensors, QtSerialPort, QtSql, QtSvg, QtTest, QtTextToSpeech, QtWebChannel,
-        QtWebSockets, QtXml, QtXmlPatterns, sip,
+        QtWebSockets, QtXml, QtXmlPatterns
     )
     from PyQt6 import (  # type: ignore
         QtDBus, QtDesigner, QtHelp, QtNetwork, QtOpenGL, QtOpenGLWidgets,
         QtPrintSupport, QtQml, QtQuick, QtQuick3D, QtQuickWidgets, QtSql, QtSvg,
-        QtSvgWidgets, QtTest, QtXml, sip,
+        QtSvgWidgets, QtTest, QtXml
     )
     from PySide2 import (  # type: ignore
         Qt3DAnimation, Qt3DCore, Qt3DExtras, Qt3DInput, Qt3DLogic, Qt3DRender, QtCharts,

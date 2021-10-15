@@ -33,4 +33,32 @@ __all__ = [
     "QMessageHandler",
     "QRangeSlider",
     "QEnumComboBox",
+    # provided by *all* backends in qtcompat via __getattr__ below
+    "QtGui",
+    "QtWidgets",
+    "QtCore",
+    "QtHelp",
+    "QtNetwork",
+    "QtOpenGL",
+    "QtPrintSupport",
+    "QtQml",
+    "QtQuick",
+    "QtQuickWidgets",
+    "QtSql",
+    "QtSvg",
+    "QtTest",
+    "QtXml",
 ]
+
+
+# Allow any imports from PySide/PyQt via qtcompat...
+def __getattr__(name: str):
+    err = f"module {__name__!r} has no attribute {name!r}"
+    if name.startswith("Qt"):
+        import importlib
+
+        try:
+            return importlib.import_module(f"{__package__}.qtcompat.{name}")
+        except ImportError:
+            err += f". Also looked in '{__package__}.qtcompat'"
+    raise AttributeError(err)
