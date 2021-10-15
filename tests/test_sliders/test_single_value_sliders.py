@@ -106,7 +106,7 @@ def test_ticks(sld: _GenericSlider, qtbot):
 
 @pytest.mark.skipif(platform.system() != "Darwin", reason="cross-platform is tricky")
 def test_press_move_release(sld: _GenericSlider, qtbot):
-    if hasattr(sld, "_slider") and sld._slider.orientation() == Qt.Vertical:
+    if hasattr(sld, "_slider") and sld._slider.orientation() == Qt.Orientation.Vertical:
         pytest.xfail("test failing for vertical at the moment")
 
     _real_sld = getattr(sld, "_slider", sld)
