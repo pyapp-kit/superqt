@@ -10,7 +10,7 @@ def exec_(self):
 
 
 QApplication = _QtWidgets.QApplication
-QApplication.exec_ = exec_
+QApplication.exec = exec_
 
 # backwargs compat with qt5
 if "6" in API_NAME:
