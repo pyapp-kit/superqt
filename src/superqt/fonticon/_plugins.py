@@ -1,4 +1,4 @@
-from typing import Set, Tuple
+from typing import Dict, Set, Tuple
 
 from ._iconfont import IconFontMeta, namespace2font
 
@@ -11,8 +11,8 @@ except ImportError:
 class FontIconManager:
 
     ENTRY_POINT = "superqt.fonticon"
-    _PLUGINS: dict[str, EntryPoint] = {}
-    _LOADED: dict[str, IconFontMeta] = {}
+    _PLUGINS: Dict[str, EntryPoint] = {}
+    _LOADED: Dict[str, IconFontMeta] = {}
     _BLOCKED: Set[EntryPoint] = set()
 
     def _discover_fonts(self) -> None:

@@ -37,7 +37,7 @@ def icon(
     opacity: float = 1,
     animation: Optional[Animation] = None,
     transform: Optional[QTransform] = None,
-    states: dict[str, dict] = {},
+    states: Dict[str, dict] = {},
 ) -> QFontIcon:
     """Create a QIcon for `glyph_key`, with a number of optional settings
 
@@ -69,7 +69,7 @@ def icon(
         by default None.
     transform : QTransform, optional
         A `QTransform` to apply when painting the icon, by default None
-    states : dict[str, dict], optional
+    states : dict, optional
         Provide additional styling for the icon in different states.  `states` must be
         a mapping of string to dict, where:
 
