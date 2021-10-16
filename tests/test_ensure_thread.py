@@ -1,3 +1,5 @@
+import inspect
+import os
 import time
 from concurrent.futures import Future, TimeoutError
 
@@ -5,6 +7,8 @@ import pytest
 
 from superqt.qtcompat.QtCore import QCoreApplication, QObject, QThread, Signal
 from superqt.utils import ensure_main_thread, ensure_object_thread
+
+skip_on_ci = pytest.mark.skipif(bool(os.getenv("CI")), reason="github hangs")
 
 
 class SampleObject(QObject):
@@ -72,7 +76,8 @@ class SampleObject(QObject):
         return a * 7
 
     @ensure_object_thread(await_return=False)
-    def check_object_thread_return_future(self, a):
+    def check_object_thread_return_future(self, a: int):
+        """sample docstring"""
         if QThread.currentThread() is not self.thread():
             raise RuntimeError("Wrong thread")
         time.sleep(0.4)
@@ -120,6 +125,84 @@ def test_only_main_thread(qapp):
     assert ob.sample_object_thread_property == 7
 
 
+def test_main_thread(qtbot):
+    print("test_main_thread start")
+    ob = SampleObject()
+    t = LocalThread(ob)
+    with qtbot.waitSignal(t.finished):
+        t.start()
+
+    assert ob.main_thread_res == {"a": 5, "b": 8}
+    assert ob.sample_main_thread_property == "text2"
+    print("test_main_thread done")
+
+
+def test_main_thread_return(qtbot):
+    ob = SampleObject()
+    t = LocalThread2(ob)
+    with qtbot.wait_signal(t.finished):
+        t.start()
+    assert t.executed
+
+
+def test_names(qapp):
+    ob = SampleObject()
+    assert ob.check_object_thread.__name__ == "check_object_thread"
+    assert ob.check_object_thread_return.__name__ == "check_object_thread_return"
+    assert (
+        ob.check_object_thread_return_timeout.__name__
+        == "check_object_thread_return_timeout"
+    )
+    assert (
+        ob.check_object_thread_return_future.__name__
+        == "check_object_thread_return_future"
+    )
+    assert ob.check_object_thread_return_future.__doc__ == "sample docstring"
+    signature = inspect.signature(ob.check_object_thread_return_future)
+    assert len(signature.parameters) == 1
+    assert list(signature.parameters.values())[0].name == "a"
+    assert list(signature.parameters.values())[0].annotation == int
+    assert ob.check_main_thread_return.__name__ == "check_main_thread_return"
+
+
+# @skip_on_ci
+def test_object_thread_return(qtbot):
+    ob = SampleObject()
+    thread = QThread()
+    thread.start()
+    ob.moveToThread(thread)
+    assert ob.check_object_thread_return(2) == 14
+    assert ob.thread() is thread
+    with qtbot.waitSignal(thread.finished):
+        thread.quit()
+
+
+# @skip_on_ci
+def test_object_thread_return_timeout(qtbot):
+    ob = SampleObject()
+    thread = QThread()
+    thread.start()
+    ob.moveToThread(thread)
+    with pytest.raises(TimeoutError):
+        ob.check_object_thread_return_timeout(2)
+    with qtbot.waitSignal(thread.finished):
+        thread.quit()
+
+
+@skip_on_ci
+def test_object_thread_return_future(qtbot):
+    ob = SampleObject()
+    thread = QThread()
+    thread.start()
+    ob.moveToThread(thread)
+    future = ob.check_object_thread_return_future(2)
+    assert isinstance(future, Future)
+    assert future.result() == 14
+    with qtbot.waitSignal(thread.finished):
+        thread.quit()
+
+
+@skip_on_ci
 def test_object_thread(qtbot):
     ob = SampleObject()
     thread = QThread()
@@ -134,53 +217,5 @@ def test_object_thread(qtbot):
 
     assert ob.sample_object_thread_property == "text"
     assert ob.thread() is thread
-    thread.exit(0)
-
-
-def test_main_thread(qtbot):
-    ob = SampleObject()
-    t = LocalThread(ob)
-    with qtbot.waitSignal(t.finished):
-        t.start()
-
-    assert ob.main_thread_res == {"a": 5, "b": 8}
-    assert ob.sample_main_thread_property == "text2"
-
-
-def test_object_thread_return(qtbot):
-    ob = SampleObject()
-    thread = QThread()
-    thread.start()
-    ob.moveToThread(thread)
-    assert ob.check_object_thread_return(2) == 14
-    assert ob.thread() is thread
-    thread.exit(0)
-
-
-def test_object_thread_return_timeout(qtbot):
-    ob = SampleObject()
-    thread = QThread()
-    thread.start()
-    ob.moveToThread(thread)
-    with pytest.raises(TimeoutError):
-        ob.check_object_thread_return_timeout(2)
-    thread.exit(0)
-
-
-def test_object_thread_return_future(qtbot):
-    ob = SampleObject()
-    thread = QThread()
-    thread.start()
-    ob.moveToThread(thread)
-    future = ob.check_object_thread_return_future(2)
-    assert isinstance(future, Future)
-    assert future.result() == 14
-    thread.exit(0)
-
-
-def test_main_thread_return(qtbot):
-    ob = SampleObject()
-    t = LocalThread2(ob)
-    with qtbot.wait_signal(t.finished):
-        t.start()
-    assert t.executed
+    with qtbot.waitSignal(thread.finished):
+        thread.quit()
