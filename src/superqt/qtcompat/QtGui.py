@@ -1,16 +1,8 @@
-from typing import TYPE_CHECKING
-
+# type: ignore
 from . import API_NAME, _get_qtmodule
 
-if TYPE_CHECKING:
-    from PyQt5.QtGui import *  # noqa: F401
-    from PyQt6.QtGui import *  # noqa: F401
-    from PySide2.QtGui import *  # noqa: F401
-    from PySide6.QtGui import *  # noqa: F401
-
-
-_QtGui = _get_qtmodule(__name__, globals())
-
+_QtGui = _get_qtmodule(__name__)
+globals().update(_QtGui.__dict__)
 
 if "6" in API_NAME:
 
