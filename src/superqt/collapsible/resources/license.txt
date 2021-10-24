@@ -1,2 +1,0 @@
-MIT
-https://github.com/twbs/icons

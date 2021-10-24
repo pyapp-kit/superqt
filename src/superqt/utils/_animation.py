@@ -1,7 +1,9 @@
 """Different animators to be used for animating components"""
-from ..qtcompat.QtGui import QIcon, QTransform
-from ..qtcompat.QtCore import QEasingCurve, QPropertyAnimation, QVariantAnimation, Slot, Signal
-from ..qtcompat.QtWidgets import QWidget
+# from math import sin, cos, radians
+
+from ..qtcompat.QtCore import QEasingCurve, QPropertyAnimation, QVariantAnimation
+from ..qtcompat.QtGui import QIcon, QPixmap, QTransform
+from ..qtcompat.QtWidgets import QAbstractButton, QWidget
 
 
 # =================================================================================================
@@ -13,7 +15,7 @@ def create_hide_show_animation(
     """
     Creates an animation that can be used to show animation while hiding and revealing the widget.
     """
-    animation:QPropertyAnimation
+    animation: QPropertyAnimation
     if widget is not None:
         animation = QPropertyAnimation(
             targetObject=widget, propertyName=b"maximumHeight"
@@ -30,34 +32,45 @@ def create_hide_show_animation(
 
     return animation
 
+
 # =================================================================================================
-def create_rotation_animation(
-    widget: QWidget, 
-    duration:int = 500, 
-    easing_curve: QEasingCurve = QEasingCurve.Type.InOutCubic
+def create_icon_rotation_animation(
+    widget: QAbstractButton,
+    duration: int = 500,
+    easing_curve: QEasingCurve = QEasingCurve.Type.InOutCubic,
+    start_value: float = 0.0,
+    end_value: float = 90.0,
 ) -> QVariantAnimation:
     """
     Creates a rotation animation
     """
-    
-    @Signal()
-    def on_valueChanged(self, value):
-        t = QTransform()
-        t.rotate(value)
-        widget.setPixmap(widget.pixmap.transformed(t))
-        
-    animation = QVariantAnimation(startValue=0.0, endValue=360.0, duration=1000, on_valueChanged=on_valueChanged)
+    animation = QVariantAnimation(
+        widget, startValue=start_value, endValue=end_value, duration=duration
+    )
+    animation.setEasingCurve(easing_curve)
+    pixmap = widget.icon.pixmap(widget.iconSize())
+    original_length = pixmap.width()
+
+    def on_value_changed(value):
+        # Calculate new size
+        # rad = radians(value)
+        # new_length = (abs(sin(rad)) + abs(cos(rad)))*original_length
+
+        transform = QTransform()
+        transform.rotate(value)
+        transformed_pixmap: QPixmap = pixmap.transformed(transform)
+        xoffset = (transformed_pixmap.width() - original_length) / 2
+        yoffset = (transformed_pixmap.height() - original_length) / 2
+        transformed_pixmap = transformed_pixmap.copy(
+            xoffset, yoffset, original_length, original_length
+        )
+
+        icon = QIcon(transformed_pixmap)
+        widget.setIcon(icon)
+
+    animation.updateCurrentValue = on_value_changed
 
     return animation
+
+
 # =================================================================================================
-
-
-#     def set_pixmap(self, pixmap):
-#         self._pixmap = pixmap
-#         self.setPixmap(self._pixmap)
-
-#     @QtCore.pyqtSlot(QtCore.QVariant)
-#     def on_valueChanged(self, value):
-#         t = QtGui.QTransform()
-#         t.rotate(value)
-#         self.setPixmap(self._pixmap.transformed(t))

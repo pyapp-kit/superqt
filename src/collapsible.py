@@ -2,13 +2,7 @@ import sys
 
 from superqt import QCollapsible
 from superqt.qtcompat.QtCore import Qt
-from superqt.qtcompat.QtWidgets import (
-    QApplication,
-    QPushButton,
-    QStyle,
-    QVBoxLayout,
-    QWidget,
-)
+from superqt.qtcompat.QtWidgets import QApplication, QPushButton, QVBoxLayout, QWidget
 
 app = QApplication([])
 
@@ -19,17 +13,17 @@ main_widget.setMinimumHeight(700)
 layout = QVBoxLayout()
 layout.setAlignment(Qt.AlignTop)
 
-icons = [
-    "SP_ArrowRight",
-    "SP_MediaPlay",
-]
-for n, name in enumerate(icons):
-    btn = QPushButton(name)
+# icons = [
+#     "SP_ArrowRight",
+#     "SP_MediaPlay",
+# ]
+# for n, name in enumerate(icons):
+#     btn = QPushButton(name)
 
-    pixmapi = getattr(QStyle, name)
-    icon = main_widget.style().standardIcon(pixmapi)
-    btn.setIcon(icon)
-    layout.addWidget(btn)
+#     pixmapi = getattr(QStyle, name)
+#     icon = main_widget.style().standardIcon(pixmapi)
+#     btn.setIcon(icon)
+#     layout.addWidget(btn)
 
 
 # Create child component
@@ -44,7 +38,7 @@ inner_widget.setLayout(inner_layout)
 collapsible = QCollapsible(
     text="Advanced analysis",
     content=inner_widget,
-    duration=2000,
+    duration=500,
     initial_is_checked=True,
 )
 
