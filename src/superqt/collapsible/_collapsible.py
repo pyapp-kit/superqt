@@ -1,10 +1,14 @@
 """A collapsible widget to hide and unhide child widgets"""
 from typing import Union
+import pathlib
 
-from ..qtcompat.QtCore import QAbstractAnimation, QEasingCurve, QParallelAnimationGroup
+from PySide2.QtCore import QPropertyAnimation, QVariantAnimation
+
+from ..qtcompat import QtCore
+from ..qtcompat.QtCore import QAbstractAnimation, QEasingCurve, QParallelAnimationGroup, Qt
 from ..qtcompat.QtGui import QIcon
 from ..qtcompat.QtWidgets import QLayout, QPushButton, QStyle, QWidget
-from ..utils._animators import create_hide_show_animator
+from ..utils._animation import create_hide_show_animation, create_rotation_animation
 
 # =================================================================================================
 
@@ -17,6 +21,8 @@ class QCollapsible(QPushButton):
 
     title: str
     animator: QParallelAnimationGroup
+    hide_show_animation:QPropertyAnimation
+    rotate_animation:QVariantAnimation
     lock_to: bool
     content: Union[QWidget, QLayout]
     icon: QIcon
@@ -53,22 +59,22 @@ class QCollapsible(QPushButton):
         self.setStyleSheet(style_string)
 
         # Add icon
-        # icons_directory = pathlib.Path(__file__).parent / "resources"
-        # icon_filename = icons_directory / "triangle-fill-svgrepo-com.svg"
-        # icon_filename = icons_directory / "right-arrow-black-triangle.png"
-
-        # icon = QIcon(str(icon_filename))
-        # self.setIconSize(QtCore.QSize(24,24))
+        icons_directory = pathlib.Path(__file__).parent / "resources"
+        icon_filename = icons_directory / "right-arrow-black-triangle.png"
+        self.icon = QIcon(str(icon_filename))
+        self.setIconSize(QtCore.QSize(8,8))
 
         # Set icon
-        pixmapi = getattr(QStyle, "SP_MediaPlay")
-        self.icon = self.style().standardIcon(pixmapi)
+        # pixmapi = getattr(QStyle, "SP_MediaPlay")
+        # self.icon = self.style().standardIcon(pixmapi)
         self.setIcon(self.icon)
 
         # Create animators
-        self.animator = create_hide_show_animator(
-            content, duration=duration, easing_curve=easing_curve
-        )
+        self.animator  = QParallelAnimationGroup()
+        self.hide_show_animation = create_hide_show_animation(content, duration=duration, easing_curve=easing_curve)
+        self.rotate_animation    = create_rotation_animation(self.icon, duration=duration)
+        self.animator.addAnimation(self.hide_show_animation)
+        self.animator.addAnimation(self.rotate_animation)
 
         # Set conent and button initial state
         self.setChecked(initial_is_checked)
@@ -89,8 +95,8 @@ class QCollapsible(QPushButton):
         easing_curve: QEasingCurve = QEasingCurve.Type.InOutCubic,
     ):
         """Update the animator settings"""
-        self.animator.setEasingCurve(easing_curve)
-        self.animator.setDuration(duration)
+        self.hide_show_animation.setEasingCurve(easing_curve)
+        self.hide_show_animation.setDuration(duration)
 
     # ===========================================
     def set_content(self, content: Union[QWidget, QLayout] = None):
@@ -101,9 +107,9 @@ class QCollapsible(QPushButton):
         else:
             self.content = content
 
-        self.animator.setTargetObject(content)
-        self.animator.setPropertyName(b"maximumHeight")
-        self.animator.setEndValue(content.sizeHint().height() + 10)
+        self.hide_show_animation.setTargetObject(content)
+        self.hide_show_animation.setPropertyName(b"maximumHeight")
+        self.hide_show_animation.setEndValue(content.sizeHint().height() + 10)
 
     # ===========================================
     def toggle_hidden(self) -> None:
@@ -125,10 +131,10 @@ class QCollapsible(QPushButton):
     # ===========================================
     def refresh_icon(self):
         """Updates the icon of the button based on the status"""
-        if self.isChecked():
-            self.setText("▼ " + self.title)
-        else:
-            self.setText("▲ " + self.title)
+        # if self.isChecked():
+        #     self.setArrowType(Qt.DownArrow)
+        # else:
+        #     self.setArrowType(Qt.RightArrow)
 
     # ===========================================
     def hide_content(self):
@@ -143,6 +149,4 @@ class QCollapsible(QPushButton):
         if self.content is not None:
             self.animator.setDirection(QAbstractAnimation.Direction.Forward)
             self.animator.start()
-
-
 # =================================================================================================
