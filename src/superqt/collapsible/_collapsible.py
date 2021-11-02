@@ -14,9 +14,8 @@ from ..utils._animation import (
     create_icon_rotation_animation,
 )
 
+
 # =================================================================================================
-
-
 class QCollapsible(QPushButton):
     """
     A collapsible widget to hide and unhide child widgets. This is based on simonxeko solution
@@ -72,7 +71,11 @@ class QCollapsible(QPushButton):
         self.setIcon(self.icon)
 
         # Set conent and button initial state
-        self.setChecked(initial_is_checked)
+        if lock_to is not None:
+            self.setChecked(lock_to)
+        else:
+            self.setChecked(initial_is_checked)
+
         if content is not None:
             if initial_is_checked is False:
                 content.setMaximumHeight(0)
@@ -81,14 +84,15 @@ class QCollapsible(QPushButton):
                 transform.rotate(90)
                 icon = QIcon(icon_pixmap.transformed(transform))
                 self.setIcon(icon)
-        # self.refresh_icon()
 
         # Create animators
         self.animator = QParallelAnimationGroup()
         self.hide_show_animation = create_hide_show_animation(
             content, duration=duration, easing_curve=easing_curve
         )
-        self.rotate_animation = create_icon_rotation_animation(self, duration=duration)
+        self.rotate_animation = create_icon_rotation_animation(
+            self, duration=duration, easing_curve=easing_curve
+        )
         self.animator.addAnimation(self.hide_show_animation)
         self.animator.addAnimation(self.rotate_animation)
 
@@ -96,14 +100,20 @@ class QCollapsible(QPushButton):
         self.clicked.connect(self.toggle_hidden)
 
     # ===========================================
-    def set_hide_show_animator_settings(
+    def set_animators_settings(
         self,
         duration: int = 500,
         easing_curve: QEasingCurve = QEasingCurve.Type.InOutCubic,
     ):
         """Update the animator settings"""
+
+        # Easing curve
         self.hide_show_animation.setEasingCurve(easing_curve)
+        self.rotate_animation.setEasingCurve(easing_curve)
+
+        # Duration
         self.hide_show_animation.setDuration(duration)
+        self.rotate_animation.setDuration(duration)
 
     # ===========================================
     def set_content(self, content: Union[QWidget, QLayout] = None):
@@ -124,7 +134,6 @@ class QCollapsible(QPushButton):
 
         if self.lock_to is not None and self.isChecked() != self.lock_to:
             self.setChecked(self.lock_to)
-            self.refresh_icon()
             return
 
         if self.lock_to is not None:
@@ -132,16 +141,6 @@ class QCollapsible(QPushButton):
 
         if self.content is not None:
             self.show_content() if self.isChecked() else self.hide_content()
-
-        self.refresh_icon()
-
-    # ===========================================
-    def refresh_icon(self):
-        """Updates the icon of the button based on the status"""
-        # if self.isChecked():
-        #     self.setArrowType(Qt.DownArrow)
-        # else:
-        #     self.setArrowType(Qt.RightArrow)
 
     # ===========================================
     def hide_content(self):
