@@ -18,9 +18,15 @@ skip_on_linux_qt6 = pytest.mark.skipif(
 )
 
 
-def _mouse_event(pos=QPointF(), type_=QEvent.MouseMove):
+def _mouse_event(pos=QPointF(), type_=QEvent.Type.MouseMove):
     """Create a mouse event of `type_` at `pos`."""
-    return QMouseEvent(type_, QPointF(pos), Qt.LeftButton, Qt.LeftButton, Qt.NoModifier)
+    return QMouseEvent(
+        type_,
+        QPointF(pos),
+        Qt.MouseButton.LeftButton,
+        Qt.MouseButton.LeftButton,
+        Qt.KeyboardModifier.NoModifier,
+    )
 
 
 def _wheel_event(arc):
@@ -31,11 +37,11 @@ def _wheel_event(arc):
             QPointF(),
             QPoint(arc, arc),
             QPoint(arc, arc),
-            Qt.NoButton,
-            Qt.NoModifier,
-            Qt.ScrollBegin,
+            Qt.MouseButton.NoButton,
+            Qt.KeyboardModifier.NoModifier,
+            Qt.ScrollPhase.ScrollBegin,
             False,
-            Qt.MouseEventSynthesizedByQt,
+            Qt.MouseEventSource.MouseEventSynthesizedByQt,
         )
     with suppress(TypeError):
         return QWheelEvent(
@@ -44,12 +50,12 @@ def _wheel_event(arc):
             QPoint(-arc, -arc),
             QPoint(-arc, -arc),
             1,
-            Qt.Vertical,
-            Qt.NoButton,
-            Qt.NoModifier,
-            Qt.ScrollBegin,
+            Qt.Orientation.Vertical,
+            Qt.MouseButton.NoButton,
+            Qt.KeyboardModifier.NoModifier,
+            Qt.ScrollPhase.ScrollBegin,
             False,
-            Qt.MouseEventSynthesizedByQt,
+            Qt.MouseEventSource.MouseEventSynthesizedByQt,
         )
 
     return QWheelEvent(
@@ -58,9 +64,9 @@ def _wheel_event(arc):
         QPoint(arc, arc),
         QPoint(arc, arc),
         1,
-        Qt.Vertical,
-        Qt.NoButton,
-        Qt.NoModifier,
+        Qt.Orientation.Vertical,
+        Qt.MouseButton.NoButton,
+        Qt.KeyboardModifier.NoModifier,
     )
 
 

@@ -4,7 +4,7 @@ from superqt.qtcompat.QtWidgets import QApplication
 
 app = QApplication([])
 
-sld = QDoubleSlider(Qt.Horizontal)
+sld = QDoubleSlider(Qt.Orientation.Horizontal)
 sld.setRange(0, 1)
 sld.setValue(0.5)
 sld.show()

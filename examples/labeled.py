@@ -9,7 +9,7 @@ from superqt.qtcompat.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout, Q
 
 app = QApplication([])
 
-ORIENTATION = Qt.Horizontal
+ORIENTATION = Qt.Orientation.Horizontal
 
 w = QWidget()
 qls = QLabeledSlider(ORIENTATION)
@@ -35,7 +35,9 @@ qldrs.setSingleStep(0.01)
 qldrs.setValue((0.2, 0.7))
 
 
-w.setLayout(QVBoxLayout() if ORIENTATION == Qt.Horizontal else QHBoxLayout())
+w.setLayout(
+    QVBoxLayout() if ORIENTATION == Qt.Orientation.Horizontal else QHBoxLayout()
+)
 w.layout().addWidget(qls)
 w.layout().addWidget(qlds)
 w.layout().addWidget(qlrs)

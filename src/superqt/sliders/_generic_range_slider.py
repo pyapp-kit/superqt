@@ -146,7 +146,7 @@ class _GenericRangeSlider(_GenericSlider[Tuple], Generic[_T]):
         return super().setStyleSheet(styleSheet + override)
 
     def event(self, ev: QEvent) -> bool:
-        if ev.type() == QEvent.StyleChange:
+        if ev.type() == QEvent.Type.StyleChange:
             update_styles_from_stylesheet(self)
         return super().event(ev)
 
@@ -225,7 +225,7 @@ class _GenericRangeSlider(_GenericSlider[Tuple], Generic[_T]):
         thickness = self._style.thickness(opt)
         offset = self._style.offset(opt)
 
-        if opt.orientation == Qt.Horizontal:
+        if opt.orientation == Qt.Orientation.Horizontal:
             r_bar.setTop(r_bar.center().y() - thickness / 2 + offset)
             r_bar.setHeight(thickness)
             r_bar.setLeft(hdl_low.center().x())
@@ -261,9 +261,9 @@ class _GenericRangeSlider(_GenericSlider[Tuple], Generic[_T]):
             opt.sliderPosition = pos
             # make pressed handles appear sunken
             if idx == pidx:
-                opt.state |= QStyle.State_Sunken
+                opt.state |= QStyle.StateFlag.State_Sunken
             else:
-                opt.state = opt.state & ~QStyle.State_Sunken
+                opt.state = opt.state & ~QStyle.StateFlag.State_Sunken
             opt.activeSubControls = SC_HANDLE if idx == hidx else SC_NONE
             painter.drawComplexControl(CC_SLIDER, opt)
 
@@ -314,11 +314,11 @@ class _GenericRangeSlider(_GenericSlider[Tuple], Generic[_T]):
         return (SC_HANDLE, len(self._position) - 1)
 
     def _execute_scroll(self, steps_to_scroll, modifiers):
-        if modifiers & Qt.AltModifier:
+        if modifiers & Qt.KeyboardModifier.AltModifier:
             self._spreadAllPositions(shrink=steps_to_scroll < 0)
         else:
             self._offsetAllPositions(steps_to_scroll)
-        self.triggerAction(QSlider.SliderMove)
+        self.triggerAction(QSlider.SliderAction.SliderMove)
 
     def _has_scroll_space_left(self, offset):
         return (offset > 0 and max(self._value) < self._maximum) or (

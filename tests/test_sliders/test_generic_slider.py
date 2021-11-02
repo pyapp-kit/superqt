@@ -11,7 +11,7 @@ from superqt.sliders._generic_slider import _GenericSlider, _sliderValueFromPosi
 from ._testutil import _linspace, _mouse_event, _wheel_event, skip_on_linux_qt6
 
 
-@pytest.fixture(params=[Qt.Horizontal, Qt.Vertical])
+@pytest.fixture(params=[Qt.Orientation.Horizontal, Qt.Orientation.Vertical])
 def gslider(qtbot, request):
     slider = _GenericSlider(request.param)
     qtbot.addWidget(slider)
@@ -67,7 +67,7 @@ def test_float_values(gslider: _GenericSlider, qtbot):
 def test_ticks(gslider: _GenericSlider, qtbot):
     gslider.setTickInterval(0.3)
     assert gslider.tickInterval() == 0.3
-    gslider.setTickPosition(gslider.TicksAbove)
+    gslider.setTickPosition(gslider.TickPosition.TicksAbove)
     gslider.show()
 
 
@@ -82,26 +82,32 @@ def test_press_move_release(gslider: _GenericSlider, qtbot):
     opt = QStyleOptionSlider()
     gslider.initStyleOption(opt)
     style = gslider.style()
-    hrect = style.subControlRect(QStyle.CC_Slider, opt, QStyle.SC_SliderHandle)
+    hrect = style.subControlRect(
+        QStyle.ComplexControl.CC_Slider, opt, QStyle.SubControl.SC_SliderHandle
+    )
     handle_pos = gslider.mapToGlobal(hrect.center())
 
     with qtbot.waitSignal(gslider.sliderPressed):
-        qtbot.mousePress(gslider, Qt.LeftButton, pos=handle_pos)
+        qtbot.mousePress(gslider, Qt.MouseButton.LeftButton, pos=handle_pos)
 
     assert gslider._pressedControl == QStyle.SubControl.SC_SliderHandle
 
     with qtbot.waitSignals([gslider.sliderMoved, gslider.valueChanged]):
-        shift = QPoint(0, -8) if gslider.orientation() == Qt.Vertical else QPoint(8, 0)
+        shift = (
+            QPoint(0, -8)
+            if gslider.orientation() == Qt.Orientation.Vertical
+            else QPoint(8, 0)
+        )
         gslider.mouseMoveEvent(_mouse_event(handle_pos + shift))
 
     with qtbot.waitSignal(gslider.sliderReleased):
-        qtbot.mouseRelease(gslider, Qt.LeftButton, pos=handle_pos)
+        qtbot.mouseRelease(gslider, Qt.MouseButton.LeftButton, pos=handle_pos)
 
     assert gslider._pressedControl == QStyle.SubControl.SC_None
 
     gslider.show()
     with qtbot.waitSignal(gslider.sliderPressed):
-        qtbot.mousePress(gslider, Qt.LeftButton, pos=handle_pos)
+        qtbot.mousePress(gslider, Qt.MouseButton.LeftButton, pos=handle_pos)
 
 
 @skip_on_linux_qt6
@@ -110,15 +116,19 @@ def test_hover(gslider: _GenericSlider):
     opt = QStyleOptionSlider()
     gslider.initStyleOption(opt)
     style = gslider.style()
-    hrect = style.subControlRect(QStyle.CC_Slider, opt, QStyle.SC_SliderHandle)
+    hrect = style.subControlRect(
+        QStyle.ComplexControl.CC_Slider, opt, QStyle.SubControl.SC_SliderHandle
+    )
     handle_pos = QPointF(gslider.mapToGlobal(hrect.center()))
 
     assert gslider._hoverControl == QStyle.SubControl.SC_None
 
-    gslider.event(QHoverEvent(QEvent.HoverEnter, handle_pos, QPointF()))
+    gslider.event(QHoverEvent(QEvent.Type.HoverEnter, handle_pos, QPointF()))
     assert gslider._hoverControl == QStyle.SubControl.SC_SliderHandle
 
-    gslider.event(QHoverEvent(QEvent.HoverLeave, QPointF(-1000, -1000), handle_pos))
+    gslider.event(
+        QHoverEvent(QEvent.Type.HoverLeave, QPointF(-1000, -1000), handle_pos)
+    )
     assert gslider._hoverControl == QStyle.SubControl.SC_None
 
 

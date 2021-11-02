@@ -4,8 +4,8 @@ from superqt.qtcompat.QtWidgets import QApplication
 
 app = QApplication([])
 
-slider = QRangeSlider(Qt.Horizontal)
-slider = QRangeSlider(Qt.Horizontal)
+slider = QRangeSlider(Qt.Orientation.Horizontal)
+slider = QRangeSlider(Qt.Orientation.Horizontal)
 
 slider.setValue((20, 80))
 slider.show()

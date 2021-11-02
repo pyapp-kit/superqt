@@ -1,166 +1,114 @@
-#
-# Copyright © 2009- The Spyder Development Team
-# Copyright © 2014-2015 Colin Duquesnoy
-#
-# Licensed under the terms of the MIT License
-# (see LICENSE.txt for details)
-
-"""
-This file is borrowed from qtpy and modified to support PySide6/PyQt6 (drops PyQt4)
-"""
+from __future__ import annotations
 
 import os
-import platform
 import sys
 import warnings
-from distutils.version import LooseVersion
+from importlib import abc, import_module, util
+from typing import TYPE_CHECKING, Optional, Sequence, Union
+
+if TYPE_CHECKING:
+    from importlib.machinery import ModuleSpec
+    from types import ModuleType
 
 
-class PythonQtError(RuntimeError):
+class QtMissingError(ImportError):
     """Error raise if no bindings could be selected."""
 
 
-class PythonQtWarning(Warning):
-    """Warning if some features are not implemented in a binding."""
-
-
-# Qt API environment variable name
-QT_API = "QT_API"
-
-# Names of the expected PyQt5 api
-PYQT5_API = ["pyqt5"]
-
-# Names of the expected PyQt6 api
-PYQT6_API = ["pyqt6"]
-
-# Names of the expected PySide2 api
-PYSIDE2_API = ["pyside2"]
-
-# Names of the expected PySide6 api
-PYSIDE6_API = ["pyside6"]
-
-# Detecting if a binding was specified by the user
-binding_specified = QT_API in os.environ
-
-# Setting a default value for QT_API
-os.environ.setdefault(QT_API, "pyqt5")
-
-API = os.environ[QT_API].lower()
-initial_api = API
-assert API in (PYQT5_API + PYQT6_API + PYSIDE2_API + PYSIDE6_API)
-
-PYQT5 = True
-PYSIDE2 = PYQT6 = PYSIDE6 = False
-
-# When `FORCE_QT_API` is set, we disregard
-# any previously imported python bindings.
-if os.environ.get("FORCE_QT_API") is not None:
-    if "PyQt5" in sys.modules:
-        API = initial_api if initial_api in PYQT5_API else "pyqt5"
-    elif "PySide2" in sys.modules:
-        API = initial_api if initial_api in PYSIDE2_API else "pyside2"
-    elif "PyQt6" in sys.modules:
-        API = initial_api if initial_api in PYQT6_API else "pyqt6"
-    elif "PySide6" in sys.modules:
-        API = initial_api if initial_api in PYSIDE6_API else "pyside6"
-
-
-if API in PYQT5_API:
-    try:
-        from PyQt5.QtCore import PYQT_VERSION_STR as PYQT_VERSION  # noqa
-        from PyQt5.QtCore import QT_VERSION_STR as QT_VERSION  # noqa
-
-        PYSIDE_VERSION = None  # noqa
-
-        if sys.platform == "darwin":
-            macos_version = LooseVersion(platform.mac_ver()[0])
-            if macos_version < LooseVersion("10.10"):
-                if LooseVersion(QT_VERSION) >= LooseVersion("5.9"):
-                    raise PythonQtError(
-                        "Qt 5.9 or higher only works in "
-                        "macOS 10.10 or higher. Your "
-                        "program will fail in this "
-                        "system."
-                    )
-            elif macos_version < LooseVersion("10.11"):
-                if LooseVersion(QT_VERSION) >= LooseVersion("5.11"):
-                    raise PythonQtError(
-                        "Qt 5.11 or higher only works in "
-                        "macOS 10.11 or higher. Your "
-                        "program will fail in this "
-                        "system."
-                    )
-
-            del macos_version
-    except ImportError:
-        API = os.environ["QT_API"] = "pyside2"
-
-if API in PYSIDE2_API:
-    try:
-        from PySide2 import __version__ as PYSIDE_VERSION  # noqa
-        from PySide2.QtCore import __version__ as QT_VERSION  # noqa
-
-        PYQT_VERSION = None  # noqa
-        PYQT5 = False
-        PYSIDE2 = True
-
-        if sys.platform == "darwin":
-            macos_version = LooseVersion(platform.mac_ver()[0])
-            if macos_version < LooseVersion("10.11"):
-                if LooseVersion(QT_VERSION) >= LooseVersion("5.11"):
-                    raise PythonQtError(
-                        "Qt 5.11 or higher only works in "
-                        "macOS 10.11 or higher. Your "
-                        "program will fail in this "
-                        "system."
-                    )
-
-            del macos_version
-    except ImportError:
-        API = os.environ["QT_API"] = "pyqt6"
-
-if API in PYQT6_API:
-    try:
-        from PyQt6.QtCore import PYQT_VERSION_STR as PYQT_VERSION  # noqa
-        from PyQt6.QtCore import QT_VERSION_STR as QT_VERSION  # noqa
-
-        PYSIDE_VERSION = None  # noqa
-        PYQT5 = False
-        PYQT6 = True
-
-    except ImportError:
-        API = os.environ["QT_API"] = "pyside6"
-
-if API in PYSIDE6_API:
-    try:
-        from PySide6 import __version__ as PYSIDE_VERSION  # noqa
-        from PySide6.QtCore import __version__ as QT_VERSION  # noqa
-
-        PYQT_VERSION = None  # noqa
-        PYQT5 = False
-        PYSIDE6 = True
-
-    except ImportError:
-        API = None
-
-if API is None:
-    raise PythonQtError(
-        "No Qt bindings could be found.\nYou must install one of the following packages "
-        "to use superqt: PyQt5, PyQt6, PySide2, or PySide6"
-    )
-
-# If a correct API name is passed to QT_API and it could not be found,
-# switches to another and informs through the warning
-if API != initial_api and binding_specified:
-    warnings.warn(
-        'Selected binding "{}" could not be found, '
-        'using "{}"'.format(initial_api, API),
-        RuntimeWarning,
-    )
-
-API_NAME = {
+VALID_APIS = {
     "pyqt5": "PyQt5",
     "pyqt6": "PyQt6",
     "pyside2": "PySide2",
     "pyside6": "PySide6",
-}[API]
+}
+
+# Detecting if a binding was specified by the user
+_requested_api = os.getenv("QT_API", "").lower()
+_forced_api = os.getenv("FORCE_QT_API")
+
+# warn if an invalid API has been requested
+if _requested_api and _requested_api not in VALID_APIS:
+    warnings.warn(
+        f"invalid QT_API specified: {_requested_api}. "
+        f"Valid values include {set(VALID_APIS)}"
+    )
+    _forced_api = None
+    _requested_api = ""
+
+# TODO: FORCE_QT_API requires also using QT_API ... does that make sense?
+
+# now we'll try to import QtCore
+_QtCore: Optional[ModuleType] = None
+
+# If `FORCE_QT_API` is not set, we first look for previously imported bindings
+if not _forced_api:
+    for api_name, module_name in VALID_APIS.items():
+        if module_name in sys.modules:
+            _QtCore = import_module(f"{module_name}.QtCore")
+            break
+
+if _QtCore is None:
+    # try the requested API first, and if _forced_api is True,
+    # raise an ImportError if it doesn't work.
+    # Otherwise go through the list of Valid APIs until something imports
+    requested = VALID_APIS.get(_requested_api)
+    for module_name in sorted(VALID_APIS.values(), key=lambda x: x != requested):
+        try:
+            _QtCore = import_module(f"{module_name}.QtCore")
+            break
+        except ImportError:
+            if _forced_api:
+                ImportError(
+                    "FORCE_QT_API set and unable to import requested QT_API: {e}"
+                )
+
+# didn't find one...  not going to work
+if _QtCore is None:
+    raise QtMissingError(f"No QtCore could be found. Tried: {VALID_APIS.values()}")
+
+# load variables based on what we found.
+if not _QtCore.__package__:
+    raise RuntimeError("QtCore does not declare __package__?")
+
+API_NAME = _QtCore.__package__
+PYSIDE2 = API_NAME == "PySide2"
+PYSIDE6 = API_NAME == "PySide6"
+PYQT5 = API_NAME == "PyQt5"
+PYQT6 = API_NAME == "PyQt6"
+QT_VERSION = getattr(_QtCore, "QT_VERSION_STR", "") or getattr(_QtCore, "__version__")
+
+# lastly, emit a warning if we ended up with an API other than the one requested
+if _requested_api and API_NAME != VALID_APIS[_requested_api]:
+    warnings.warn(
+        f"Selected binding {_requested_api!r} could not be found, using {API_NAME!r}"
+    )
+
+
+# Setup the meta path finder that lets us import anything using `superqt.qtcompat.Mod`
+class SuperQtImporter(abc.MetaPathFinder):
+    def find_spec(
+        self,
+        fullname: str,
+        path: Optional[Sequence[Union[bytes, str]]],
+        target: Optional[ModuleType] = None,
+    ) -> Optional[ModuleSpec]:
+        """Find a spec for the specified module.
+
+        If fullname is superqt.X or superqt.qtcompat.Xx ...
+        it will look for API_NAME.X instead...
+
+        See https://docs.python.org/3/reference/import.html#the-meta-path
+        """
+        if fullname.startswith(__name__):
+            spec = fullname.replace(__name__, API_NAME)
+            return util.find_spec(spec)
+        return None
+
+
+def _get_qtmodule(mod_name: str) -> ModuleType:
+    """Convenience to get a submodule from the current QT_API"""
+    _mod_name = mod_name.rsplit(".", maxsplit=1)[-1]
+    return import_module(f"{API_NAME}.{_mod_name}")
+
+
+sys.meta_path.append(SuperQtImporter())
