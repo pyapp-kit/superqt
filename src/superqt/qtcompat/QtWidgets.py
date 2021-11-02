@@ -5,12 +5,13 @@ _QtWidgets = _get_qtmodule(__name__)
 globals().update(_QtWidgets.__dict__)
 
 
-def exec_(self):
-    self.exec()
-
-
 QApplication = _QtWidgets.QApplication
-QApplication.exec = exec_
+if not hasattr(QApplication, "exec"):
+
+    def exec_(self):
+        _QtWidgets.QApplication.exec(self)
+
+    QApplication.exec = exec_
 
 # backwargs compat with qt5
 if "6" in API_NAME:
