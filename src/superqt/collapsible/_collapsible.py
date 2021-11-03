@@ -101,7 +101,7 @@ class QCollapsible(QPushButton):
         self.clicked.connect(self._toggleHidden)
 
     # ===========================================
-    def setAnimatorsSettings(
+    def setAnimatationsSettings(
         self,
         duration: int = 500,
         easing_curve: QEasingCurve = QEasingCurve.Type.InOutCubic,

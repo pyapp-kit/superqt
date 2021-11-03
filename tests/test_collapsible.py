@@ -65,7 +65,7 @@ def test_locking(qtbot):
 def test_changing_animation_settings(qtbot):
     """Quick test for changing animation settings"""
     wdg = QCollapsible(duration=300)
-    wdg.setAnimatorsSettings(duration=600, easing_curve=QEasingCurve.InElastic)
+    wdg.setAnimatationsSettings(duration=600, easing_curve=QEasingCurve.InElastic)
     assert wdg.hide_show_animation.easingCurve() == QEasingCurve.InElastic
     assert wdg.hide_show_animation.duration() == 600
     assert wdg.rotate_animation.easingCurve() == QEasingCurve.InElastic
