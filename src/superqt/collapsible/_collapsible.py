@@ -98,10 +98,10 @@ class QCollapsible(QPushButton):
         self.animator.addAnimation(self.rotate_animation)
 
         # Connect events
-        self.clicked.connect(self.toggle_hidden)
+        self.clicked.connect(self._toggleHidden)
 
     # ===========================================
-    def set_animators_settings(
+    def setAnimatorsSettings(
         self,
         duration: int = 500,
         easing_curve: QEasingCurve = QEasingCurve.Type.InOutCubic,
@@ -117,7 +117,7 @@ class QCollapsible(QPushButton):
         self.rotate_animation.setDuration(duration)
 
     # ===========================================
-    def set_content(self, content: Union[QWidget, QLayout] = None):
+    def setContent(self, content: Union[QWidget, QLayout] = None):
         """Sets the content to collapse"""
         if isinstance(content, QLayout):
             self.content = QWidget()
@@ -130,7 +130,7 @@ class QCollapsible(QPushButton):
         self.hide_show_animation.setEndValue(content.sizeHint().height() + 10)
 
     # ===========================================
-    def toggle_hidden(self) -> None:
+    def _toggleHidden(self) -> None:
         """Toggle the hidden state of the frame"""
 
         if self.lock_to is not None and self.isChecked() != self.lock_to:
@@ -141,17 +141,17 @@ class QCollapsible(QPushButton):
             self.setChecked(self.lock_to)
 
         if self.content is not None:
-            self.show_content() if self.isChecked() else self.hide_content()
+            self._showContent() if self.isChecked() else self._hideContent()
 
     # ===========================================
-    def hide_content(self):
+    def _hideContent(self):
         """Hides the content"""
         if self.content is not None:
             self.animator.setDirection(QAbstractAnimation.Direction.Backward)
             self.animator.start()
 
     # ===========================================
-    def show_content(self):
+    def _showContent(self):
         """Show the content"""
         if self.content is not None:
             self.animator.setDirection(QAbstractAnimation.Direction.Forward)

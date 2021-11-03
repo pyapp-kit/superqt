@@ -35,18 +35,18 @@ def test_content_hide_show(qtbot):
         initial_is_checked=True,
     )
 
-    collapsible.hide_content()
+    collapsible._hideContent()
     assert collapsible.content.maximumHeight() == 0
-    collapsible.show_content()
+    collapsible._showContent()
     assert collapsible.content.maximumHeight() >= 600
 
     collapsible.setChecked(False)
-    collapsible.toggle_hidden()
+    collapsible._toggleHidden()
     assert collapsible.isChecked() is False
     assert collapsible.content.maximumHeight() == 0
 
     collapsible.setChecked(True)
-    collapsible.toggle_hidden()
+    collapsible._toggleHidden()
     assert collapsible.isChecked() is True
     assert collapsible.content.maximumHeight() > 600
 
@@ -65,7 +65,7 @@ def test_locking(qtbot):
 def test_changing_animation_settings(qtbot):
     """Quick test for changing animation settings"""
     wdg = QCollapsible(duration=300)
-    wdg.set_animators_settings(duration=600, easing_curve=QEasingCurve.InElastic)
+    wdg.setAnimatorsSettings(duration=600, easing_curve=QEasingCurve.InElastic)
     assert wdg.hide_show_animation.easingCurve() == QEasingCurve.InElastic
     assert wdg.hide_show_animation.duration() == 600
     assert wdg.rotate_animation.easingCurve() == QEasingCurve.InElastic
@@ -78,7 +78,7 @@ def test_changing_content(qtbot):
     content = QPushButton()
     wdg = QCollapsible()
     assert wdg.content is None
-    wdg.set_content(content)
+    wdg.setContent(content)
     assert wdg.content is not None
 
 
