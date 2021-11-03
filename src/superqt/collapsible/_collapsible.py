@@ -90,6 +90,7 @@ class QCollapsible(QPushButton):
         self.hide_show_animation = create_hide_show_animation(
             content, duration=duration, easing_curve=easing_curve
         )
+        self.hide_show_animation.setTargetObject(content)
         self.rotate_animation = create_icon_rotation_animation(
             self, duration=duration, easing_curve=easing_curve
         )

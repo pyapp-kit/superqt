@@ -76,6 +76,10 @@ def test_changing_animation_settings(qtbot):
 def test_changing_content(qtbot):
 
     content = QPushButton()
-    wdg = QCollapsible(content=content)
-    # assert wdg.content is None
-    wdg.set_content(QPushButton)
+    wdg = QCollapsible()
+    assert wdg.content is None
+    wdg.set_content(content)
+    assert wdg.content is not None
+
+
+# =================================================================================================
