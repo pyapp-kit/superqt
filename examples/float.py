@@ -6,9 +6,9 @@ app = QApplication([])
 
 w = QWidget()
 
-sld1 = QDoubleSlider(Qt.Horizontal)
-sld2 = QDoubleRangeSlider(Qt.Horizontal)
-rs = QRangeSlider(Qt.Horizontal)
+sld1 = QDoubleSlider(Qt.Orientation.Horizontal)
+sld2 = QDoubleRangeSlider(Qt.Orientation.Horizontal)
+rs = QRangeSlider(Qt.Orientation.Horizontal)
 
 sld1.valueChanged.connect(lambda e: print("doubslider valuechanged", e))
 

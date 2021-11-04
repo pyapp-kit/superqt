@@ -93,7 +93,7 @@ class QLargeIntSpinBox(QAbstractSpinBox):
         return super().closeEvent(e)
 
     def keyPressEvent(self, e) -> None:
-        if e.key() in (Qt.Key_Enter, Qt.Key_Return):
+        if e.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):
             self._interpret(
                 _EmitPolicy.AlwaysEmit
                 if self.keyboardTracking()
@@ -112,13 +112,13 @@ class QLargeIntSpinBox(QAbstractSpinBox):
         self._setValue(self._bound(self._value + (step * steps)), e)
 
     def stepEnabled(self):
-        flags = QAbstractSpinBox.StepNone
+        flags = QAbstractSpinBox.StepEnabledFlag.StepNone
         if self.isReadOnly():
             return flags
         if self._value < self._maximum:
-            flags |= QAbstractSpinBox.StepUpEnabled
+            flags |= QAbstractSpinBox.StepEnabledFlag.StepUpEnabled
         if self._value > self._minimum:
-            flags |= QAbstractSpinBox.StepDownEnabled
+            flags |= QAbstractSpinBox.StepEnabledFlag.StepDownEnabled
         return flags
 
     def sizeHint(self):
@@ -134,7 +134,9 @@ class QLargeIntSpinBox(QAbstractSpinBox):
         opt = QStyleOptionSpinBox()
         self.initStyleOption(opt)
         hint = QSize(w, h)
-        return self.style().sizeFromContents(QStyle.CT_SpinBox, opt, hint, self)
+        return self.style().sizeFromContents(
+            QStyle.ContentsType.CT_SpinBox, opt, hint, self
+        )
 
     # ###############  Implementation Details  #######################
 

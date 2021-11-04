@@ -1,48 +1,20 @@
-#
-# Copyright © 2014-2015 Colin Duquesnoy
-# Copyright © 2009- The Spyder Developmet Team
-#
-# Licensed under the terms of the MIT License
-# (see LICENSE.txt for details)
+# type: ignore
+from . import API_NAME, _get_qtmodule
 
-"""
-Modified from qtpy.QtWidgets
-Provides widget classes and functions.
-"""
+_QtWidgets = _get_qtmodule(__name__)
+globals().update(_QtWidgets.__dict__)
 
-from . import PYQT5, PYQT6, PYSIDE2, PYSIDE6, PythonQtError
 
-if PYQT5:
-    from PyQt5.QtWidgets import *
-elif PYSIDE2:
-    from PySide2.QtWidgets import *
-
-    def exec(self):
-        self.exec_()
-
-    QApplication.exec = exec
-
-elif PYQT6:
-    from PyQt6.QtWidgets import *
-
-    # backwards compat with PyQt5
-    # namespace moves:
-    for cls in (QStyle, QSlider, QSizePolicy, QSpinBox):
-        for attr in dir(cls):
-            if not attr[0].isupper():
-                continue
-            ns = getattr(cls, attr)
-            for name, val in vars(ns).items():
-                if not name.startswith("_"):
-                    setattr(cls, name, val)
+QApplication = _QtWidgets.QApplication
+if not hasattr(QApplication, "exec"):
 
     def exec_(self):
-        self.exec()
+        _QtWidgets.QApplication.exec(self)
 
-    QApplication.exec_ = exec_
+    QApplication.exec = exec_
 
-elif PYSIDE6:
-    from PySide6.QtWidgets import *  # noqa
-
-else:
-    raise PythonQtError("No Qt bindings could be found")
+# backwargs compat with qt5
+if "6" in API_NAME:
+    _QtGui = _get_qtmodule("QtGui")
+    QAction = _QtGui.QAction
+    QShortcut = _QtGui.QShortcut
