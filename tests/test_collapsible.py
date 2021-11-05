@@ -5,7 +5,6 @@ from superqt.qtcompat.QtCore import QEasingCurve
 from superqt.qtcompat.QtWidgets import QPushButton, QVBoxLayout, QWidget
 
 
-# =================================================================================================
 def test_checked_initialization(qtbot):
     """Test simple collapsible"""
     wdg1 = QCollapsible(initial_is_checked=True)
@@ -15,7 +14,6 @@ def test_checked_initialization(qtbot):
     assert wdg2.isChecked() is False
 
 
-# =================================================================================================
 def test_content_hide_show(qtbot):
     """Test collapsible with content"""
 
@@ -51,7 +49,6 @@ def test_content_hide_show(qtbot):
     assert collapsible.content.maximumHeight() > 600
 
 
-# =================================================================================================
 def test_locking(qtbot):
     """Test locking collapsible"""
     wdg1 = QCollapsible(initial_is_checked=True, lock_to=False)
@@ -61,7 +58,6 @@ def test_locking(qtbot):
     assert wdg2.isChecked() is False
 
 
-# =================================================================================================
 def test_changing_animation_settings(qtbot):
     """Quick test for changing animation settings"""
     wdg = QCollapsible(duration=300)
@@ -72,14 +68,10 @@ def test_changing_animation_settings(qtbot):
     assert wdg.rotate_animation.duration() == 600
 
 
-# =================================================================================================
 def test_changing_content(qtbot):
-
+    """Test changing the content"""
     content = QPushButton()
     wdg = QCollapsible()
     assert wdg.content is None
     wdg.setContent(content)
     assert wdg.content is not None
-
-
-# =================================================================================================
