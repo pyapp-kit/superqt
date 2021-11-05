@@ -2,12 +2,15 @@
 import pathlib
 from typing import Union
 
-from PySide2.QtCore import QPropertyAnimation, QVariantAnimation
-from PySide2.QtGui import QTransform
-
 from ..qtcompat import QtCore
-from ..qtcompat.QtCore import QAbstractAnimation, QEasingCurve, QParallelAnimationGroup
-from ..qtcompat.QtGui import QIcon, QPixmap
+from ..qtcompat.QtCore import (
+    QAbstractAnimation,
+    QEasingCurve,
+    QParallelAnimationGroup,
+    QPropertyAnimation,
+    QVariantAnimation,
+)
+from ..qtcompat.QtGui import QIcon, QPixmap, QTransform
 from ..qtcompat.QtWidgets import QLayout, QPushButton, QWidget
 from ..utils._animation import (
     create_hide_show_animation,
