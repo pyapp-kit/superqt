@@ -14,7 +14,6 @@ from ..qtcompat.QtGui import QIcon, QPixmap, QTransform
 from ..qtcompat.QtWidgets import QAbstractButton, QLayout, QPushButton, QWidget
 
 
-# =================================================================================================
 class QCollapsible(QPushButton):
     """
     A collapsible widget to hide and unhide child widgets. This is based on simonxeko solution
@@ -99,7 +98,6 @@ class QCollapsible(QPushButton):
         # Connect events
         self.clicked.connect(self._toggleHidden)
 
-    # ===========================================
     def setAnimatationsSettings(
         self,
         duration: int = 500,
@@ -115,7 +113,6 @@ class QCollapsible(QPushButton):
         self.hide_show_animation.setDuration(duration)
         self.rotate_animation.setDuration(duration)
 
-    # ===========================================
     def setContent(self, content: Union[QWidget, QLayout] = None):
         """Sets the content to collapse"""
         if isinstance(content, QLayout):
@@ -128,7 +125,6 @@ class QCollapsible(QPushButton):
         self.hide_show_animation.setPropertyName(b"maximumHeight")
         self.hide_show_animation.setEndValue(content.sizeHint().height() + 10)
 
-    # ===========================================
     def _toggleHidden(self) -> None:
         """Toggle the hidden state of the frame"""
 
@@ -142,14 +138,12 @@ class QCollapsible(QPushButton):
         if self.content is not None:
             self._showContent() if self.isChecked() else self._hideContent()
 
-    # ===========================================
     def _hideContent(self):
         """Hides the content"""
         if self.content is not None:
             self.animator.setDirection(QAbstractAnimation.Direction.Backward)
             self.animator.start()
 
-    # ===========================================
     def _showContent(self):
         """Show the content"""
         if self.content is not None:
