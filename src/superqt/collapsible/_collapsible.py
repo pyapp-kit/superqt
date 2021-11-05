@@ -85,11 +85,11 @@ class QCollapsible(QPushButton):
 
         # Create animators
         self.animator = QParallelAnimationGroup()
-        self.hide_show_animation = create_hide_show_animation(
+        self.hide_show_animation = _create_hide_show_animation(
             content, duration=duration, easing_curve=easing_curve
         )
         self.hide_show_animation.setTargetObject(content)
-        self.rotate_animation = create_icon_rotation_animation(
+        self.rotate_animation = _create_icon_rotation_animation(
             self, duration=duration, easing_curve=easing_curve
         )
         self.animator.addAnimation(self.hide_show_animation)
@@ -151,7 +151,7 @@ class QCollapsible(QPushButton):
             self.animator.start()
 
 
-def create_hide_show_animation(
+def _create_hide_show_animation(
     widget: QWidget = None,
     duration: int = 500,
     easing_curve: QEasingCurve = QEasingCurve.Type.InOutCubic,
@@ -177,7 +177,7 @@ def create_hide_show_animation(
     return animation
 
 
-def create_icon_rotation_animation(
+def _create_icon_rotation_animation(
     widget: QAbstractButton,
     duration: int = 500,
     easing_curve: QEasingCurve = QEasingCurve.Type.InOutCubic,
