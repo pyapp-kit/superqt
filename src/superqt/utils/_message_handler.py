@@ -2,11 +2,7 @@ import logging
 from contextlib import suppress
 from typing import List, NamedTuple, Optional
 
-from superqt.qtcompat.QtCore import (
-    QMessageLogContext,
-    QtMsgType,
-    qInstallMessageHandler,
-)
+from qtpy.QtCore import QMessageLogContext, QtMsgType, qInstallMessageHandler
 
 
 class Record(NamedTuple):

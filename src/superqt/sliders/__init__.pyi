@@ -1,4 +1,4 @@
-from superqt.qtcompat.QtWidgets import QSlider
+from qtpy.QtWidgets import QSlider
 
 from ._generic_range_slider import _GenericRangeSlider
 from ._generic_slider import _GenericSlider

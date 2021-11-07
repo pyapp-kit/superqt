@@ -5,9 +5,9 @@ import re
 from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING
 
-from ..qtcompat import QT_VERSION
-from ..qtcompat.QtCore import Qt
-from ..qtcompat.QtGui import (
+from qtpy import QT_VERSION
+from qtpy.QtCore import Qt
+from qtpy.QtGui import (
     QBrush,
     QColor,
     QGradient,
@@ -15,7 +15,7 @@ from ..qtcompat.QtGui import (
     QPalette,
     QRadialGradient,
 )
-from ..qtcompat.QtWidgets import QApplication, QSlider, QStyleOptionSlider
+from qtpy.QtWidgets import QApplication, QSlider, QStyleOptionSlider
 
 if TYPE_CHECKING:
     from ._generic_range_slider import _GenericRangeSlider

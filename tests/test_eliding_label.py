@@ -1,8 +1,9 @@
 import platform
 
+from qtpy.QtCore import QSize, Qt
+from qtpy.QtGui import QResizeEvent
+
 from superqt import QElidingLabel
-from superqt.qtcompat.QtCore import QSize, Qt
-from superqt.qtcompat.QtGui import QResizeEvent
 
 TEXT = (
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do "

@@ -1,6 +1,7 @@
 import os
 
 import pytest
+from qtpy import API_NAME
 
 from superqt import (
     QDoubleRangeSlider,
@@ -8,7 +9,6 @@ from superqt import (
     QLabeledDoubleRangeSlider,
     QLabeledDoubleSlider,
 )
-from superqt.qtcompat import API_NAME
 
 range_types = {QDoubleRangeSlider, QLabeledDoubleRangeSlider}
 

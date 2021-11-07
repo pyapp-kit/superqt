@@ -4,8 +4,8 @@ import time
 from concurrent.futures import Future, TimeoutError
 
 import pytest
+from qtpy.QtCore import QCoreApplication, QObject, QThread, Signal
 
-from superqt.qtcompat.QtCore import QCoreApplication, QObject, QThread, Signal
 from superqt.utils import ensure_main_thread, ensure_object_thread
 
 skip_on_ci = pytest.mark.skipif(bool(os.getenv("CI")), reason="github hangs")

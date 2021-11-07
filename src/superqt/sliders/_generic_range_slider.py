@@ -1,17 +1,9 @@
 from typing import Generic, List, Sequence, Tuple, TypeVar, Union
 
-from ..qtcompat import QtGui
-from ..qtcompat.QtCore import (
-    Property,
-    QEvent,
-    QPoint,
-    QPointF,
-    QRect,
-    QRectF,
-    Qt,
-    Signal,
-)
-from ..qtcompat.QtWidgets import QSlider, QStyle, QStyleOptionSlider, QStylePainter
+from qtpy import QtGui
+from qtpy.QtCore import Property, QEvent, QPoint, QPointF, QRect, QRectF, Qt, Signal
+from qtpy.QtWidgets import QSlider, QStyle, QStyleOptionSlider, QStylePainter
+
 from ._generic_slider import CC_SLIDER, SC_GROOVE, SC_HANDLE, SC_NONE, _GenericSlider
 from ._range_style import RangeSliderStyle, update_styles_from_stylesheet
 

@@ -1,8 +1,8 @@
 from enum import Enum, EnumMeta
 from typing import Optional, TypeVar
 
-from ..qtcompat.QtCore import Signal
-from ..qtcompat.QtWidgets import QComboBox
+from qtpy.QtCore import Signal
+from qtpy.QtWidgets import QComboBox
 
 EnumType = TypeVar("EnumType", bound=Enum)
 

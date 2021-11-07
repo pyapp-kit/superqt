@@ -16,7 +16,7 @@ an instance of
 To block and wait for the result, see [Synchronous mode](#synchronous-mode)
 
 ```python
-from superqt.qtcompat.QtCore import QObject
+from qtpy.QtCore import QObject
 from superqt import ensure_main_thread, ensure_object_thread
 
 @ensure_main_thread

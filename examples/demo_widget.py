@@ -1,6 +1,7 @@
+from qtpy import QtCore
+from qtpy import QtWidgets as QtW
+
 from superqt import QRangeSlider
-from superqt.qtcompat import QtCore
-from superqt.qtcompat import QtWidgets as QtW
 
 QSS = """
 QSlider {
