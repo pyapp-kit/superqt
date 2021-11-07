@@ -2,8 +2,11 @@ from __future__ import annotations
 
 import warnings
 from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
-from typing import DefaultDict, Dict, FrozenSet, Optional, Tuple, Type, Union
+from typing import DefaultDict, Dict, FrozenSet, Optional, Tuple, Type, Union, cast
+
+from typing_extensions import TypedDict
 
 from superqt.qtcompat import QT_VERSION
 from superqt.qtcompat.QtCore import QObject, QPoint, QRect, QSize, Qt
@@ -11,6 +14,7 @@ from superqt.qtcompat.QtGui import (
     QColor,
     QFont,
     QFontDatabase,
+    QGuiApplication,
     QIcon,
     QIconEngine,
     QPainter,
@@ -18,9 +22,17 @@ from superqt.qtcompat.QtGui import (
     QPixmap,
     QTransform,
 )
-from superqt.qtcompat.QtWidgets import QApplication, QWidget
+from superqt.qtcompat.QtWidgets import QApplication, QStyleOption, QWidget
 
 from ._animations import Animation
+
+
+class Unset:
+    def __repr__(self) -> str:
+        return "UNSET"
+
+
+_Unset = Unset()
 
 # A 16 pixel-high icon yields a font size of 14, which is pixel perfect
 # for font-awesome. 16 * 0.875 = 14
@@ -37,7 +49,6 @@ ValidColor = Union[
     Tuple[int, int, int],
     None,
 ]
-Unset = object()
 _DEFAULT_STATE = (QIcon.State.Off, QIcon.Mode.Normal)
 _states: Dict[FrozenSet[str], tuple[QIcon.State, QIcon.Mode]] = {
     frozenset({"on"}): (QIcon.State.On, QIcon.Mode.Normal),
@@ -57,6 +68,58 @@ _states: Dict[FrozenSet[str], tuple[QIcon.State, QIcon.Mode]] = {
 }
 
 
+class IconStateMode(Enum):
+    ON_NORMAL = (QIcon.State.On, QIcon.Mode.Normal)
+    ON_ACTIVE = (QIcon.State.On, QIcon.Mode.Active)
+    ON_SELECTED = (QIcon.State.On, QIcon.Mode.Selected)
+    ON_DISABLED = (QIcon.State.On, QIcon.Mode.Disabled)
+    OFF_NORMAL = (QIcon.State.Off, QIcon.Mode.Normal)
+    OFF_ACTIVE = (QIcon.State.Off, QIcon.Mode.Active)
+    OFF_SELECTED = (QIcon.State.Off, QIcon.Mode.Selected)
+    OFF_DISABLED = (QIcon.State.Off, QIcon.Mode.Disabled)
+    ON = ON_NORMAL
+    OFF = OFF_NORMAL
+    NORMAL = OFF_NORMAL
+    ACTIVE = OFF_ACTIVE
+    SELECTED = OFF_SELECTED
+    DEFAULT = OFF_NORMAL
+
+
+def _norm_state_mode(kw: str) -> Tuple[QIcon.State, QIcon.Mode]:
+    try:
+        return _states[frozenset(kw.lower().split("_"))]
+    except KeyError:
+        raise ValueError(
+            f"{kw!r} is not a valid state key, must be a combination of {{on, "
+            "off, active, disabled, selected, normal} separated by underscore"
+        )
+
+
+class IconOptionDict(TypedDict, total=False):
+    glyph_key: str
+    scale_factor: float
+    color: ValidColor
+    opacity: float
+    animation: Optional[Animation]
+    transform: Optional[QTransform]
+
+
+# public facing, for a nicer IDE experience than a dict
+@dataclass
+class IconOpts:
+    glyph_key: Union[str, Unset] = _Unset
+    scale_factor: Union[float, Unset] = _Unset
+    color: Union[ValidColor, Unset] = _Unset
+    opacity: Union[float, Unset] = _Unset
+    animation: Union[Animation, Unset, None] = _Unset
+    transform: Union[QTransform, Unset, None] = _Unset
+
+    def dict(self) -> IconOptionDict:
+        # not using asdict due to pickle errors on animation
+        d = {k: v for k, v in vars(self).items() if v is not _Unset}
+        return cast(IconOptionDict, d)
+
+
 @dataclass
 class IconOptions:
     """The set of options needed to render a font in a single State/Mode."""
@@ -68,24 +131,12 @@ class IconOptions:
     animation: Optional[Animation] = None
     transform: Optional[QTransform] = None
 
-    @classmethod
-    def _from_kwargs(
-        cls, kwargs: dict, defaults: Optional[IconOptions] = None
-    ) -> IconOptions:
-        defaults = defaults or cls._defaults()
-        kwargs = {
-            f: getattr(defaults, f) if kwargs[f] is None else kwargs[f]
-            for f in IconOptions.__dataclass_fields__  # type: ignore
-        }
-        return IconOptions(**kwargs)
+    def _update(self, icon_opts: IconOpts) -> IconOptions:
+        return IconOptions(**{**vars(self), **icon_opts.dict()})
 
-    __defaults = None
-
-    @classmethod
-    def _defaults(cls):
-        if cls.__defaults is None:
-            cls.__defaults = IconOptions("")
-        return cls.__defaults
+    def dict(self) -> IconOptionDict:
+        # not using asdict due to pickle errors on animation
+        return cast(IconOptionDict, vars(self))
 
 
 class _QFontIconEngine(QIconEngine):
@@ -97,11 +148,11 @@ class _QFontIconEngine(QIconEngine):
         ] = DefaultDict(dict)
 
     def clone(self) -> QIconEngine:  # pragma: no cover
-        ico = _QFontIconEngine(None)  # type: ignore
+        ico = _QFontIconEngine(self._default_opts)
         ico._opts = self._opts.copy()
         return ico
 
-    def _get_opts(self, state, mode: QIcon.Mode) -> IconOptions:
+    def _get_opts(self, state: QIcon.State, mode: QIcon.Mode) -> IconOptions:
         opts = self._opts[state].get(mode) or self._default_opts
         if opts.color is None:
             # use current palette in absense of color
@@ -111,7 +162,9 @@ class _QFontIconEngine(QIconEngine):
                 QIcon.Mode.Normal: QPalette.ColorGroup.Normal,
                 QIcon.Mode.Active: QPalette.ColorGroup.Active,
             }
-            opts.color = QApplication.palette().color(role[mode], QPalette.ButtonText)
+            opts.color = QApplication.palette().color(
+                role[mode], QPalette.ColorRole.ButtonText
+            )
         return opts
 
     def paint(
@@ -152,14 +205,29 @@ class _QFontIconEngine(QIconEngine):
 
     def pixmap(self, size: QSize, mode: QIcon.Mode, state: QIcon.State) -> QPixmap:
         pixmap = QPixmap(size)
+        if not size.isValid():
+            return pixmap
         pixmap.fill(Qt.GlobalColor.transparent)
         painter = QPainter(pixmap)
         self.paint(painter, QRect(QPoint(0, 0), size), mode, state)
+        painter.end()
+
+        # Apply palette-based styles for disabled/selected modes
+        # unless the user has specifically set a color for this mode/state
+        if mode != QIcon.Mode.Normal:
+            ico_opts = self._opts[state].get(mode)
+            if not ico_opts or not ico_opts.color:
+                opt = QStyleOption()
+                opt.palette = QGuiApplication.palette()
+                generated = QApplication.style().generatedIconPixmap(mode, pixmap, opt)
+                if not generated.isNull():
+                    pixmap = generated
+
         return pixmap
 
 
 class QFontIcon(QIcon):
-    def __init__(self, options):
+    def __init__(self, options: IconOptions) -> None:
         self._engine = _QFontIconEngine(options)
         super().__init__(self._engine)
 
@@ -167,18 +235,23 @@ class QFontIcon(QIcon):
         self,
         state: QIcon.State = QIcon.State.Off,
         mode: QIcon.Mode = QIcon.Mode.Normal,
-        glyph_key: Optional[str] = None,
-        font_family: Optional[str] = None,
-        font_style: Optional[str] = None,
-        scale_factor: float = DEFAULT_SCALING_FACTOR,
-        color: ValidColor = None,
-        opacity: float = DEFAULT_OPACITY,
-        animation: Optional[Animation] = None,
-        transform: Optional[QTransform] = None,
-    ):
+        glyph_key: Union[str, Unset] = _Unset,
+        scale_factor: Union[float, Unset] = _Unset,
+        color: Union[ValidColor, Unset] = _Unset,
+        opacity: Union[float, Unset] = _Unset,
+        animation: Union[Animation, Unset, None] = _Unset,
+        transform: Union[QTransform, Unset, None] = _Unset,
+    ) -> None:
         """Set icon options for a specific mode/state."""
-        opts = IconOptions._from_kwargs(locals(), self._engine._default_opts)
-        self._engine._opts[state][mode] = opts
+        _opts = IconOpts(
+            glyph_key=glyph_key,
+            scale_factor=scale_factor,
+            color=color,
+            opacity=opacity,
+            animation=animation,
+            transform=transform,
+        )
+        self._engine._opts[state][mode] = self._engine._default_opts._update(_opts)
 
 
 class QFontIconStore(QObject):
@@ -194,9 +267,10 @@ class QFontIconStore(QObject):
 
     def __init__(self, parent: Optional[QObject] = None) -> None:
         super().__init__(parent=parent)
-        if hasattr(Qt.ApplicationAttribute, "AA_UseHighDpiPixmaps"):
-            # QT6 drops this
-            QApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
+        # QT6 drops this
+        dpi = getattr(Qt.ApplicationAttribute, "AA_UseHighDpiPixmaps", None)
+        if dpi:
+            QApplication.setAttribute(dpi)
 
     @classmethod
     def instance(cls) -> QFontIconStore:
@@ -307,7 +381,7 @@ class QFontIconStore(QObject):
 
         # in Qt6, everything becomes a static member
         QFd: Union[QFontDatabase, Type[QFontDatabase]] = (
-            QFontDatabase()
+            QFontDatabase()  # type: ignore
             if tuple(QT_VERSION.split(".")) < ("6", "0")
             else QFontDatabase
         )
@@ -334,25 +408,27 @@ class QFontIconStore(QObject):
         opacity: float = 1,
         animation: Optional[Animation] = None,
         transform: Optional[QTransform] = None,
-        states: Dict[str, dict] = {},
+        states: Dict[str, Union[IconOptionDict, IconOpts]] = {},
     ) -> QFontIcon:
         self.key2glyph(glyph_key)  # make sure it's a valid glyph_key
-
-        default_opts = IconOptions._from_kwargs(locals())
-
+        default_opts = IconOptions(
+            glyph_key=glyph_key,
+            scale_factor=scale_factor,
+            color=color,
+            opacity=opacity,
+            animation=animation,
+            transform=transform,
+        )
         icon = QFontIcon(default_opts)
         for kw, options in states.items():
-            try:
-                state, mode = _states[frozenset(kw.lower().split("_"))]
-            except KeyError:
-                raise ValueError(
-                    f"{kw!r} is not a valid state key, must be a combination of {{on, "
-                    "off, active, disabled, selected, normal} separated by underscore"
-                )
-            icon.addState(state, mode, **options)
+            if isinstance(options, IconOpts):
+                options = default_opts._update(options).dict()
+            icon.addState(*_norm_state_mode(kw), **options)
         return icon
 
-    def setTextIcon(self, widget: QWidget, glyph_key: str, size: float = None) -> None:
+    def setTextIcon(
+        self, widget: QWidget, glyph_key: str, size: Optional[float] = None
+    ) -> None:
         """Sets text on a widget to a specific font & glyph.
 
         This is an alternative to setting a QIcon with a pixmap.  It may
@@ -368,7 +444,7 @@ class QFontIconStore(QObject):
         widget.setFont(self.font(glyph_key, int(size)))
         setText(glyph)
 
-    def font(self, font_prefix: str, size: int = None) -> QFont:
+    def font(self, font_prefix: str, size: Optional[int] = None) -> QFont:
         """Create QFont for `font_prefix`"""
         font_key, _ = font_prefix.split(".", maxsplit=1)
         family, style = self._key2family(font_key)

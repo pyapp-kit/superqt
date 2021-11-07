@@ -7,18 +7,18 @@ __all__ = [
     "icon",
     "IconFont",
     "IconFontMeta",
-    "IconOptions",
+    "IconOpts",
     "Animation",
     "pulse",
     "spin",
 ]
 
-from typing import TYPE_CHECKING, Dict, Optional, Tuple
+from typing import TYPE_CHECKING, Dict, Optional, Tuple, Union
 
 from ._animations import Animation, pulse, spin
 from ._iconfont import IconFont, IconFontMeta
 from ._plugins import FontIconManager as _FIM
-from ._qfont_icon import DEFAULT_SCALING_FACTOR, IconOptions
+from ._qfont_icon import DEFAULT_SCALING_FACTOR, IconOptionDict, IconOpts
 from ._qfont_icon import QFontIconStore as _QFIS
 
 if TYPE_CHECKING:
@@ -37,7 +37,7 @@ def icon(
     opacity: float = 1,
     animation: Optional[Animation] = None,
     transform: Optional[QTransform] = None,
-    states: Dict[str, dict] = {},
+    states: Dict[str, Union[IconOptionDict, IconOpts]] = {},
 ) -> QFontIcon:
     """Create a QIcon for `glyph_key`, with a number of optional settings
 
@@ -139,7 +139,7 @@ def icon(
     )
 
 
-def setTextIcon(widget: QWidget, glyph_key: str, size: float = None) -> None:
+def setTextIcon(widget: QWidget, glyph_key: str, size: Optional[float] = None) -> None:
     """Set text on a widget to a specific font & glyph.
 
     This is an alternative to setting a QIcon with a pixmap.  It may be easier to
@@ -157,7 +157,7 @@ def setTextIcon(widget: QWidget, glyph_key: str, size: float = None) -> None:
     return _QFIS.instance().setTextIcon(widget, glyph_key, size)
 
 
-def font(font_prefix: str, size: int = None) -> QFont:
+def font(font_prefix: str, size: Optional[int] = None) -> QFont:
     """Create QFont for `font_prefix`
 
     Parameters
