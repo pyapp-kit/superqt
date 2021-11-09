@@ -22,13 +22,11 @@ class QtPdb(pdb.Pdb):
     def set_quit(self) -> None:
         app = QApplication.instance()
         if app is not None:
-            print("exit")
             app.exit()
         super().set_quit()
 
 
 def qt_set_trace(*, header: Optional[str] = None) -> None:
-    print("SETTRACE")
     pdb = QtPdb()
     if header is not None:
         pdb.message(header)
