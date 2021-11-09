@@ -28,15 +28,16 @@ class QtPdb(pdb.Pdb):
 
 
 def qt_set_trace(*, header: Optional[str] = None) -> None:
+    print("SETTRACE")
     pdb = QtPdb()
     if header is not None:
         pdb.message(header)
     pdb.set_trace(sys._getframe().f_back)
 
 
-def install_qtbreakpoint() -> None:
+def install_qt_breakpoint() -> None:
     sys.breakpointhook = qt_set_trace
 
 
-def uninstall_qtbreakpoint() -> None:
+def uninstall_qt_breakpoint() -> None:
     sys.breakpointhook = sys.__breakpointhook__
