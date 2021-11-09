@@ -18,8 +18,8 @@ from superqt.qtcompat.QtGui import (
     QIcon,
     QIconEngine,
     QPainter,
-    QPalette,
     QPixmap,
+    QPixmapCache,
     QTransform,
 )
 from superqt.qtcompat.QtWidgets import QApplication, QStyleOption, QWidget
@@ -140,12 +140,23 @@ class IconOptions:
 
 
 class _QFontIconEngine(QIconEngine):
+    _opt_hash: str = ""
+
     def __init__(self, options: IconOptions):
         super().__init__()
-        self._default_opts = options
         self._opts: DefaultDict[
             QIcon.State, Dict[QIcon.Mode, Optional[IconOptions]]
         ] = DefaultDict(dict)
+        self._opts[QIcon.State.Off][QIcon.Mode.Normal] = options
+        self.update_hash()
+
+    @property
+    def _default_opts(self) -> IconOptions:
+        return cast(IconOptions, self._opts[QIcon.State.Off][QIcon.Mode.Normal])
+
+    def _add_opts(self, state: QIcon.State, mode: QIcon.Mode, opts: IconOpts) -> None:
+        self._opts[state][mode] = self._default_opts._update(opts)
+        self.update_hash()
 
     def clone(self) -> QIconEngine:  # pragma: no cover
         ico = _QFontIconEngine(self._default_opts)
@@ -153,19 +164,46 @@ class _QFontIconEngine(QIconEngine):
         return ico
 
     def _get_opts(self, state: QIcon.State, mode: QIcon.Mode) -> IconOptions:
-        opts = self._opts[state].get(mode) or self._default_opts
-        if opts.color is None:
-            # use current palette in absense of color
-            role = {
-                QIcon.Mode.Disabled: QPalette.ColorGroup.Disabled,
-                QIcon.Mode.Selected: QPalette.ColorGroup.Current,
-                QIcon.Mode.Normal: QPalette.ColorGroup.Normal,
-                QIcon.Mode.Active: QPalette.ColorGroup.Active,
-            }
-            opts.color = QApplication.palette().color(
-                role[mode], QPalette.ColorRole.ButtonText
+        opts = self._opts[state].get(mode)
+        if opts:
+            return opts
+
+        opp_state = QIcon.State.Off if state == QIcon.State.On else QIcon.State.On
+        if mode in (QIcon.Mode.Disabled, QIcon.Mode.Selected):
+            opp_mode = (
+                QIcon.Mode.Disabled
+                if mode == QIcon.Mode.Selected
+                else QIcon.Mode.Selected
             )
-        return opts
+            for m, s in [
+                (QIcon.Mode.Normal, state),
+                (QIcon.Mode.Active, state),
+                (mode, opp_state),
+                (QIcon.Mode.Normal, opp_state),
+                (QIcon.Mode.Active, opp_state),
+                (opp_mode, state),
+                (opp_mode, opp_state),
+            ]:
+                opts = self._opts[s].get(m)
+                if opts:
+                    return opts
+        else:
+            opp_mode = (
+                QIcon.Mode.Active if mode == QIcon.Mode.Normal else QIcon.Mode.Normal
+            )
+            for m, s in [
+                (opp_mode, state),
+                (mode, opp_state),
+                (opp_mode, opp_state),
+                (QIcon.Mode.Disabled, state),
+                (QIcon.Mode.Selected, state),
+                (QIcon.Mode.Disabled, opp_state),
+                (QIcon.Mode.Selected, opp_state),
+            ]:
+                opts = self._opts[s].get(m)
+                if opts:
+                    return opts
+        return self._default_opts
 
     def paint(
         self,
@@ -204,6 +242,12 @@ class _QFontIconEngine(QIconEngine):
         painter.restore()
 
     def pixmap(self, size: QSize, mode: QIcon.Mode, state: QIcon.State) -> QPixmap:
+        # first look in cache
+        pmckey = self._pmcKey(size, mode, state)
+        # pm = QPixmapCache.find(pmckey)
+        # if pm:
+        #     print("cache hit", pmckey, mode, state)
+        #     return pm
         pixmap = QPixmap(size)
         if not size.isValid():
             return pixmap
@@ -223,7 +267,23 @@ class _QFontIconEngine(QIconEngine):
                 if not generated.isNull():
                     pixmap = generated
 
+        if not pixmap.isNull():
+            QPixmapCache.insert(pmckey, pixmap)
+
         return pixmap
+
+    def _pmcKey(self, size: QSize, mode: QIcon.Mode, state: QIcon.State) -> str:
+        k = ((((((size.width()) << 11) | size.height()) << 11) | mode) << 4) | state
+        return f"$superqt_{self._opt_hash}_{hex(k)}"
+
+    def update_hash(self) -> None:
+        hsh = id(self)
+        for state, d in self._opts.items():
+            for mode, opts in d.items():
+                if not opts:
+                    continue
+                hsh += hash(hash(opts.glyph_key) + hash(opts.color) + state + mode)
+        self._opt_hash = hex(hsh)
 
 
 class QFontIcon(QIcon):
@@ -243,6 +303,9 @@ class QFontIcon(QIcon):
         transform: Union[QTransform, Unset, None] = _Unset,
     ) -> None:
         """Set icon options for a specific mode/state."""
+        if glyph_key is not _Unset:
+            QFontIconStore.key2glyph(glyph_key)  # type: ignore
+
         _opts = IconOpts(
             glyph_key=glyph_key,
             scale_factor=scale_factor,
@@ -251,7 +314,7 @@ class QFontIcon(QIcon):
             animation=animation,
             transform=transform,
         )
-        self._engine._opts[state][mode] = self._engine._default_opts._update(_opts)
+        self._engine._add_opts(state, mode, _opts)
 
 
 class QFontIconStore(QObject):
@@ -330,6 +393,8 @@ class QFontIconStore(QObject):
     @classmethod
     def key2glyph(cls, glyph_key: str) -> tuple[str, str, Optional[str]]:
         """Return (char, family, style) given a `glyph_key`"""
+        if "." not in glyph_key:
+            raise ValueError("Glyph key must contain a period")
         font_key, char = glyph_key.split(".", maxsplit=1)
         family, style = cls._key2family(font_key)
         char = cls._ensure_char(char, family, style)
