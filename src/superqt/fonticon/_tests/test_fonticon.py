@@ -4,7 +4,6 @@ import pytest
 
 from superqt.fonticon import icon, pulse, setTextIcon, spin
 from superqt.fonticon._qfont_icon import QFontIconStore, _ensure_identifier
-from superqt.qtcompat import QT_VERSION
 from superqt.qtcompat.QtGui import QIcon, QPixmap
 from superqt.qtcompat.QtWidgets import QPushButton
 
@@ -105,19 +104,26 @@ def test_multistate(full_store, qtbot, qapp):
     active = icn._engine._opts[QIcon.State.Off][QIcon.Mode.Active].animation.timer
     disabled = icn._engine._opts[QIcon.State.Off][QIcon.Mode.Disabled].animation.timer
 
-    # FIXME: code and examples still work (with animations)... but active.timeout
-    # is not getting emitted during tests for Qt6
-    if QT_VERSION.startswith("6"):
-        pytest.mark.xfail(reason="Qt6 not emitting timeout signal")
-        return
-
     with qtbot.waitSignal(active.timeout, timeout=1000):
         btn.setEnabled(True)
+        # hack to get the signal emitted
+        icn.pixmap(100, 100, QIcon.Mode.Active, QIcon.State.Off)
+
     assert active.isActive()
     assert not disabled.isActive()
     with qtbot.waitSignal(disabled.timeout):
         btn.setEnabled(False)
     assert disabled.isActive()
+
+    # smoke test, paint all the states
+    icn.pixmap(100, 100, QIcon.Mode.Active, QIcon.State.Off)
+    icn.pixmap(100, 100, QIcon.Mode.Disabled, QIcon.State.Off)
+    icn.pixmap(100, 100, QIcon.Mode.Selected, QIcon.State.Off)
+    icn.pixmap(100, 100, QIcon.Mode.Normal, QIcon.State.Off)
+    icn.pixmap(100, 100, QIcon.Mode.Active, QIcon.State.On)
+    icn.pixmap(100, 100, QIcon.Mode.Disabled, QIcon.State.On)
+    icn.pixmap(100, 100, QIcon.Mode.Selected, QIcon.State.On)
+    icn.pixmap(100, 100, QIcon.Mode.Normal, QIcon.State.On)
 
 
 def test_ensure_identifier():
