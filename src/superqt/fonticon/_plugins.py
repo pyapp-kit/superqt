@@ -1,4 +1,4 @@
-from typing import Dict, Set, Tuple
+from typing import Dict, List, Set, Tuple
 
 from ._iconfont import IconFontMeta, namespace2font
 
@@ -70,14 +70,34 @@ class FontIconManager:
                 ) from e
         return self._LOADED[key]
 
+    def dict(self) -> dict:
+        return {
+            key: sorted(filter(lambda x: not x.startswith("_"), cls.__dict__))
+            for key, cls in self._LOADED.items()
+        }
 
-manager = FontIconManager()
-get_font_class = manager._get_font_class
+
+_manager = FontIconManager()
+get_font_class = _manager._get_font_class
+
+
+def discover() -> Tuple[str]:
+    _manager._discover_fonts()
 
 
 def available() -> Tuple[str]:
-    return tuple(manager._PLUGINS)
+    return tuple(_manager._PLUGINS)
 
 
-def loaded() -> Tuple[str]:
-    return tuple(manager._LOADED)
+def loaded(load_all=False) -> dict[str, List[str]]:
+    if load_all:
+        discover()
+        for x in available():
+            try:
+                _manager._get_font_class(x)
+            except Exception:
+                continue
+    return {
+        key: sorted(filter(lambda x: not x.startswith("_"), cls.__dict__))
+        for key, cls in _manager._LOADED.items()
+    }

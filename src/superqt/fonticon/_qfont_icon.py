@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import warnings
+from collections import abc
 from dataclasses import dataclass
-from enum import Enum
 from pathlib import Path
-from typing import DefaultDict, Dict, FrozenSet, Optional, Tuple, Type, Union, cast
+from typing import DefaultDict, Dict, Optional, Sequence, Tuple, Type, Union, cast
 
 from typing_extensions import TypedDict
 
@@ -49,50 +49,41 @@ ValidColor = Union[
     Tuple[int, int, int],
     None,
 ]
-_DEFAULT_STATE = (QIcon.State.Off, QIcon.Mode.Normal)
-_states: Dict[FrozenSet[str], tuple[QIcon.State, QIcon.Mode]] = {
-    frozenset({"on"}): (QIcon.State.On, QIcon.Mode.Normal),
-    frozenset({"off"}): _DEFAULT_STATE,
-    frozenset({"normal"}): _DEFAULT_STATE,
-    frozenset({"active"}): (QIcon.State.Off, QIcon.Mode.Active),
-    frozenset({"selected"}): (QIcon.State.Off, QIcon.Mode.Selected),
-    frozenset({"disabled"}): (QIcon.State.Off, QIcon.Mode.Disabled),
-    frozenset({"on", "normal"}): (QIcon.State.On, QIcon.Mode.Normal),
-    frozenset({"on", "active"}): (QIcon.State.On, QIcon.Mode.Active),
-    frozenset({"on", "selected"}): (QIcon.State.On, QIcon.Mode.Selected),
-    frozenset({"on", "disabled"}): (QIcon.State.On, QIcon.Mode.Disabled),
-    frozenset({"off", "normal"}): _DEFAULT_STATE,
-    frozenset({"off", "active"}): (QIcon.State.Off, QIcon.Mode.Active),
-    frozenset({"off", "selected"}): (QIcon.State.Off, QIcon.Mode.Selected),
-    frozenset({"off", "disabled"}): (QIcon.State.Off, QIcon.Mode.Disabled),
+
+StateOrMode = Union[QIcon.State, QIcon.Mode]
+StateModeKey = Union[StateOrMode, str, Sequence[StateOrMode]]
+_SM_MAP: Dict[str, StateOrMode] = {
+    "on": QIcon.State.On,
+    "off": QIcon.State.Off,
+    "normal": QIcon.Mode.Normal,
+    "active": QIcon.Mode.Active,
+    "selected": QIcon.Mode.Selected,
+    "disabled": QIcon.Mode.Disabled,
 }
 
 
-class IconStateMode(Enum):
-    ON_NORMAL = (QIcon.State.On, QIcon.Mode.Normal)
-    ON_ACTIVE = (QIcon.State.On, QIcon.Mode.Active)
-    ON_SELECTED = (QIcon.State.On, QIcon.Mode.Selected)
-    ON_DISABLED = (QIcon.State.On, QIcon.Mode.Disabled)
-    OFF_NORMAL = (QIcon.State.Off, QIcon.Mode.Normal)
-    OFF_ACTIVE = (QIcon.State.Off, QIcon.Mode.Active)
-    OFF_SELECTED = (QIcon.State.Off, QIcon.Mode.Selected)
-    OFF_DISABLED = (QIcon.State.Off, QIcon.Mode.Disabled)
-    ON = ON_NORMAL
-    OFF = OFF_NORMAL
-    NORMAL = OFF_NORMAL
-    ACTIVE = OFF_ACTIVE
-    SELECTED = OFF_SELECTED
-    DEFAULT = OFF_NORMAL
+def _norm_state_mode(key: StateModeKey) -> Tuple[QIcon.State, QIcon.Mode]:
+    """return state/mode tuple given a variety of valid inputs.
 
+    Input can be either a string, or a sequence of state or mode enums.
+    Strings can be any combination of on, off, normal, active, selected, disabled,
+    sep by underscore.
+    """
+    _sm: Sequence[StateOrMode]
+    if isinstance(key, str):
+        try:
+            _sm = [_SM_MAP[k.lower()] for k in key.split("_")]
+        except KeyError:
+            raise ValueError(
+                f"{key!r} is not a valid state key, must be a combination of {{on, "
+                "off, active, disabled, selected, normal} separated by underscore"
+            )
+    else:
+        _sm = key if isinstance(key, abc.Sequence) else [key]  # type: ignore
 
-def _norm_state_mode(kw: str) -> Tuple[QIcon.State, QIcon.Mode]:
-    try:
-        return _states[frozenset(kw.lower().split("_"))]
-    except KeyError:
-        raise ValueError(
-            f"{kw!r} is not a valid state key, must be a combination of {{on, "
-            "off, active, disabled, selected, normal} separated by underscore"
-        )
+    state = next((i for i in _sm if isinstance(i, QIcon.State)), QIcon.State.Off)
+    mode = next((i for i in _sm if isinstance(i, QIcon.Mode)), QIcon.Mode.Normal)
+    return state, mode
 
 
 class IconOptionDict(TypedDict, total=False):
@@ -228,7 +219,7 @@ class _QFontIconEngine(QIconEngine):
 
         # animation
         if opts.animation is not None:
-            opts.animation.animate(painter, rect)
+            opts.animation.animate(painter)
 
         # animation
         if opts.transform is not None:

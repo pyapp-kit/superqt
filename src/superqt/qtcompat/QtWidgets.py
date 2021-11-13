@@ -7,11 +7,7 @@ globals().update(_QtWidgets.__dict__)
 
 QApplication = _QtWidgets.QApplication
 if not hasattr(QApplication, "exec"):
-
-    def exec_(self):
-        _QtWidgets.QApplication.exec(self)
-
-    QApplication.exec = exec_
+    QApplication.exec = _QtWidgets.QApplication.exec_
 
 # backwargs compat with qt5
 if "6" in API_NAME:
