@@ -96,6 +96,10 @@ class IconOptionDict(TypedDict, total=False):
 
 
 # public facing, for a nicer IDE experience than a dict
+# The difference between IconOpts and _IconOptions is that all of IconOpts
+# all default to `_Unset` and are intended to extend some base/default option
+# IconOpts are *not* guaranteed to be fully capable of rendering an icon, whereas
+# IconOptions are.
 @dataclass
 class IconOpts:
     glyph_key: Union[str, Unset] = _Unset
@@ -112,7 +116,7 @@ class IconOpts:
 
 
 @dataclass
-class IconOptions:
+class _IconOptions:
     """The set of options needed to render a font in a single State/Mode."""
 
     glyph_key: str
@@ -122,8 +126,8 @@ class IconOptions:
     animation: Optional[Animation] = None
     transform: Optional[QTransform] = None
 
-    def _update(self, icon_opts: IconOpts) -> IconOptions:
-        return IconOptions(**{**vars(self), **icon_opts.dict()})
+    def _update(self, icon_opts: IconOpts) -> _IconOptions:
+        return _IconOptions(**{**vars(self), **icon_opts.dict()})
 
     def dict(self) -> IconOptionDict:
         # not using asdict due to pickle errors on animation
@@ -133,17 +137,17 @@ class IconOptions:
 class _QFontIconEngine(QIconEngine):
     _opt_hash: str = ""
 
-    def __init__(self, options: IconOptions):
+    def __init__(self, options: _IconOptions):
         super().__init__()
         self._opts: DefaultDict[
-            QIcon.State, Dict[QIcon.Mode, Optional[IconOptions]]
+            QIcon.State, Dict[QIcon.Mode, Optional[_IconOptions]]
         ] = DefaultDict(dict)
         self._opts[QIcon.State.Off][QIcon.Mode.Normal] = options
         self.update_hash()
 
     @property
-    def _default_opts(self) -> IconOptions:
-        return cast(IconOptions, self._opts[QIcon.State.Off][QIcon.Mode.Normal])
+    def _default_opts(self) -> _IconOptions:
+        return cast(_IconOptions, self._opts[QIcon.State.Off][QIcon.Mode.Normal])
 
     def _add_opts(self, state: QIcon.State, mode: QIcon.Mode, opts: IconOpts) -> None:
         self._opts[state][mode] = self._default_opts._update(opts)
@@ -154,7 +158,7 @@ class _QFontIconEngine(QIconEngine):
         ico._opts = self._opts.copy()
         return ico
 
-    def _get_opts(self, state: QIcon.State, mode: QIcon.Mode) -> IconOptions:
+    def _get_opts(self, state: QIcon.State, mode: QIcon.Mode) -> _IconOptions:
         opts = self._opts[state].get(mode)
         if opts:
             return opts
@@ -277,7 +281,7 @@ class _QFontIconEngine(QIconEngine):
 
 
 class QFontIcon(QIcon):
-    def __init__(self, options: IconOptions) -> None:
+    def __init__(self, options: _IconOptions) -> None:
         self._engine = _QFontIconEngine(options)
         super().__init__(self._engine)
 
@@ -466,7 +470,7 @@ class QFontIconStore(QObject):
         states: Dict[str, Union[IconOptionDict, IconOpts]] = {},
     ) -> QFontIcon:
         self.key2glyph(glyph_key)  # make sure it's a valid glyph_key
-        default_opts = IconOptions(
+        default_opts = _IconOptions(
             glyph_key=glyph_key,
             scale_factor=scale_factor,
             color=color,
