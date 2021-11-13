@@ -1,8 +1,13 @@
+from superqt.fonticon._plugins import loaded
 from superqt.qtcompat import QtCore, QtGui, QtWidgets
 from superqt.qtcompat.QtCore import Qt
 
+P = loaded(load_all=True)
+if not P:
+    print("you have no font packs loaded!")
 
-class ImageDelegate(QtWidgets.QItemDelegate):
+
+class GlyphDelegate(QtWidgets.QItemDelegate):
     def createEditor(self, parent, option, index):
         if index.column() < 2:
             edit = QtWidgets.QLineEdit(parent)
@@ -73,7 +78,6 @@ class IconPreviewArea(QtWidgets.QWidget):
                 mainLayout.addWidget(self.pixmapLabels[i][j], j + 1, i + 1)
 
     def setIcon(self, icon):
-        print("set icon")
         self.icon = icon
         self.updatePixmapLabels()
 
@@ -128,12 +132,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setCentralWidget(self.centralWidget)
 
         self.createPreviewGroupBox()
-        self.createImagesGroupBox()
+        self.createGlyphBox()
         self.createIconSizeGroupBox()
 
         mainLayout = QtWidgets.QGridLayout()
         mainLayout.addWidget(self.previewGroupBox, 0, 0, 1, 2)
-        mainLayout.addWidget(self.imagesGroupBox, 1, 0)
+        mainLayout.addWidget(self.glyphGroupBox, 1, 0)
         mainLayout.addWidget(self.iconSizeGroupBox, 1, 1)
         self.centralWidget.setLayout(mainLayout)
 
@@ -141,7 +145,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.otherRadioButton.click()
 
         self.resize(self.minimumSizeHint())
-        self.addImage()
 
     def changeSize(self):
         if self.otherRadioButton.isChecked():
@@ -169,11 +172,11 @@ class MainWindow(QtWidgets.QMainWindow):
         from superqt import fonticon
 
         icon = None
-        for row in range(self.imagesTable.rowCount()):
-            item0 = self.imagesTable.item(row, 0)
-            item1 = self.imagesTable.item(row, 1)
-            item2 = self.imagesTable.item(row, 2)
-            item3 = self.imagesTable.item(row, 3)
+        for row in range(self.glyphTable.rowCount()):
+            item0 = self.glyphTable.item(row, 0)
+            item1 = self.glyphTable.item(row, 1)
+            item2 = self.glyphTable.item(row, 2)
+            item3 = self.glyphTable.item(row, 3)
 
             if item0.checkState() != Qt.CheckState.Checked:
                 continue
@@ -205,28 +208,6 @@ class MainWindow(QtWidgets.QMainWindow):
         if icon:
             self.previewArea.setIcon(icon)
 
-    def addImage(self):
-        for _ in range(4):
-            row = self.imagesTable.rowCount()
-            self.imagesTable.setRowCount(row + 1)
-
-            item0 = QtWidgets.QTableWidgetItem()
-            item1 = QtWidgets.QTableWidgetItem()
-            # item0.setText('')
-            # item0.setFlags(item0.flags() & ~Qt.ItemFlag.ItemIsEditable)
-
-            item2 = QtWidgets.QTableWidgetItem("Normal")
-            item3 = QtWidgets.QTableWidgetItem("Off")
-
-            self.imagesTable.setItem(row, 0, item0)
-            self.imagesTable.setItem(row, 1, item1)
-            self.imagesTable.setItem(row, 2, item2)
-            self.imagesTable.setItem(row, 3, item3)
-            self.imagesTable.openPersistentEditor(item2)
-            self.imagesTable.openPersistentEditor(item3)
-
-            item0.setCheckState(Qt.CheckState.Checked)
-
     def createPreviewGroupBox(self):
         self.previewGroupBox = QtWidgets.QGroupBox("Preview")
 
@@ -236,36 +217,61 @@ class MainWindow(QtWidgets.QMainWindow):
         layout.addWidget(self.previewArea)
         self.previewGroupBox.setLayout(layout)
 
-    def createImagesGroupBox(self):
-        self.imagesGroupBox = QtWidgets.QGroupBox("Glpyhs")
+    def createGlyphBox(self):
+        self.glyphGroupBox = QtWidgets.QGroupBox("Glpyhs")
+        self.glyphGroupBox.setMinimumSize(480, 200)
+        self.glyphTable = QtWidgets.QTableWidget()
+        self.glyphTable.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
+        self.glyphTable.setItemDelegate(GlyphDelegate(self))
 
-        self.imagesTable = QtWidgets.QTableWidget()
-        self.imagesTable.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
-        self.imagesTable.setItemDelegate(ImageDelegate(self))
-
-        self.imagesTable.horizontalHeader().setDefaultSectionSize(100)
-        self.imagesTable.setColumnCount(4)
-        self.imagesTable.setHorizontalHeaderLabels(("Glyph", "Color", "Mode", "State"))
-        self.imagesTable.horizontalHeader().setSectionResizeMode(
+        self.glyphTable.horizontalHeader().setDefaultSectionSize(100)
+        self.glyphTable.setColumnCount(4)
+        self.glyphTable.setHorizontalHeaderLabels(("Glyph", "Color", "Mode", "State"))
+        self.glyphTable.horizontalHeader().setSectionResizeMode(
             0, QtWidgets.QHeaderView.Stretch
         )
-        self.imagesTable.horizontalHeader().setSectionResizeMode(
+        self.glyphTable.horizontalHeader().setSectionResizeMode(
             1, QtWidgets.QHeaderView.Fixed
         )
-        self.imagesTable.horizontalHeader().setSectionResizeMode(
+        self.glyphTable.horizontalHeader().setSectionResizeMode(
             2, QtWidgets.QHeaderView.Fixed
         )
-        self.imagesTable.horizontalHeader().setSectionResizeMode(
+        self.glyphTable.horizontalHeader().setSectionResizeMode(
             3, QtWidgets.QHeaderView.Fixed
         )
-        self.imagesTable.verticalHeader().hide()
+        self.glyphTable.verticalHeader().hide()
 
-        self.imagesTable.itemChanged.connect(self.changeIcon)
+        self.glyphTable.itemChanged.connect(self.changeIcon)
 
         layout = QtWidgets.QVBoxLayout()
-        layout.addWidget(self.imagesTable)
-        self.imagesGroupBox.setLayout(layout)
+        layout.addWidget(self.glyphTable)
+        self.glyphGroupBox.setLayout(layout)
         self.changeIcon()
+
+        p0 = list(P)[-1]
+        key = f"{p0}.{list(P[p0])[1]}"
+        for _ in range(4):
+            row = self.glyphTable.rowCount()
+            self.glyphTable.setRowCount(row + 1)
+
+            item0 = QtWidgets.QTableWidgetItem()
+            item1 = QtWidgets.QTableWidgetItem()
+
+            if _ == 0:
+                item0.setText(key)
+            # item0.setFlags(item0.flags() & ~Qt.ItemFlag.ItemIsEditable)
+
+            item2 = QtWidgets.QTableWidgetItem("Normal")
+            item3 = QtWidgets.QTableWidgetItem("Off")
+
+            self.glyphTable.setItem(row, 0, item0)
+            self.glyphTable.setItem(row, 1, item1)
+            self.glyphTable.setItem(row, 2, item2)
+            self.glyphTable.setItem(row, 3, item3)
+            self.glyphTable.openPersistentEditor(item2)
+            self.glyphTable.openPersistentEditor(item3)
+
+            item0.setCheckState(Qt.CheckState.Checked)
 
     def createIconSizeGroupBox(self):
         self.iconSizeGroupBox = QtWidgets.QGroupBox("Icon Size")

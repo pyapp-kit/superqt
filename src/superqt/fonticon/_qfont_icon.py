@@ -235,10 +235,9 @@ class _QFontIconEngine(QIconEngine):
     def pixmap(self, size: QSize, mode: QIcon.Mode, state: QIcon.State) -> QPixmap:
         # first look in cache
         pmckey = self._pmcKey(size, mode, state)
-        # pm = QPixmapCache.find(pmckey)
-        # if pm:
-        #     print("cache hit", pmckey, mode, state)
-        #     return pm
+        pm = QPixmapCache.find(pmckey)
+        if pm:
+            return pm
         pixmap = QPixmap(size)
         if not size.isValid():
             return pixmap

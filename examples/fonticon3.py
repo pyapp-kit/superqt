@@ -6,15 +6,35 @@ except ImportError as e:
         "pip install git+https://github.com/tlambert03/fonticon-fontawesome5.git"
     )
 
-from superqt.fonticon import setTextIcon
+from superqt.fonticon import IconOpts, icon, pulse, spin
+from superqt.qtcompat.QtCore import QSize
 from superqt.qtcompat.QtWidgets import QApplication, QPushButton
 
 app = QApplication([])
 
+btn = QPushButton()
+btn.setIcon(
+    icon(
+        FA5S.smile,
+        color="blue",
+        states={
+            "active": IconOpts(
+                glyph_key=FA5S.spinner,
+                color="red",
+                scale_factor=0.5,
+                animation=pulse(btn),
+            ),
+            "disabled": {"color": "green", "scale_factor": 0.8, "animation": spin(btn)},
+        },
+    )
+)
+btn.setIconSize(QSize(256, 256))
+btn.show()
 
-btn4 = QPushButton()
-btn4.resize(275, 275)
-setTextIcon(btn4, FA5S.hamburger)
-btn4.show()
+
+@btn.clicked.connect
+def toggle_state():
+    btn.setChecked(not btn.isChecked())
+
 
 app.exec()
