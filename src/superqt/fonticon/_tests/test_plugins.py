@@ -46,7 +46,6 @@ def plugin_store(qapp, monkeypatch):
     store.clear()
 
 
-@pytest.mark.filterwarnings("ignore:SelectableGroups dict:DeprecationWarning")
 def test_plugin(plugin_store):
     assert not _plugins.loaded()
     icn = icon("ico.smiley")
