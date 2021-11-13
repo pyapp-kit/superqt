@@ -100,6 +100,7 @@ def test_multistate(full_store, qtbot):
     btn.setIcon(icn)
     btn.show()
 
+    btn.setEnabled(False)
     active = icn._engine._opts[QIcon.State.Off][QIcon.Mode.Active].animation.timer
     disabled = icn._engine._opts[QIcon.State.Off][QIcon.Mode.Disabled].animation.timer
 
