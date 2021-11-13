@@ -39,6 +39,6 @@ def plugin_store(qapp, monkeypatch):
 def test_plugin(plugin_store):
     assert not _plugins.loaded()
     icn = icon("ico.smiley")
-    assert _plugins.loaded() == ("ico",)
+    assert _plugins.loaded() == {"ico": ["smiley"]}
     assert isinstance(icn, QIcon)
     assert isinstance(icn.pixmap(40, 40), QPixmap)
