@@ -219,7 +219,10 @@ class _QFontIconEngine(QIconEngine):
             font.setStyleName(style)
 
         # color
-        color_args = opts.color if isinstance(opts.color, tuple) else (opts.color,)
+        if isinstance(opts.color, tuple):
+            color_args = opts.color
+        else:
+            color_args = (opts.color,) if opts.color else ()  # type: ignore
 
         # animation
         if opts.animation is not None:
@@ -267,6 +270,11 @@ class _QFontIconEngine(QIconEngine):
         return pixmap
 
     def _pmcKey(self, size: QSize, mode: QIcon.Mode, state: QIcon.State) -> str:
+        # Qt6-style enums
+        if hasattr(mode, "value"):
+            mode = mode.value
+        if hasattr(state, "value"):
+            state = state.value
         k = ((((((size.width()) << 11) | size.height()) << 11) | mode) << 4) | state
         return f"$superqt_{self._opt_hash}_{hex(k)}"
 
@@ -276,7 +284,9 @@ class _QFontIconEngine(QIconEngine):
             for mode, opts in d.items():
                 if not opts:
                     continue
-                hsh += hash(hash(opts.glyph_key) + hash(opts.color) + state + mode)
+                hsh += hash(
+                    hash(opts.glyph_key) + hash(opts.color) + hash(state) + hash(mode)
+                )
         self._opt_hash = hex(hsh)
 
 
@@ -356,7 +366,7 @@ class QFontIconStore(QObject):
                 if not result:  # pragma: no cover
                     raise Exception("Invalid font file")
                 cls._LOADED_KEYS[key] = result
-            except Exception as e:
+            except ValueError as e:
                 raise ValueError(
                     f"Unrecognized font key: {key!r}.\n"
                     f"Known plugin keys include: {_plugins.available()}.\n"
@@ -422,10 +432,14 @@ class QFontIconStore(QObject):
             font-family and font-style for the file just registered, or None if
             something goes wrong.
         """
-        assert prefix not in cls._LOADED_KEYS, f"Prefix {prefix} already loaded"
-        assert Path(filepath).exists(), f"Font file doesn't exist: {filepath}"
-        assert QApplication.instance() is not None, "Please create QApplication first."
-        # TODO: remember filepath?
+        if prefix in cls._LOADED_KEYS:
+            warnings.warn(f"Prefix {prefix} already loaded")
+            return
+
+        if not Path(filepath).exists():
+            raise FileNotFoundError(f"Font file doesn't exist: {filepath}")
+        if QApplication.instance() is None:
+            raise RuntimeError("Please create QApplication before adding a Font")
 
         fontId = QFontDatabase.addApplicationFont(str(Path(filepath).absolute()))
         if fontId < 0:  # pragma: no cover
