@@ -1,5 +1,4 @@
 import sys
-from collections import namedtuple
 from pathlib import Path
 
 import pytest
@@ -7,6 +6,11 @@ import pytest
 from superqt.fonticon import _plugins, icon
 from superqt.fonticon._qfont_icon import QFontIconStore
 from superqt.qtcompat.QtGui import QIcon, QPixmap
+
+try:
+    from importlib.metadata import Distribution
+except ImportError:
+    from importlib_metadata import Distribution  # type: ignore
 
 
 class ICO:
@@ -26,8 +30,14 @@ def plugin_store(qapp, monkeypatch):
 
     class MockFinder:
         def find_distributions(self, *a):
-            Distrbution = namedtuple("Distrbution", ("entry_points",))
-            return [Distrbution([MockEntryPoint()])]
+            class D(Distribution):
+                name = "mock"
+
+                @property
+                def entry_points(self):
+                    return [MockEntryPoint()]
+
+            return [D()]
 
     store = QFontIconStore().instance()
     with monkeypatch.context() as m:
@@ -36,6 +46,7 @@ def plugin_store(qapp, monkeypatch):
     store.clear()
 
 
+@pytest.mark.filterwarnings("ignore:SelectableGroups dict:DeprecationWarning")
 def test_plugin(plugin_store):
     assert not _plugins.loaded()
     icn = icon("ico.smiley")
