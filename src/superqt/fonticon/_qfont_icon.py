@@ -8,9 +8,9 @@ from typing import DefaultDict, Dict, Optional, Sequence, Tuple, Type, Union, ca
 
 from typing_extensions import TypedDict
 
-from superqt.qtcompat import QT_VERSION
-from superqt.qtcompat.QtCore import QObject, QPoint, QRect, QSize, Qt
-from superqt.qtcompat.QtGui import (
+from ..qtcompat import QT_VERSION
+from ..qtcompat.QtCore import QObject, QPoint, QRect, QSize, Qt
+from ..qtcompat.QtGui import (
     QColor,
     QFont,
     QFontDatabase,
@@ -22,8 +22,8 @@ from superqt.qtcompat.QtGui import (
     QPixmapCache,
     QTransform,
 )
-from superqt.qtcompat.QtWidgets import QApplication, QStyleOption, QWidget
-
+from ..qtcompat.QtWidgets import QApplication, QStyleOption, QWidget
+from ..utils import QMessageHandler
 from ._animations import Animation
 
 
@@ -236,13 +236,14 @@ class _QFontIconEngine(QIconEngine):
         painter.setPen(QColor(*color_args))
         painter.setOpacity(opts.opacity)
         painter.setFont(font)
-        painter.drawText(rect, Qt.AlignmentFlag.AlignCenter, char)
+        with QMessageHandler():  # avoid "Populating font family aliases" warning
+            painter.drawText(rect, Qt.AlignmentFlag.AlignCenter, char)
         painter.restore()
 
     def pixmap(self, size: QSize, mode: QIcon.Mode, state: QIcon.State) -> QPixmap:
         # first look in cache
         pmckey = self._pmcKey(size, mode, state)
-        pm = QPixmapCache.find(pmckey)
+        pm = QPixmapCache.find(pmckey) if pmckey else None
         if pm:
             return pm
         pixmap = QPixmap(size)
@@ -264,13 +265,15 @@ class _QFontIconEngine(QIconEngine):
                 if not generated.isNull():
                     pixmap = generated
 
-        if not pixmap.isNull():
+        if pmckey and not pixmap.isNull():
             QPixmapCache.insert(pmckey, pixmap)
 
         return pixmap
 
     def _pmcKey(self, size: QSize, mode: QIcon.Mode, state: QIcon.State) -> str:
         # Qt6-style enums
+        if self._get_opts(state, mode).animation:
+            return ""
         if hasattr(mode, "value"):
             mode = mode.value
         if hasattr(state, "value"):

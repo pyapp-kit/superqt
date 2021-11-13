@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
 
-from superqt.qtcompat.QtCore import QObject, QRectF, QTimer
+from superqt.qtcompat.QtCore import QRectF, QTimer
 from superqt.qtcompat.QtGui import QPainter
+from superqt.qtcompat.QtWidgets import QWidget
 
 
 class Animation(ABC):
-    def __init__(self, parent_widget: QObject, interval: int = 10, step: int = 1):
+    def __init__(self, parent_widget: QWidget, interval: int = 10, step: int = 1):
         self.parent_widget = parent_widget
         self.timer = QTimer()
         self.timer.timeout.connect(self._update)  # type: ignore
@@ -27,6 +28,7 @@ class spin(Animation):
     def animate(self, painter: QPainter):
         if not self.timer.isActive():
             self.timer.start()
+
         mid = QRectF(painter.viewport()).center()
         painter.translate(mid)
         painter.rotate(self._angle % 360)
@@ -34,5 +36,5 @@ class spin(Animation):
 
 
 class pulse(spin):
-    def __init__(self, parent_widget: QObject = None):
+    def __init__(self, parent_widget: QWidget = None):
         super().__init__(parent_widget, interval=200, step=45)
