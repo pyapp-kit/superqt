@@ -30,6 +30,11 @@ if TYPE_CHECKING:
 ENTRY_POINT = _FIM.ENTRY_POINT
 
 
+# FIXME: currently, an Animation requires a *pre-bound* QObject.  which makes it very
+# awkward to use animations when declaratively listing icons.  It would be much better
+# to have a way to find the widget later, to execute the animation... short of that, I
+# think we should take animation off of `icon` here, and suggest that it be an
+# an additional convenience method after the icon has been bound to a QObject.
 def icon(
     glyph_key: str,
     scale_factor: float = DEFAULT_SCALING_FACTOR,
