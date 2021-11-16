@@ -13,7 +13,7 @@ class QCollapsible(QFrame):
     """
 
     _EXPANDED = "▼  "
-    _COLLAPSED = "▶  "
+    _COLLAPSED = "▲  "
 
     def __init__(
         self, title: str = "", parent: Optional[QWidget] = None, flags=Qt.WindowFlags()
@@ -23,7 +23,7 @@ class QCollapsible(QFrame):
 
         self._toggle_btn = QPushButton(self._EXPANDED + title)
         self._toggle_btn.setCheckable(True)
-        self._toggle_btn.setChecked(True)
+        self._toggle_btn.setChecked(False)
         self._toggle_btn.setStyleSheet("text-align: left; background: transparent;")
         self._toggle_btn.clicked.connect(self._toggle)
 
@@ -42,6 +42,7 @@ class QCollapsible(QFrame):
         # default content widget
         _content = QWidget()
         _content.setLayout(QVBoxLayout())
+        _content.setMaximumHeight(0)
         self.setContent(_content)
 
     def setText(self, text: str):
@@ -74,6 +75,23 @@ class QCollapsible(QFrame):
     def collapse(self):
         self._animate(QAbstractAnimation.Direction.Backward)
 
+    def quickExpand(self):
+        self._toggle_btn.setChecked(True)
+        self._toggle_btn.setText(
+            self._EXPANDED + self._toggle_btn.text()[len(self._COLLAPSED) :]
+        )
+        self._content.setMaximumHeight(self._content.sizeHint().height() + 10)
+
+    def quickCollapse(self):
+        self._toggle_btn.setChecked(False)
+        self._toggle_btn.setText(
+            self._COLLAPSED + self._toggle_btn.text()[len(self._EXPANDED) :]
+        )
+        self._content.setMaximumHeight(0)
+
+    def expanded(self):
+        return self._toggle_btn.isChecked()
+
     def _animate(self, direction: QAbstractAnimation.Direction):
         if self._locked:
             return
@@ -86,6 +104,8 @@ class QCollapsible(QFrame):
         self._animation.start()
 
     def _toggle(self):
+        if self._locked is True:
+            self._toggle_btn.setChecked(not self._toggle_btn.isChecked)
         self.expand() if self._toggle_btn.isChecked() else self.collapse()
 
     def setLocked(self, locked: bool = True):

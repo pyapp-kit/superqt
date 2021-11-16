@@ -2,76 +2,65 @@
 
 from superqt import QCollapsible
 from superqt.qtcompat.QtCore import QEasingCurve
-from superqt.qtcompat.QtWidgets import QPushButton, QVBoxLayout, QWidget
+from superqt.qtcompat.QtWidgets import QPushButton
 
 
 def test_checked_initialization(qtbot):
     """Test simple collapsible"""
-    wdg1 = QCollapsible(initial_is_checked=True)
-    assert wdg1.isChecked() is True
+    wdg1 = QCollapsible("Advanced analysis")
+    wdg1.quickExpand()
+    assert wdg1.expanded() is True
+    assert wdg1._content.maximumHeight() > 0
 
-    wdg2 = QCollapsible(initial_is_checked=False)
-    assert wdg2.isChecked() is False
+    wdg2 = QCollapsible("Advanced analysis")
+    wdg1.quickCollapse
+    assert wdg2.expanded() is False
+    assert wdg2._content.maximumHeight() == 0
 
 
 def test_content_hide_show(qtbot):
     """Test collapsible with content"""
 
     # Create child component
-    inner_layout = QVBoxLayout()
-    inner_widget = QWidget()
+    collapsible = QCollapsible("Advanced analysis")
     for i in range(10):
-        conetent_button = QPushButton(text="Content button " + str(i + 1))
-        inner_layout.addWidget(conetent_button)
-    inner_widget.setLayout(inner_layout)
+        collapsible.addWidget(QPushButton(f"Content button {i + 1}"))
 
-    # Create collapsible
-    collapsible = QCollapsible(
-        text="Advanced analysis",
-        content=inner_widget,
-        duration=0,
-        initial_is_checked=True,
-    )
+    collapsible.quickCollapse()
+    assert collapsible.expanded() is False
+    assert collapsible._content.maximumHeight() == 0
 
-    collapsible._hideContent()
-    assert collapsible.content.maximumHeight() == 0
-    collapsible._showContent()
-    assert collapsible.content.maximumHeight() >= 600
-
-    collapsible.setChecked(False)
-    collapsible._toggleHidden()
-    assert collapsible.isChecked() is False
-    assert collapsible.content.maximumHeight() == 0
-
-    collapsible.setChecked(True)
-    collapsible._toggleHidden()
-    assert collapsible.isChecked() is True
-    assert collapsible.content.maximumHeight() > 600
+    collapsible.quickExpand()
+    assert collapsible.expanded() is True
+    assert collapsible._content.maximumHeight() > 600
 
 
 def test_locking(qtbot):
     """Test locking collapsible"""
-    wdg1 = QCollapsible(initial_is_checked=True, lock_to=False)
-    assert wdg1.isChecked() is False
+    wdg1 = QCollapsible()
+    assert wdg1.locked() is False
+    wdg1.setLocked(True)
+    assert wdg1.locked() is True
 
-    wdg2 = QCollapsible(initial_is_checked=False, lock_to=False)
-    assert wdg2.isChecked() is False
+    # Simulate button press
+    wdg1._toggle_btn.setChecked(True)
+    wdg1._toggle()
+
+    assert wdg1.expanded() is False
 
 
 def test_changing_animation_settings(qtbot):
     """Quick test for changing animation settings"""
-    wdg = QCollapsible(duration=300)
-    wdg.setAnimatationsSettings(duration=600, easing_curve=QEasingCurve.InElastic)
-    assert wdg.hide_show_animation.easingCurve() == QEasingCurve.InElastic
-    assert wdg.hide_show_animation.duration() == 600
-    assert wdg.rotate_animation.easingCurve() == QEasingCurve.InElastic
-    assert wdg.rotate_animation.duration() == 600
+    wdg = QCollapsible()
+    wdg.setDuration(600)
+    wdg.setEasingCurve(QEasingCurve.InElastic)
+    assert wdg._animation.easingCurve() == QEasingCurve.InElastic
+    assert wdg._animation.duration() == 600
 
 
 def test_changing_content(qtbot):
     """Test changing the content"""
     content = QPushButton()
     wdg = QCollapsible()
-    assert wdg.content is None
     wdg.setContent(content)
-    assert wdg.content is not None
+    assert wdg._content == content
