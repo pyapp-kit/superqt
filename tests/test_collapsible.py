@@ -32,7 +32,7 @@ def test_content_hide_show(qtbot):
 
     collapsible.quickExpand()
     assert collapsible.expanded() is True
-    assert collapsible._content.maximumHeight() > 600
+    assert collapsible._content.maximumHeight() > 0
 
 
 def test_locking(qtbot):
