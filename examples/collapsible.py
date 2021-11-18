@@ -8,6 +8,6 @@ collapsible = QCollapsible("Advanced analysis")
 for i in range(10):
     collapsible.addWidget(QPushButton(f"Content button {i + 1}"))
 
-collapsible.quickExpand()
+collapsible.expand(animate=False)
 collapsible.show()
 app.exec_()

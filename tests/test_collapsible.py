@@ -8,12 +8,12 @@ from superqt.qtcompat.QtWidgets import QPushButton
 def test_checked_initialization(qtbot):
     """Test simple collapsible"""
     wdg1 = QCollapsible("Advanced analysis")
-    wdg1.quickExpand()
+    wdg1.expand(False)
     assert wdg1.expanded() is True
     assert wdg1._content.maximumHeight() > 0
 
     wdg2 = QCollapsible("Advanced analysis")
-    wdg1.quickCollapse
+    wdg1.collapse(False)
     assert wdg2.expanded() is False
     assert wdg2._content.maximumHeight() == 0
 
@@ -26,11 +26,11 @@ def test_content_hide_show(qtbot):
     for i in range(10):
         collapsible.addWidget(QPushButton(f"Content button {i + 1}"))
 
-    collapsible.quickCollapse()
+    collapsible.collapse(False)
     assert collapsible.expanded() is False
     assert collapsible._content.maximumHeight() == 0
 
-    collapsible.quickExpand()
+    collapsible.expand(False)
     assert collapsible.expanded() is True
     assert collapsible._content.maximumHeight() > 0
 

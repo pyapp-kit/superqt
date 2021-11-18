@@ -69,36 +69,35 @@ class QCollapsible(QFrame):
     def removeWidget(self, widget: QWidget):
         self._content.layout().removeWidget(widget)
 
-    def expand(self):
-        self._animate(QAbstractAnimation.Direction.Forward)
+    def expand(self, animate: bool = True):
+        if self._locked:
+            return
 
-    def collapse(self):
-        self._animate(QAbstractAnimation.Direction.Backward)
-
-    def quickExpand(self):
         self._toggle_btn.setChecked(True)
         self._toggle_btn.setText(
             self._EXPANDED + self._toggle_btn.text()[len(self._COLLAPSED) :]
         )
-        self._content.setMaximumHeight(self._content.sizeHint().height() + 10)
+        if animate:
+            self._animate(QAbstractAnimation.Direction.Forward)
+        else:
+            self._content.setMaximumHeight(self._content.sizeHint().height() + 10)
 
-    def quickCollapse(self):
+    def collapse(self, animate: bool = True):
+        if self._locked:
+            return
         self._toggle_btn.setChecked(False)
         self._toggle_btn.setText(
             self._COLLAPSED + self._toggle_btn.text()[len(self._EXPANDED) :]
         )
-        self._content.setMaximumHeight(0)
+        if animate:
+            self._animate(QAbstractAnimation.Direction.Backward)
+        else:
+            self._content.setMaximumHeight(0)
 
     def expanded(self):
         return self._toggle_btn.isChecked()
 
     def _animate(self, direction: QAbstractAnimation.Direction):
-        if self._locked:
-            return
-        forward = direction == QAbstractAnimation.Direction.Forward
-        self._toggle_btn.setChecked(forward)
-        text = self._EXPANDED if forward else self._COLLAPSED
-        self._toggle_btn.setText(text + self._toggle_btn.text()[len(self._EXPANDED) :])
         self._animation.setDirection(direction)
         self._animation.setEndValue(self._content.sizeHint().height() + 10)
         self._animation.start()
