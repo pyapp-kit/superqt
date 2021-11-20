@@ -15,10 +15,8 @@ class QCollapsible(QFrame):
     _EXPANDED = "▼  "
     _COLLAPSED = "▲  "
 
-    def __init__(
-        self, title: str = "", parent: Optional[QWidget] = None, flags=Qt.WindowFlags()
-    ):
-        super().__init__(parent, flags)
+    def __init__(self, title: str = "", parent: Optional[QWidget] = None):
+        super().__init__(parent)
         self._locked = False
 
         self._toggle_btn = QPushButton(self._COLLAPSED + title)
