@@ -27,7 +27,7 @@ class QCollapsible(QFrame):
 
         # frame layout
         self.setLayout(QVBoxLayout())
-        self.layout().setAlignment(Qt.AlignTop)
+        self.layout().setAlignment(Qt.AlignmentFlag.AlignTop)
         self.layout().addWidget(self._toggle_btn)
 
         # Create animators
