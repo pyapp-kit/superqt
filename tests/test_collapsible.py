@@ -53,8 +53,8 @@ def test_changing_animation_settings(qtbot):
     """Quick test for changing animation settings"""
     wdg = QCollapsible()
     wdg.setDuration(600)
-    wdg.setEasingCurve(QEasingCurve.InElastic)
-    assert wdg._animation.easingCurve() == QEasingCurve.InElastic
+    wdg.setEasingCurve(QEasingCurve.Type.InElastic)
+    assert wdg._animation.easingCurve() == QEasingCurve.Type.InElastic
     assert wdg._animation.duration() == 600
 
 
