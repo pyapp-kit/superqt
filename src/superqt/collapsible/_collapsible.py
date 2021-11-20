@@ -21,7 +21,7 @@ class QCollapsible(QFrame):
         super().__init__(parent, flags)
         self._locked = False
 
-        self._toggle_btn = QPushButton(self._EXPANDED + title)
+        self._toggle_btn = QPushButton(self._COLLAPSED + title)
         self._toggle_btn.setCheckable(True)
         self._toggle_btn.setChecked(False)
         self._toggle_btn.setStyleSheet("text-align: left; background: transparent;")
