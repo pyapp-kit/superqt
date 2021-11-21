@@ -1,8 +1,14 @@
 """A collapsible widget to hide and unhide child widgets"""
 from typing import Optional
 
-from ..qtcompat.QtCore import QAbstractAnimation, QEasingCurve, QPropertyAnimation, Qt, QMargins
-from ..qtcompat.QtWidgets import QFrame, QPushButton, QVBoxLayout, QWidget
+from qtpy.QtCore import (
+    QAbstractAnimation,
+    QEasingCurve,
+    QMargins,
+    QPropertyAnimation,
+    Qt,
+)
+from qtpy.QtWidgets import QFrame, QPushButton, QVBoxLayout, QWidget
 
 
 class QCollapsible(QFrame):
@@ -41,7 +47,7 @@ class QCollapsible(QFrame):
         _content = QWidget()
         _content.setLayout(QVBoxLayout())
         _content.setMaximumHeight(0)
-        _content.layout().setContentsMargins(QMargins(5,0,0,0))
+        _content.layout().setContentsMargins(QMargins(5, 0, 0, 0))
         self.setContent(_content)
 
     def setText(self, text: str):
@@ -77,7 +83,9 @@ class QCollapsible(QFrame):
     def expanded(self):
         return self._toggle_btn.isChecked()
 
-    def _expand_collapse(self,  direction: QAbstractAnimation.Direction, animate:bool = True):
+    def _expand_collapse(
+        self, direction: QAbstractAnimation.Direction, animate: bool = True
+    ):
         if self._locked is True:
             return
 
@@ -92,7 +100,7 @@ class QCollapsible(QFrame):
             self._animation.setEndValue(self._content.sizeHint().height() + 10)
             self._animation.start()
         else:
-            height  = 0 if forward==False else (self._content.sizeHint().height() + 10)
+            height = 0 if not forward else self._content.sizeHint().height() + 10
             self._content.setMaximumHeight(height)
 
     def _toggle(self):
