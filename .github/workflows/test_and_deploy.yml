@@ -81,6 +81,17 @@ jobs:
             platform: ubuntu-latest
             backend: pyqt514
 
+          # py3.10
+          - python-version: "3.10"
+            platform: ubuntu-latest
+            backend: pyside6
+          - python-version: "3.10"
+            platform: ubuntu-latest
+            backend: pyqt5
+          - python-version: "3.10"
+            platform: ubuntu-latest
+            backend: pyqt6
+
     steps:
       - uses: actions/checkout@v2
 
