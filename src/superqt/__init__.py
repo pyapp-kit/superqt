@@ -6,6 +6,7 @@ except ImportError:
 
 
 from ._eliding_label import QElidingLabel
+from .collapsible import QCollapsible
 from .combobox import QEnumComboBox
 from .sliders import (
     QDoubleRangeSlider,
@@ -33,4 +34,5 @@ __all__ = [
     "QMessageHandler",
     "QRangeSlider",
     "QEnumComboBox",
+    "QCollapsible",
 ]
