@@ -1,7 +1,8 @@
 """Example for QCollapsible"""
 from PySide2.QtWidgets import QLabel
+from qtpy.QtWidgets import QApplication, QLabel, QPushButton
+
 from superqt import QCollapsible
-from superqt.qtcompat.QtWidgets import QApplication, QPushButton, QLabel
 
 app = QApplication([])
 

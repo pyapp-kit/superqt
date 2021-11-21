@@ -6,8 +6,9 @@ except ImportError as e:
         "pip install git+https://github.com/tlambert03/fonticon-fontawesome5.git"
     )
 
+from qtpy.QtWidgets import QApplication, QPushButton
+
 from superqt.fonticon import setTextIcon
-from superqt.qtcompat.QtWidgets import QApplication, QPushButton
 
 app = QApplication([])
 

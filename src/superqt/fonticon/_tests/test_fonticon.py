@@ -1,11 +1,11 @@
 from pathlib import Path
 
 import pytest
+from qtpy.QtGui import QIcon, QPixmap
+from qtpy.QtWidgets import QPushButton
 
 from superqt.fonticon import icon, pulse, setTextIcon, spin
 from superqt.fonticon._qfont_icon import QFontIconStore, _ensure_identifier
-from superqt.qtcompat.QtGui import QIcon, QPixmap
-from superqt.qtcompat.QtWidgets import QPushButton
 
 TEST_PREFIX = "ico"
 TEST_CHARNAME = "smiley"

@@ -1,6 +1,7 @@
+from qtpy import QtCore, QtGui, QtWidgets
+from qtpy.QtCore import Qt
+
 from superqt.fonticon._plugins import loaded
-from superqt.qtcompat import QtCore, QtGui, QtWidgets
-from superqt.qtcompat.QtCore import Qt
 
 P = loaded(load_all=True)
 if not P:

@@ -2,10 +2,10 @@ import sys
 from pathlib import Path
 
 import pytest
+from qtpy.QtGui import QIcon, QPixmap
 
 from superqt.fonticon import _plugins, icon
 from superqt.fonticon._qfont_icon import QFontIconStore
-from superqt.qtcompat.QtGui import QIcon, QPixmap
 
 try:
     from importlib.metadata import Distribution
