@@ -27,7 +27,7 @@ class QCollapsible(QFrame):
         self._toggle_btn = QPushButton(self._COLLAPSED + title)
         self._toggle_btn.setCheckable(True)
         self._toggle_btn.setStyleSheet("text-align: left; background: transparent;")
-        self._toggle_btn.clicked.connect(self._toggle)
+        self._toggle_btn.toggled.connect(self._toggle)
 
         # frame layout
         self.setLayout(QVBoxLayout())
@@ -52,6 +52,10 @@ class QCollapsible(QFrame):
         """Set the text of the toggle button."""
         current = self._toggle_btn.text()[: len(self._EXPANDED)]
         self._toggle_btn.setText(current + text)
+
+    def text(self) -> str:
+        """Return the text of the toggle button."""
+        return self._toggle_btn.text()[len(self._EXPANDED) :]
 
     def setContent(self, content: QWidget):
         """Replace central widget (the widget that gets expanded/collapsed)."""
@@ -94,6 +98,7 @@ class QCollapsible(QFrame):
     def setLocked(self, locked: bool = True):
         """Set whether collapse/expand is disabled"""
         self._locked = locked
+        self._toggle_btn.setCheckable(not locked)
 
     def locked(self) -> bool:
         """Return True if collapse/expand is disabled"""
@@ -114,11 +119,10 @@ class QCollapsible(QFrame):
         _content_height = self._content.sizeHint().height() + 10
         if animate:
             self._animation.setDirection(direction)
-            self._animation.setEndValue()
+            self._animation.setEndValue(_content_height)
             self._animation.start()
         else:
-            height = _content_height if forward else 0
-            self._content.setMaximumHeight(height)
+            self._content.setMaximumHeight(_content_height if forward else 0)
 
     def _toggle(self):
         self.expand() if self.isExpanded() else self.collapse()
