@@ -19,6 +19,7 @@
 
 **Merged pull requests:**
 
+- reskip test\_object\_thread\_return on ci [\#43](https://github.com/napari/superqt/pull/43) ([tlambert03](https://github.com/tlambert03))
 - refactoring qtcompat [\#34](https://github.com/napari/superqt/pull/34) ([tlambert03](https://github.com/tlambert03))
 - update deploy [\#33](https://github.com/napari/superqt/pull/33) ([tlambert03](https://github.com/tlambert03))
 - move to src layout [\#32](https://github.com/napari/superqt/pull/32) ([tlambert03](https://github.com/tlambert03))
