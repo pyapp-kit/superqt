@@ -1,5 +1,28 @@
 # Changelog
 
+## [v0.2.5](https://github.com/napari/superqt/tree/v0.2.5) (2021-11-22)
+
+[Full Changelog](https://github.com/napari/superqt/compare/v0.2.4...v0.2.5)
+
+**Implemented enhancements:**
+
+- add support for python 3.10 [\#42](https://github.com/napari/superqt/pull/42) ([tlambert03](https://github.com/tlambert03))
+- QCollapsible for Collapsible Section Control [\#37](https://github.com/napari/superqt/pull/37) ([MosGeo](https://github.com/MosGeo))
+- Threadworker [\#31](https://github.com/napari/superqt/pull/31) ([tlambert03](https://github.com/tlambert03))
+- Add font icons [\#24](https://github.com/napari/superqt/pull/24) ([tlambert03](https://github.com/tlambert03))
+
+**Fixed bugs:**
+
+- Fix some small linting issues. [\#41](https://github.com/napari/superqt/pull/41) ([tlambert03](https://github.com/tlambert03))
+- Use functools.wraps insterad of \_\_wraped\_\_ and manual proxing \_\_name\_\_ [\#29](https://github.com/napari/superqt/pull/29) ([Czaki](https://github.com/Czaki))
+- Propagate function name in `ensure_main_thread` and `ensure_object_thread` [\#28](https://github.com/napari/superqt/pull/28) ([Czaki](https://github.com/Czaki))
+
+**Merged pull requests:**
+
+- refactoring qtcompat [\#34](https://github.com/napari/superqt/pull/34) ([tlambert03](https://github.com/tlambert03))
+- update deploy [\#33](https://github.com/napari/superqt/pull/33) ([tlambert03](https://github.com/tlambert03))
+- move to src layout [\#32](https://github.com/napari/superqt/pull/32) ([tlambert03](https://github.com/tlambert03))
+
 ## [v0.2.4](https://github.com/napari/superqt/tree/v0.2.4) (2021-09-13)
 
 [Full Changelog](https://github.com/napari/superqt/compare/v0.2.3...v0.2.4)
@@ -9,6 +32,10 @@
 - Add type stubs for ensure\_thread decorator [\#23](https://github.com/napari/superqt/pull/23) ([tlambert03](https://github.com/tlambert03))
 - Add `ensure_main_tread` and `ensure_object_thread` [\#22](https://github.com/napari/superqt/pull/22) ([Czaki](https://github.com/Czaki))
 - Add QMessageHandler context manager [\#21](https://github.com/napari/superqt/pull/21) ([tlambert03](https://github.com/tlambert03))
+
+**Merged pull requests:**
+
+- add changelog for 0.2.4 [\#25](https://github.com/napari/superqt/pull/25) ([tlambert03](https://github.com/tlambert03))
 
 ## [v0.2.3](https://github.com/napari/superqt/tree/v0.2.3) (2021-08-25)
 
@@ -33,12 +60,16 @@
 
 ## [v0.2.1](https://github.com/napari/superqt/tree/v0.2.1) (2021-07-10)
 
-[Full Changelog](https://github.com/napari/superqt/compare/v0.2.0...v0.2.1)
+[Full Changelog](https://github.com/napari/superqt/compare/v0.2.0rc1...v0.2.1)
 
 **Fixed bugs:**
 
 - Fix QLabeledRangeSlider API \(fix slider proxy\) [\#10](https://github.com/napari/superqt/pull/10) ([tlambert03](https://github.com/tlambert03))
 - Fix range slider with negative min range [\#9](https://github.com/napari/superqt/pull/9) ([tlambert03](https://github.com/tlambert03))
+
+## [v0.2.0rc1](https://github.com/napari/superqt/tree/v0.2.0rc1) (2021-06-26)
+
+[Full Changelog](https://github.com/napari/superqt/compare/v0.2.0...v0.2.0rc1)
 
 
 
