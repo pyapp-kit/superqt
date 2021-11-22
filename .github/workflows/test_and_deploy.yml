@@ -114,7 +114,7 @@ jobs:
 
       - name: Test with tox
         uses: GabrielBB/xvfb-action@v1
-        timeout-minutes: 2
+        timeout-minutes: 3
         with:
           run: tox
         env:
