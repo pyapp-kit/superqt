@@ -165,7 +165,7 @@ def test_names(qapp):
     assert ob.check_main_thread_return.__name__ == "check_main_thread_return"
 
 
-# @skip_on_ci
+@skip_on_ci
 def test_object_thread_return(qtbot):
     ob = SampleObject()
     thread = QThread()
@@ -177,7 +177,7 @@ def test_object_thread_return(qtbot):
         thread.quit()
 
 
-# @skip_on_ci
+@skip_on_ci
 def test_object_thread_return_timeout(qtbot):
     ob = SampleObject()
     thread = QThread()
