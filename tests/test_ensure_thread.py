@@ -126,7 +126,6 @@ def test_only_main_thread(qapp):
 
 
 def test_main_thread(qtbot):
-    print("test_main_thread start")
     ob = SampleObject()
     t = LocalThread(ob)
     with qtbot.waitSignal(t.finished):
@@ -134,7 +133,6 @@ def test_main_thread(qtbot):
 
     assert ob.main_thread_res == {"a": 5, "b": 8}
     assert ob.sample_main_thread_property == "text2"
-    print("test_main_thread done")
 
 
 def test_main_thread_return(qtbot):
