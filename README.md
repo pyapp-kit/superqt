@@ -6,7 +6,7 @@
 [![Python
 Version](https://img.shields.io/pypi/pyversions/superqt.svg?color=green)](https://python.org)
 [![Test](https://github.com/napari/superqt/actions/workflows/test_and_deploy.yml/badge.svg)](https://github.com/napari/superqt/actions/workflows/test_and_deploy.yml)
-[![codecov](https://codecov.io/gh/napari/superqt/branch/master/graph/badge.svg)](https://codecov.io/gh/napari/superqt)
+[![codecov](https://codecov.io/gh/napari/superqt/branch/main/graph/badge.svg?token=dcsjgl1sOi)](https://codecov.io/gh/napari/superqt)
 
 ###  "missing" widgets and components for PyQt/PySide
 
