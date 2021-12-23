@@ -157,6 +157,9 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
+    def setLabelVisible(self, value) -> None:
+        self._label.setVisible(value)
+
 
 class QLabeledDoubleSlider(QLabeledSlider):
     _slider_class = QDoubleSlider
@@ -387,6 +390,10 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
     def resizeEvent(self, a0) -> None:
         super().resizeEvent(a0)
         self._reposition_labels()
+
+    def setLabelsVisible(self, value) -> None:
+        for lbl in [*self._handle_labels, self._min_label, self._max_label]:
+            lbl.setVisible(value)
 
 
 class QLabeledDoubleRangeSlider(QLabeledRangeSlider):
