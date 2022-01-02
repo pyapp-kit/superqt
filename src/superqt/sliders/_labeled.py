@@ -128,11 +128,12 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         self._slider = self._slider_class()
         self._label = SliderLabel(self._slider, connect=self._slider.setValue)
 
-        self.setOrientation(orientation)
         self._rename_signals()
         self._slider.rangeChanged.connect(self.rangeChanged.emit)
         self._slider.valueChanged.connect(self.valueChanged.emit)
         self._slider.valueChanged.connect(self._label.setValue)
+
+        self.setOrientation(orientation)
 
     def _rename_signals(self):
         # for subclasses
