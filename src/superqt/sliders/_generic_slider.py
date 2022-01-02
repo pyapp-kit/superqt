@@ -23,7 +23,7 @@ QRangeSlider.
 from typing import Generic, TypeVar
 
 from ..qtcompat import QtGui
-from ..qtcompat.QtCore import QEvent, QPoint, QPointF, QRect, Qt, Signal
+from ..qtcompat.QtCore import QEvent, QPoint, QPointF, QRect, Qt, Signal, SignalInstance
 from ..qtcompat.QtWidgets import (
     QApplication,
     QSlider,
@@ -44,9 +44,9 @@ QOVERFLOW = 2 ** 31 - 1
 
 
 class _GenericSlider(QSlider, Generic[_T]):
-    valueChanged = Signal(float)
-    sliderMoved = Signal(float)
-    rangeChanged = Signal(float, float)
+    _fvalueChanged = Signal(float)
+    _fsliderMoved = Signal(float)
+    _frangeChanged = Signal(float, float)
 
     MAX_DISPLAY = 5000
 
@@ -74,6 +74,10 @@ class _GenericSlider(QSlider, Generic[_T]):
         self._control_fraction = 0.04
 
         super().__init__(*args, **kwargs)
+        self.valueChanged: SignalInstance = self._fvalueChanged
+        self.sliderMoved: SignalInstance = self._fsliderMoved
+        self.rangeChanged: SignalInstance = self._frangeChanged
+
         self.setAttribute(Qt.WidgetAttribute.WA_Hover)
 
     # ###############  QtOverrides  #######################

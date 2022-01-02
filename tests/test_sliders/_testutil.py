@@ -1,5 +1,4 @@
 from contextlib import suppress
-from distutils.version import LooseVersion
 from platform import system
 
 import pytest
@@ -8,12 +7,12 @@ from superqt.qtcompat import QT_VERSION
 from superqt.qtcompat.QtCore import QEvent, QPoint, QPointF, Qt
 from superqt.qtcompat.QtGui import QMouseEvent, QWheelEvent
 
-QT_VERSION = LooseVersion(QT_VERSION)
+QT_VERSION = tuple(int(x) for x in QT_VERSION.split("."))
 
 SYS_DARWIN = system() == "Darwin"
 
 skip_on_linux_qt6 = pytest.mark.skipif(
-    system() == "Linux" and QT_VERSION >= LooseVersion("6.0"),
+    system() == "Linux" and QT_VERSION >= (6, 0),
     reason="hover events not working on linux pyqt6",
 )
 

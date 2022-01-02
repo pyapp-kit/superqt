@@ -128,11 +128,13 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         self._slider = self._slider_class()
         self._label = SliderLabel(self._slider, connect=self._slider.setValue)
 
+        self.setOrientation(orientation)
+        self._connect_signals()
+
+    def _connect_signals(self):
         self._slider.rangeChanged.connect(self.rangeChanged.emit)
         self._slider.valueChanged.connect(self.valueChanged.emit)
         self._slider.valueChanged.connect(self._label.setValue)
-
-        self.setOrientation(orientation)
 
     def setOrientation(self, orientation):
         """Set orientation, value will be 'horizontal' or 'vertical'."""
@@ -161,12 +163,19 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
 class QLabeledDoubleSlider(QLabeledSlider):
     _slider_class = QDoubleSlider
     _slider: QDoubleSlider
-    valueChanged = Signal(float)
-    rangeChanged = Signal(float, float)
+    _fvalueChanged = Signal(float)
+    _fsliderMoved = Signal(float)
+    _frangeChanged = Signal(float, float)
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.setDecimals(2)
+
+    def _connect_signals(self):
+        self.valueChanged = self._fvalueChanged
+        self.sliderMoved = self._fsliderMoved
+        self.rangeChanged = self._frangeChanged
+        super()._connect_signals()
 
     def decimals(self) -> int:
         return self._label.decimals()
@@ -176,7 +185,7 @@ class QLabeledDoubleSlider(QLabeledSlider):
 
 
 class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
-    valueChanged = Signal(tuple)
+    _valueChanged = Signal(tuple)
     LabelPosition = LabelPosition
     EdgeLabelMode = EdgeLabelMode
     _slider_class = QRangeSlider
@@ -185,6 +194,8 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
     def __init__(self, *args, **kwargs) -> None:
         parent, orientation = _handle_overloaded_slider_sig(args, kwargs)
         super().__init__(parent)
+        self._rename_signals()
+
         self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating)
         self._handle_labels = []
         self._handle_label_position: LabelPosition = LabelPosition.LabelsAbove
@@ -215,6 +226,9 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
         self._on_value_changed(self._slider.value())
         self._on_range_changed(self._slider.minimum(), self._slider.maximum())
         self.setOrientation(orientation)
+
+    def _rename_signals(self):
+        self.valueChanged = self._valueChanged
 
     def handleLabelPosition(self) -> LabelPosition:
         return self._handle_label_position
@@ -392,11 +406,15 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
 class QLabeledDoubleRangeSlider(QLabeledRangeSlider):
     _slider_class = QDoubleRangeSlider
     _slider: QDoubleRangeSlider
-    rangeChanged = Signal(float, float)
+    _frangeChanged = Signal(float, float)
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.setDecimals(2)
+
+    def _rename_signals(self):
+        super()._rename_signals()
+        self.rangeChanged = self._frangeChanged
 
     def decimals(self) -> int:
         return self._min_label.decimals()
