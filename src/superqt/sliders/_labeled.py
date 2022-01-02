@@ -129,12 +129,14 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         self._label = SliderLabel(self._slider, connect=self._slider.setValue)
 
         self.setOrientation(orientation)
-        self._connect_signals()
-
-    def _connect_signals(self):
+        self._rename_signals()
         self._slider.rangeChanged.connect(self.rangeChanged.emit)
         self._slider.valueChanged.connect(self.valueChanged.emit)
         self._slider.valueChanged.connect(self._label.setValue)
+
+    def _rename_signals(self):
+        # for subclasses
+        pass
 
     def setOrientation(self, orientation):
         """Set orientation, value will be 'horizontal' or 'vertical'."""
@@ -171,11 +173,10 @@ class QLabeledDoubleSlider(QLabeledSlider):
         super().__init__(*args, **kwargs)
         self.setDecimals(2)
 
-    def _connect_signals(self):
+    def _rename_signals(self):
         self.valueChanged = self._fvalueChanged
         self.sliderMoved = self._fsliderMoved
         self.rangeChanged = self._frangeChanged
-        super()._connect_signals()
 
     def decimals(self) -> int:
         return self._label.decimals()
