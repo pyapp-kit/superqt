@@ -24,16 +24,17 @@ class _GenericRangeSlider(_GenericSlider[Tuple], Generic[_T]):
     """
 
     # Emitted when the slider value has changed, with the new slider values
-    valueChanged = Signal(tuple)
+    _valuesChanged = Signal(tuple)
 
     # Emitted when sliderDown is true and the slider moves
     # This usually happens when the user is dragging the slider
     # The value is the positions of *all* handles.
-    sliderMoved = Signal(tuple)
+    _slidersMoved = Signal(tuple)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
+        self.valueChanged = self._valuesChanged
+        self.sliderMoved = self._slidersMoved
         # list of values
         self._value: List[_T] = [20, 80]
 
