@@ -130,7 +130,11 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         self._label = SliderLabel(self._slider, connect=self._slider.setValue)
 
         self._rename_signals()
+        self._slider.actionTriggered.connect(self.actionTriggered.emit)
         self._slider.rangeChanged.connect(self.rangeChanged.emit)
+        self._slider.sliderMoved.connect(self.sliderMoved.emit)
+        self._slider.sliderPressed.connect(self.sliderPressed.emit)
+        self._slider.sliderReleased.connect(self.sliderReleased.emit)
         self._slider.valueChanged.connect(self.valueChanged.emit)
         self._slider.valueChanged.connect(self._label.setValue)
 
