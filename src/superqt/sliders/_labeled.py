@@ -2,9 +2,9 @@ from enum import IntEnum
 from functools import partial
 from typing import Any
 
-from ..qtcompat.QtCore import QPoint, QSize, Qt, Signal
-from ..qtcompat.QtGui import QFontMetrics, QValidator
-from ..qtcompat.QtWidgets import (
+from qtpy.QtCore import QPoint, QSize, Qt, Signal
+from qtpy.QtGui import QFontMetrics, QValidator
+from qtpy.QtWidgets import (
     QAbstractSlider,
     QApplication,
     QDoubleSpinBox,
@@ -16,6 +16,7 @@ from ..qtcompat.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
+
 from ._sliders import QDoubleRangeSlider, QDoubleSlider, QRangeSlider
 
 

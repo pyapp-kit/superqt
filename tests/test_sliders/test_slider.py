@@ -1,10 +1,10 @@
 import platform
 
 import pytest
+from qtpy import API_NAME
+from qtpy.QtCore import Qt
 
 from superqt import QRangeSlider
-from superqt.qtcompat import API_NAME
-from superqt.qtcompat.QtCore import Qt
 from superqt.sliders._generic_range_slider import SC_BAR, SC_HANDLE, SC_NONE
 
 NOT_LINUX = platform.system() != "Linux"

@@ -2,10 +2,9 @@ from contextlib import suppress
 from platform import system
 
 import pytest
-
-from superqt.qtcompat import QT_VERSION
-from superqt.qtcompat.QtCore import QEvent, QPoint, QPointF, Qt
-from superqt.qtcompat.QtGui import QMouseEvent, QWheelEvent
+from qtpy import QT_VERSION
+from qtpy.QtCore import QEvent, QPoint, QPointF, Qt
+from qtpy.QtGui import QMouseEvent, QWheelEvent
 
 QT_VERSION = tuple(int(x) for x in QT_VERSION.split("."))
 

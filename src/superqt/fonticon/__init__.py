@@ -22,8 +22,8 @@ from ._qfont_icon import DEFAULT_SCALING_FACTOR, IconOptionDict, IconOpts
 from ._qfont_icon import QFontIconStore as _QFIS
 
 if TYPE_CHECKING:
-    from superqt.qtcompat.QtGui import QFont, QTransform
-    from superqt.qtcompat.QtWidgets import QWidget
+    from qtpy.QtGui import QFont, QTransform
+    from qtpy.QtWidgets import QWidget
 
     from ._qfont_icon import QFontIcon, ValidColor
 

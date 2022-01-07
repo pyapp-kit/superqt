@@ -6,11 +6,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import DefaultDict, Dict, Optional, Sequence, Tuple, Type, Union, cast
 
-from typing_extensions import TypedDict
-
-from ..qtcompat import QT_VERSION
-from ..qtcompat.QtCore import QObject, QPoint, QRect, QSize, Qt
-from ..qtcompat.QtGui import (
+from qtpy import QT_VERSION
+from qtpy.QtCore import QObject, QPoint, QRect, QSize, Qt
+from qtpy.QtGui import (
     QColor,
     QFont,
     QFontDatabase,
@@ -22,7 +20,9 @@ from ..qtcompat.QtGui import (
     QPixmapCache,
     QTransform,
 )
-from ..qtcompat.QtWidgets import QApplication, QStyleOption, QWidget
+from qtpy.QtWidgets import QApplication, QStyleOption, QWidget
+from typing_extensions import TypedDict
+
 from ..utils import QMessageHandler
 from ._animations import Animation
 

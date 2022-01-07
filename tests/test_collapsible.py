@@ -1,8 +1,9 @@
 """A test module for testing collapsible"""
 
+from qtpy.QtCore import QEasingCurve
+from qtpy.QtWidgets import QPushButton
+
 from superqt import QCollapsible
-from superqt.qtcompat.QtCore import QEasingCurve
-from superqt.qtcompat.QtWidgets import QPushButton
 
 
 def test_checked_initialization(qtbot):

@@ -1,6 +1,7 @@
+from qtpy.QtCore import Qt
+from qtpy.QtWidgets import QApplication, QVBoxLayout, QWidget
+
 from superqt import QDoubleRangeSlider, QDoubleSlider, QRangeSlider
-from superqt.qtcompat.QtCore import Qt
-from superqt.qtcompat.QtWidgets import QApplication, QVBoxLayout, QWidget
 
 app = QApplication([])
 

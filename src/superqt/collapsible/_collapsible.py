@@ -1,14 +1,14 @@
 """A collapsible widget to hide and unhide child widgets"""
 from typing import Optional
 
-from ..qtcompat.QtCore import (
+from qtpy.QtCore import (
     QAbstractAnimation,
     QEasingCurve,
     QMargins,
     QPropertyAnimation,
     Qt,
 )
-from ..qtcompat.QtWidgets import QFrame, QPushButton, QVBoxLayout, QWidget
+from qtpy.QtWidgets import QFrame, QPushButton, QVBoxLayout, QWidget
 
 
 class QCollapsible(QFrame):

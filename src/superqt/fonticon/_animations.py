@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 
-from superqt.qtcompat.QtCore import QRectF, QTimer
-from superqt.qtcompat.QtGui import QPainter
-from superqt.qtcompat.QtWidgets import QWidget
+from qtpy.QtCore import QRectF, QTimer
+from qtpy.QtGui import QPainter
+from qtpy.QtWidgets import QWidget
 
 
 class Animation(ABC):

@@ -1,5 +1,6 @@
+from qtpy.QtWidgets import QApplication
+
 from superqt import QElidingLabel
-from superqt.qtcompat.QtWidgets import QApplication
 
 app = QApplication([])
 

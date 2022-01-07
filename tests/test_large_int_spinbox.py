@@ -1,4 +1,5 @@
-from superqt.qtcompat.QtCore import Qt
+from qtpy.QtCore import Qt
+
 from superqt.spinbox import QLargeIntSpinBox
 
 

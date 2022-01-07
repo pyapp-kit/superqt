@@ -1,4 +1,5 @@
-from ..qtcompat.QtCore import Signal
+from qtpy.QtCore import Signal
+
 from ._generic_range_slider import _GenericRangeSlider
 from ._generic_slider import _GenericSlider
 

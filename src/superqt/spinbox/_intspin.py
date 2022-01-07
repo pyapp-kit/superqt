@@ -1,8 +1,8 @@
 from enum import Enum
 
-from ..qtcompat.QtCore import QSize, Qt, Signal
-from ..qtcompat.QtGui import QFontMetrics, QValidator
-from ..qtcompat.QtWidgets import QAbstractSpinBox, QStyle, QStyleOptionSpinBox
+from qtpy.QtCore import QSize, Qt, Signal
+from qtpy.QtGui import QFontMetrics, QValidator
+from qtpy.QtWidgets import QAbstractSpinBox, QStyle, QStyleOptionSpinBox
 
 
 class _EmitPolicy(Enum):

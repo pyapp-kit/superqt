@@ -20,9 +20,8 @@ from typing import (
     overload,
 )
 
+from qtpy.QtCore import QObject, QRunnable, QThread, QThreadPool, QTimer, Signal
 from typing_extensions import Literal, ParamSpec
-
-from ..qtcompat.QtCore import QObject, QRunnable, QThread, QThreadPool, QTimer, Signal
 
 if TYPE_CHECKING:
 

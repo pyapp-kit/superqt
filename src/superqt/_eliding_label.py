@@ -1,8 +1,8 @@
 from typing import List
 
-from superqt.qtcompat.QtCore import QPoint, QRect, QSize, Qt
-from superqt.qtcompat.QtGui import QFont, QFontMetrics, QResizeEvent, QTextLayout
-from superqt.qtcompat.QtWidgets import QLabel
+from qtpy.QtCore import QPoint, QRect, QSize, Qt
+from qtpy.QtGui import QFont, QFontMetrics, QResizeEvent, QTextLayout
+from qtpy.QtWidgets import QLabel
 
 
 class QElidingLabel(QLabel):

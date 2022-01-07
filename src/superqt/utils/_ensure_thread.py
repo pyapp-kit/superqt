@@ -3,7 +3,7 @@ from concurrent.futures import Future
 from functools import wraps
 from typing import Callable, List, Optional
 
-from superqt.qtcompat.QtCore import (
+from qtpy.QtCore import (
     QCoreApplication,
     QMetaObject,
     QObject,

@@ -1,7 +1,8 @@
 import logging
 
+from qtpy import QtCore
+
 from superqt import QMessageHandler
-from superqt.qtcompat import QtCore
 
 
 def test_message_handler():
