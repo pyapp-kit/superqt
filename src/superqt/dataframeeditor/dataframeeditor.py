@@ -231,9 +231,6 @@ class DataFrameEditor(BaseDialog):
         self.setModel(self.dataModel)
         self.resizeColumnsToContents()
 
-        # format = '%' + self.get_conf('dataframe_format')
-        # self.dataModel.set_format(format)
-
         return True
 
     def accept(self, e):
@@ -390,10 +387,6 @@ class DataFrameEditor(BaseDialog):
         table.setModel(model)
         if old_sel_model:
             del old_sel_model
-
-    def setAutosizeLimitTime(self, limit_ms):
-        """Set maximum time to calculate size hint for columns."""
-        self._max_autosize_ms = limit_ms
 
     def setModel(self, model, relayout=True):
         """Set the model for the data, header/index and level views."""
@@ -830,8 +823,6 @@ class DataFrameModel(QAbstractTableModel):
                     return "Display Error!"
         elif role == Qt.BackgroundColorRole:
             return to_qvariant(self.get_bgcolor(index))
-        # elif role == Qt.FontRole:
-        #     return to_qvariant(get_font(font_size_delta=DEFAULT_SMALL_DELTA))
         elif role == Qt.ToolTipRole:
             if index in self.display_error_idxs:
                 return trans_(
@@ -1307,12 +1298,5 @@ class DataFrameHeaderModel(QAbstractTableModel):
             return None
 
         header = self.model.header(self.axis, col, row)
-
-        # Don't perform any conversion on strings
-        # because it leads to differences between
-        # the data present in the dataframe and
-        # what is shown by Spyder
-        # if not is_type_text_string(header):
-        #     header = str(header)
 
         return header
