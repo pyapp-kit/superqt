@@ -858,7 +858,6 @@ class DataFrameModel(QAbstractTableModel):
                         kind="mergesort",
                     )
 
-                    print("sorted df: ", self.df)
                 except AttributeError:
                     # for pandas version < 0.17
                     self.df.sort(
