@@ -234,6 +234,7 @@ class DataFrameEditor(BaseDialog):
         return True
 
     def accept(self, e):
+        self.dataModel.df.to_pickle("tmp.pkl")
         self.close()
 
     @Slot(QModelIndex, QModelIndex)
@@ -394,7 +395,7 @@ class DataFrameEditor(BaseDialog):
         sel_model = self.dataTable.selectionModel()
         sel_model.currentColumnChanged.connect(self._resizeCurrentColumnToContents)
 
-        # Asociate the models (level, vertical index and horizontal header)
+        # Associate the models (level, vertical index and horizontal header)
         # with its corresponding view.
         self._reset_model(
             self.table_level, DataFrameLevelModel(model, self.palette(), self.font())
