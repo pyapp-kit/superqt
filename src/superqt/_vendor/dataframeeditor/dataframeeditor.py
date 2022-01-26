@@ -984,13 +984,9 @@ class DataFrameEditor(QWidget):
         self.is_series = False
         self.layout = None
 
-        self.layout = QGridLayout()
-        self.layout.setSpacing(0)
-        self.layout.setContentsMargins(20, 20, 20, 0)
-        self.setLayout(self.layout)
         self.setWindowTitle(title)
 
-    def setup_and_check(self, data, title=""):
+    def setup_and_check(self, data):
         """
         Setup DataFrameEditor:
         return False if data is not supported, True otherwise.
@@ -999,14 +995,15 @@ class DataFrameEditor(QWidget):
         # self._selection_rec = False
         self._model = None
 
-        # self.layout = QGridLayout()
-        # self.layout.setSpacing(0)
-        # self.layout.setContentsMargins(20, 20, 20, 0)
-        # self.setLayout(self.layout)
+        self.layout = QGridLayout()
+        self.layout.setSpacing(0)
+        self.layout.setContentsMargins(20, 20, 20, 0)
+        self.setLayout(self.layout)
         #         if title:
         #             title = to_text_string(title) + " - %s" % data.__class__.__name__
         #         else:
         #             title = _("%s editor") % data.__class__.__name__
+
         if isinstance(data, pd.Series):
             self.is_series = True
             data = data.to_frame()
