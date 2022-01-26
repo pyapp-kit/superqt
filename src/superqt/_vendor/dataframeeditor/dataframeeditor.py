@@ -55,20 +55,17 @@ from qtpy.QtCore import (
 from qtpy.QtGui import QColor, QCursor
 from qtpy.QtWidgets import (
     QApplication,
-    QCheckBox,
-    QDialog,
     QFileDialog,
     QFrame,
     QGridLayout,
-    QHBoxLayout,
     QInputDialog,
     QItemDelegate,
     QLineEdit,
     QMessageBox,
-    QPushButton,
     QScrollBar,
     QTableView,
     QTableWidget,
+    QWidget,
 )
 
 # from spyder_kernels.utils.lazymodules import numpy as np, pandas as pd
@@ -108,41 +105,41 @@ BACKGROUND_STRING_ALPHA = 0.05
 BACKGROUND_MISC_ALPHA = 0.3
 
 
-class BaseDialog(QDialog):
-    def __init__(self, parent=None):
-        QDialog.__init__(self, parent)
+# class BaseDialog(QDialog):
+#     def __init__(self, parent=None):
+#         QDialog.__init__(self, parent)
 
-        # # Set style of all QPushButton's inside the dialog.
-        # css = qstylizer.style.StyleSheet()
-        # css.QPushButton.setValues(
-        #     padding='3px 15px 3px 15px',
-        # )
-        # self.setStyleSheet(css.toString())
+#         # # Set style of all QPushButton's inside the dialog.
+#         # css = qstylizer.style.StyleSheet()
+#         # css.QPushButton.setValues(
+#         #     padding='3px 15px 3px 15px',
+#         # )
+#         # self.setStyleSheet(css.toString())
 
-    def set_dynamic_width_and_height(
-        self, screen_geometry, width_ratio=0.5, height_ratio=0.5
-    ):
-        """
-        Update width and height using an updated screen geometry.
-        Use a ratio for the width and height of the dialog.
-        """
-        screen_width = int(screen_geometry.width() * width_ratio)
-        screen_height = int(screen_geometry.height() * height_ratio)
-        self.resize(screen_width, screen_height)
+#     def set_dynamic_width_and_height(
+#         self, screen_geometry, width_ratio=0.5, height_ratio=0.5
+#     ):
+#         """
+#     Update width and height using an updated screen geometry.
+#     Use a ratio for the width and height of the dialog.
+#     """
+#     screen_width = int(screen_geometry.width() * width_ratio)
+#     screen_height = int(screen_geometry.height() * height_ratio)
+#     self.resize(screen_width, screen_height)
 
-        # Make the dialog window appear in the center of the screen
-        x = int(screen_geometry.center().x() - self.width() / 2)
-        y = int(screen_geometry.center().y() - self.height() / 2)
-        self.move(x, y)
+#     # Make the dialog window appear in the center of the screen
+#     x = int(screen_geometry.center().x() - self.width() / 2)
+#     y = int(screen_geometry.center().y() - self.height() / 2)
+#     self.move(x, y)
 
-    def show(self):
-        super().show()
-        window = self.window()
-        windowHandle = window.windowHandle()
-        screen = windowHandle.screen()
-        geometry = screen.geometry()
-        self.set_dynamic_width_and_height(geometry)
-        screen.geometryChanged.connect(self.set_dynamic_width_and_height)
+# def show(self):
+#     super().show()
+#     window = self.window()
+#     windowHandle = window.windowHandle()
+#     screen = windowHandle.screen()
+#     geometry = screen.geometry()
+#     self.set_dynamic_width_and_height(geometry)
+#     screen.geometryChanged.connect(self.set_dynamic_width_and_height)
 
 
 def bool_false_check(value):
@@ -189,7 +186,7 @@ class DataFrameModel(QAbstractTableModel):
         if size < LARGE_SIZE:
             self.max_min_col_update()
             self.colum_avg_enabled = True
-            self.bgcolor_enabled = True
+            self.bgcolor_enabled = False
             self.colum_avg(1)
         else:
             self.colum_avg_enabled = False
@@ -966,7 +963,7 @@ class DataFrameLevelModel(QAbstractTableModel):
         return None
 
 
-class DataFrameEditor(BaseDialog):
+class DataFrameEditor(QWidget):
     # class DataFrameEditor(BaseDialog, SpyderConfigurationAccessor):
     """
     Dialog for displaying and editing DataFrame and related objects.
@@ -976,7 +973,7 @@ class DataFrameEditor(BaseDialog):
     """
     CONF_SECTION = "variable_explorer"
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, title=""):
         super().__init__(parent)
 
         # Destroying the C++ object right after closing the dialog box,
@@ -987,6 +984,12 @@ class DataFrameEditor(BaseDialog):
         self.is_series = False
         self.layout = None
 
+        self.layout = QGridLayout()
+        self.layout.setSpacing(0)
+        self.layout.setContentsMargins(20, 20, 20, 0)
+        self.setLayout(self.layout)
+        self.setWindowTitle(title)
+
     def setup_and_check(self, data, title=""):
         """
         Setup DataFrameEditor:
@@ -996,10 +999,10 @@ class DataFrameEditor(BaseDialog):
         # self._selection_rec = False
         self._model = None
 
-        self.layout = QGridLayout()
-        self.layout.setSpacing(0)
-        self.layout.setContentsMargins(20, 20, 20, 0)
-        self.setLayout(self.layout)
+        # self.layout = QGridLayout()
+        # self.layout.setSpacing(0)
+        # self.layout.setContentsMargins(20, 20, 20, 0)
+        # self.setLayout(self.layout)
         #         if title:
         #             title = to_text_string(title) + " - %s" % data.__class__.__name__
         #         else:
@@ -1009,8 +1012,6 @@ class DataFrameEditor(BaseDialog):
             data = data.to_frame()
         elif isinstance(data, pd.Index):
             data = pd.DataFrame(data)
-
-        self.setWindowTitle(title)
 
         self.hscroll = QScrollBar(Qt.Horizontal)
         self.vscroll = QScrollBar(Qt.Vertical)
@@ -1026,7 +1027,7 @@ class DataFrameEditor(BaseDialog):
 
         # Create the model and view of the data
         self.dataModel = DataFrameModel(data, parent=self)
-        self.dataModel.dataChanged.connect(self.save_and_close_enable)
+        # self.dataModel.dataChanged.connect(self.save_and_close_enable)
         self.create_data_table()
 
         self.layout.addWidget(self.hscroll, 2, 0, 1, 2)
@@ -1045,48 +1046,48 @@ class DataFrameEditor(BaseDialog):
 
         self.setLayout(self.layout)
         # Make the dialog act as a window
-        self.setWindowFlags(Qt.Window)
-        btn_layout = QHBoxLayout()
-        btn_layout.setSpacing(5)
+        # self.setWindowFlags(Qt.Window)
+        # btn_layout = QHBoxLayout()
+        # btn_layout.setSpacing(5)
 
-        btn_format = QPushButton("Format")
+        # btn_format = QPushButton("Format")
         # disable format button for int type
-        btn_layout.addWidget(btn_format)
-        btn_format.clicked.connect(self.change_format)
+        # btn_layout.addWidget(btn_format)
+        # btn_format.clicked.connect(self.change_format)
 
-        btn_resize = QPushButton("Resize")
-        btn_layout.addWidget(btn_resize)
-        btn_resize.clicked.connect(self.resize_to_contents)
+        # btn_resize = QPushButton("Resize")
+        # btn_layout.addWidget(btn_resize)
+        # btn_resize.clicked.connect(self.resize_to_contents)
 
-        bgcolor = QCheckBox("Background color")
-        bgcolor.setChecked(self.dataModel.bgcolor_enabled)
-        bgcolor.setEnabled(self.dataModel.bgcolor_enabled)
-        bgcolor.stateChanged.connect(self.change_bgcolor_enable)
-        btn_layout.addWidget(bgcolor)
+        # bgcolor = QCheckBox("Background color")
+        # bgcolor.setChecked(self.dataModel.bgcolor_enabled)
+        # bgcolor.setEnabled(self.dataModel.bgcolor_enabled)
+        # bgcolor.stateChanged.connect(self.change_bgcolor_enable)
+        # btn_layout.addWidget(bgcolor)
 
-        self.bgcolor_global = QCheckBox("Column min/max")
-        self.bgcolor_global.setChecked(self.dataModel.colum_avg_enabled)
-        self.bgcolor_global.setEnabled(
-            not self.is_series and self.dataModel.bgcolor_enabled
-        )
-        self.bgcolor_global.stateChanged.connect(self.dataModel.colum_avg)
-        btn_layout.addWidget(self.bgcolor_global)
+        # self.bgcolor_global = QCheckBox("Column min/max")
+        # self.bgcolor_global.setChecked(self.dataModel.colum_avg_enabled)
+        # self.bgcolor_global.setEnabled(
+        # not self.is_series and self.dataModel.bgcolor_enabled
+        # )
+        # self.bgcolor_global.stateChanged.connect(self.dataModel.colum_avg)
+        # btn_layout.addWidget(self.bgcolor_global)
 
-        btn_layout.addStretch()
+        # btn_layout.addStretch()
 
-        self.btn_save_and_close = QPushButton("Save and Close")
-        self.btn_save_and_close.setDisabled(True)
-        self.btn_save_and_close.clicked.connect(self.accept)
-        btn_layout.addWidget(self.btn_save_and_close)
+        # self.btn_save_and_close = QPushButton("Save and Close")
+        # self.btn_save_and_close.setDisabled(True)
+        # self.btn_save_and_close.clicked.connect(self.accept)
+        # btn_layout.addWidget(self.btn_save_and_close)
 
-        self.btn_close = QPushButton("Close")
-        self.btn_close.setAutoDefault(True)
-        self.btn_close.setDefault(True)
-        self.btn_close.clicked.connect(self.reject)
-        btn_layout.addWidget(self.btn_close)
+        # self.btn_close = QPushButton("Close")
+        # self.btn_close.setAutoDefault(True)
+        # self.btn_close.setDefault(True)
+        # self.btn_close.clicked.connect(self.reject)
+        # btn_layout.addWidget(self.btn_close)
 
-        btn_layout.setContentsMargins(0, 16, 0, 16)
-        self.layout.addLayout(btn_layout, 4, 0, 1, 2)
+        # btn_layout.setContentsMargins(0, 16, 0, 16)
+        # self.layout.addLayout(btn_layout, 4, 0, 1, 2)
         self.setModel(self.dataModel)
         self.resizeColumnsToContents()
 
