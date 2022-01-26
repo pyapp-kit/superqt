@@ -55,7 +55,6 @@ from qtpy.QtCore import (
 from qtpy.QtGui import QColor, QCursor
 from qtpy.QtWidgets import (
     QApplication,
-    QFileDialog,
     QFrame,
     QGridLayout,
     QInputDialog,
@@ -966,14 +965,14 @@ class DataFrameLevelModel(QAbstractTableModel):
 class DataFrameEditor(QWidget):
     # class DataFrameEditor(BaseDialog, SpyderConfigurationAccessor):
     """
-    Dialog for displaying and editing DataFrame and related objects.
+    Widget for displaying and editing DataFrame and related objects.
     Based on the gtabview project (ExtTableView).
     For more information please see:
     https://github.com/wavexx/gtabview/blob/master/gtabview/viewer.py
     """
     CONF_SECTION = "variable_explorer"
 
-    def __init__(self, parent=None, title=""):
+    def __init__(self, parent=None):
         super().__init__(parent)
 
         # Destroying the C++ object right after closing the dialog box,
@@ -984,7 +983,7 @@ class DataFrameEditor(QWidget):
         self.is_series = False
         self.layout = None
 
-        self.setWindowTitle(title)
+        # self.setWindowTitle(title)
 
     def setup_and_check(self, data):
         """
@@ -1092,17 +1091,6 @@ class DataFrameEditor(QWidget):
         #         self.dataModel.set_format(format)
 
         return True
-
-    def accept(self, e):
-        # New code to save.  may not be needed though...
-        fileName, _ = QFileDialog.getSaveFileName(
-            self,
-            "Save File",
-            "",
-            "*.pkl",
-        )
-        self.dataModel.df.to_pickle(fileName)
-        self.close()
 
     @Slot(QModelIndex, QModelIndex)
     def save_and_close_enable(self, top_left, bottom_right):
