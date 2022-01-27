@@ -57,9 +57,7 @@ from qtpy.QtWidgets import (
     QApplication,
     QFrame,
     QGridLayout,
-    QInputDialog,
     QItemDelegate,
-    QLineEdit,
     QMessageBox,
     QScrollBar,
     QTableView,
@@ -1073,12 +1071,12 @@ class DataFrameEditor(QWidget):
 
         # btn_resize = QPushButton("Resize")
         # btn_layout.addWidget(btn_resize)
-        # btn_resize.clicked.connect(self.resize_to_contents)
+        # btn_resize.clicked.connect(self._resize_to_contents)
 
         # bgcolor = QCheckBox("Background color")
         # bgcolor.setChecked(self.dataModel.bgcolor_enabled)
         # bgcolor.setEnabled(self.dataModel.bgcolor_enabled)
-        # bgcolor.stateChanged.connect(self.change_bgcolor_enable)
+        # bgcolor.stateChanged.connect(self._change_bgcolor_enable)
         # btn_layout.addWidget(bgcolor)
 
         # self.bgcolor_global = QCheckBox("Column min/max")
@@ -1427,40 +1425,40 @@ class DataFrameEditor(QWidget):
         )
         self._update_layout()
 
-    def change_bgcolor_enable(self, state):
+    def _change_bgcolor_enable(self, state):
         """
         This is implementet so column min/max is only active when bgcolor is
         """
         self.dataModel._bg_color(state)
         self.bgcolor_global.setEnabled(not self.is_series and state > 0)
 
-    def change_format(self):
-        """
-        Ask user for display format for floats and use it.
-        """
-        format, valid = QInputDialog.getText(
-            self,
-            "Format",
-            "Float formatting",
-            QLineEdit.Normal,
-            self.dataModel.getFormat(),
-        )
-        if valid:
-            format = str(format)
-            try:
-                format % 1.1
-            except:  # noqa E722:
-                msg = "Format ({format}) is incorrect"
-                QMessageBox.critical(self, "Error", msg)
-                return
-            if not format.startswith("%"):
-                msg = "Format ({format}) should start with '%'"
-                QMessageBox.critical(self, "Error", msg)
-                return
-            self.dataModel.setFormat(format)
+    # def change_format(self):
+    #     """
+    #     Ask user for display format for floats and use it.
+    #     """
+    #     format, valid = QInputDialog.getText(
+    #         self,
+    #         "Format",
+    #         "Float formatting",
+    #         QLineEdit.Normal,
+    #         self.dataModel.getFormat(),
+    #     )
+    #     if valid:
+    #         format = str(format)
+    #         try:
+    #             format % 1.1
+    #         except:  # noqa E722:
+    #             msg = "Format ({format}) is incorrect"
+    #             QMessageBox.critical(self, "Error", msg)
+    #             return
+    #         if not format.startswith("%"):
+    #             msg = "Format ({format}) should start with '%'"
+    #             QMessageBox.critical(self, "Error", msg)
+    #             return
+    #         self.dataModel.setFormat(format)
 
-            format = format[1:]
-            # self.set_conf('dataframe_format', format)
+    #         format = format[1:]
+    #         # self.set_conf('dataframe_format', format)
 
     def getValue(self):
         """Return modified Dataframe -- this is *not* a copy"""
@@ -1504,7 +1502,7 @@ class DataFrameEditor(QWidget):
         """Fetch more data for the index (rows)."""
         self.table_index.model()._fetch_more()
 
-    def resize_to_contents(self):
+    def _resize_to_contents(self):
         QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
         self.dataTable.resizeColumnsToContents()
         self.dataModel._fetch_more(columns=True)
