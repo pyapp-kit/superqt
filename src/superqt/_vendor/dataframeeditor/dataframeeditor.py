@@ -551,7 +551,7 @@ class DataFrameModel(QAbstractTableModel):
         except AttributeError:
             return 0
 
-    def fetch_more(self, rows=False, columns=False):
+    def _fetch_more(self, rows=False, columns=False):
         """Get more columns and/or rows."""
         if rows and self.total_rows > self.rows_loaded:
             reminder = self.total_rows - self.rows_loaded
@@ -645,10 +645,10 @@ class DataFrameView(QTableView):
         """Load more rows and columns to display."""
         try:
             if rows and value == self.verticalScrollBar().maximum():
-                self.model().fetch_more(rows=rows)
+                self.model()._fetch_more(rows=rows)
                 self.sig_fetch_more_rows.emit()
             if columns and value == self.horizontalScrollBar().maximum():
-                self.model().fetch_more(columns=columns)
+                self.model()._fetch_more(columns=columns)
                 self.sig_fetch_more_columns.emit()
 
         except NameError:
@@ -802,7 +802,7 @@ class DataFrameHeaderModel(QAbstractTableModel):
         else:
             return max(1, self._shape[1])
 
-    def fetch_more(self, rows=False, columns=False):
+    def _fetch_more(self, rows=False, columns=False):
         """Get more columns or rows (based on axis)."""
         if self.axis == 1 and self.total_rows > self.rows_loaded:
             reminder = self.total_rows - self.rows_loaded
@@ -1033,18 +1033,18 @@ class DataFrameEditor(QWidget):
         self.vscroll = QScrollBar(Qt.Vertical)
 
         # Create the view for the level
-        self.create_table_level()
+        self._create_table_level()
 
         # Create the view for the horizontal header
-        self.create_table_header()
+        self._create_table_header()
 
         # Create the view for the vertical index
-        self.create_table_index()
+        self._create_table_index()
 
         # Create the model and view of the data
         self.dataModel = DataFrameModel(data, parent=self)
-        # self.dataModel.dataChanged.connect(self.save_and_close_enable)
-        self.create_data_table()
+        # self.dataModel.dataChanged.connect(self._save_and_close_enable)
+        self._create_data_table()
 
         self.layout.addWidget(self.hscroll, 2, 0, 1, 2)
         self.layout.addWidget(self.vscroll, 0, 2, 2, 1)
@@ -1113,13 +1113,13 @@ class DataFrameEditor(QWidget):
         return True
 
     @Slot(QModelIndex, QModelIndex)
-    def save_and_close_enable(self, top_left, bottom_right):
+    def _save_and_close_enable(self, top_left, bottom_right):
         """Handle the data change event to enable the save and close button."""
         self.btn_save_and_close.setEnabled(True)
         self.btn_save_and_close.setAutoDefault(True)
         self.btn_save_and_close.setDefault(True)
 
-    def create_table_level(self):
+    def _create_table_level(self):
         """Create the QTableView that will hold the level model."""
         self.table_level = QTableView()
         self.table_level.setEditTriggers(QTableWidget.NoEditTriggers)
@@ -1133,7 +1133,7 @@ class DataFrameEditor(QWidget):
         self.table_level.setContentsMargins(0, 0, 0, 0)
         self.table_level.horizontalHeader().sectionClicked.connect(self.sortByIndex)
 
-    def create_table_header(self):
+    def _create_table_header(self):
         """Create the QTableView that will hold the header model."""
         self.table_header = QTableView()
         self.table_header.verticalHeader().hide()
@@ -1149,7 +1149,7 @@ class DataFrameEditor(QWidget):
         self.table_header.setItemDelegate(QItemDelegate())
         self.layout.addWidget(self.table_header, 0, 1)
 
-    def create_table_index(self):
+    def _create_table_index(self):
         """Create the QTableView that will hold the index model."""
         self.table_index = QTableView()
         self.table_index.horizontalHeader().hide()
@@ -1164,7 +1164,7 @@ class DataFrameEditor(QWidget):
         self.layout.addWidget(self.table_index, 1, 0)
         self.table_index.setContentsMargins(0, 0, 0, 0)
 
-    def create_data_table(self):
+    def _create_data_table(self):
         """Create the QTableView that will hold the data model."""
         self.dataTable = DataFrameView(
             self,
@@ -1198,47 +1198,47 @@ class DataFrameEditor(QWidget):
         """Get the model of the dataframe."""
         return self._model
 
-    def set_large_df_size(self, value):
+    def setLargeDfSize(self, value):
         self.large_df_size = value
 
-    def set_large_nrows(self, value):
+    def setLargeNumRows(self, value):
         self.large_nrows = value
 
-    def set_large_ncols(self, value):
+    def setLargeNumCols(self, value):
         self.large_ncols = value
 
-    def set_rows_to_load(self, value):
+    def setRowsToLoad(self, value):
         self.rows_to_load = value
 
-    def set_cols_to_load(self, value):
+    def setColsToLoad(self, value):
         self.cols_to_load = value
 
-    def set_background_num_min_hue(self, value):
+    def setBackgroundNumMinHue(self, value):
         self.background_number_min_hue = value
 
-    def set_background_num_hue_range(self, value):
+    def setBackgroundNumHueRange(self, value):
         # (hue for smallest) minus (hue for largest)
         self.background_number_hue_range = value
 
-    def set_background_num_saturation(self, value):
+    def setBackgroundNumSaturation(self, value):
         self.background_number_saturation = value
 
-    def set_background_num_value(self, value):
+    def setBackgroundNumValue(self, value):
         self.background_number_value = value
 
-    def set_background_num_alpha(self, value):
+    def setBackgroundNumAlpha(self, value):
         self.background_number_alpha = value
 
-    def set_background_nonnumber_color(self, value):
+    def setBackgroundNonNumberColor(self, value):
         self.background_nonnumber_color = Qt.lightGray
 
-    def set_background_index_alpha(self, value):
+    def setBackgroundIndexAlpha(self, value):
         self.background_index_alpha = value
 
-    def set_background_string_alpha(self, value):
+    def setBackgroundStringAlpha(self, value):
         self.background_string_alpha = value
 
-    def set_background_misc_alpha(self, value):
+    def setBackgroundMiscAlpha(self, value):
         self.background_misc_alpha = value
 
     def _column_resized(self, col, old_width, new_width):
@@ -1498,16 +1498,16 @@ class DataFrameEditor(QWidget):
 
     def _fetch_more_columns(self):
         """Fetch more data for the header (columns)."""
-        self.table_header.model().fetch_more()
+        self.table_header.model()._fetch_more()
 
     def _fetch_more_rows(self):
         """Fetch more data for the index (rows)."""
-        self.table_index.model().fetch_more()
+        self.table_index.model()._fetch_more()
 
     def resize_to_contents(self):
         QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
         self.dataTable.resizeColumnsToContents()
-        self.dataModel.fetch_more(columns=True)
+        self.dataModel._fetch_more(columns=True)
         self.dataTable.resizeColumnsToContents()
         self._update_header_size()
         QApplication.restoreOverrideCursor()
