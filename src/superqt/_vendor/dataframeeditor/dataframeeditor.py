@@ -183,14 +183,14 @@ class DataFrameModel(QAbstractTableModel):
 
         self.max_min_col = None
         if size < parent.large_df_size:
-            self.maxMinColUpdate()
+            self._max_min_col_update()
             self.colum_avg_enabled = True
             self.bgcolor_enabled = False  # ppw note: turned off for now.
-            self.columnAvg(1)
+            self._column_avg(1)
         else:
             self.colum_avg_enabled = False
             self.bgcolor_enabled = False
-            self.columnAvg(0)
+            self._column_avg(0)
 
         # Use paging when the total size, number of rows or number of
         # columns is too large
@@ -272,7 +272,7 @@ class DataFrameModel(QAbstractTableModel):
         if ax.name:
             return ax.name
 
-    def maxMinColUpdate(self):
+    def _max_min_col_update(self):
         """
         Determines the maximum and minimum number in each column.
         The result is a list whose k-th entry is [vmax, vmin], where vmax and
@@ -318,12 +318,12 @@ class DataFrameModel(QAbstractTableModel):
         self._format = format
         self.reset()
 
-    def bgColor(self, state):
+    def _bg_color(self, state):
         """Toggle backgroundcolor"""
         self.bgcolor_enabled = state > 0
         self.reset()
 
-    def columnAvg(self, state):
+    def _column_avg(self, state):
         """Toggle backgroundcolor"""
         self.colum_avg_enabled = state > 0
         if self.colum_avg_enabled:
@@ -332,7 +332,7 @@ class DataFrameModel(QAbstractTableModel):
             self.return_max = global_max
         self.reset()
 
-    def getBgColor(self, index):
+    def _get_bg_color(self, index):
         """Background color depending on value."""
         column = index.column()
         if not self.bgcolor_enabled:
@@ -411,7 +411,7 @@ class DataFrameModel(QAbstractTableModel):
                     self.display_error_idxs.append(index)
                     return "Display Error!"
         elif role == Qt.BackgroundColorRole:
-            return to_qvariant(self.getBgColor(index))
+            return to_qvariant(self._get_bg_color(index))
         # elif role == Qt.FontRole:
         #     return to_qvariant(get_font(font_size_delta=DEFAULT_SMALL_DELTA))
         elif role == Qt.ToolTipRole:
@@ -530,11 +530,11 @@ class DataFrameModel(QAbstractTableModel):
                     ),
                 )
                 return False
-        self.maxMinColUpdate()
+        self._max_min_col_update()
         self.dataChanged.emit(index, index)
         return True
 
-    def get_data(self):
+    def getData(self):
         """Return data"""
         return self.df
 
@@ -1431,7 +1431,7 @@ class DataFrameEditor(QWidget):
         """
         This is implementet so column min/max is only active when bgcolor is
         """
-        self.dataModel.bgColor(state)
+        self.dataModel._bg_color(state)
         self.bgcolor_global.setEnabled(not self.is_series and state > 0)
 
     def change_format(self):
@@ -1466,7 +1466,7 @@ class DataFrameEditor(QWidget):
         """Return modified Dataframe -- this is *not* a copy"""
         # It is import to avoid accessing Qt C++ object as it has probably
         # already been destroyed, due to the Qt.WA_DeleteOnClose attribute
-        df = self.dataModel.get_data()
+        df = self.dataModel.getData()
         if self.is_series:
             return df.iloc[:, 0]
         else:
