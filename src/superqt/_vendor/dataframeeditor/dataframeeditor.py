@@ -85,23 +85,23 @@ _bool_false = ["false", "f", "0", "0.", "0.0", " "]
 # Default format for data frames with floats
 DEFAULT_FORMAT = "%.6g"
 
-# Limit at which dataframe is considered so large that it is loaded on demand
-LARGE_SIZE = 5e5
-LARGE_NROWS = 1e5
-LARGE_COLS = 60
-ROWS_TO_LOAD = 500
-COLS_TO_LOAD = 40
+# # Limit at which dataframe is considered so large that it is loaded on demand
+# LARGE_SIZE = 5e5
+# LARGE_NROWS = 1e5
+# LARGE_COLS = 60
+# ROWS_TO_LOAD = 500
+# COLS_TO_LOAD = 40
 
 # Background colours
-BACKGROUND_NUMBER_MINHUE = 0.66  # hue for largest number
-BACKGROUND_NUMBER_HUERANGE = 0.33  # (hue for smallest) minus (hue for largest)
-BACKGROUND_NUMBER_SATURATION = 0.7
-BACKGROUND_NUMBER_VALUE = 1.0
-BACKGROUND_NUMBER_ALPHA = 0.6
-BACKGROUND_NONNUMBER_COLOR = Qt.lightGray
-# BACKGROUND_INDEX_ALPHA = 0.8
-BACKGROUND_STRING_ALPHA = 0.05
-BACKGROUND_MISC_ALPHA = 0.3
+# BACKGROUND_NUMBER_MINHUE = 0.66  # hue for largest number
+# BACKGROUND_NUMBER_HUERANGE = 0.33  # (hue for smallest) minus (hue for largest)
+# BACKGROUND_NUMBER_SATURATION = 0.7
+# BACKGROUND_NUMBER_VALUE = 1.0
+# BACKGROUND_NUMBER_ALPHA = 0.6
+# BACKGROUND_NONNUMBER_COLOR = Qt.lightGray
+# # BACKGROUND_INDEX_ALPHA = 0.8
+# BACKGROUND_STRING_ALPHA = 0.05
+# BACKGROUND_MISC_ALPHA = 0.3
 
 
 # class BaseDialog(QDialog):
@@ -182,28 +182,28 @@ class DataFrameModel(QAbstractTableModel):
         size = self.total_rows * self.total_cols
 
         self.max_min_col = None
-        if size < LARGE_SIZE:
-            self.max_min_col_update()
+        if size < parent.large_df_size:
+            self.maxMinColUpdate()
             self.colum_avg_enabled = True
-            self.bgcolor_enabled = False
-            self.colum_avg(1)
+            self.bgcolor_enabled = False  # ppw note: turned off for now.
+            self.columnAvg(1)
         else:
             self.colum_avg_enabled = False
             self.bgcolor_enabled = False
-            self.colum_avg(0)
+            self.columnAvg(0)
 
         # Use paging when the total size, number of rows or number of
         # columns is too large
-        if size > LARGE_SIZE:
-            self.rows_loaded = ROWS_TO_LOAD
-            self.cols_loaded = COLS_TO_LOAD
+        if size > parent.large_df_size:
+            self.rows_loaded = parent.rows_to_load
+            self.cols_loaded = parent.cols_to_load
         else:
-            if self.total_rows > LARGE_NROWS:
-                self.rows_loaded = ROWS_TO_LOAD
+            if self.total_rows > parent.large_nrows:
+                self.rows_loaded = parent.rows_to_load
             else:
                 self.rows_loaded = self.total_rows
-            if self.total_cols > LARGE_COLS:
-                self.cols_loaded = COLS_TO_LOAD
+            if self.total_cols > parent.large_ncols:
+                self.cols_loaded = parent.cols_to_load
             else:
                 self.cols_loaded = self.total_cols
 
@@ -242,12 +242,12 @@ class DataFrameModel(QAbstractTableModel):
         return self.df.shape
 
     @property
-    def header_shape(self):
+    def headerShape(self):
         """Return the levels for the columns and rows of the dataframe."""
         return (self._axis_levels(0), self._axis_levels(1))
 
     @property
-    def chunk_size(self):
+    def chunkSize(self):
         """Return the max value of the dimensions of the dataframe."""
         return max(*self.shape())
 
@@ -272,7 +272,7 @@ class DataFrameModel(QAbstractTableModel):
         if ax.name:
             return ax.name
 
-    def max_min_col_update(self):
+    def maxMinColUpdate(self):
         """
         Determines the maximum and minimum number in each column.
         The result is a list whose k-th entry is [vmax, vmin], where vmax and
@@ -308,22 +308,22 @@ class DataFrameModel(QAbstractTableModel):
                 max_min = None
             self.max_min_col.append(max_min)
 
-    def get_format(self):
+    def getFormat(self):
         """Return current format"""
         # Avoid accessing the private attribute _format from outside
         return self._format
 
-    def set_format(self, format):
+    def setFormat(self, format):
         """Change display format"""
         self._format = format
         self.reset()
 
-    def bgcolor(self, state):
+    def bgColor(self, state):
         """Toggle backgroundcolor"""
         self.bgcolor_enabled = state > 0
         self.reset()
 
-    def colum_avg(self, state):
+    def columnAvg(self, state):
         """Toggle backgroundcolor"""
         self.colum_avg_enabled = state > 0
         if self.colum_avg_enabled:
@@ -332,19 +332,19 @@ class DataFrameModel(QAbstractTableModel):
             self.return_max = global_max
         self.reset()
 
-    def get_bgcolor(self, index):
+    def getBgColor(self, index):
         """Background color depending on value."""
         column = index.column()
         if not self.bgcolor_enabled:
             return
-        value = self.get_value(index.row(), column)
+        value = self.getValue(index.row(), column)
         if self.max_min_col[column] is None or pd.isna(value):
-            color = QColor(BACKGROUND_NONNUMBER_COLOR)
+            color = QColor(self.background_nonnumber_color)
             if type(value) == str:  # ppw change
                 # if is_text_string(value):
-                color.setAlphaF(BACKGROUND_STRING_ALPHA)
+                color.setAlphaF(self.background_string_alpha)
             else:
-                color.setAlphaF(BACKGROUND_MISC_ALPHA)
+                color.setAlphaF(self.background_misc_alpha)
         else:
             if isinstance(value, COMPLEX_NUMBER_TYPES):
                 color_func = abs
@@ -355,7 +355,7 @@ class DataFrameModel(QAbstractTableModel):
                 vmax_vmin_diff = 1.0
             else:
                 vmax_vmin_diff = vmax - vmin
-            hue = BACKGROUND_NUMBER_MINHUE + BACKGROUND_NUMBER_HUERANGE * (
+            hue = self.background_number_min_hue + self.background_number_hue_range * (
                 vmax - color_func(value)
             ) / (vmax_vmin_diff)
             hue = float(abs(hue))
@@ -363,13 +363,13 @@ class DataFrameModel(QAbstractTableModel):
                 hue = 1
             color = QColor.fromHsvF(
                 hue,
-                BACKGROUND_NUMBER_SATURATION,
-                BACKGROUND_NUMBER_VALUE,
-                BACKGROUND_NUMBER_ALPHA,
+                self.background_number_saturation,
+                self.background_number_value,
+                self.background_number_alpha,
             )
         return color
 
-    def get_value(self, row, column):
+    def getValue(self, row, column):
         """Return the value of the DataFrame."""
         # To increase the performance iat is used but that requires error
         # handling, so fallback uses iloc
@@ -388,7 +388,7 @@ class DataFrameModel(QAbstractTableModel):
         if role == Qt.DisplayRole or role == Qt.EditRole:
             column = index.column()
             row = index.row()
-            value = self.get_value(row, column)
+            value = self.getValue(row, column)
             if isinstance(value, float):
                 try:
                     return to_qvariant(self._format % value)
@@ -411,7 +411,7 @@ class DataFrameModel(QAbstractTableModel):
                     self.display_error_idxs.append(index)
                     return "Display Error!"
         elif role == Qt.BackgroundColorRole:
-            return to_qvariant(self.get_bgcolor(index))
+            return to_qvariant(self.getBgColor(index))
         # elif role == Qt.FontRole:
         #     return to_qvariant(get_font(font_size_delta=DEFAULT_SMALL_DELTA))
         elif role == Qt.ToolTipRole:
@@ -422,7 +422,7 @@ class DataFrameModel(QAbstractTableModel):
                 )
         return to_qvariant()
 
-    def recalculate_index(self):
+    def recalculateIndex(self):
         """Recalcuate index information."""
         self.df_index_list = self.df.index.tolist()
 
@@ -471,7 +471,7 @@ class DataFrameModel(QAbstractTableModel):
                     #  "SystemError: %s" % to_text_string(e))
             else:
                 # Update index list
-                self.recalculate_index()
+                self.recalculateIndex()
                 # To sort by index
                 self.df.sort_index(inplace=True, ascending=ascending)
         except TypeError as e:
@@ -506,7 +506,7 @@ class DataFrameModel(QAbstractTableModel):
                 self.df.iloc[row, column] = change_type("0")
         else:
             val = from_qvariant(value, str)
-            current_value = self.get_value(row, column)
+            current_value = self.getValue(row, column)
             if isinstance(current_value, (bool, np.bool_)):
                 val = bool_false_check(val)
             supported_types = (bool, np.bool_) + REAL_NUMBER_TYPES
@@ -530,7 +530,7 @@ class DataFrameModel(QAbstractTableModel):
                     ),
                 )
                 return False
-        self.max_min_col_update()
+        self.maxMinColUpdate()
         self.dataChanged.emit(index, index)
         return True
 
@@ -555,7 +555,7 @@ class DataFrameModel(QAbstractTableModel):
         """Get more columns and/or rows."""
         if rows and self.total_rows > self.rows_loaded:
             reminder = self.total_rows - self.rows_loaded
-            items_to_fetch = min(reminder, ROWS_TO_LOAD)
+            items_to_fetch = min(reminder, self.rows_to_load)
             self.beginInsertRows(
                 QModelIndex(), self.rows_loaded, self.rows_loaded + items_to_fetch - 1
             )
@@ -563,7 +563,7 @@ class DataFrameModel(QAbstractTableModel):
             self.endInsertRows()
         if columns and self.total_cols > self.cols_loaded:
             reminder = self.total_cols - self.cols_loaded
-            items_to_fetch = min(reminder, COLS_TO_LOAD)
+            items_to_fetch = min(reminder, self.cols_to_load)
             self.beginInsertColumns(
                 QModelIndex(), self.cols_loaded, self.cols_loaded + items_to_fetch - 1
             )
@@ -762,25 +762,25 @@ class DataFrameHeaderModel(QAbstractTableModel):
 
         # Use paging when the total size, number of rows or number of
         # columns is too large
-        if size > LARGE_SIZE:
-            self.rows_loaded = ROWS_TO_LOAD
-            self.cols_loaded = COLS_TO_LOAD
+        if size > self.model.dialog.large_df_size:
+            self.rows_loaded = self.model.dialog.rows_to_load
+            self.cols_loaded = self.model.dialog.cols_to_load
         else:
-            if self.total_cols > LARGE_COLS:
-                self.cols_loaded = COLS_TO_LOAD
+            if self.total_cols > self.model.dialog.large_ncols:
+                self.cols_loaded = self.model.dialog.cols_to_load
             else:
                 self.cols_loaded = self.total_cols
-            if self.total_rows > LARGE_NROWS:
-                self.rows_loaded = ROWS_TO_LOAD
+            if self.total_rows > self.model.dialog.large_nrows:
+                self.rows_loaded = self.model.dialog.rows_to_load
             else:
                 self.rows_loaded = self.total_rows
 
         if self.axis == 0:
             self.total_cols = self.model.shape[1]
-            self._shape = (self.model.header_shape[0], self.model.shape[1])
+            self._shape = (self.model.headerShape[0], self.model.shape[1])
         else:
             self.total_rows = self.model.shape[0]
-            self._shape = (self.model.shape[0], self.model.header_shape[1])
+            self._shape = (self.model.shape[0], self.model.headerShape[1])
 
     def rowCount(self, index=None):
         """Get number of rows in the header."""
@@ -806,7 +806,7 @@ class DataFrameHeaderModel(QAbstractTableModel):
         """Get more columns or rows (based on axis)."""
         if self.axis == 1 and self.total_rows > self.rows_loaded:
             reminder = self.total_rows - self.rows_loaded
-            items_to_fetch = min(reminder, ROWS_TO_LOAD)
+            items_to_fetch = min(reminder, self.rows_to_load)
             self.beginInsertRows(
                 QModelIndex(), self.rows_loaded, self.rows_loaded + items_to_fetch - 1
             )
@@ -814,7 +814,7 @@ class DataFrameHeaderModel(QAbstractTableModel):
             self.endInsertRows()
         if self.axis == 0 and self.total_cols > self.cols_loaded:
             reminder = self.total_cols - self.cols_loaded
-            items_to_fetch = min(reminder, COLS_TO_LOAD)
+            items_to_fetch = min(reminder, self.cols_to_load)
             self.beginInsertColumns(
                 QModelIndex(), self.cols_loaded, self.cols_loaded + items_to_fetch - 1
             )
@@ -839,7 +839,7 @@ class DataFrameHeaderModel(QAbstractTableModel):
         if self.axis == 1 and self._shape[1] <= 1:
             return None
         orient_axis = 0 if orientation == Qt.Horizontal else 1
-        if self.model.header_shape[orient_axis] > 1:
+        if self.model.headerShape[orient_axis] > 1:
             header = section
         else:
             header = self.model.header(self.axis, section)
@@ -911,11 +911,11 @@ class DataFrameLevelModel(QAbstractTableModel):
 
     def rowCount(self, index=None):
         """Get number of rows (number of levels for the header)."""
-        return max(1, self.model.header_shape[0])
+        return max(1, self.model.headerShape[0])
 
     def columnCount(self, index=None):
         """Get the number of columns (number of levels for the index)."""
-        return max(1, self.model.header_shape[1])
+        return max(1, self.model.headerShape[1])
 
     def headerData(self, section, orientation, role):
         """
@@ -929,13 +929,13 @@ class DataFrameLevelModel(QAbstractTableModel):
                 return Qt.AlignRight | Qt.AlignVCenter
         if role != Qt.DisplayRole and role != Qt.ToolTipRole:
             return None
-        if self.model.header_shape[0] <= 1 and orientation == Qt.Horizontal:
+        if self.model.headerShape[0] <= 1 and orientation == Qt.Horizontal:
             if self.model.name(1, section):
                 return self.model.name(1, section)
             return "Index"
-        elif self.model.header_shape[0] <= 1:
+        elif self.model.headerShape[0] <= 1:
             return None
-        elif self.model.header_shape[1] <= 1 and orientation == Qt.Vertical:
+        elif self.model.headerShape[1] <= 1 and orientation == Qt.Vertical:
             return None
         return "Index" + " " + str(section)
         # return 'Index' + ' ' + to_text_string(section)
@@ -947,9 +947,9 @@ class DataFrameLevelModel(QAbstractTableModel):
         if role == Qt.FontRole:
             return self._font
         label = ""
-        if index.column() == self.model.header_shape[1] - 1:
+        if index.column() == self.model.headerShape[1] - 1:
             label = str(self.model.name(0, index.row()))
-        elif index.row() == self.model.header_shape[0] - 1:
+        elif index.row() == self.model.headerShape[0] - 1:
             label = str(self.model.name(1, index.column()))
         if role == Qt.DisplayRole and label:
             return label
@@ -982,6 +982,26 @@ class DataFrameEditor(QWidget):
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.is_series = False
         self.layout = None
+
+        # Limit at which dataframe is considered so large that it is loaded on demand
+        self.large_df_size = 5e5  # LARGE_SIZE
+        self.large_nrows = 1e5  # LARGE_NROWS
+        self.large_ncols = 60  # LARGE_COLS
+        self.rows_to_load = 500  # ROWS_TO_LOAD
+        self.cols_to_load = 40  # COLS_TO_LOAD
+
+        # Background colours
+        self.background_number_min_hue = (
+            0.66  # hue for largest number  BACKGROUND_NUMBER_MINHUE
+        )
+        self.background_number_hue_range = 0.33  # (hue for smallest) minus (hue for largest) BACKGROUND_NUMBER_HUERANGE
+        self.background_number_saturation = 0.7  # BACKGROUND_NUMBER_SATURATION
+        self.background_number_value = 1.0  # BACKGROUND_NUMBER_VALUE
+        self.background_number_alpha = 0.6  # BACKGROUND_NUMBER_ALPHA
+        self.background_nonnumber_color = Qt.lightGray  # BACKGROUND_NONNUMBER_COLOR
+        # self.background_index_alpha = 0.8   # BACKGROUND_INDEX_ALPHA
+        self.background_string_alpha = 0.05  # BACKGROUND_STRING_ALPHA
+        self.background_misc_alpha = 0.3  # BACKGROUND_MISC_ALPHA
 
         # self.setWindowTitle(title)
 
@@ -1088,7 +1108,7 @@ class DataFrameEditor(QWidget):
         self.resizeColumnsToContents()
 
         #         format = '%' + self.get_conf('dataframe_format')
-        #         self.dataModel.set_format(format)
+        #         self.dataModel.setFormat(format)
 
         return True
 
@@ -1178,6 +1198,49 @@ class DataFrameEditor(QWidget):
         """Get the model of the dataframe."""
         return self._model
 
+    def set_large_df_size(self, value):
+        self.large_df_size = value
+
+    def set_large_nrows(self, value):
+        self.large_nrows = value
+
+    def set_large_ncols(self, value):
+        self.large_ncols = value
+
+    def set_rows_to_load(self, value):
+        self.rows_to_load = value
+
+    def set_cols_to_load(self, value):
+        self.cols_to_load = value
+
+    def set_background_num_min_hue(self, value):
+        self.background_number_min_hue = value
+
+    def set_background_num_hue_range(self, value):
+        # (hue for smallest) minus (hue for largest)
+        self.background_number_hue_range = value
+
+    def set_background_num_saturation(self, value):
+        self.background_number_saturation = value
+
+    def set_background_num_value(self, value):
+        self.background_number_value = value
+
+    def set_background_num_alpha(self, value):
+        self.background_number_alpha = value
+
+    def set_background_nonnumber_color(self, value):
+        self.background_nonnumber_color = Qt.lightGray
+
+    def set_background_index_alpha(self, value):
+        self.background_index_alpha = value
+
+    def set_background_string_alpha(self, value):
+        self.background_string_alpha = value
+
+    def set_background_misc_alpha(self, value):
+        self.background_misc_alpha = value
+
     def _column_resized(self, col, old_width, new_width):
         """Update the column width."""
         self.dataTable.setColumnWidth(col, new_width)
@@ -1207,7 +1270,7 @@ class DataFrameEditor(QWidget):
         self.table_level.verticalHeader().setFixedWidth(h_width)
         self.table_index.verticalHeader().setFixedWidth(h_width)
 
-        last_row = self._model.header_shape[0] - 1
+        last_row = self._model.headerShape[0] - 1
         if last_row < 0:
             hdr_height = self.table_level.horizontalHeader().height()
         else:
@@ -1224,7 +1287,7 @@ class DataFrameEditor(QWidget):
         self.table_header.setFixedHeight(hdr_height)
         self.table_level.setFixedHeight(hdr_height)
 
-        last_col = self._model.header_shape[1] - 1
+        last_col = self._model.headerShape[1] - 1
         if last_col < 0:
             idx_width = self.table_level.verticalHeader().width()
         else:
@@ -1368,7 +1431,7 @@ class DataFrameEditor(QWidget):
         """
         This is implementet so column min/max is only active when bgcolor is
         """
-        self.dataModel.bgcolor(state)
+        self.dataModel.bgColor(state)
         self.bgcolor_global.setEnabled(not self.is_series and state > 0)
 
     def change_format(self):
@@ -1380,7 +1443,7 @@ class DataFrameEditor(QWidget):
             "Format",
             "Float formatting",
             QLineEdit.Normal,
-            self.dataModel.get_format(),
+            self.dataModel.getFormat(),
         )
         if valid:
             format = str(format)
@@ -1394,12 +1457,12 @@ class DataFrameEditor(QWidget):
                 msg = "Format ({format}) should start with '%'"
                 QMessageBox.critical(self, "Error", msg)
                 return
-            self.dataModel.set_format(format)
+            self.dataModel.setFormat(format)
 
             format = format[1:]
             # self.set_conf('dataframe_format', format)
 
-    def get_value(self):
+    def getValue(self):
         """Return modified Dataframe -- this is *not* a copy"""
         # It is import to avoid accessing Qt C++ object as it has probably
         # already been destroyed, due to the Qt.WA_DeleteOnClose attribute
@@ -1430,7 +1493,7 @@ class DataFrameEditor(QWidget):
         Uses the model of the dataTable as the base.
         """
         # Update index list calculation
-        self.dataModel.recalculate_index()
+        self.dataModel.recalculateIndex()
         self.setModel(self.dataTable.model())
 
     def _fetch_more_columns(self):
