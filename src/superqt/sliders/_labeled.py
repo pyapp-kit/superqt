@@ -118,6 +118,7 @@ def _handle_overloaded_slider_sig(args, kwargs):
 
 
 class QLabeledSlider(_SliderProxy, QAbstractSlider):
+    EdgeLabelMode = EdgeLabelMode
     _slider_class = QSlider
     _slider: QSlider
 
@@ -128,6 +129,7 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
 
         self._slider = self._slider_class()
         self._label = SliderLabel(self._slider, connect=self._slider.setValue)
+        self._edge_label_mode: EdgeLabelMode = EdgeLabelMode.LabelIsValue
 
         self._rename_signals()
         self._slider.actionTriggered.connect(self.actionTriggered.emit)
@@ -147,6 +149,7 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
     def setOrientation(self, orientation):
         """Set orientation, value will be 'horizontal' or 'vertical'."""
         self._slider.setOrientation(orientation)
+        marg = (0, 0, 0, 0)
         if orientation == Qt.Orientation.Vertical:
             layout = QVBoxLayout()
             layout.addWidget(self._slider, alignment=Qt.AlignmentFlag.AlignHCenter)
@@ -154,6 +157,9 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
             self._label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             layout.setSpacing(1)
         else:
+            if self._edge_label_mode == EdgeLabelMode.NoLabel:
+                marg = (0, 0, 5, 0)
+
             layout = QHBoxLayout()
             layout.addWidget(self._slider)
             layout.addWidget(self._label)
@@ -164,8 +170,32 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         if old_layout is not None:
             QWidget().setLayout(old_layout)
 
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(*marg)
         self.setLayout(layout)
+
+    def edgeLabelMode(self) -> EdgeLabelMode:
+        return self._edge_label_mode
+
+    def setEdgeLabelMode(self, opt: EdgeLabelMode) -> None:
+        if opt is EdgeLabelMode.LabelIsRange:
+            raise ValueError(
+                "mode must be one of 'EdgeLabelMode.NoLabel' or "
+                "'EdgeLabelMode.LabelIsValue'."
+            )
+
+        self._edge_label_mode = opt
+        if not self._edge_label_mode:
+            self._label.hide()
+            w = 5 if self.orientation() == Qt.Orientation.Horizontal else 0
+            self.layout().setContentsMargins(0, 0, w, 0)
+        else:
+            if self.isVisible():
+                self._label.show()
+            self._label.setMode(opt)
+            self._label.setValue(self._slider.value())
+            self.layout().setContentsMargins(0, 0, 0, 0)
+
+        QApplication.processEvents()
 
 
 class QLabeledDoubleSlider(QLabeledSlider):
@@ -487,7 +517,7 @@ class SliderLabel(QDoubleSpinBox):
         )
         self.setFixedSize(size)
 
-    def setValue(self, val):
+    def setValue(self, val: Any) -> None:
         super().setValue(val)
         if self._mode == EdgeLabelMode.LabelIsRange:
             self._update_size()
