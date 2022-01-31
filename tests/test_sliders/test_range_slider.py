@@ -86,7 +86,7 @@ def test_steps(gslider: QRangeSlider, qtbot):
 
 @pytest.mark.parametrize("mag", list(range(4, 37, 4)) + list(range(-4, -37, -4)))
 def test_slider_extremes(gslider: QRangeSlider, mag, qtbot):
-    _mag = 10 ** mag
+    _mag = 10**mag
     with qtbot.waitSignal(gslider.rangeChanged):
         gslider.setRange(-_mag, _mag)
     for i in _linspace(-_mag, _mag, 10):

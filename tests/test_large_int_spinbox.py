@@ -8,18 +8,18 @@ def test_large_spinbox(qtbot):
     qtbot.addWidget(sb)
 
     for e in range(2, 100, 2):
-        sb.setMaximum(10 ** e + 2)
+        sb.setMaximum(10**e + 2)
         with qtbot.waitSignal(sb.valueChanged) as sgnl:
-            sb.setValue(10 ** e)
-        assert sgnl.args == [10 ** e]
-        assert sb.value() == 10 ** e
+            sb.setValue(10**e)
+        assert sgnl.args == [10**e]
+        assert sb.value() == 10**e
 
-        sb.setMinimum(-(10 ** e) - 2)
+        sb.setMinimum(-(10**e) - 2)
 
         with qtbot.waitSignal(sb.valueChanged) as sgnl:
-            sb.setValue(-(10 ** e))
-        assert sgnl.args == [-(10 ** e)]
-        assert sb.value() == -(10 ** e)
+            sb.setValue(-(10**e))
+        assert sgnl.args == [-(10**e)]
+        assert sb.value() == -(10**e)
 
 
 def test_large_spinbox_type(qtbot):

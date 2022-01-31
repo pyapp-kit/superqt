@@ -40,7 +40,7 @@ SC_GROOVE = QStyle.SubControl.SC_SliderGroove
 SC_TICKMARKS = QStyle.SubControl.SC_SliderTickmarks
 
 CC_SLIDER = QStyle.ComplexControl.CC_Slider
-QOVERFLOW = 2 ** 31 - 1
+QOVERFLOW = 2**31 - 1
 
 
 class _GenericSlider(QSlider, Generic[_T]):

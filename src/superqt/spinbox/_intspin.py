@@ -40,7 +40,7 @@ class QLargeIntSpinBox(QAbstractSpinBox):
         super().__init__(parent)
         self._value: int = 0
         self._minimum: int = 0
-        self._maximum: int = 2 ** 64 - 1
+        self._maximum: int = 2**64 - 1
         self._single_step: int = 1
         self._pending_emit = False
         validator = _AnyIntValidator(self)
