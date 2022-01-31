@@ -50,7 +50,6 @@ from qtpy.QtCore import (
     QModelIndex,
     Qt,
     Signal,
-    Slot,
 )
 from qtpy.QtGui import QColor, QCursor
 from qtpy.QtWidgets import (
@@ -1127,12 +1126,12 @@ class DataFrameEditor(QWidget):
 
         return True
 
-    @Slot(QModelIndex, QModelIndex)
-    def _save_and_close_enable(self, top_left, bottom_right):
-        """Handle the data change event to enable the save and close button."""
-        self.btn_save_and_close.setEnabled(True)
-        self.btn_save_and_close.setAutoDefault(True)
-        self.btn_save_and_close.setDefault(True)
+    # @Slot(QModelIndex, QModelIndex)
+    # def _save_and_close_enable(self, top_left, bottom_right):
+    #     """Handle the data change event to enable the save and close button."""
+    #     self.btn_save_and_close.setEnabled(True)
+    #     self.btn_save_and_close.setAutoDefault(True)
+    #     self.btn_save_and_close.setDefault(True)
 
     def _create_table_level(self):
         """Create the QTableView that will hold the level model."""
