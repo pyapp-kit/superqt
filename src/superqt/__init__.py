@@ -8,6 +8,7 @@ except ImportError:
 from ._eliding_label import QElidingLabel
 from .collapsible import QCollapsible
 from .combobox import QEnumComboBox
+from .dataframeeditor import QDataFrameEditor
 from .sliders import (
     QDoubleRangeSlider,
     QDoubleSlider,
@@ -23,6 +24,7 @@ from .utils import QMessageHandler, ensure_main_thread, ensure_object_thread
 __all__ = [
     "ensure_main_thread",
     "ensure_object_thread",
+    "QDataFrameEditor",
     "QDoubleRangeSlider",
     "QDoubleSlider",
     "QElidingLabel",

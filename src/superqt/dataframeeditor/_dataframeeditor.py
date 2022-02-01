@@ -968,7 +968,7 @@ class DataFrameLevelModel(QAbstractTableModel):
         return None
 
 
-class DataFrameEditor(QWidget):
+class QDataFrameEditor(QWidget):
     # class DataFrameEditor(BaseDialog, SpyderConfigurationAccessor):
     """
     Widget for displaying and editing DataFrame and related objects.

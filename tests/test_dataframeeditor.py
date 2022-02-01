@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from superqt.dataframeeditor.dataframeeditor import DataFrameEditor
+from superqt.dataframeeditor import QDataFrameEditor
 
 df = pd.DataFrame({"col1": ["a", "b", "c"], "col2": [1, 3, 2], "col3": [1.3, 2.4, 5.1]})
 
@@ -9,7 +9,7 @@ df = pd.DataFrame({"col1": ["a", "b", "c"], "col2": [1, 3, 2], "col3": [1.3, 2.4
 @pytest.fixture
 def dataframe_widget(qtbot):
     def _dataframe_widget(**kwargs):
-        widget = DataFrameEditor(**kwargs)
+        widget = QDataFrameEditor(**kwargs)
         widget.show()
         qtbot.addWidget(widget)
 
