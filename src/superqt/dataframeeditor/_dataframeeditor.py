@@ -39,7 +39,11 @@ Components of gtabview from gtabview/viewer.py and gtabview/models.py of the
 from time import perf_counter
 
 import numpy as np
-import pandas as pd
+
+try:
+    import pandas as pd
+except ImportError:
+    raise Exception("To use the dataframeeditor you need to have pandas installed!")
 
 # Third party imports
 from qtpy.compat import from_qvariant, to_qvariant
@@ -616,8 +620,9 @@ class DataFrameView(QTableView):
         self.setModel(model)
         self.setHorizontalScrollBar(hscroll)
         self.setVerticalScrollBar(vscroll)
-        self.setHorizontalScrollMode(1)
-        self.setVerticalScrollMode(1)
+
+        self.setHorizontalScrollMode(self.ScrollPerPixel)
+        self.setVerticalScrollMode(self.ScrollPerPixel)
 
         self._sort_old = [None]
         self._header_class = header
