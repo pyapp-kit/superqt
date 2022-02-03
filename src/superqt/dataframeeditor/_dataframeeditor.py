@@ -159,7 +159,7 @@ def global_max(col_vals, index):
     return max(max_col), min(min_col)
 
 
-class DataFrameModel(QAbstractTableModel):
+class QDataFrameModel(QAbstractTableModel):
     """
     DataFrame Table Model.
     Partly based in ExtDataModel and ExtFrameModel classes
@@ -351,7 +351,7 @@ class DataFrameModel(QAbstractTableModel):
             else:
                 color.setAlphaF(self._background_misc_alpha)
         else:
-            if isinstance(value, self._complex_number_types):
+            if isinstance(value, self._dialog._complex_number_types):
                 color_func = abs
             else:
                 color_func = float
@@ -361,8 +361,8 @@ class DataFrameModel(QAbstractTableModel):
             else:
                 vmax_vmin_diff = vmax - vmin
             hue = (
-                self._background_number_min_hue
-                + self._background_number_hue_range
+                self._dialog._background_number_min_hue
+                + self._dialog._background_number_hue_range
                 * (vmax - color_func(value))
                 / (vmax_vmin_diff)
             )
@@ -371,9 +371,9 @@ class DataFrameModel(QAbstractTableModel):
                 hue = 1
             color = QColor.fromHsvF(
                 hue,
-                self._background_number_saturation,
-                self._background_number_value,
-                self._background_number_alpha,
+                self._dialog._background_number_saturation,
+                self._dialog._background_number_value,
+                self._dialog._background_number_alpha,
             )
         return color
 
@@ -497,14 +497,24 @@ class DataFrameModel(QAbstractTableModel):
         )
 
     def setData(self, index, value, role=Qt.EditRole, change_type=None):
-        """Cell content change"""
+        """Cell content change
+
+        Parameters
+        -----------
+        change_type: function that converts the data in cells (ex. float, str, bool, etc)
+
+        """
         column = index.column()
         row = index.row()
-
         if index in self._display_error_idxs:
             return False
         if change_type is not None:
             try:
+                # ppw note: from what I can see, the intent of this block of code is not to set a new
+                # value and change the type.  For example, if you want to set a value to
+                # False and change from int to bool, this will not currently work.  It appears
+                # the original intent of this block was to be set via a menu where you change
+                # the type, then you can edit the values separately.
                 value = self.data(index, role=Qt.DisplayRole)
                 val = from_qvariant(value, str)
                 if change_type is bool:
@@ -514,9 +524,11 @@ class DataFrameModel(QAbstractTableModel):
                 self._df.iloc[row, column] = change_type("0")
         else:
             val = from_qvariant(value, str)
+            # ppw note:  this should change to str, but it doesn't yet, so doing this below
+            val = str(val)
             current_value = self.getValue(row, column)
             if isinstance(current_value, (bool, np.bool_)):
-                val = bool_false_check(val)
+                val = bool_false_check(val, self._dialog._bool_false)
             supported_types = (bool, np.bool_) + self._dialog._real_number_types
             if (
                 isinstance(current_value, supported_types) or type(current_value) == str
@@ -1061,7 +1073,7 @@ class QDataFrameEditor(QWidget):
         self._create_table_index()
 
         # Create the model and view of the data
-        self._dataModel = DataFrameModel(data, parent=self)
+        self._dataModel = QDataFrameModel(data, parent=self)
         # self._dataModel.dataChanged.connect(self._save_and_close_enable)
         self._create_data_table()
 
@@ -1457,7 +1469,7 @@ class QDataFrameEditor(QWidget):
         This is implementet so column min/max is only active when bgcolor is
         """
         self._dataModel._bg_color(state)
-        self.bgcolor_global.setEnabled(not self._is_series and state > 0)
+        # self.bgcolor_global.setEnabled(not self._is_series and state > 0)
 
     # def change_format(self):
     #     """
