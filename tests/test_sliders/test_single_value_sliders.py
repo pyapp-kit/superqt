@@ -227,7 +227,7 @@ def test_slider_extremes(sld: _GenericSlider, mag, qtbot):
     if type(sld) is QLabeledSlider:
         pytest.skip()
 
-    _mag = 10 ** mag
+    _mag = 10**mag
     with qtbot.waitSignal(sld.rangeChanged, timeout=400):
         sld.setRange(-_mag, _mag)
     for i in _linspace(-_mag, _mag, 10):
