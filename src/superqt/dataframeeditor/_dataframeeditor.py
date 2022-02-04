@@ -183,15 +183,27 @@ class QDataFrameModel(QAbstractTableModel):
         size = self._total_rows * self._total_cols
 
         self._max_min_col = None
-        if size < parent._large_df_size:
+
+        # ppw note: set the ability to color cells from the dataframeeditor
+        self._bgcolor_enabled = parent._background_color_enabled
+        if parent._background_color_enabled:
             self._max_min_col_update()
             self._colum_avg_enabled = True
-            self._bgcolor_enabled = False  # ppw note: turned off for now.
+            self._bgcolor_enabled = True
             self._column_avg(1)
         else:
             self._colum_avg_enabled = False
             self._bgcolor_enabled = False
             self._column_avg(0)
+        # if size < parent._large_df_size:
+        #     self._max_min_col_update()
+        #     self._colum_avg_enabled = True
+        #     # self._bgcolor_enabled = False  # ppw note: turned off for now.
+        #     self._column_avg(1)
+        # else:
+        #     self._colum_avg_enabled = False
+        #     # self._bgcolor_enabled = False
+        #     self._column_avg(0)
 
         # Use paging when the total size, number of rows or number of
         # columns is too large
@@ -250,7 +262,7 @@ class QDataFrameModel(QAbstractTableModel):
     @property
     def _chunkSize(self):
         """Return the max value of the dimensions of the dataframe."""
-        return max(*self.shape())
+        return max(*self.shape)
 
     def _header(self, axis, x, level=0):
         """
@@ -1022,6 +1034,7 @@ class QDataFrameEditor(QWidget):
         self._cols_to_load = 40  # COLS_TO_LOAD
 
         # Background colours
+        self._background_color_enabled = False
         self._background_number_min_hue = (
             0.66  # hue for largest number  BACKGROUND_NUMBER_MINHUE
         )
@@ -1243,6 +1256,9 @@ class QDataFrameEditor(QWidget):
 
     def _setColsToLoad(self, value):
         self._cols_to_load = value
+
+    def _enableBackgroundColor(self, value):
+        self._background_color_enabled = value
 
     def _setBackgroundNumMinHue(self, value):
         self._background_number_min_hue = value

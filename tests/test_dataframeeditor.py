@@ -34,6 +34,12 @@ def test_dataframeeditor_dataframe(dataframe_widget):
 
     assert df.equals(wdg.getValue())
 
+    # test complex number dataframe
+    df = pd.DataFrame(
+        {"col1": ["a", "b", "c"], "col2": [1j, 3, 2j], "col3": [1.3, 2.4, 5.1]}
+    )
+    wdg._setup_and_check(df)
+
 
 def test_dataframeeditor_dataframe_sort(dataframe_widget):
 
@@ -75,17 +81,54 @@ def test_qdataframemodel_setData(dataframe_widget):
 
 
 def test_dataframe_largedf(dataframe_widget):
-
+    # check that a large dataframe will still load.
     wdg = dataframe_widget()
     wdg._setLargeDfSize(25)
-    df = pd.DataFrame(np.random.choice([20, 30, 40], size=(30, 3)))
+    df = pd.DataFrame(np.random.choice([20, 30, 40], size=(30, 10)))
     wdg._setup_and_check(df)
+
+    wdg._setLargeDfSize(500)
+    wdg._setLargeNumRows(20)
+    wdg._setLargeNumCols(5)
+    wdg._setRowsToLoad(10)
+    wdg._setColsToLoad(3)
+    wdg._setup_and_check(df)
+
+    assert wdg._model.rowCount() == 10
+    assert wdg._model.columnCount() == 3
+    assert wdg._model._chunkSize == 30
 
 
 def test_dataframe_bgcolor(dataframe_widget):
 
     wdg = dataframe_widget()
     df = pd.DataFrame(np.random.choice([20, 30, 40], size=(30, 3)))
+    wdg._enableBackgroundColor(True)
     wdg._setup_and_check(df)
-    wdg._setLargeDfSize(25)
-    wdg._change_bgcolor_enable(1)
+
+    # empty dataframe
+    # test empty dataframe
+    df = pd.DataFrame({})
+    wdg._setup_and_check(df)
+
+    # test complex with background color
+    # test complex number dataframe
+    df = pd.DataFrame(
+        {"col1": ["a", "b", "c"], "col2": [1j, 3, 2j], "col3": [1.3, 2.4, 5.1]}
+    )
+    wdg._setup_and_check(df)
+
+
+def test_dataframe_multiindex(dataframe_widget):
+
+    idx = pd.MultiIndex.from_product([["bar", "baz", "foo", "qux"], ["one", "two"]])
+    df = pd.DataFrame(np.random.randn(8, 2), index=idx, columns=["A", "B"])
+
+    wdg = dataframe_widget()
+    wdg._enableBackgroundColor(True)
+    wdg._setup_and_check(df)
+
+
+# def test_dataframe_large_rows(dataframe_widget):
+#     wdg = dataframe_widget()
+#     df = pd.DataFrame(np.random.choice([20, 30, 40], size=(30, 3)))
