@@ -356,12 +356,12 @@ class QDataFrameModel(QAbstractTableModel):
             return
         value = self.getValue(index.row(), column)
         if self._max_min_col[column] is None or pd.isna(value):
-            color = QColor(self._background_nonnumber_color)
+            color = QColor(self._dialog._background_nonnumber_color)
             if type(value) == str:  # ppw change
                 # if is_text_string(value):
-                color.setAlphaF(self._background_string_alpha)
+                color.setAlphaF(self._dialog._background_string_alpha)
             else:
-                color.setAlphaF(self._background_misc_alpha)
+                color.setAlphaF(self._dialog._background_misc_alpha)
         else:
             if isinstance(value, self._dialog._complex_number_types):
                 color_func = abs

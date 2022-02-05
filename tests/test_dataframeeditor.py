@@ -4,7 +4,20 @@ import pytest
 
 from superqt.dataframeeditor import QDataFrameEditor
 
-df = pd.DataFrame({"col1": ["a", "b", "c"], "col2": [1, 3, 2], "col3": [1.3, 2.4, 5.1]})
+idx = pd.MultiIndex.from_product([["bar", "baz", "foo", "qux"], ["one", "two"]])
+dataframe = [
+    pd.DataFrame({"col1": ["a", "b", "c"], "col2": [1, 3, 2], "col3": [1.3, 2.4, 5.1]}),
+    pd.DataFrame(np.random.choice([20, 30, 40], size=(30, 10))),
+    pd.DataFrame(
+        {
+            "col1": ["a", "b", "c"],
+            "col2": [complex(0, 1), 3, complex(2, 3)],
+            "col3": [1.3, 2.4, 5.1],
+        }
+    ),
+    pd.DataFrame(np.random.choice([20, 30, 40], size=(30, 3))),
+    pd.DataFrame(np.random.randn(8, 3), index=idx, columns=["col1", "col2", "col3"]),
+]
 
 
 @pytest.fixture
@@ -23,61 +36,34 @@ def test_dataframeeditor_defaults(dataframe_widget):
     dataframe_widget()
 
 
-def test_dataframeeditor_dataframe(dataframe_widget):
-
-    df = pd.DataFrame(
-        {"col1": ["a", "b", "c"], "col2": [1, 3, 2], "col3": [1.3, 2.4, 5.1]}
-    )
+@pytest.mark.parametrize("df", dataframe)
+def test_dataframeeditor_dataframe(dataframe_widget, df):
 
     wdg = dataframe_widget()
     wdg._setup_and_check(df)
 
     assert df.equals(wdg.getValue())
 
-    # test complex number dataframe
-    df = pd.DataFrame(
-        {"col1": ["a", "b", "c"], "col2": [1j, 3, 2j], "col3": [1.3, 2.4, 5.1]}
-    )
-    wdg._setup_and_check(df)
 
-
-def test_dataframeeditor_dataframe_sort(dataframe_widget):
+@pytest.mark.parametrize("df", dataframe)
+def test_dataframeeditor_dataframe_sort(dataframe_widget, df):
 
     wdg = dataframe_widget()
 
     wdg._setup_and_check(df)
     wdg._dataTable.sortByColumn(1)
-
-    df2 = pd.DataFrame(
-        {"col1": ["b", "c", "a"], "col2": [3, 2, 1], "col3": [2.4, 5.1, 1.3]}
-    )
-
-    assert df2.values.all() == wdg.getValue().values.all()
+    assert wdg._model.getValue(0, 1) == df.max()[1]
 
 
-# QDataFrameModel
+@pytest.mark.parametrize("df", dataframe)
+def test_qdataframemodel_setData(dataframe_widget, df):
 
-
-def test_qdataframemodel_setData(dataframe_widget):
     wdg = dataframe_widget()
-    df = pd.DataFrame(
-        {"col1": ["a", "b", "c"], "col2": [1, 3, 2], "col3": [1.3, 2.4, 5.1]}
-    )
     wdg._setup_and_check(df)
-    index = wdg._model.index(0, 1)
+    index = wdg._model.index(0, 2)
     wdg._model.setData(index, 4)
 
-    df_result = pd.DataFrame(
-        {"col1": ["a", "b", "c"], "col2": [4, 3, 2], "col3": [1.3, 2.4, 5.1]}
-    )
-
-    assert df_result.equals(wdg.getValue())
-
-    wdg._model.setData(index, "", change_type=bool)
-    assert wdg._model.getValue(index.row(), index.column()) is True
-
-    wdg._model.setData(index, 0)
-    assert wdg._model.getValue(index.row(), index.column()) is False
+    assert wdg._model.getValue(0, 2) == 4
 
 
 def test_dataframe_largedf(dataframe_widget):
@@ -99,36 +85,9 @@ def test_dataframe_largedf(dataframe_widget):
     assert wdg._model._chunkSize == 30
 
 
-def test_dataframe_bgcolor(dataframe_widget):
-
-    wdg = dataframe_widget()
-    df = pd.DataFrame(np.random.choice([20, 30, 40], size=(30, 3)))
-    wdg._enableBackgroundColor(True)
-    wdg._setup_and_check(df)
-
-    # empty dataframe
-    # test empty dataframe
-    df = pd.DataFrame({})
-    wdg._setup_and_check(df)
-
-    # test complex with background color
-    # test complex number dataframe
-    df = pd.DataFrame(
-        {"col1": ["a", "b", "c"], "col2": [1j, 3, 2j], "col3": [1.3, 2.4, 5.1]}
-    )
-    wdg._setup_and_check(df)
-
-
-def test_dataframe_multiindex(dataframe_widget):
-
-    idx = pd.MultiIndex.from_product([["bar", "baz", "foo", "qux"], ["one", "two"]])
-    df = pd.DataFrame(np.random.randn(8, 2), index=idx, columns=["A", "B"])
+@pytest.mark.parametrize("df", dataframe)
+def test_dataframe_bgcolor(dataframe_widget, df):
 
     wdg = dataframe_widget()
     wdg._enableBackgroundColor(True)
     wdg._setup_and_check(df)
-
-
-# def test_dataframe_large_rows(dataframe_widget):
-#     wdg = dataframe_widget()
-#     df = pd.DataFrame(np.random.choice([20, 30, 40], size=(30, 3)))
