@@ -8,8 +8,12 @@ __all__ = (
     "QMessageHandler",
     "thread_worker",
     "WorkerBase",
+    "install_qt_breakpoint",
+    "uninstall_qt_breakpoint",
+    "qt_set_trace",
 )
 
+from ._breakpoint import install_qt_breakpoint, qt_set_trace, uninstall_qt_breakpoint
 from ._ensure_thread import ensure_main_thread, ensure_object_thread
 from ._message_handler import QMessageHandler
 from ._qthreading import (
