@@ -247,8 +247,13 @@ class WorkerBase(QRunnable, Generic[_R]):
 
         self._worker_set.add(self)
         self._finished.connect(self._set_discard)
-        start_ = partial(QThreadPool.globalInstance().start, self)
-        QTimer.singleShot(10, start_)
+        if QThread.currentThread().loopLevel():
+            # if we're in a thread with an eventloop, queue the worker to start
+            start_ = partial(QThreadPool.globalInstance().start, self)
+            QTimer.singleShot(1, start_)
+        else:
+            # otherwise start it immediately
+            QThreadPool.globalInstance().start(self)
 
     @classmethod
     def _set_discard(cls, obj: WorkerBase) -> None:
