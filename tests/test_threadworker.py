@@ -3,6 +3,7 @@ import time
 import warnings
 from functools import partial
 from operator import eq
+from unittest.mock import Mock
 
 import pytest
 
@@ -274,3 +275,20 @@ def test_abort_does_not_return(qtbot):
     assert loop_counter < 4
     assert abort_counter == 1
     assert return_counter == 0
+
+
+def test_nested_threads_start(qtbot):
+    mock1 = Mock()
+    mock2 = Mock()
+
+    def call_mock():
+        mock1()
+        worker2 = qthreading.create_worker(mock2)
+        worker2.start()
+
+    worker = qthreading.create_worker(call_mock)
+    worker.start()
+
+    qtbot.wait(20)
+    mock1.assert_called_once()
+    mock2.assert_called_once()
