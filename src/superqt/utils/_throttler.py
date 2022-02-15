@@ -28,9 +28,10 @@ SOFTWARE.
 """
 from enum import IntFlag, auto
 from functools import partial
-from typing import Any, Callable, Optional
+from typing import Callable, Optional, TypeVar, Union, overload
 
 from qtpy.QtCore import QObject, Qt, QTimer, Signal
+from typing_extensions import Literal, ParamSpec
 
 
 class Kind(IntFlag):
@@ -67,31 +68,35 @@ class GenericSignalThrottler(QObject):
         self._timer.timeout.connect(self._maybeEmitTriggered)
 
     def kind(self) -> Kind:
+        """Return the kind of throttler (throttler or debouncer)."""
         return self._kind
 
     def emissionPolicy(self) -> EmissionPolicy:
+        """Return the emission policy (trailing or leading)."""
         return self._emissionPolicy
 
     def timeout(self) -> int:
-        """Return current timeout in seconds."""
+        """Return current timeout in milliseconds."""
         return self._timer.interval()  # type: ignore
 
     def setTimeout(self, timeout: int) -> None:
-        """Set timeout in seconds"""
+        """Set timeout in milliseconds"""
         if self._timer.interval() != timeout:
             self._timer.setInterval(timeout)
             self.timeoutChanged.emit(timeout)
 
     def timerType(self) -> Qt.TimerType:
+        """Return current Qt.TimerType."""
         return self._timer.timerType()
 
     def setTimerType(self, timerType: Qt.TimerType) -> None:
-        """Set timer type"""
+        """Set current Qt.TimerType."""
         if self._timer.timerType() != timerType:
             self._timer.setTimerType(timerType)
             self.timerTypeChanged.emit(timerType)
 
     def throttle(self) -> None:
+        """Emit triggered if not running, then start timer."""
         # public slot
         self._hasPendingEmission = True
         # Emit only if we haven't emitted already. We know if that's
@@ -114,9 +119,11 @@ class GenericSignalThrottler(QObject):
         assert self._timer.isActive()
 
     def cancel(self) -> None:
+        """ "Cancel and pending emissions."""
         self._hasPendingEmission = False
 
     def flush(self) -> None:
+        """ "Force emission of any pending emissions."""
         self._maybeEmitTriggered()
 
     def _emitTriggered(self) -> None:
@@ -135,15 +142,27 @@ class GenericSignalThrottler(QObject):
 
 
 class QSignalThrottler(GenericSignalThrottler):
+    """A Signal Throttler.
+
+    This object's `triggered` signal will emit at most once per timeout
+    (set with setTimeout()).
+    """
+
     def __init__(
         self,
-        policy: EmissionPolicy = EmissionPolicy.Trailing,
+        policy: EmissionPolicy = EmissionPolicy.Leading,
         parent: Optional[QObject] = None,
     ) -> None:
         super().__init__(Kind.Throttler, policy, parent)
 
 
 class QSignalDebouncer(GenericSignalThrottler):
+    """A Signal Debouncer.
+
+    This object's `triggered` signal will not be emitted until `self.timeout()`
+    milliseconds have elapsed since the last time `triggered` was emitted.
+    """
+
     def __init__(
         self,
         policy: EmissionPolicy = EmissionPolicy.Trailing,
@@ -154,53 +173,142 @@ class QSignalDebouncer(GenericSignalThrottler):
 
 # below here part is unique to superqt (not from KD)
 
+P = ParamSpec("P")
+R = TypeVar("R")
 
+
+@overload
 def qthrottled(
-    func: Optional[Callable[..., None]] = None,
-    timeout=100,
+    func: Callable[P, R],
+    timeout: int = 100,
     leading: bool = True,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
-) -> Callable[..., None]:
+) -> Callable[P, None]:
+    ...
+
+
+@overload
+def qthrottled(
+    func: Literal[None] = None,
+    timeout: int = 100,
+    leading: bool = True,
+    timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
+) -> Callable[[Callable[P, R]], Callable[P, None]]:
+    ...
+
+
+def qthrottled(
+    func: Optional[Callable[P, R]] = None,
+    timeout: int = 100,
+    leading: bool = True,
+    timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
+) -> Union[Callable[P, None], Callable[[Callable[P, R]], Callable[P, None]]]:
     """Creates a throttled function that invokes func at most once per timeout.
 
-    The throttled function comes with a cancel method to cancel delayed func
-    invocations and a flush method to immediately invoke them. Provide options
+    The throttled function comes with a `cancel` method to cancel delayed func
+    invocations and a `flush` method to immediately invoke them. Options
     to indicate whether func should be invoked on the leading and/or trailing
     edge of the wait timeout. The func is invoked with the last arguments provided
     to the throttled function. Subsequent calls to the throttled function return
     the result of the last func invocation.
+
+    This decorator may be used with or without parameters.
+
+    Parameters
+    ----------
+    func : Callable
+        A function to throttle
+    timeout : int
+        Timeout in milliseconds to wait before allowing another call, by default 100
+    leading : bool
+        Whether to invoke the function on the leading edge of the wait timer,
+        by default True
+    timer_type : Qt.TimerType
+        The timer type. by default `Qt.TimerType.PreciseTimer`
+        One of:
+            - `Qt.PreciseTimer`: Precise timers try to keep millisecond accuracy
+            - `Qt.CoarseTimer`: Coarse timers try to keep accuracy within 5% of the
+              desired interval
+            - `Qt.VeryCoarseTimer`: Very coarse timers only keep full second accuracy
     """
     return _make_decorator(func, timeout, leading, timer_type, Kind.Throttler)
 
 
+@overload
 def qdebounced(
-    func: Optional[Callable[..., None]] = None,
-    timeout=100,
-    leading: bool = True,
+    func: Callable[P, R],
+    timeout: int = 100,
+    leading: bool = False,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
-):
-    """Creates a debounced function that delays invoking func at until `timeout`
-    ms have elapsed since the last time the debounced function was invoked.
+) -> Callable[P, None]:
+    ...
 
-    The debounced function comes with a cancel method to cancel delayed func
-    invocations and a flush method to immediately invoke them. Provide options to
+
+@overload
+def qdebounced(
+    func: Literal[None] = None,
+    timeout: int = 100,
+    leading: bool = False,
+    timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
+) -> Callable[[Callable[P, R]], Callable[P, None]]:
+    ...
+
+
+def qdebounced(
+    func: Optional[Callable[P, R]] = None,
+    timeout: int = 100,
+    leading: bool = False,
+    timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
+) -> Union[Callable[P, None], Callable[[Callable[P, R]], Callable[P, None]]]:
+    """Creates a debounced function that delays invoking func.
+
+    `func` will not be invoked until `timeout` ms have elapsed since the last time
+    the debounced function was invoked.
+
+    The debounced function comes with a `cancel` method to cancel delayed func
+    invocations and a `flush` method to immediately invoke them. Options
     indicate whether func should be invoked on the leading and/or trailing edge
     of the wait timeout. The func is invoked with the last arguments provided to
     the debounced function. Subsequent calls to the debounced function return the
     result of the last func invocation.
+
+    This decorator may be used with or without parameters.
+
+    Parameters
+    ----------
+    func : Callable
+        A function to throttle
+    timeout : int
+        Timeout in milliseconds to wait before allowing another call, by default 100
+    leading : bool
+        Whether to invoke the function on the leading edge of the wait timer,
+        by default False
+    timer_type : Qt.TimerType
+        The timer type. by default `Qt.TimerType.PreciseTimer`
+        One of:
+            - `Qt.PreciseTimer`: Precise timers try to keep millisecond accuracy
+            - `Qt.CoarseTimer`: Coarse timers try to keep accuracy within 5% of the
+              desired interval
+            - `Qt.VeryCoarseTimer`: Very coarse timers only keep full second accuracy
     """
     return _make_decorator(func, timeout, leading, timer_type, Kind.Debouncer)
 
 
-def _make_decorator(func, timeout, leading, timer_type, kind):
-    def deco(func: Callable[..., None]) -> Callable[..., None]:
+def _make_decorator(
+    func: Optional[Callable[P, R]],
+    timeout: int,
+    leading: bool,
+    timer_type: Qt.TimerType,
+    kind: Kind,
+) -> Union[Callable[P, None], Callable[[Callable[P, R]], Callable[P, None]]]:
+    def deco(func: Callable[P, R]) -> Callable[P, None]:
         policy = EmissionPolicy.Leading if leading else EmissionPolicy.Trailing
         throttle = GenericSignalThrottler(kind, policy)
         throttle.setTimerType(timer_type)
         throttle.setTimeout(timeout)
         last_f = None
 
-        def inner(*args: Any, **kwargs: Any) -> None:
+        def inner(*args: P.args, **kwargs: P.kwargs) -> None:
             nonlocal last_f
             if last_f is not None:
                 throttle.triggered.disconnect(last_f)
@@ -209,9 +317,9 @@ def _make_decorator(func, timeout, leading, timer_type, kind):
             throttle.triggered.connect(last_f)
             throttle.throttle()
 
-        inner.cancel = throttle.cancel
-        inner.flush = throttle.flush
-        inner.set_timeout = throttle.setTimeout
+        setattr(inner, "cancel", throttle.cancel)
+        setattr(inner, "flush", throttle.flush)
+        setattr(inner, "set_timeout", throttle.setTimeout)
         return inner
 
     return deco(func) if func is not None else deco
