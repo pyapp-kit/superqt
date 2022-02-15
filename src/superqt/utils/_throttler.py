@@ -26,11 +26,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 """
+from concurrent.futures import Future
 from enum import IntFlag, auto
-from functools import partial
-from typing import Callable, Optional, TypeVar, Union, overload
+from typing import Callable, Generic, Optional, TypeVar, Union, overload
 
-from qtpy.QtCore import QObject, Qt, QTimer, Signal
+from qtpy.QtCore import QObject, Qt, QTimer, Signal, SignalInstance
 from typing_extensions import Literal, ParamSpec
 
 
@@ -177,13 +177,29 @@ P = ParamSpec("P")
 R = TypeVar("R")
 
 
+class ThrottledCallable(Generic[P, R]):
+    triggered: SignalInstance
+
+    def cancel(self) -> None:
+        ...
+
+    def flush(self) -> None:
+        ...
+
+    def set_timeout(self, timeout: int) -> None:
+        ...
+
+    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> Future[R]:
+        ...
+
+
 @overload
 def qthrottled(
     func: Callable[P, R],
     timeout: int = 100,
     leading: bool = True,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
-) -> Callable[P, None]:
+) -> ThrottledCallable[P, R]:
     ...
 
 
@@ -193,7 +209,7 @@ def qthrottled(
     timeout: int = 100,
     leading: bool = True,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
-) -> Callable[[Callable[P, R]], Callable[P, None]]:
+) -> Callable[[Callable[P, R]], ThrottledCallable[P, R]]:
     ...
 
 
@@ -202,7 +218,9 @@ def qthrottled(
     timeout: int = 100,
     leading: bool = True,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
-) -> Union[Callable[P, None], Callable[[Callable[P, R]], Callable[P, None]]]:
+) -> Union[
+    ThrottledCallable[P, R], Callable[[Callable[P, R]], ThrottledCallable[P, R]]
+]:
     """Creates a throttled function that invokes func at most once per timeout.
 
     The throttled function comes with a `cancel` method to cancel delayed func
@@ -240,7 +258,7 @@ def qdebounced(
     timeout: int = 100,
     leading: bool = False,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
-) -> Callable[P, None]:
+) -> ThrottledCallable[P, R]:
     ...
 
 
@@ -250,7 +268,7 @@ def qdebounced(
     timeout: int = 100,
     leading: bool = False,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
-) -> Callable[[Callable[P, R]], Callable[P, None]]:
+) -> Callable[[Callable[P, R]], ThrottledCallable[P, R]]:
     ...
 
 
@@ -259,7 +277,9 @@ def qdebounced(
     timeout: int = 100,
     leading: bool = False,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
-) -> Union[Callable[P, None], Callable[[Callable[P, R]], Callable[P, None]]]:
+) -> Union[
+    ThrottledCallable[P, R], Callable[[Callable[P, R]], ThrottledCallable[P, R]]
+]:
     """Creates a debounced function that delays invoking func.
 
     `func` will not be invoked until `timeout` ms have elapsed since the last time
@@ -300,26 +320,35 @@ def _make_decorator(
     leading: bool,
     timer_type: Qt.TimerType,
     kind: Kind,
-) -> Union[Callable[P, None], Callable[[Callable[P, R]], Callable[P, None]]]:
-    def deco(func: Callable[P, R]) -> Callable[P, None]:
+) -> Union[
+    ThrottledCallable[P, R], Callable[[Callable[P, R]], ThrottledCallable[P, R]]
+]:
+    def deco(func: Callable[P, R]) -> ThrottledCallable[P, R]:
         policy = EmissionPolicy.Leading if leading else EmissionPolicy.Trailing
         throttle = GenericSignalThrottler(kind, policy)
         throttle.setTimerType(timer_type)
         throttle.setTimeout(timeout)
         last_f = None
+        future: Optional[Future[R]] = None
 
-        def inner(*args: P.args, **kwargs: P.kwargs) -> None:
+        def inner(*args: P.args, **kwargs: P.kwargs) -> Future[R]:
             nonlocal last_f
+            nonlocal future
             if last_f is not None:
                 throttle.triggered.disconnect(last_f)
+            if future is not None and not future.done():
+                future.cancel()
 
-            last_f = partial(func, *args, **kwargs) if args or kwargs else func
+            future = Future()
+            last_f = lambda: future.set_result(func(*args, **kwargs))  # noqa
             throttle.triggered.connect(last_f)
             throttle.throttle()
+            return future
 
         setattr(inner, "cancel", throttle.cancel)
         setattr(inner, "flush", throttle.flush)
         setattr(inner, "set_timeout", throttle.setTimeout)
+        setattr(inner, "triggered", throttle.triggered)
         return inner
 
     return deco(func) if func is not None else deco
