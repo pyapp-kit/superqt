@@ -26,6 +26,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 """
+import sys
 from concurrent.futures import Future
 from enum import IntFlag, auto
 from typing import Callable, Generic, Optional, TypeVar, Union, overload
@@ -189,8 +190,15 @@ class ThrottledCallable(Generic[P, R]):
     def set_timeout(self, timeout: int) -> None:
         ...
 
-    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> Future[R]:
-        ...
+    if sys.version_info < (3, 9):
+
+        def __call__(self, *args: P.args, **kwargs: P.kwargs) -> Future:
+            ...
+
+    else:
+
+        def __call__(self, *args: P.args, **kwargs: P.kwargs) -> Future[R]:
+            ...
 
 
 @overload
@@ -329,9 +337,9 @@ def _make_decorator(
         throttle.setTimerType(timer_type)
         throttle.setTimeout(timeout)
         last_f = None
-        future: Optional[Future[R]] = None
+        future: Optional[Future] = None
 
-        def inner(*args: P.args, **kwargs: P.kwargs) -> Future[R]:
+        def inner(*args: P.args, **kwargs: P.kwargs) -> Future:
             nonlocal last_f
             nonlocal future
             if last_f is not None:
