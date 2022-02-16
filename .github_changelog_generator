@@ -5,4 +5,5 @@ user=napari
 project=superqt
 issues=false
 since-tag=v0.2.0
-add-sections={"documentation":{"prefix":"**Documentation updates:**","labels":["documentation"]}}
+exclude-labels=duplicate,question,invalid,wontfix,hide
+add-sections={"documentation":{"prefix":"**Documentation updates:**","labels":["documentation"]},"tests":{"prefix":"**Tests & CI:**","labels":["tests"]},"refactor":{"prefix":"**Refactors:**","labels":["refactor"]}}
