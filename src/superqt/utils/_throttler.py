@@ -342,6 +342,7 @@ def _make_decorator(
         last_f = None
         future: Optional[Future] = None
 
+        @wraps(func)
         def inner(*args: P.args, **kwargs: P.kwargs) -> Future:
             nonlocal last_f
             nonlocal future
