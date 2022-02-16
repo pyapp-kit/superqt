@@ -29,6 +29,7 @@ SOFTWARE.
 import sys
 from concurrent.futures import Future
 from enum import IntFlag, auto
+from functools import wraps
 from typing import TYPE_CHECKING, Callable, Generic, Optional, TypeVar, Union, overload
 
 from qtpy.QtCore import QObject, Qt, QTimer, Signal, SignalInstance
