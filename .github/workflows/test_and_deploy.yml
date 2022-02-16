@@ -164,9 +164,8 @@ jobs:
 
       - name: Test napari magicgui
         uses: GabrielBB/xvfb-action@v1
-        working-directory: napari
         with:
-          run: python -m pytest --color=yes napari/_qt
+          run: python -m pytest --color=yes napari/napari/_qt
 
   check_manifest:
     runs-on: ubuntu-latest
