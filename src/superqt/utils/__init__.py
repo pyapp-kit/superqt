@@ -8,6 +8,10 @@ __all__ = (
     "QMessageHandler",
     "thread_worker",
     "WorkerBase",
+    "qthrottled",
+    "qdebounced",
+    "QSignalDebouncer",
+    "QSignalThrottler",
 )
 
 from ._ensure_thread import ensure_main_thread, ensure_object_thread
@@ -20,3 +24,4 @@ from ._qthreading import (
     new_worker_qthread,
     thread_worker,
 )
+from ._throttler import QSignalDebouncer, QSignalThrottler, qdebounced, qthrottled
