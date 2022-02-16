@@ -29,7 +29,7 @@ SOFTWARE.
 import sys
 from concurrent.futures import Future
 from enum import IntFlag, auto
-from typing import Callable, Generic, Optional, TypeVar, Union, overload
+from typing import TYPE_CHECKING, Callable, Generic, Optional, TypeVar, Union, overload
 
 from qtpy.QtCore import QObject, Qt, QTimer, Signal, SignalInstance
 from typing_extensions import Literal, ParamSpec
@@ -177,28 +177,30 @@ class QSignalDebouncer(GenericSignalThrottler):
 P = ParamSpec("P")
 R = TypeVar("R")
 
+if TYPE_CHECKING:
+    from typing_extensions import Protocol
 
-class ThrottledCallable(Generic[P, R]):
-    triggered: SignalInstance
+    class ThrottledCallable(Generic[P, R], Protocol):
+        triggered: SignalInstance
 
-    def cancel(self) -> None:
-        ...
-
-    def flush(self) -> None:
-        ...
-
-    def set_timeout(self, timeout: int) -> None:
-        ...
-
-    if sys.version_info < (3, 9):
-
-        def __call__(self, *args: P.args, **kwargs: P.kwargs) -> Future:
+        def cancel(self) -> None:
             ...
 
-    else:
-
-        def __call__(self, *args: P.args, **kwargs: P.kwargs) -> Future[R]:
+        def flush(self) -> None:
             ...
+
+        def set_timeout(self, timeout: int) -> None:
+            ...
+
+        if sys.version_info < (3, 9):
+
+            def __call__(self, *args: P.args, **kwargs: P.kwargs) -> Future:
+                ...
+
+        else:
+
+            def __call__(self, *args: P.args, **kwargs: P.kwargs) -> Future[R]:
+                ...
 
 
 @overload
@@ -207,7 +209,7 @@ def qthrottled(
     timeout: int = 100,
     leading: bool = True,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
-) -> ThrottledCallable[P, R]:
+) -> "ThrottledCallable[P, R]":
     ...
 
 
@@ -217,7 +219,7 @@ def qthrottled(
     timeout: int = 100,
     leading: bool = True,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
-) -> Callable[[Callable[P, R]], ThrottledCallable[P, R]]:
+) -> Callable[[Callable[P, R]], "ThrottledCallable[P, R]"]:
     ...
 
 
@@ -227,7 +229,7 @@ def qthrottled(
     leading: bool = True,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
 ) -> Union[
-    ThrottledCallable[P, R], Callable[[Callable[P, R]], ThrottledCallable[P, R]]
+    "ThrottledCallable[P, R]", Callable[[Callable[P, R]], "ThrottledCallable[P, R]"]
 ]:
     """Creates a throttled function that invokes func at most once per timeout.
 
@@ -266,7 +268,7 @@ def qdebounced(
     timeout: int = 100,
     leading: bool = False,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
-) -> ThrottledCallable[P, R]:
+) -> "ThrottledCallable[P, R]":
     ...
 
 
@@ -276,7 +278,7 @@ def qdebounced(
     timeout: int = 100,
     leading: bool = False,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
-) -> Callable[[Callable[P, R]], ThrottledCallable[P, R]]:
+) -> Callable[[Callable[P, R]], "ThrottledCallable[P, R]"]:
     ...
 
 
@@ -286,9 +288,9 @@ def qdebounced(
     leading: bool = False,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
 ) -> Union[
-    ThrottledCallable[P, R], Callable[[Callable[P, R]], ThrottledCallable[P, R]]
+    "ThrottledCallable[P, R]", Callable[[Callable[P, R]], "ThrottledCallable[P, R]"]
 ]:
-    """Creates a debounced function that delays invoking func.
+    """Creates a debounced function that delays invoking `func`.
 
     `func` will not be invoked until `timeout` ms have elapsed since the last time
     the debounced function was invoked.
@@ -296,9 +298,9 @@ def qdebounced(
     The debounced function comes with a `cancel` method to cancel delayed func
     invocations and a `flush` method to immediately invoke them. Options
     indicate whether func should be invoked on the leading and/or trailing edge
-    of the wait timeout. The func is invoked with the last arguments provided to
+    of the wait timeout. The func is invoked with the *last* arguments provided to
     the debounced function. Subsequent calls to the debounced function return the
-    result of the last func invocation.
+    result of the last `func` invocation.
 
     This decorator may be used with or without parameters.
 
@@ -329,9 +331,9 @@ def _make_decorator(
     timer_type: Qt.TimerType,
     kind: Kind,
 ) -> Union[
-    ThrottledCallable[P, R], Callable[[Callable[P, R]], ThrottledCallable[P, R]]
+    "ThrottledCallable[P, R]", Callable[[Callable[P, R]], "ThrottledCallable[P, R]"]
 ]:
-    def deco(func: Callable[P, R]) -> ThrottledCallable[P, R]:
+    def deco(func: Callable[P, R]) -> "ThrottledCallable[P, R]":
         policy = EmissionPolicy.Leading if leading else EmissionPolicy.Trailing
         throttle = GenericSignalThrottler(kind, policy)
         throttle.setTimerType(timer_type)
@@ -357,6 +359,6 @@ def _make_decorator(
         setattr(inner, "flush", throttle.flush)
         setattr(inner, "set_timeout", throttle.setTimeout)
         setattr(inner, "triggered", throttle.triggered)
-        return inner
+        return inner  # type: ignore
 
     return deco(func) if func is not None else deco
