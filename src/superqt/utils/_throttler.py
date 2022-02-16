@@ -131,6 +131,7 @@ class GenericSignalThrottler(QObject):
     def _emitTriggered(self) -> None:
         self._hasPendingEmission = False
         self.triggered.emit()
+        self._timer.start()
 
     def _maybeEmitTriggered(self) -> None:
         if self._hasPendingEmission:
