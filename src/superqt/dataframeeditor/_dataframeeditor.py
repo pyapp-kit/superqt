@@ -536,7 +536,7 @@ class QDataFrameModel(QAbstractTableModel):
                 self._df.iloc[row, column] = change_type("0")
         else:
             val = from_qvariant(value, str)
-            # ppw note:  this should change to str, but it doesn't yet, so doing this below
+            # ppw note:  this should change to str, but it doesn't yet, so doing this here
             val = str(val)
             current_value = self.getValue(row, column)
             if isinstance(current_value, (bool, np.bool_)):
@@ -563,7 +563,7 @@ class QDataFrameModel(QAbstractTableModel):
                 )
                 return False
         self._max_min_col_update()
-        self.dataChanged.emit(index, index)
+        # self.dataChanged.emit(index, index)
         return True
 
     def getData(self):  # ppw: not sure if this is Qt method.
@@ -582,6 +582,23 @@ class QDataFrameModel(QAbstractTableModel):
                 return self._rows_loaded
         except AttributeError:
             return 0
+
+    def _insert_row(self, rows=False, columns=False):
+        """Add a column and/or row."""
+        # temp. first assume that the whole thing is loaded.
+
+        if rows and self._total_rows == self._rows_loaded:
+            # remainder = self._total_rows - self._rows_loaded 0
+            # items_to_fetch = min(remainder, self._rows_to_load) 1
+            self.beginInsertRows(QModelIndex(), self._rows_loaded, self._rows_loaded)
+            self._rows_loaded += 1
+            self.endInsertRows()
+            row = self._df.shape[0]
+            print("row", row)
+            index = self.index(3, 2)
+            print(type(index))
+            print("test! ", index.row())
+            self.setData(index, 100)
 
     def _fetch_more(self, rows=False, columns=False):
         """Get more columns and/or rows."""
@@ -836,6 +853,15 @@ class DataFrameHeaderModel(QAbstractTableModel):
                 return self._cols_loaded
         else:
             return max(1, self._shape[1])
+
+    def _insert_row_or_col(self, rows=False, columns=False):
+        if self._axis == 1 and self._total_rows == self._rows_loaded:
+            # remainder = self._total_rows - self._rows_loaded 0
+            # items_to_fetch = min(remainder, self._rows_to_load) 1
+
+            self.beginInsertRows(QModelIndex(), self._rows_loaded, self._rows_loaded)
+            self._rows_loaded += 1
+            self.endInsertRows()
 
     def _fetch_more(self, rows=False, columns=False):
         """Get more columns or rows (based on axis)."""
@@ -1161,7 +1187,14 @@ class QDataFrameEditor(QWidget):
     #     """Handle the data change event to enable the save and close button."""
     #     self.btn_save_and_close.setEnabled(True)
     #     self.btn_save_and_close.setAutoDefault(True)
-    #     self.btn_save_and_close.setDefault(True)
+    #     self.btn_save_and_close.setDefault(True)'
+
+    # def _reset_df_data(self, data):
+    #     # ideas from ppw -- not really working.
+    #     self._dataModel = QDataFrameModel(data, parent=self)
+    #     self.setModel(self._dataModel)
+    #     self.resizeColumnsToContents()
+    #     self._create_data_table()
 
     def _create_table_level(self):
         """Create the QTableView that will hold the level model."""
@@ -1556,6 +1589,25 @@ class QDataFrameEditor(QWidget):
     def _fetch_more_rows(self):
         """Fetch more data for the index (rows)."""
         self._table_index.model()._fetch_more()
+
+    def _add_a_row(self):
+        print(self._dataModel._df)
+        # make dataframe have an empty row at end
+
+        np.empty((1, self._model._total_cols))
+        print(self._model._total_cols)
+        empty_row = np.empty((1, self._model._total_cols))
+        empty_row[:] = None
+        empty_row = empty_row[0].tolist()
+        series = pd.Series(empty_row, index=self._dataModel._df.columns)
+        self._dataModel._df = self._dataModel._df.append(series, ignore_index=True)
+        print(self._dataModel._df)
+        self._dataModel._insert_row(rows=True)
+        self._table_index.model()._insert_row_or_col(rows=True)
+        self._dataTable.model().layoutChanged.emit()
+        # index = QModelIndex()
+        # index.se = self._model._total_rows
+        # self._dataModel.setData()
 
     def _resize_to_contents(self):
         QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
