@@ -563,7 +563,7 @@ class QDataFrameModel(QAbstractTableModel):
                 )
                 return False
         self._max_min_col_update()
-        # self.dataChanged.emit(index, index)
+        self.dataChanged.emit(index, index)
         return True
 
     def getData(self):  # ppw: not sure if this is Qt method.
@@ -1026,7 +1026,9 @@ class QDataFrameEditor(QWidget):
     """
     # CONF_SECTION = "variable_explorer"
 
-    def __init__(self, parent=None):
+    valueChanged = Signal(pd.DataFrame)
+
+    def __init__(self, data: pd.DataFrame, parent=None, **kwargs):
         super().__init__(parent)
 
         # Destroying the C++ object right after closing the dialog box,
@@ -1054,6 +1056,7 @@ class QDataFrameEditor(QWidget):
 
         # Background colours
         self._background_color_enabled = False
+
         self._background_number_min_hue = (
             0.66  # hue for largest number  BACKGROUND_NUMBER_MINHUE
         )
@@ -1067,6 +1070,8 @@ class QDataFrameEditor(QWidget):
         self._background_misc_alpha = 0.3  # BACKGROUND_MISC_ALPHA
 
         # self.setWindowTitle(title)
+
+        self._setup_and_check(data)
 
     def _setup_and_check(self, data):
         """
@@ -1106,7 +1111,9 @@ class QDataFrameEditor(QWidget):
 
         # Create the model and view of the data
         self._dataModel = QDataFrameModel(data, parent=self)
-        # self._dataModel.dataChanged.connect(self._save_and_close_enable)
+        self._dataModel.dataChanged.connect(
+            lambda: self.valueChanged.emit(self.getValue())
+        )
         self._create_data_table()
 
         self._layout.addWidget(self._hscroll, 2, 0, 1, 2)
@@ -1283,8 +1290,17 @@ class QDataFrameEditor(QWidget):
     def _setColsToLoad(self, value):
         self._cols_to_load = value
 
-    def _enableBackgroundColor(self, value):
+    def enableBackgroundColor(self, value):
         self._background_color_enabled = value
+        if value is True:
+            self._dataModel._max_min_col_update()
+            self._dataModel._colum_avg_enabled = True
+            self._dataModel._bgcolor_enabled = True
+            self._dataModel._column_avg(1)
+        else:
+            self._dataModel._colum_avg_enabled = False
+            self._dataModel._bgcolor_enabled = False
+            self._dataModel._column_avg(0)
 
     def _setBackgroundNumMinHue(self, value):
         self._background_number_min_hue = value
@@ -1408,11 +1424,20 @@ class QDataFrameEditor(QWidget):
         if relayout:
             self._update_layout()
 
-    def setCurrentIndex(self, y, x):
+    def _setCurrentIndex(self, row, col):
         """Set current selection."""
         self._dataTable.selectionModel().setCurrentIndex(
-            self._dataTable.model().index(y, x), QItemSelectionModel.ClearAndSelect
+            self._dataTable.model().index(row, col), QItemSelectionModel.ClearAndSelect
         )
+
+    def _getCurrentIndex(self):
+        return self._dataTable.selectionModel().currentIndex()
+
+    def setData(self, row, col, value):
+        """Set a value in the table."""
+        self._setCurrentIndex(row, col)
+        self._dataModel.setData(self._getCurrentIndex(), value)
+        # self.valueChanged.emit(self.getValue())
 
     def _sizeHintForColumn(self, table, col, limit_ms=None):
         """Get the size hint for a given column in a table."""
@@ -1506,12 +1531,12 @@ class QDataFrameEditor(QWidget):
         )
         self._update_layout()
 
-    def _change_bgcolor_enable(self, state):
-        """
-        This is implementet so column min/max is only active when bgcolor is
-        """
-        self._dataModel._bg_color(state)
-        # self.bgcolor_global.setEnabled(not self._is_series and state > 0)
+    # def _change_bgcolor_enable(self, state):
+    #     """
+    #     This is implementet so column min/max is only active when bgcolor is
+    #     """
+    #     self._dataModel._bg_color(state)
+    # self.bgcolor_global.setEnabled(not self._is_series and state > 0)
 
     # def change_format(self):
     #     """
@@ -1583,7 +1608,7 @@ class QDataFrameEditor(QWidget):
         """Fetch more data for the index (rows)."""
         self._table_index.model()._fetch_more()
 
-    def _add_a_row(self):
+    def addRow(self):
 
         # make dataframe have an empty row at end, will need to fill
         # with '0's in order to have proper typen (mostly to get
