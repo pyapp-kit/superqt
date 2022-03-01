@@ -1617,9 +1617,10 @@ class QDataFrameEditor(QWidget):
         datarow1 = self._dataModel._df.iloc[0]
         new_vals = []
         for idx, val in enumerate(datarow1):
-            ctype = type(val)
-            if ctype is str:
+            if isinstance(val, str):
                 new_vals.append("0")
+            elif isinstance(val, (bool, np.bool_)):
+                new_vals.append("False")
             else:
                 new_vals.append(0)
 
