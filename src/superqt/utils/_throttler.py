@@ -32,8 +32,11 @@ from enum import IntFlag, auto
 from functools import wraps
 from typing import TYPE_CHECKING, Callable, Generic, Optional, TypeVar, Union, overload
 
-from qtpy.QtCore import QObject, Qt, QTimer, Signal, SignalInstance
+from qtpy.QtCore import QObject, Qt, QTimer, Signal
 from typing_extensions import Literal, ParamSpec
+
+if TYPE_CHECKING:
+    from qtpy.QtCore import SignalInstance
 
 
 class Kind(IntFlag):
@@ -183,7 +186,7 @@ if TYPE_CHECKING:
     from typing_extensions import Protocol
 
     class ThrottledCallable(Generic[P, R], Protocol):
-        triggered: SignalInstance
+        triggered: "SignalInstance"
 
         def cancel(self) -> None:
             ...
