@@ -1,5 +1,17 @@
 # Changelog
 
+## [v0.3.1](https://github.com/napari/superqt/tree/v0.3.1) (2022-03-02)
+
+[Full Changelog](https://github.com/napari/superqt/compare/v0.3.0...v0.3.1)
+
+**Implemented enhancements:**
+
+- Add `signals_blocked` util [\#69](https://github.com/napari/superqt/pull/69) ([tlambert03](https://github.com/tlambert03))
+
+**Fixed bugs:**
+
+- put SignalInstance in TYPE\_CHECKING clause, check min requirements [\#70](https://github.com/napari/superqt/pull/70) ([tlambert03](https://github.com/tlambert03))
+
 ## [v0.3.0](https://github.com/napari/superqt/tree/v0.3.0) (2022-02-16)
 
 [Full Changelog](https://github.com/napari/superqt/compare/v0.2.5-1...v0.3.0)
@@ -24,6 +36,10 @@
 **Refactors:**
 
 - Use qtpy, deprecate superqt.qtcompat, drop support for Qt \<5.12 [\#39](https://github.com/napari/superqt/pull/39) ([tlambert03](https://github.com/tlambert03))
+
+**Merged pull requests:**
+
+- Add changelog for v0.3.0 [\#68](https://github.com/napari/superqt/pull/68) ([tlambert03](https://github.com/tlambert03))
 
 ## [v0.2.5-1](https://github.com/napari/superqt/tree/v0.2.5-1) (2021-11-23)
 
