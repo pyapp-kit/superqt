@@ -136,3 +136,4 @@ class QCollapsible(QFrame):
         if a1.type() == QEvent.Type.Resize:
             if self.isExpanded():
                 self._expand_collapse(QAbstractAnimation.Direction.Forward)
+        return False
