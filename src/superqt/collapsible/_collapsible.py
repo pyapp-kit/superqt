@@ -4,7 +4,9 @@ from typing import Optional
 from qtpy.QtCore import (
     QAbstractAnimation,
     QEasingCurve,
+    QEvent,
     QMargins,
+    QObject,
     QPropertyAnimation,
     Qt,
 )
@@ -77,11 +79,13 @@ class QCollapsible(QFrame):
 
     def addWidget(self, widget: QWidget):
         """Add a widget to the central content widget's layout."""
+        widget.installEventFilter(self)
         self._content.layout().addWidget(widget)
 
     def removeWidget(self, widget: QWidget):
         """Remove widget from the central content widget's layout."""
         self._content.layout().removeWidget(widget)
+        widget.removeEventFilter(self)
 
     def expand(self, animate: bool = True):
         """Expand (show) the collapsible section"""
@@ -126,3 +130,10 @@ class QCollapsible(QFrame):
 
     def _toggle(self):
         self.expand() if self.isExpanded() else self.collapse()
+
+    def eventFilter(self, a0: QObject, a1: QEvent) -> bool:
+        """If a child widget resizes, we need to update our expanded height."""
+        if a1.type() == QEvent.Type.Resize:
+            if self.isExpanded():
+                self._expand_collapse(QAbstractAnimation.Direction.Forward)
+        return False
