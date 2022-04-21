@@ -7,7 +7,8 @@ except ImportError:
 
 from ._eliding_label import QElidingLabel
 from .collapsible import QCollapsible
-from .combobox import QEnumComboBox
+from .combobox import QEnumComboBox, QSearchableComboBox
+from .selection import QSearchableListWidget
 from .sliders import (
     QDoubleRangeSlider,
     QDoubleSlider,
@@ -26,13 +27,15 @@ __all__ = [
     "QDoubleRangeSlider",
     "QDoubleSlider",
     "QElidingLabel",
+    "QEnumComboBox",
     "QLabeledDoubleRangeSlider",
     "QLabeledDoubleSlider",
     "QLabeledRangeSlider",
     "QLabeledSlider",
     "QLargeIntSpinBox",
     "QMessageHandler",
+    "QSearchableComboBox",
+    "QSearchableListWidget",
     "QRangeSlider",
-    "QEnumComboBox",
     "QCollapsible",
 ]
