@@ -167,12 +167,19 @@ def test_hover(sld: _GenericSlider):
     with suppress(AttributeError):  # for QSlider
         assert _real_sld._hoverControl == QStyle.SubControl.SC_None
 
-    _real_sld.event(QHoverEvent(QEvent.Type.HoverEnter, handle_pos, QPointF()))
+    glb = sld.mapToGlobal(handle_pos)
+
+    _real_sld.event(QHoverEvent(QEvent.Type.HoverEnter, handle_pos, glb, QPointF()))
     with suppress(AttributeError):  # for QSlider
         assert _real_sld._hoverControl == QStyle.SubControl.SC_SliderHandle
 
     _real_sld.event(
-        QHoverEvent(QEvent.Type.HoverLeave, QPointF(-1000, -1000), handle_pos)
+        QHoverEvent(
+            QEvent.Type.HoverLeave,
+            QPointF(-1000, -1000),
+            sld.mapToGlobal(QPointF(-1000, -1000)),
+            handle_pos,
+        )
     )
     with suppress(AttributeError):  # for QSlider
         assert _real_sld._hoverControl == QStyle.SubControl.SC_None

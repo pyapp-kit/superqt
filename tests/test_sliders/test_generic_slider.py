@@ -129,11 +129,23 @@ def test_hover(gslider: _GenericSlider):
 
     assert gslider._hoverControl == QStyle.SubControl.SC_None
 
-    gslider.event(QHoverEvent(QEvent.Type.HoverEnter, handle_pos, QPointF()))
+    gslider.event(
+        QHoverEvent(
+            QEvent.Type.HoverEnter,
+            handle_pos,
+            gslider.mapToGlobal(handle_pos),
+            QPointF(),
+        )
+    )
     assert gslider._hoverControl == QStyle.SubControl.SC_SliderHandle
 
     gslider.event(
-        QHoverEvent(QEvent.Type.HoverLeave, QPointF(-1000, -1000), handle_pos)
+        QHoverEvent(
+            QEvent.Type.HoverLeave,
+            QPointF(-1000, -1000),
+            gslider.mapToGlobal(QPointF(-1000, -1000)),
+            handle_pos,
+        )
     )
     assert gslider._hoverControl == QStyle.SubControl.SC_None
 
