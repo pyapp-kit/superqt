@@ -69,12 +69,14 @@ def _wheel_event(arc):
 
 
 def _hover_event(_type, position, old_position, widget=None):
-    return QHoverEvent(
-        _type,
-        position,
-        widget.mapToGlobal(position),
-        old_position,
-    )
+    with suppress(TypeError):
+        return QHoverEvent(
+            _type,
+            position,
+            widget.mapToGlobal(position),
+            old_position,
+        )
+    return QHoverEvent(_type, position, old_position)
 
 
 def _linspace(start, stop, n):
