@@ -118,6 +118,7 @@ def test_press_move_release(gslider: _GenericSlider, qtbot):
 @skip_on_linux_qt6
 def test_hover(gslider: _GenericSlider):
 
+    # stub
     opt = QStyleOptionSlider()
     gslider.initStyleOption(opt)
     style = gslider.style()
