@@ -4,7 +4,7 @@ from platform import system
 import pytest
 from qtpy import QT_VERSION
 from qtpy.QtCore import QEvent, QPoint, QPointF, Qt
-from qtpy.QtGui import QMouseEvent, QWheelEvent
+from qtpy.QtGui import QHoverEvent, QMouseEvent, QWheelEvent
 
 QT_VERSION = tuple(int(x) for x in QT_VERSION.split("."))
 
@@ -65,6 +65,15 @@ def _wheel_event(arc):
         Qt.Orientation.Vertical,
         Qt.MouseButton.NoButton,
         Qt.KeyboardModifier.NoModifier,
+    )
+
+
+def _hover_event(_type, position, old_position, widget=None):
+    return QHoverEvent(
+        _type,
+        position,
+        widget.mapToGlobal(position),
+        old_position,
     )
 
 

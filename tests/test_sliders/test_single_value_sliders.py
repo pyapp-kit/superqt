@@ -4,7 +4,6 @@ from contextlib import suppress
 
 import pytest
 from qtpy.QtCore import QEvent, QPoint, QPointF, Qt
-from qtpy.QtGui import QHoverEvent
 from qtpy.QtWidgets import QSlider, QStyle, QStyleOptionSlider
 
 from superqt import QDoubleSlider, QLabeledDoubleSlider, QLabeledSlider
@@ -12,6 +11,7 @@ from superqt.sliders._generic_slider import _GenericSlider
 
 from ._testutil import (
     QT_VERSION,
+    _hover_event,
     _linspace,
     _mouse_event,
     _wheel_event,
@@ -167,19 +167,12 @@ def test_hover(sld: _GenericSlider):
     with suppress(AttributeError):  # for QSlider
         assert _real_sld._hoverControl == QStyle.SubControl.SC_None
 
-    glb = sld.mapToGlobal(handle_pos)
-
-    _real_sld.event(QHoverEvent(QEvent.Type.HoverEnter, handle_pos, glb, QPointF()))
+    _real_sld.event(_hover_event(QEvent.Type.HoverEnter, handle_pos, QPointF(), sld))
     with suppress(AttributeError):  # for QSlider
         assert _real_sld._hoverControl == QStyle.SubControl.SC_SliderHandle
 
     _real_sld.event(
-        QHoverEvent(
-            QEvent.Type.HoverLeave,
-            QPointF(-1000, -1000),
-            sld.mapToGlobal(QPointF(-1000, -1000)),
-            handle_pos,
-        )
+        _hover_event(QEvent.Type.HoverLeave, QPointF(-1000, -1000), handle_pos, sld)
     )
     with suppress(AttributeError):  # for QSlider
         assert _real_sld._hoverControl == QStyle.SubControl.SC_None
