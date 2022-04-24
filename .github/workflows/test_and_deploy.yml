@@ -70,9 +70,6 @@ jobs:
           - python-version: 3.8
             platform: ubuntu-18.04
             backend: pyside2
-          - python-version: 3.6
-            platform: windows-2016
-            backend: pyqt5
 
           # legacy Qt
           - python-version: 3.7
