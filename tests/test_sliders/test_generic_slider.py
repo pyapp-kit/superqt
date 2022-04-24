@@ -3,12 +3,17 @@ import platform
 
 import pytest
 from qtpy.QtCore import QEvent, QPoint, QPointF, Qt
-from qtpy.QtGui import QHoverEvent
 from qtpy.QtWidgets import QStyle, QStyleOptionSlider
 
 from superqt.sliders._generic_slider import _GenericSlider, _sliderValueFromPosition
 
-from ._testutil import _linspace, _mouse_event, _wheel_event, skip_on_linux_qt6
+from ._testutil import (
+    _hover_event,
+    _linspace,
+    _mouse_event,
+    _wheel_event,
+    skip_on_linux_qt6,
+)
 
 
 @pytest.fixture(params=[Qt.Orientation.Horizontal, Qt.Orientation.Vertical])
@@ -118,6 +123,7 @@ def test_press_move_release(gslider: _GenericSlider, qtbot):
 @skip_on_linux_qt6
 def test_hover(gslider: _GenericSlider):
 
+    # stub
     opt = QStyleOptionSlider()
     gslider.initStyleOption(opt)
     style = gslider.style()
@@ -128,11 +134,11 @@ def test_hover(gslider: _GenericSlider):
 
     assert gslider._hoverControl == QStyle.SubControl.SC_None
 
-    gslider.event(QHoverEvent(QEvent.Type.HoverEnter, handle_pos, QPointF()))
+    gslider.event(_hover_event(QEvent.Type.HoverEnter, handle_pos, QPointF(), gslider))
     assert gslider._hoverControl == QStyle.SubControl.SC_SliderHandle
 
     gslider.event(
-        QHoverEvent(QEvent.Type.HoverLeave, QPointF(-1000, -1000), handle_pos)
+        _hover_event(QEvent.Type.HoverLeave, QPointF(-1000, -1000), handle_pos, gslider)
     )
     assert gslider._hoverControl == QStyle.SubControl.SC_None
 
