@@ -1,7 +1,11 @@
-from packaging.version import parse
 from qtpy import QT_VERSION
 from qtpy.QtCore import Qt, Signal
 from qtpy.QtWidgets import QComboBox, QCompleter
+
+try:
+    is_qt_bellow_5_14 = tuple(int(x) for x in QT_VERSION.split(".")[:2]) < (5, 14)
+except ValueError:
+    is_qt_bellow_5_14 = False
 
 
 class QSearchableComboBox(QComboBox):
@@ -9,7 +13,7 @@ class QSearchableComboBox(QComboBox):
     ComboCox with completer for fast search in multiple options
     """
 
-    if parse(QT_VERSION) < parse("5.14.0"):
+    if is_qt_bellow_5_14:
         textActivated = Signal(str)  # pragma: no cover
 
     def __init__(self, parent=None):
@@ -21,7 +25,7 @@ class QSearchableComboBox(QComboBox):
         self.completer_object.setFilterMode(Qt.MatchContains)
         self.setCompleter(self.completer_object)
         self.setInsertPolicy(QComboBox.NoInsert)
-        if parse(QT_VERSION) < parse("5.14.0"):  # pragma: no cover
+        if is_qt_bellow_5_14:  # pragma: no cover
             self.currentIndexChanged.connect(self._text_activated)
 
     def _text_activated(self):  # pragma: no cover
