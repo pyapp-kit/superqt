@@ -137,8 +137,8 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         self._slider.sliderMoved.connect(self.sliderMoved.emit)
         self._slider.sliderPressed.connect(self.sliderPressed.emit)
         self._slider.sliderReleased.connect(self.sliderReleased.emit)
-        self._slider.valueChanged.connect(self.valueChanged.emit)
         self._slider.valueChanged.connect(self._label.setValue)
+        self._slider.valueChanged.connect(self.valueChanged.emit)
 
         self.setOrientation(orientation)
 
