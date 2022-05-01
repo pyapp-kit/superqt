@@ -1,15 +1,7 @@
 """A collapsible widget to hide and unhide child widgets"""
 from typing import Optional
 
-from qtpy.QtCore import (
-    QAbstractAnimation,
-    QEasingCurve,
-    QEvent,
-    QMargins,
-    QObject,
-    QPropertyAnimation,
-    Qt,
-)
+from qtpy.QtCore import QEasingCurve, QEvent, QMargins, QObject, QPropertyAnimation, Qt
 from qtpy.QtWidgets import QFrame, QPushButton, QVBoxLayout, QWidget
 
 
@@ -25,6 +17,7 @@ class QCollapsible(QFrame):
     def __init__(self, title: str = "", parent: Optional[QWidget] = None):
         super().__init__(parent)
         self._locked = False
+        self._is_animating = False
 
         self._toggle_btn = QPushButton(self._COLLAPSED + title)
         self._toggle_btn.setCheckable(True)
@@ -40,6 +33,7 @@ class QCollapsible(QFrame):
         self._animation = QPropertyAnimation(self)
         self._animation.setPropertyName(b"maximumHeight")
         self._animation.setStartValue(0)
+        self._animation.finished.connect(self._on_animation_done)
         self.setDuration(300)
         self.setEasingCurve(QEasingCurve.Type.InOutCubic)
 
@@ -89,11 +83,11 @@ class QCollapsible(QFrame):
 
     def expand(self, animate: bool = True):
         """Expand (show) the collapsible section"""
-        self._expand_collapse(QAbstractAnimation.Direction.Forward, animate)
+        self._expand_collapse(QPropertyAnimation.Direction.Forward, animate)
 
     def collapse(self, animate: bool = True):
         """Collapse (hide) the collapsible section"""
-        self._expand_collapse(QAbstractAnimation.Direction.Backward, animate)
+        self._expand_collapse(QPropertyAnimation.Direction.Backward, animate)
 
     def isExpanded(self) -> bool:
         """Return whether the collapsible section is visible"""
@@ -109,12 +103,12 @@ class QCollapsible(QFrame):
         return self._locked
 
     def _expand_collapse(
-        self, direction: QAbstractAnimation.Direction, animate: bool = True
+        self, direction: QPropertyAnimation.Direction, animate: bool = True
     ):
         if self._locked:
             return
 
-        forward = direction == QAbstractAnimation.Direction.Forward
+        forward = direction == QPropertyAnimation.Direction.Forward
         text = self._EXPANDED if forward else self._COLLAPSED
 
         self._toggle_btn.setChecked(forward)
@@ -124,6 +118,7 @@ class QCollapsible(QFrame):
         if animate:
             self._animation.setDirection(direction)
             self._animation.setEndValue(_content_height)
+            self._is_animating = True
             self._animation.start()
         else:
             self._content.setMaximumHeight(_content_height if forward else 0)
@@ -133,7 +128,13 @@ class QCollapsible(QFrame):
 
     def eventFilter(self, a0: QObject, a1: QEvent) -> bool:
         """If a child widget resizes, we need to update our expanded height."""
-        if a1.type() == QEvent.Type.Resize:
-            if self.isExpanded():
-                self._expand_collapse(QAbstractAnimation.Direction.Forward)
+        if (
+            a1.type() == QEvent.Type.Resize
+            and self.isExpanded()
+            and not self._is_animating
+        ):
+            self._expand_collapse(QPropertyAnimation.Direction.Forward, animate=False)
         return False
+
+    def _on_animation_done(self):
+        self._is_animating = False
