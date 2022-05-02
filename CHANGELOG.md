@@ -6,17 +6,17 @@
 
 **Implemented enhancements:**
 
-- feat: Add QSearchableListWidget and QSearchableComboBox widgets [\#80](https://github.com/napari/superqt/pull/80) ([Czaki](https://github.com/Czaki))
+- Add QSearchableListWidget and QSearchableComboBox widgets [\#80](https://github.com/napari/superqt/pull/80) ([Czaki](https://github.com/Czaki))
 
 **Fixed bugs:**
 
 - Fix crazy animation loop on Qcollapsible [\#84](https://github.com/napari/superqt/pull/84) ([tlambert03](https://github.com/tlambert03))
-- reorder label update signal [\#83](https://github.com/napari/superqt/pull/83) ([tlambert03](https://github.com/tlambert03))
+- Reorder label update signal [\#83](https://github.com/napari/superqt/pull/83) ([tlambert03](https://github.com/tlambert03))
 - Fix height of expanded QCollapsible when child changes size [\#72](https://github.com/napari/superqt/pull/72) ([tlambert03](https://github.com/tlambert03))
 
 **Tests & CI:**
 
-- fix deprecation warnings in tests [\#82](https://github.com/napari/superqt/pull/82) ([tlambert03](https://github.com/tlambert03))
+- Fix deprecation warnings in tests [\#82](https://github.com/napari/superqt/pull/82) ([tlambert03](https://github.com/tlambert03))
 
 ## [v0.3.1](https://github.com/napari/superqt/tree/v0.3.1) (2022-03-02)
 
