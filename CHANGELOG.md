@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.3.2](https://github.com/napari/superqt/tree/0.3.2) (2022-05-02)
+
+[Full Changelog](https://github.com/napari/superqt/compare/v0.3.1...0.3.2)
+
+**Implemented enhancements:**
+
+- Add QSearchableListWidget and QSearchableComboBox widgets [\#80](https://github.com/napari/superqt/pull/80) ([Czaki](https://github.com/Czaki))
+
+**Fixed bugs:**
+
+- Fix crazy animation loop on Qcollapsible [\#84](https://github.com/napari/superqt/pull/84) ([tlambert03](https://github.com/tlambert03))
+- Reorder label update signal [\#83](https://github.com/napari/superqt/pull/83) ([tlambert03](https://github.com/tlambert03))
+- Fix height of expanded QCollapsible when child changes size [\#72](https://github.com/napari/superqt/pull/72) ([tlambert03](https://github.com/tlambert03))
+
+**Tests & CI:**
+
+- Fix deprecation warnings in tests [\#82](https://github.com/napari/superqt/pull/82) ([tlambert03](https://github.com/tlambert03))
+
 ## [v0.3.1](https://github.com/napari/superqt/tree/v0.3.1) (2022-03-02)
 
 [Full Changelog](https://github.com/napari/superqt/compare/v0.3.0...v0.3.1)
@@ -11,6 +29,10 @@
 **Fixed bugs:**
 
 - put SignalInstance in TYPE\_CHECKING clause, check min requirements [\#70](https://github.com/napari/superqt/pull/70) ([tlambert03](https://github.com/tlambert03))
+
+**Merged pull requests:**
+
+- Add changelog for v0.3.1 [\#71](https://github.com/napari/superqt/pull/71) ([tlambert03](https://github.com/tlambert03))
 
 ## [v0.3.0](https://github.com/napari/superqt/tree/v0.3.0) (2022-02-16)
 
@@ -126,7 +148,11 @@
 
 ## [v0.2.0rc0](https://github.com/napari/superqt/tree/v0.2.0rc0) (2021-06-26)
 
-[Full Changelog](https://github.com/napari/superqt/compare/v0.2.0...v0.2.0rc0)
+[Full Changelog](https://github.com/napari/superqt/compare/v0.2.0rc1...v0.2.0rc0)
+
+## [v0.2.0rc1](https://github.com/napari/superqt/tree/v0.2.0rc1) (2021-06-26)
+
+[Full Changelog](https://github.com/napari/superqt/compare/v0.2.0...v0.2.0rc1)
 
 
 
