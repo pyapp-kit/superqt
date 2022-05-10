@@ -1,3 +1,4 @@
+from PyQt5.QtGui import QColor, QPalette
 from qtpy.QtWidgets import QApplication, QTextEdit
 
 from superqt.utils import CodeSyntaxHighlight
@@ -6,11 +7,13 @@ app = QApplication([])
 
 text_area = QTextEdit()
 
-highlight = CodeSyntaxHighlight(text_area.document(), "python", "default")
+highlight = CodeSyntaxHighlight(text_area.document(), "python", "monokai")
 
+palette = text_area.palette()
+palette.setColor(QPalette.Base, QColor(highlight.background_color))
+text_area.setPalette(palette)
 text_area.setText(
-    """
-from argparse import ArgumentParser
+    """from argparse import ArgumentParser
 
 def main():
     parser = ArgumentParser()

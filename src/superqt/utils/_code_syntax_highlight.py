@@ -1,6 +1,9 @@
+from itertools import takewhile
+
 from pygments import highlight
 from pygments.formatter import Formatter
-from pygments.lexers import get_lexer_by_name
+from pygments.lexers import find_lexer_class_by_name, get_lexer_by_name
+from pygments.util import ClassNotFound
 from qtpy import QtGui
 
 # inspired by  https://github.com/Vector35/snippets/blob/master/QCodeEditor.py (MIT license) and
@@ -61,19 +64,30 @@ class CodeSyntaxHighlight(QtGui.QSyntaxHighlighter):
     def __init__(self, parent, lang, theme):
         super().__init__(parent)
         self.formatter = QFormatter(style=theme)
-        self.lexer = get_lexer_by_name(lang)
+        try:
+            self.lexer = get_lexer_by_name(lang)
+        except ClassNotFound:
+            self.lexer = find_lexer_class_by_name(lang)()
+
+    @property
+    def background_color(self):
+        return self.formatter.style.background_color
 
     def highlightBlock(self, text):
         cb = self.currentBlock()
         p = cb.position()
-        text = self.document().toPlainText() + "\n"
-        highlight(text, self.lexer, self.formatter)
+        text_ = self.document().toPlainText() + "\n"
+        highlight(text_, self.lexer, self.formatter)
+
+        enters = sum(1 for _ in takewhile(lambda x: x == "\n", text_))
+        # pygments lexer ignore leading empty lines, so we need to do correction
+        # here calculating the number of empty lines.
 
         # dirty, dirty hack
         # The core problem is that pygemnts by default use string streams,
         # that will not handle QTextCharFormat, so wee need use `data` property to work around this.
         for i in range(len(text)):
             try:
-                self.setFormat(i, 1, self.formatter.data[p + i])
+                self.setFormat(i, 1, self.formatter.data[p + i - enters])
             except IndexError:
                 pass
