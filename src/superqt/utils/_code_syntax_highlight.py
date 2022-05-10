@@ -2,7 +2,7 @@ from itertools import takewhile
 
 from pygments import highlight
 from pygments.formatter import Formatter
-from pygments.lexers import find_lexer_class_by_name, get_lexer_by_name
+from pygments.lexers import find_lexer_class, get_lexer_by_name
 from pygments.util import ClassNotFound
 from qtpy import QtGui
 
@@ -67,7 +67,7 @@ class CodeSyntaxHighlight(QtGui.QSyntaxHighlighter):
         try:
             self.lexer = get_lexer_by_name(lang)
         except ClassNotFound:
-            self.lexer = find_lexer_class_by_name(lang)()
+            self.lexer = find_lexer_class(lang)()
 
     @property
     def background_color(self):
@@ -89,5 +89,5 @@ class CodeSyntaxHighlight(QtGui.QSyntaxHighlighter):
         for i in range(len(text)):
             try:
                 self.setFormat(i, 1, self.formatter.data[p + i - enters])
-            except IndexError:
+            except IndexError:  # pragma: no cover
                 pass
