@@ -1,4 +1,5 @@
 __all__ = (
+    "CodeSyntaxHighlight",
     "create_worker",
     "ensure_main_thread",
     "ensure_object_thread",
@@ -15,7 +16,7 @@ __all__ = (
     "WorkerBase",
 )
 
-
+from ._code_syntax_highlight import CodeSyntaxHighlight
 from ._ensure_thread import ensure_main_thread, ensure_object_thread
 from ._message_handler import QMessageHandler
 from ._misc import signals_blocked
