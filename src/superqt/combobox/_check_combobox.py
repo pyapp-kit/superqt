@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from typing import Any, Union
+from typing import Any, List, Union
 
 from qtpy.QtCore import QEvent, Qt
 from qtpy.QtGui import QStandardItem
@@ -77,7 +77,7 @@ class QCheckComboBox(QComboBox):
             self._update_label_text_with_selected_items()
 
     def addItems(
-        self, texts: list[str], checked: Union[bool, list[bool]] = True
+        self, texts: List[str], checked: Union[bool, List[bool]] = True
     ) -> None:
         """Overirdes the combobox addItems to make sure it is checkable"""
         if isinstance(checked, bool):
@@ -117,7 +117,7 @@ class QCheckComboBox(QComboBox):
         for i in range(self.count()):
             self.setItemChecked(i, checked=checked)
 
-    def checkedIndices(self) -> list[int]:
+    def checkedIndices(self) -> List[int]:
         """Returns the checked indices"""
         model_indices = self.model().match(
             self.model().index(0, 0),
@@ -129,7 +129,7 @@ class QCheckComboBox(QComboBox):
         indecies = [model_index.row() for model_index in model_indices]
         return indecies
 
-    def uncheckedIndices(self) -> list[int]:
+    def uncheckedIndices(self) -> List[int]:
         """Returns teh unchecked indices"""
         model_indices = self.model().match(
             self.model().index(0, 0),
