@@ -7,7 +7,7 @@ except ImportError:
 
 from ._eliding_label import QElidingLabel
 from .collapsible import QCollapsible
-from .combobox import QEnumComboBox, QSearchableComboBox, QCheckComboBox
+from .combobox import QCheckComboBox, QEnumComboBox, QSearchableComboBox
 from .selection import QSearchableListWidget
 from .sliders import (
     QDoubleRangeSlider,
