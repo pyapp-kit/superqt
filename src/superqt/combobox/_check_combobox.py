@@ -107,16 +107,14 @@ class QCheckComboBox(QComboBox):
     def setItemChecked(self, index: int, checked: bool = True) -> None:
         """Sets the status"""
         item: QStandardItem = self.model().item(index)
-        checked_old = item.checkState()
+        checked_state_old = item.checkState()
+        checked_state_new = Qt.Checked if checked else Qt.Unchecked
 
         # Stopping condition
-        if checked_old == checked:
+        if checked_state_old == checked_state_new:
             return
 
-        if checked:
-            item.setCheckState(Qt.Checked)
-        else:
-            item.setCheckState(Qt.Unchecked)
+        item.setCheckState(checked_state_new)
 
         if self._label_type == QCheckComboBox.QCheckComboBoxLabelType.SELECTED_ITEMS:
             self._update_label_text_with_selected_items()
