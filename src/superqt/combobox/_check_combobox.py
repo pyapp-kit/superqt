@@ -106,11 +106,20 @@ class QCheckComboBox(QComboBox):
 
     def setItemChecked(self, index: int, checked: bool = True) -> None:
         """Sets the status"""
-        item: QStandardItem = self.model().item(index, self.modelColumn())
+        item: QStandardItem = self.model().item(index)
+        checked_old = item.checkState()
+
+        # Stopping condition
+        if checked_old == checked:
+            return
+
         if checked:
             item.setCheckState(Qt.Checked)
         else:
             item.setCheckState(Qt.Unchecked)
+
+        if self._label_type == QCheckComboBox.QCheckComboBoxLabelType.SELECTED_ITEMS:
+            self._update_label_text_with_selected_items()
 
     def setAllItemChecked(self, checked: bool = True) -> None:
         """Set all item checked status in one go"""
@@ -119,27 +128,21 @@ class QCheckComboBox(QComboBox):
 
     def checkedIndices(self) -> List[int]:
         """Returns the checked indices"""
-        model_indices = self.model().match(
-            self.model().index(0, 0),
-            Qt.CheckStateRole,
-            Qt.Checked,
-            -1,
-            Qt.MatchRecursive,
-        )
-        indecies = [model_index.row() for model_index in model_indices]
+        indecies = []
+        for i in range(self.count()):
+            item = self.model().item(i)
+            if item.checkState() == Qt.Checked:
+                indecies.append(i)
         return indecies
 
     def uncheckedIndices(self) -> List[int]:
         """Returns teh unchecked indices"""
-        model_indices = self.model().match(
-            self.model().index(0, 0),
-            Qt.CheckStateRole,
-            Qt.Unchecked,
-            -1,
-            Qt.MatchRecursive,
-        )
-        indices = [model_index.row() for model_index in model_indices]
-        return indices
+        indecies = []
+        for i in range(self.count()):
+            item = self.model().item(i)
+            if item.checkState() == Qt.Unchecked:
+                indecies.append(i)
+        return indecies
 
     def paintEvent(self, event: QEvent) -> None:
         """Overrides the paint event to update the label"""

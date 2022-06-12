@@ -91,7 +91,8 @@ def test_selected_items_label_type(qtbot: QtBot) -> None:
 
     check_combobox.addItem("Item 1")
     check_combobox.addItems(["Item 2", "Item 3"])
-    assert check_combobox.labelText() == "Item 1, Item 2, Item 3"
+    check_combobox.setItemChecked(1, False)
+    assert check_combobox.labelText() == "Item 1, Item 3"
 
 
 def test_paint_event(qtbot: QtBot) -> None:
