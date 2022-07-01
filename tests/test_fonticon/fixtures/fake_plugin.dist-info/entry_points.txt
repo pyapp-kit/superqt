@@ -1,0 +1,2 @@
+[superqt.fonticon]
+ico = fake_plugin:ICO

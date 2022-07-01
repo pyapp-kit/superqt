@@ -11,7 +11,7 @@ TEST_PREFIX = "ico"
 TEST_CHARNAME = "smiley"
 TEST_CHAR = "\ue900"
 TEST_GLYPHKEY = f"{TEST_PREFIX}.{TEST_CHARNAME}"
-FONT_FILE = Path(__file__).parent / "icontest.ttf"
+FONT_FILE = Path(__file__).parent / 'fixtures' / 'fake_plugin' / "icontest.ttf"
 
 
 @pytest.fixture
