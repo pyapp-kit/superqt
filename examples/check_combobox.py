@@ -1,6 +1,6 @@
 from qtpy.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget
 
-from src.superqt import QCheckComboBox
+from superqt import QCheckComboBox
 
 
 def change_label_type() -> None:

@@ -25,6 +25,7 @@ class QCheckComboBox(QComboBox):
         """Initializes the widget"""
         super().__init__()
         self.view().pressed.connect(self._handleItemPressed)
+        self.view().doubleClicked.connect(self._handleItemPressed)
         self._changed = False
 
     def _update_label_text_with_selected_items(self) -> None:
