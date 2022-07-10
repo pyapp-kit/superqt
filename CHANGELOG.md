@@ -1,8 +1,20 @@
 # Changelog
 
-## [0.3.2](https://github.com/napari/superqt/tree/0.3.2) (2022-05-02)
+## [0.3.3](https://github.com/napari/superqt/tree/0.3.3) (2022-07-10)
 
-[Full Changelog](https://github.com/napari/superqt/compare/v0.3.1...0.3.2)
+[Full Changelog](https://github.com/napari/superqt/compare/v0.3.2...0.3.3)
+
+**Implemented enhancements:**
+
+- Add code syntax highlight utils [\#88](https://github.com/napari/superqt/pull/88) ([Czaki](https://github.com/Czaki))
+
+**Fixed bugs:**
+
+- fix: fix deprecation warning on fonticon plugin discovery on python 3.10 [\#95](https://github.com/napari/superqt/pull/95) ([tlambert03](https://github.com/tlambert03))
+
+## [v0.3.2](https://github.com/napari/superqt/tree/v0.3.2) (2022-05-03)
+
+[Full Changelog](https://github.com/napari/superqt/compare/v0.3.1...v0.3.2)
 
 **Implemented enhancements:**
 
@@ -17,6 +29,10 @@
 **Tests & CI:**
 
 - Fix deprecation warnings in tests [\#82](https://github.com/napari/superqt/pull/82) ([tlambert03](https://github.com/tlambert03))
+
+**Merged pull requests:**
+
+- Add changelog for v0.3.2 [\#86](https://github.com/napari/superqt/pull/86) ([tlambert03](https://github.com/tlambert03))
 
 ## [v0.3.1](https://github.com/napari/superqt/tree/v0.3.1) (2022-03-02)
 
