@@ -243,7 +243,9 @@ class _QFontIconEngine(QIconEngine):
     def pixmap(self, size: QSize, mode: QIcon.Mode, state: QIcon.State) -> QPixmap:
         # first look in cache
         pmckey = self._pmcKey(size, mode, state)
-        pm = QPixmapCache.find(pmckey) if pmckey else None
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", "QPixmapCache.find")
+            pm = QPixmapCache.find(pmckey) if pmckey else None
         if pm:
             return pm
         pixmap = QPixmap(size)
