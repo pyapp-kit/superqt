@@ -33,10 +33,22 @@ from functools import wraps
 from typing import TYPE_CHECKING, Callable, Generic, Optional, TypeVar, Union, overload
 
 from qtpy.QtCore import QObject, Qt, QTimer, Signal
-from typing_extensions import Literal, ParamSpec
 
 if TYPE_CHECKING:
     from qtpy.QtCore import SignalInstance
+    from typing_extensions import Literal, ParamSpec
+
+    P = ParamSpec("P")
+# maintain runtime compatibility with older typing_extensions
+else:
+    try:
+        from typing_extensions import ParamSpec
+
+        P = ParamSpec("P")
+    except ImportError:
+        P = TypeVar("P")
+
+R = TypeVar("R")
 
 
 class Kind(IntFlag):
@@ -179,8 +191,6 @@ class QSignalDebouncer(GenericSignalThrottler):
 
 # below here part is unique to superqt (not from KD)
 
-P = ParamSpec("P")
-R = TypeVar("R")
 
 if TYPE_CHECKING:
     from typing_extensions import Protocol
@@ -199,12 +209,12 @@ if TYPE_CHECKING:
 
         if sys.version_info < (3, 9):
 
-            def __call__(self, *args: P.args, **kwargs: P.kwargs) -> Future:
+            def __call__(self, *args: "P.args", **kwargs: "P.kwargs") -> Future:
                 ...
 
         else:
 
-            def __call__(self, *args: P.args, **kwargs: P.kwargs) -> Future[R]:
+            def __call__(self, *args: "P.args", **kwargs: "P.kwargs") -> Future[R]:
                 ...
 
 
@@ -220,7 +230,7 @@ def qthrottled(
 
 @overload
 def qthrottled(
-    func: Literal[None] = None,
+    func: "Literal[None]" = None,
     timeout: int = 100,
     leading: bool = True,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
@@ -279,7 +289,7 @@ def qdebounced(
 
 @overload
 def qdebounced(
-    func: Literal[None] = None,
+    func: "Literal[None]" = None,
     timeout: int = 100,
     leading: bool = False,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
@@ -347,7 +357,7 @@ def _make_decorator(
         future: Optional[Future] = None
 
         @wraps(func)
-        def inner(*args: P.args, **kwargs: P.kwargs) -> Future:
+        def inner(*args: "P.args", **kwargs: "P.kwargs") -> Future:
             nonlocal last_f
             nonlocal future
             if last_f is not None:

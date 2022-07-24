@@ -21,10 +21,8 @@ from typing import (
 )
 
 from qtpy.QtCore import QObject, QRunnable, QThread, QThreadPool, QTimer, Signal
-from typing_extensions import Literal, ParamSpec
 
 if TYPE_CHECKING:
-
     _T = TypeVar("_T")
 
     class SigInst(Generic[_T]):
@@ -40,11 +38,21 @@ if TYPE_CHECKING:
         def emit(*args: _T) -> None:
             ...
 
+    from typing_extensions import Literal, ParamSpec
+
+    _P = ParamSpec("_P")
+# maintain runtime compatibility with older typing_extensions
+else:
+    try:
+        from typing_extensions import ParamSpec
+
+        _P = ParamSpec("_P")
+    except ImportError:
+        _P = TypeVar("_P")
 
 _Y = TypeVar("_Y")
 _S = TypeVar("_S")
 _R = TypeVar("_R")
-_P = ParamSpec("_P")
 
 
 def as_generator_function(
