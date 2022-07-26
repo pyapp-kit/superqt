@@ -89,6 +89,7 @@ def test_changing_label_string(qtbot: QtBot) -> None:
 def test_selected_items_label_type(qtbot: QtBot) -> None:
     """Tests selected item label"""
     check_combobox = QCheckComboBox()
+    qtbot.add_widget(check_combobox)
     check_combobox.setLabelType(QCheckComboBox.QCheckComboBoxLabelType.SELECTED_ITEMS)
     assert (
         check_combobox.labelType()
