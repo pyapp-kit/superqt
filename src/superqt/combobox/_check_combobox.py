@@ -1,7 +1,7 @@
 from enum import Enum, auto
 from typing import Any, List, Union
 
-from qtpy.QtCore import QEvent, Qt
+from qtpy.QtCore import QEvent, Qt, Signal
 from qtpy.QtGui import QIcon, QStandardItem
 from qtpy.QtWidgets import QComboBox, QStyle, QStyleOptionComboBox, QStylePainter
 
@@ -20,6 +20,7 @@ class QCheckComboBox(QComboBox):
 
     _label_text: str = "Select items"
     _label_type: QCheckComboBoxLabelType = QCheckComboBoxLabelType.STRING
+    selectionUpdated = Signal(int, bool)
 
     def __init__(self) -> None:
         """Initializes the widget"""
@@ -141,6 +142,7 @@ class QCheckComboBox(QComboBox):
             return
 
         item.setCheckState(checked_state_new)
+        self.selectionUpdated.emit(index, checked)
 
         if self._label_type == QCheckComboBox.QCheckComboBoxLabelType.SELECTED_ITEMS:
             self._update_label_text_with_selected_items()
