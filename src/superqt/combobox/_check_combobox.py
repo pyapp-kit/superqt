@@ -170,6 +170,15 @@ class QCheckComboBox(QComboBox):
                 indecies.append(i)
         return indecies
 
+    def checkedTexts(self) -> List[str]:
+        """Returns the checked indices"""
+        texts = []
+        for i in range(self.count()):
+            item = self.model().item(i)
+            if item.checkState() == Qt.Checked:
+                texts.append(item.text())
+        return texts
+
     def paintEvent(self, event: QEvent) -> None:
         """Overrides the paint event to update the label"""
         painter = QStylePainter(self)
