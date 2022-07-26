@@ -51,6 +51,7 @@ def test_add_items(qtbot: QtBot) -> None:
 def test_set_all_items_checked(qtbot: QtBot) -> None:
     """Tests setting all items checked status"""
     check_combobox = QCheckComboBox()
+    qtbot.add_widget(check_combobox)
     check_combobox.addItems(["Item 1", "Item 2", "Item 3"], checked=[True, False, True])
     checked_status = [
         check_combobox.itemChecked(i) for i in range(check_combobox.count())
