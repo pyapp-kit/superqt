@@ -34,6 +34,7 @@ def test_add_items(qtbot: QtBot) -> None:
     assert check_combobox2.itemChecked(1) is False
 
     check_combobox3 = QCheckComboBox()
+    qtbot.add_widget(check_combobox3)
     check_combobox3.addItems(["Item 1", "Item 2"], checked=True)
     assert check_combobox3.itemChecked(0) is True
     assert check_combobox3.itemChecked(1) is True
