@@ -8,6 +8,7 @@ def test_add_item(qtbot: QtBot) -> None:
     """Tests the addition of item"""
 
     check_combobox = QCheckComboBox()
+    qtbot.add_widget(check_combobox)
 
     check_combobox.addItem("Item 1", userData=1, checked=False)
     check_combobox.addItem("Item 2", userData="2", checked=True)
