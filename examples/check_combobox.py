@@ -26,6 +26,9 @@ combobox.setLabelText("Select items")
 texts = [f"Item {i}" for i in range(5)]
 combobox.addItems(texts)
 
+# Use insertItem instead of addItems
+combobox.insertItem(1, text="New Item at index 1")
+
 # Add button to change the label type
 button = QPushButton("Change label type")
 button.clicked.connect(lambda: change_label_type())

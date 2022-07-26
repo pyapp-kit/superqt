@@ -93,6 +93,20 @@ class QCheckComboBox(QComboBox):
         ):
             self._update_label_text_with_selected_items()
 
+    def insertItem(
+        self, index: int, text: str, checked: bool = True, userData: Any = ...
+    ) -> None:
+        """Inserts an item"""
+        super().insertItem(index, text, userData)
+        item: QStandardItem = self.model().item(index, self.modelColumn())
+        item.setCheckable(True)
+        self.setItemChecked(index, checked=checked)
+        if (
+            self._label_type == QCheckComboBox.QCheckComboBoxLabelType.SELECTED_ITEMS
+            and checked is True
+        ):
+            self._update_label_text_with_selected_items()
+
     def hidePopup(self) -> None:
         """Override hidePopup to disable it if an item state has changed"""
         if not self._changed:
