@@ -123,6 +123,7 @@ def test_hidepopup(qtbot: QtBot) -> None:
 def test_handle_item_checked(qtbot: QtBot) -> None:
     """Tests the check combobox interactions"""
     check_combobox = QCheckComboBox()
+    qtbot.add_widget(check_combobox)
     check_combobox.addItems(["Item 1", "Item 2"], [True, False])
     check_combobox.setLabelType(QCheckComboBox.QCheckComboBoxLabelType.SELECTED_ITEMS)
     model = check_combobox.model()
