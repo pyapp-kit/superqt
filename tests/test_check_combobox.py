@@ -81,6 +81,7 @@ def test_indices_retrival(qtbot: QtBot) -> None:
 def test_changing_label_string(qtbot: QtBot) -> None:
     """Tests changing the label string"""
     check_combobox = QCheckComboBox()
+    qtbot.add_widget(check_combobox)
     check_combobox.setLabelText("Please select items")
     assert check_combobox.labelText() == "Please select items"
 
