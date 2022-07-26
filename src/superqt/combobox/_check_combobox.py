@@ -2,7 +2,7 @@ from enum import Enum, auto
 from typing import Any, List, Union
 
 from qtpy.QtCore import QEvent, Qt
-from qtpy.QtGui import QStandardItem
+from qtpy.QtGui import QIcon, QStandardItem
 from qtpy.QtWidgets import QComboBox, QStyle, QStyleOptionComboBox, QStylePainter
 
 
@@ -65,12 +65,16 @@ class QCheckComboBox(QComboBox):
             self._update_label_text_with_selected_items()
         self._changed = True
 
-    def addItem(self, text: str, userData: Any = None, checked: bool = True) -> None:
+    def addItem(
+        self, text: str, icon: QIcon = None, userData: Any = None, checked: bool = True
+    ) -> None:
         """Overrides the combobox additem to make sure it is chackable"""
         super().addItem(text, userData)
         item: QStandardItem = self.model().item(self.count() - 1, self.modelColumn())
         item.setCheckable(True)
         self.setItemChecked(self.count() - 1, checked=checked)
+        if icon:
+            item.setIcon(icon)
         if (
             self._label_type == QCheckComboBox.QCheckComboBoxLabelType.SELECTED_ITEMS
             and checked is True
@@ -94,13 +98,20 @@ class QCheckComboBox(QComboBox):
             self._update_label_text_with_selected_items()
 
     def insertItem(
-        self, index: int, text: str, checked: bool = True, userData: Any = ...
+        self,
+        index: int,
+        text: str,
+        icon: QIcon = None,
+        userData: Any = ...,
+        checked: bool = True,
     ) -> None:
         """Inserts an item"""
         super().insertItem(index, text, userData)
         item: QStandardItem = self.model().item(index, self.modelColumn())
         item.setCheckable(True)
         self.setItemChecked(index, checked=checked)
+        if icon:
+            item.setIcon(icon)
         if (
             self._label_type == QCheckComboBox.QCheckComboBoxLabelType.SELECTED_ITEMS
             and checked is True
