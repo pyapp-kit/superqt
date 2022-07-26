@@ -98,8 +98,11 @@ def test_selected_items_label_type(qtbot: QtBot) -> None:
 def test_paint_event(qtbot: QtBot) -> None:
     """Simple test for paint event; execute without error"""
     check_combobox = QCheckComboBox()
+    qtbot.add_widget(check_combobox)
+    check_combobox.show()
     check_combobox.setLabelText("A new label")
     check_combobox.paintEvent(QEvent(QEvent.Paint))
+    check_combobox.hide()
 
 
 def test_hidepopup(qtbot: QtBot) -> None:
