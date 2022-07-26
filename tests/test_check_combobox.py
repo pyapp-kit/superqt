@@ -73,6 +73,7 @@ def test_set_all_items_checked(qtbot: QtBot) -> None:
 def test_indices_retrival(qtbot: QtBot) -> None:
     """Tests retrival of the indices checked and unchecked"""
     check_combobox = QCheckComboBox()
+    qtbot.add_widget(check_combobox)
     check_combobox.addItems(["Item 1", "Item 2", "Item 3"], checked=[True, False, True])
     assert check_combobox.checkedIndices() == [0, 2]
     assert check_combobox.uncheckedIndices() == [1]
