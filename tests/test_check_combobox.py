@@ -114,6 +114,7 @@ def test_paint_event(qtbot: QtBot) -> None:
 
 def test_hidepopup(qtbot: QtBot) -> None:
     check_combobox = QCheckComboBox()
+    qtbot.add_widget(check_combobox)
     check_combobox._changed = True
     check_combobox.hidePopup()
     assert check_combobox._changed is False
