@@ -1,8 +1,29 @@
 # Changelog
 
-## [0.3.2](https://github.com/napari/superqt/tree/0.3.2) (2022-05-02)
+## [0.3.4](https://github.com/napari/superqt/tree/0.3.4) (2022-07-24)
 
-[Full Changelog](https://github.com/napari/superqt/compare/v0.3.1...0.3.2)
+[Full Changelog](https://github.com/napari/superqt/compare/v0.3.3...0.3.4)
+
+**Fixed bugs:**
+
+- fix: relax runtime typing extensions requirement [\#101](https://github.com/napari/superqt/pull/101) ([tlambert03](https://github.com/tlambert03))
+- fix: catch qpixmap deprecation [\#99](https://github.com/napari/superqt/pull/99) ([tlambert03](https://github.com/tlambert03))
+
+## [v0.3.3](https://github.com/napari/superqt/tree/v0.3.3) (2022-07-10)
+
+[Full Changelog](https://github.com/napari/superqt/compare/v0.3.2...v0.3.3)
+
+**Implemented enhancements:**
+
+- Add code syntax highlight utils [\#88](https://github.com/napari/superqt/pull/88) ([Czaki](https://github.com/Czaki))
+
+**Fixed bugs:**
+
+- fix: fix deprecation warning on fonticon plugin discovery on python 3.10 [\#95](https://github.com/napari/superqt/pull/95) ([tlambert03](https://github.com/tlambert03))
+
+## [v0.3.2](https://github.com/napari/superqt/tree/v0.3.2) (2022-05-03)
+
+[Full Changelog](https://github.com/napari/superqt/compare/v0.3.1...v0.3.2)
 
 **Implemented enhancements:**
 
@@ -17,6 +38,10 @@
 **Tests & CI:**
 
 - Fix deprecation warnings in tests [\#82](https://github.com/napari/superqt/pull/82) ([tlambert03](https://github.com/tlambert03))
+
+**Merged pull requests:**
+
+- Add changelog for v0.3.2 [\#86](https://github.com/napari/superqt/pull/86) ([tlambert03](https://github.com/tlambert03))
 
 ## [v0.3.1](https://github.com/napari/superqt/tree/v0.3.1) (2022-03-02)
 
@@ -139,20 +164,12 @@
 
 ## [v0.2.1](https://github.com/napari/superqt/tree/v0.2.1) (2021-07-10)
 
-[Full Changelog](https://github.com/napari/superqt/compare/v0.2.0rc0...v0.2.1)
+[Full Changelog](https://github.com/napari/superqt/compare/v0.2.0...v0.2.1)
 
 **Fixed bugs:**
 
 - Fix QLabeledRangeSlider API \(fix slider proxy\) [\#10](https://github.com/napari/superqt/pull/10) ([tlambert03](https://github.com/tlambert03))
 - Fix range slider with negative min range [\#9](https://github.com/napari/superqt/pull/9) ([tlambert03](https://github.com/tlambert03))
-
-## [v0.2.0rc0](https://github.com/napari/superqt/tree/v0.2.0rc0) (2021-06-26)
-
-[Full Changelog](https://github.com/napari/superqt/compare/v0.2.0rc1...v0.2.0rc0)
-
-## [v0.2.0rc1](https://github.com/napari/superqt/tree/v0.2.0rc1) (2021-06-26)
-
-[Full Changelog](https://github.com/napari/superqt/compare/v0.2.0...v0.2.0rc1)
 
 
 
