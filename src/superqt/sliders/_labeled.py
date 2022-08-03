@@ -128,7 +128,7 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         super().__init__(parent)
 
         self._slider = self._slider_class()
-        self._label = SliderLabel(self._slider, connect=self._slider.setValue)
+        self._label = SliderLabel(self._slider, connect=self._setValue)
         self._edge_label_mode: EdgeLabelMode = EdgeLabelMode.LabelIsValue
 
         self._rename_signals()
@@ -141,6 +141,13 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         self._slider.valueChanged.connect(self.valueChanged.emit)
 
         self.setOrientation(orientation)
+
+    def _setValue(self, value: float):
+        """
+        Convert the value from float to int before
+        setting the slider value
+        """
+        self._slider.setValue(int(value))
 
     def _rename_signals(self):
         # for subclasses
