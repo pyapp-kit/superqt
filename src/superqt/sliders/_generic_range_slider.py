@@ -146,10 +146,16 @@ class _GenericRangeSlider(_GenericSlider[Tuple], Generic[_T]):
     def mouseMoveEvent(self, ev: QtGui.QMouseEvent) -> None:
         if self._pressedControl == SC_BAR:
             ev.accept()
-            delta = self._clickOffset - self._pixelPosToRangeValue(self._pick(ev.pos()))
+            delta = self._clickOffset - self._pixelPosToRangeValue(
+                self._pick(self._event_position(ev))
+            )
             self._offsetAllPositions(-delta, self._sldPosAtPress)
         else:
             super().mouseMoveEvent(ev)
+
+    def _event_position(self, event):
+        # API changes between PyQt5 (.pos()) and PyQt6 (.position())
+        return event.pos() if hasattr(event, "pos") else event.position()
 
     # ###############  Implementation Details  #######################
 
