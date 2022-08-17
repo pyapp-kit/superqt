@@ -179,13 +179,15 @@ jobs:
         run: |
           python -m pip install -U pip
           python -m pip install -e ./napari[testing,pyqt5]
-          python -m pip install -e ./superqt
+          python -m pip install ./superqt
 
-      - name: Test napari magicgui
+      - name: Test napari
         uses: GabrielBB/xvfb-action@v1
         with:
-          workdir: napari
-          run: python -m pytest --color=yes napari/_qt
+          run: |
+            cd napari
+            ls
+            python -m pytest --color=yes napari/_qt
 
   check_manifest:
     runs-on: ubuntu-latest
