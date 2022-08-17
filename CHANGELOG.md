@@ -1,8 +1,17 @@
 # Changelog
 
-## [0.3.4](https://github.com/napari/superqt/tree/0.3.4) (2022-07-24)
+## [0.3.5](https://github.com/napari/superqt/tree/0.3.5) (2022-08-17)
 
-[Full Changelog](https://github.com/napari/superqt/compare/v0.3.3...0.3.4)
+[Full Changelog](https://github.com/napari/superqt/compare/v0.3.4...0.3.5)
+
+**Fixed bugs:**
+
+- fix range slider drag crash on PyQt6 [\#108](https://github.com/napari/superqt/pull/108) ([sfhbarnett](https://github.com/sfhbarnett))
+- Fix float value error in pyqt configuration [\#106](https://github.com/napari/superqt/pull/106) ([mstabrin](https://github.com/mstabrin))
+
+## [v0.3.4](https://github.com/napari/superqt/tree/v0.3.4) (2022-07-24)
+
+[Full Changelog](https://github.com/napari/superqt/compare/v0.3.3...v0.3.4)
 
 **Fixed bugs:**
 
