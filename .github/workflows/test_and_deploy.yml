@@ -159,19 +159,19 @@ jobs:
     name: napari tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
           path: superqt
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           repository: napari/napari
           path: napari-repo
           fetch-depth: 2
 
       - uses: tlambert03/setup-qt-libs@v1
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
@@ -180,12 +180,11 @@ jobs:
           python -m pip install -U pip
           python -m pip install ./superqt
           python -m pip install ./napari-repo[testing,pyqt5]
-          ls -la napari-repo
 
-      - name: Test napari magicgui
+      - name: Test napari
         uses: GabrielBB/xvfb-action@v1
         with:
-          workdir: napari-repo
+          working-directory: napari-repo
           run: python -m pytest --color=yes napari/_qt
 
   check_manifest:
