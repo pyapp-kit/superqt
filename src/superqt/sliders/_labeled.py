@@ -234,6 +234,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
     EdgeLabelMode = EdgeLabelMode
     _slider_class = QRangeSlider
     _slider: QRangeSlider
+    _frangeChanged = Signal(float, float)
 
     def __init__(self, *args, **kwargs) -> None:
         parent, orientation = _handle_overloaded_slider_sig(args, kwargs)
@@ -273,6 +274,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
 
     def _rename_signals(self):
         self.valueChanged = self._valueChanged
+        self.rangeChanged = self._frangeChanged
 
     def handleLabelPosition(self) -> LabelPosition:
         return self._handle_label_position
@@ -450,15 +452,10 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
 class QLabeledDoubleRangeSlider(QLabeledRangeSlider):
     _slider_class = QDoubleRangeSlider
     _slider: QDoubleRangeSlider
-    _frangeChanged = Signal(float, float)
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.setDecimals(2)
-
-    def _rename_signals(self):
-        super()._rename_signals()
-        self.rangeChanged = self._frangeChanged
 
     def decimals(self) -> int:
         return self._min_label.decimals()
