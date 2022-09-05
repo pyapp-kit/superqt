@@ -16,7 +16,7 @@ repos:
         additional_dependencies: [flake8-typing-imports==1.7.0]
         exclude: examples
   - repo: https://github.com/myint/autoflake
-    rev: v1.4
+    rev: v1.5.3
     hooks:
       - id: autoflake
         args: ["--in-place", "--remove-all-unused-imports"]
@@ -30,7 +30,7 @@ repos:
       - id: pyupgrade
         args: [--py37-plus, --keep-runtime-typing]
   - repo: https://github.com/psf/black
-    rev: 22.6.0
+    rev: 22.8.0
     hooks:
       - id: black
   - repo: https://github.com/pre-commit/mirrors-mypy
