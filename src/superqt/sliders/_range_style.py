@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import platform
 import re
 from dataclasses import dataclass, replace
@@ -19,6 +20,18 @@ from qtpy.QtWidgets import QApplication, QSlider, QStyleOptionSlider
 
 if TYPE_CHECKING:
     from ._generic_range_slider import _GenericRangeSlider
+
+# whether to use the MONTEREY_SLIDER_STYLES_FIX QSS hack
+# for fixing sliders on macos>=12 with QT < 6
+# https://bugreports.qt.io/browse/QTBUG-98093
+# https://github.com/napari/superqt/issues/74
+USE_MAC_SLIDER_PATCH = (
+    QT_VERSION
+    and int(QT_VERSION.split(".")[0]) < 6
+    and platform.system() == "Darwin"
+    and int(platform.mac_ver()[0].split(".", maxsplit=1)[0]) >= 12
+    and not os.getenv("DISABLE_MONTEREY_SLIDER_STYLES")
+)
 
 
 @dataclass
@@ -86,13 +99,12 @@ class RangeSliderStyle:
             val = QColor(val)
         if opt.tickPosition != QSlider.TickPosition.NoTicks:
             val.setAlphaF(self.tick_bar_alpha or SYSTEM_STYLE.tick_bar_alpha)
-
         return val
 
     def offset(self, opt: QStyleOptionSlider) -> int:
-        tp = opt.tickPosition
         off = 0
         if not self.has_stylesheet:
+            tp = opt.tickPosition
             if opt.orientation == Qt.Orientation.Horizontal:
                 off += self.h_offset or SYSTEM_STYLE.h_offset or 0
             else:
@@ -144,16 +156,18 @@ if QT_VERSION and int(QT_VERSION.split(".")[0]) == 6:
 
 BIG_SUR_STYLE = replace(
     CATALINA_STYLE,
+    pen_active="#DFDFDF",
     brush_active="#0A81FE",
     brush_inactive="#D5D5D5",
     brush_disabled="#E6E6E6",
     tick_offset=0,
     horizontal_thickness=4,
     vertical_thickness=4,
-    h_offset=-2,
+    h_offset=0 if USE_MAC_SLIDER_PATCH else -2,
     tick_bar_alpha=0.2,
 )
 
+MONTEREY_STYLE = replace(BIG_SUR_STYLE, h_offset=0)
 if QT_VERSION and int(QT_VERSION.split(".")[0]) == 6:
     BIG_SUR_STYLE = replace(BIG_SUR_STYLE, tick_offset=-3)
 
@@ -259,7 +273,8 @@ def parse_color(color: str, default_attr) -> QColor | QGradient:
 
 
 def update_styles_from_stylesheet(obj: _GenericRangeSlider):
-    qss = obj.styleSheet()
+
+    qss: str = obj.styleSheet()
 
     parent = obj.parent()
     while parent is not None:
@@ -268,6 +283,8 @@ def update_styles_from_stylesheet(obj: _GenericRangeSlider):
     qss = QApplication.instance().styleSheet() + qss
     if not qss:
         return
+    if MONTEREY_SLIDER_STYLES_FIX in qss:
+        qss = qss.replace(MONTEREY_SLIDER_STYLES_FIX, "")
 
     # Find bar height/width
     for orient, dim in (("horizontal", "height"), ("vertical", "width")):
@@ -279,3 +296,57 @@ def update_styles_from_stylesheet(obj: _GenericRangeSlider):
                     thickness = float(bgrd.groups()[-1])
                     setattr(obj._style, f"{orient}_thickness", thickness)
                     obj._style.has_stylesheet = True
+
+
+# a fix for https://bugreports.qt.io/browse/QTBUG-98093
+
+MONTEREY_SLIDER_STYLES_FIX = """
+QSlider::groove {
+    background: #DFDFDF;
+    border: 1px solid #DBDBDB;
+    border-radius: 2px;
+}
+QSlider::groove:horizontal {
+    height: 2px;
+    margin: 2px;
+}
+QSlider::groove:vertical {
+    width: 2px;
+    margin: 2px 0 6px 0;
+}
+
+
+QSlider::handle {
+    background: white;
+    border: 0.5px solid #DADADA;
+    width: 19.5px;
+    height: 19.5px;
+    border-radius: 10.5px;
+}
+QSlider::handle:horizontal {
+    margin: -10px -2px;
+}
+QSlider::handle:vertical {
+    margin: -2px -10px;
+}
+
+QSlider::handle:pressed {
+    background: #F0F0F0;
+}
+
+
+QSlider::sub-page:horizontal {
+    background: #0981FE;
+    border: 1px solid #097DF7;
+    border-radius: 2px;
+    margin: 2px;
+    height: 2px;
+}
+QSlider::add-page:vertical {
+    background: #0981FE;
+    border: 1px solid #097DF7;
+    border-radius: 2px;
+    margin: 2px 0 6px 0;
+    width: 2px;
+}
+""".strip()

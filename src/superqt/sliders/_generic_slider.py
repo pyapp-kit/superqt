@@ -19,7 +19,6 @@ So that's what `_GenericSlider` is below.
 scalar (with one handle per item), and it forms the basis of
 QRangeSlider.
 """
-
 from typing import Generic, TypeVar
 
 from qtpy import QtGui
@@ -32,6 +31,8 @@ from qtpy.QtWidgets import (
     QStylePainter,
 )
 
+from ._range_style import MONTEREY_SLIDER_STYLES_FIX, USE_MAC_SLIDER_PATCH
+
 _T = TypeVar("_T")
 
 SC_NONE = QStyle.SubControl.SC_None
@@ -41,6 +42,12 @@ SC_TICKMARKS = QStyle.SubControl.SC_SliderTickmarks
 
 CC_SLIDER = QStyle.ComplexControl.CC_Slider
 QOVERFLOW = 2**31 - 1
+
+
+if USE_MAC_SLIDER_PATCH:
+    _MAC_SLIDER_STYLE_PATCH = MONTEREY_SLIDER_STYLES_FIX
+else:
+    _MAC_SLIDER_STYLE_PATCH = ""
 
 
 class _GenericSlider(QSlider, Generic[_T]):
@@ -79,8 +86,16 @@ class _GenericSlider(QSlider, Generic[_T]):
         self.rangeChanged = self._frangeChanged
 
         self.setAttribute(Qt.WidgetAttribute.WA_Hover)
+        self.setStyleSheet("")
 
     # ###############  QtOverrides  #######################
+
+    def setStyleSheet(self, styleSheet: str) -> None:
+        return super().setStyleSheet(self._patch_style(styleSheet))
+
+    def _patch_style(self, styleSheet: str) -> str:
+        # only use the stylesheet patch if a stylesheet is not already set
+        return styleSheet or _MAC_SLIDER_STYLE_PATCH
 
     def value(self) -> _T:  # type: ignore
         return self._value
@@ -271,6 +286,23 @@ class _GenericSlider(QSlider, Generic[_T]):
         if opt.tickPosition != QSlider.TickPosition.NoTicks:
             opt.subControls |= SC_TICKMARKS
         painter.drawComplexControl(CC_SLIDER, opt)
+        if USE_MAC_SLIDER_PATCH and opt.tickPosition != QSlider.TickPosition.NoTicks:
+            # draw tick marks manually because they are badly behaved with style sheets
+            interval = opt.tickInterval or int(self._pageStep)
+            _range = self._maximum - self._minimum
+            nticks = (_range + interval) // interval
+
+            painter.setPen(QtGui.QColor("#C7C7C7"))
+            half_height = 3
+            for i in range(int(nticks)):
+                if self.orientation() == Qt.Orientation.Vertical:
+                    y = int((self.height() - 8) * i / (nticks - 1)) + 1
+                    x = self.rect().center().x()
+                    painter.drawRect(x - half_height, y, 6, 1)
+                else:
+                    x = int((self.width() - 3) * i / (nticks - 1)) + 1
+                    y = self.rect().center().y()
+                    painter.drawRect(x, y - half_height, 1, 6)
 
         self._draw_handle(painter, opt)
 

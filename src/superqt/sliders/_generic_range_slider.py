@@ -32,6 +32,8 @@ class _GenericRangeSlider(_GenericSlider[Tuple], Generic[_T]):
     _slidersMoved = Signal(tuple)
 
     def __init__(self, *args, **kwargs):
+        self._style = RangeSliderStyle()
+
         super().__init__(*args, **kwargs)
         self.valueChanged = self._valuesChanged
         self.sliderMoved = self._slidersMoved
@@ -55,9 +57,7 @@ class _GenericRangeSlider(_GenericSlider[Tuple], Generic[_T]):
 
         # color
 
-        self._style = RangeSliderStyle()
         self.setStyleSheet("")
-        update_styles_from_stylesheet(self)
 
     # ###############  New Public API  #######################
 
@@ -130,13 +130,17 @@ class _GenericRangeSlider(_GenericSlider[Tuple], Generic[_T]):
 
         self._doSliderMove()
 
-    def setStyleSheet(self, styleSheet: str) -> None:
+    def _patch_style(self, style: str):
+        """Override to patch style options before painting."""
         # sub-page styles render on top of the lower sliders and don't work here.
+        style = super()._patch_style(style)
         override = f"""
-            \n{type(self).__name__}::sub-page:horizontal {{background: none}}
-            \n{type(self).__name__}::sub-page:vertical {{background: none}}
+            \n{type(self).__name__}::sub-page:horizontal
+                {{background: none; border: none}}
+            \n{type(self).__name__}::add-page:vertical
+                {{background: none; border: none}}
         """
-        return super().setStyleSheet(styleSheet + override)
+        return style + override
 
     def event(self, ev: QEvent) -> bool:
         if ev.type() == QEvent.Type.StyleChange:
