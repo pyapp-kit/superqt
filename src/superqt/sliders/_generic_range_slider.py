@@ -5,7 +5,11 @@ from qtpy.QtCore import Property, QEvent, QPoint, QPointF, QRect, QRectF, Qt, Si
 from qtpy.QtWidgets import QSlider, QStyle, QStyleOptionSlider, QStylePainter
 
 from ._generic_slider import CC_SLIDER, SC_GROOVE, SC_HANDLE, SC_NONE, _GenericSlider
-from ._range_style import RangeSliderStyle, update_styles_from_stylesheet
+from ._range_style import (
+    MONTEREY_SLIDER_STYLES_FIX,
+    RangeSliderStyle,
+    update_styles_from_stylesheet,
+)
 
 _T = TypeVar("_T")
 
@@ -97,6 +101,10 @@ class _GenericRangeSlider(_GenericSlider[Tuple], Generic[_T]):
     def showBar(self) -> None:
         self.setBarVisible(True)
 
+    def applyMacStylePatch(self) -> str:
+        super().applyMacStylePatch()
+        self._style._macpatch = True
+
     # ###############  QtOverrides  #######################
 
     def value(self) -> Tuple[_T, ...]:
@@ -130,10 +138,15 @@ class _GenericRangeSlider(_GenericSlider[Tuple], Generic[_T]):
 
         self._doSliderMove()
 
+    def setStyleSheet(self, styleSheet: str) -> None:
+        return super().setStyleSheet(self._patch_style(styleSheet))
+
     def _patch_style(self, style: str):
         """Override to patch style options before painting."""
         # sub-page styles render on top of the lower sliders and don't work here.
-        style = super()._patch_style(style)
+        if self._style._macpatch and not style:
+            style = MONTEREY_SLIDER_STYLES_FIX
+
         override = f"""
             \n{type(self).__name__}::sub-page:horizontal
                 {{background: none; border: none}}
