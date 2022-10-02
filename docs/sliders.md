@@ -246,6 +246,7 @@ may not see this issue if you're already using custom stylesheets.
 To opt in to the workaround, do any of the following:
 
 - set the environment variable `USE_MAC_SLIDER_PATCH=1` before importing superqt
+  (note: this is safe to use even if you're targeting more than just MacOS 12, it will only be applied when needed)
 - call the `applyMacStylePatch()` method on any of the superqt slider subclasses (note, this will override your slider styles)
 - apply the stylesheet manually:
 
