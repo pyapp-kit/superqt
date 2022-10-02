@@ -272,6 +272,9 @@ def update_styles_from_stylesheet(obj: _GenericRangeSlider):
         return
     if MONTEREY_SLIDER_STYLES_FIX in qss:
         qss = qss.replace(MONTEREY_SLIDER_STYLES_FIX, "")
+        obj._style._macpatch = True
+    else:
+        obj._style._macpatch = False
 
     # Find bar height/width
     for orient, dim in (("horizontal", "height"), ("vertical", "width")):

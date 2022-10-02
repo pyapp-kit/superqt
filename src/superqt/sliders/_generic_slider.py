@@ -54,9 +54,8 @@ USE_MAC_SLIDER_PATCH = (
     and int(QT_VERSION.split(".")[0]) < 6
     and platform.system() == "Darwin"
     and int(platform.mac_ver()[0].split(".", maxsplit=1)[0]) >= 12
-    and os.getenv("USE_MAC_SLIDER_PATCH", "1") != "0"
+    and os.getenv("USE_MAC_SLIDER_PATCH", "0") not in ("0", "False", "false")
 )
-print("USE_MAC_SLIDER_PATCH", USE_MAC_SLIDER_PATCH)
 
 
 class _GenericSlider(QSlider, Generic[_T]):
