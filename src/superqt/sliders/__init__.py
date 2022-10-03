@@ -4,6 +4,7 @@ from ._labeled import (
     QLabeledRangeSlider,
     QLabeledSlider,
 )
+from ._range_style import MONTEREY_SLIDER_STYLES_FIX
 from ._sliders import QDoubleRangeSlider, QDoubleSlider, QRangeSlider
 
 __all__ = [
@@ -14,4 +15,5 @@ __all__ = [
     "QLabeledRangeSlider",
     "QLabeledSlider",
     "QRangeSlider",
+    "MONTEREY_SLIDER_STYLES_FIX",
 ]

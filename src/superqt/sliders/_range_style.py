@@ -36,6 +36,7 @@ class RangeSliderStyle:
     v_offset: float | None = None
     h_offset: float | None = None
     has_stylesheet: bool = False
+    _macpatch: bool = False
 
     def brush(self, opt: QStyleOptionSlider) -> QBrush:
         cg = opt.palette.currentColorGroup()
@@ -86,15 +87,15 @@ class RangeSliderStyle:
             val = QColor(val)
         if opt.tickPosition != QSlider.TickPosition.NoTicks:
             val.setAlphaF(self.tick_bar_alpha or SYSTEM_STYLE.tick_bar_alpha)
-
         return val
 
     def offset(self, opt: QStyleOptionSlider) -> int:
-        tp = opt.tickPosition
         off = 0
         if not self.has_stylesheet:
+            tp = opt.tickPosition
             if opt.orientation == Qt.Orientation.Horizontal:
-                off += self.h_offset or SYSTEM_STYLE.h_offset or 0
+                if not self._macpatch:
+                    off += self.h_offset or SYSTEM_STYLE.h_offset or 0
             else:
                 off += self.v_offset or SYSTEM_STYLE.v_offset or 0
             if tp == QSlider.TickPosition.TicksAbove:
@@ -259,7 +260,8 @@ def parse_color(color: str, default_attr) -> QColor | QGradient:
 
 
 def update_styles_from_stylesheet(obj: _GenericRangeSlider):
-    qss = obj.styleSheet()
+
+    qss: str = obj.styleSheet()
 
     parent = obj.parent()
     while parent is not None:
@@ -268,6 +270,11 @@ def update_styles_from_stylesheet(obj: _GenericRangeSlider):
     qss = QApplication.instance().styleSheet() + qss
     if not qss:
         return
+    if MONTEREY_SLIDER_STYLES_FIX in qss:
+        qss = qss.replace(MONTEREY_SLIDER_STYLES_FIX, "")
+        obj._style._macpatch = True
+    else:
+        obj._style._macpatch = False
 
     # Find bar height/width
     for orient, dim in (("horizontal", "height"), ("vertical", "width")):
@@ -279,3 +286,56 @@ def update_styles_from_stylesheet(obj: _GenericRangeSlider):
                     thickness = float(bgrd.groups()[-1])
                     setattr(obj._style, f"{orient}_thickness", thickness)
                     obj._style.has_stylesheet = True
+
+
+# a fix for https://bugreports.qt.io/browse/QTBUG-98093
+
+MONTEREY_SLIDER_STYLES_FIX = """
+/* MONTEREY_SLIDER_STYLES_FIX */
+
+QSlider::groove {
+    background: #DFDFDF;
+    border: 1px solid #DBDBDB;
+    border-radius: 2px;
+}
+QSlider::groove:horizontal {
+    height: 2px;
+    margin: 2px;
+}
+QSlider::groove:vertical {
+    width: 2px;
+    margin: 2px 0 6px 0;
+}
+
+
+QSlider::handle {
+    background: white;
+    border: 0.5px solid #DADADA;
+    width: 19.5px;
+    height: 19.5px;
+    border-radius: 10.5px;
+}
+QSlider::handle:horizontal {
+    margin: -10px -2px;
+}
+QSlider::handle:vertical {
+    margin: -2px -10px;
+}
+
+QSlider::handle:pressed {
+    background: #F0F0F0;
+}
+
+QSlider::sub-page:horizontal {
+    background: #0981FE;
+    border-radius: 2px;
+    margin: 2px;
+    height: 2px;
+}
+QSlider::add-page:vertical {
+    background: #0981FE;
+    border-radius: 2px;
+    margin: 2px 0 6px 0;
+    width: 2px;
+}
+""".strip()
