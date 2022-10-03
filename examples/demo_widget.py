@@ -1,7 +1,12 @@
+import os
+
 from qtpy import QtCore
 from qtpy import QtWidgets as QtW
 
-from superqt import QRangeSlider
+# patch for Qt 5.15 on macos >= 12
+os.environ["USE_MAC_SLIDER_PATCH"] = "1"
+
+from superqt import QRangeSlider  # noqa
 
 QSS = """
 QSlider {
