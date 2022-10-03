@@ -79,7 +79,7 @@ def _hover_event(_type, position, old_position, widget=None):
     return QHoverEvent(_type, position, old_position)
 
 
-def _linspace(start, stop, n):
+def _linspace(start: int, stop: int, n: int):
     h = (stop - start) / (n - 1)
     for i in range(n):
         yield start + h * i
