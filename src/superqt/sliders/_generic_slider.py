@@ -44,9 +44,9 @@ QOVERFLOW = 2**31 - 1
 
 
 class _GenericSlider(QSlider, Generic[_T]):
-    _fvalueChanged = Signal(float)
-    _fsliderMoved = Signal(float)
-    _frangeChanged = Signal(float, float)
+    _fvalueChanged = Signal(int)
+    _fsliderMoved = Signal(int)
+    _frangeChanged = Signal(int, int)
 
     MAX_DISPLAY = 5000
 
@@ -134,8 +134,8 @@ class _GenericSlider(QSlider, Generic[_T]):
         self.setRange(min(self._minimum, max), max)
 
     def setRange(self, min: float, max_: float) -> None:
-        oldMin, self._minimum = self._minimum, float(min)
-        oldMax, self._maximum = self._maximum, float(max(min, max_))
+        oldMin, self._minimum = self._minimum, self._type_cast(min)
+        oldMax, self._maximum = self._maximum, self._type_cast(max(min, max_))
 
         if oldMin != self._minimum or oldMax != self._maximum:
             self.sliderChange(self.SliderChange.SliderRangeChange)

@@ -172,3 +172,44 @@ def test_wheel(gslider: QRangeSlider, qtbot):
         gslider.wheelEvent(_wheel_event(120))
 
     gslider.wheelEvent(_wheel_event(0))
+
+
+def _assert_types(args, type_):
+    # sourcery skip: comprehension-to-generator
+    assert all([isinstance(v, type_) for v in args]), "invalid type"
+
+
+def test_rangeslider_signals(qtbot):
+    from unittest.mock import Mock
+
+    from superqt import QRangeSlider
+
+    ls = QRangeSlider()
+    qtbot.addWidget(ls)
+
+    mock = Mock()
+    ls.valueChanged.connect(mock)
+    with qtbot.waitSignal(ls.valueChanged):
+        ls.setValue((20, 40))
+    mock.assert_called_once_with((20, 40))
+    _assert_types(mock.call_args.args, tuple)
+    _assert_types(mock.call_args.args[0], int)
+
+    mock = Mock()
+    ls.rangeChanged.connect(mock)
+    with qtbot.waitSignal(ls.rangeChanged):
+        ls.setMinimum(3)
+    mock.assert_called_once_with(3, 99)
+    _assert_types(mock.call_args.args, int)
+
+    mock.reset_mock()
+    with qtbot.waitSignal(ls.rangeChanged):
+        ls.setMaximum(15)
+    mock.assert_called_once_with(3, 15)
+    _assert_types(mock.call_args.args, int)
+
+    mock.reset_mock()
+    with qtbot.waitSignal(ls.rangeChanged):
+        ls.setRange(1, 2)
+    mock.assert_called_once_with(1, 2)
+    _assert_types(mock.call_args.args, int)
