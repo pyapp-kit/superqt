@@ -10,7 +10,7 @@
 - Supports mouse wheel and keypress (soon) events
 - Supports more than 2 handles (e.g. `slider.setValue([0, 10, 60, 80])`)
 
-------
+*Note: There is a Qt5 Bug that affects sliders in MacOS 12+, see fix at bottom of page.*
 
 ## Range Slider
 
@@ -221,12 +221,6 @@ from superqt import QLabeledSlider
 
 (no additional options at this point)
 
-## Issues
-
-If you encounter any problems, please [file an issue] along with a detailed
-description.
-
-[file an issue]: https://github.com/napari/superqt/issues
 
 ## Float Slider
 
@@ -234,4 +228,30 @@ just like QSlider, but supports float values
 
 ```python
 from superqt import QDoubleSlider
+```
+
+## Issues
+
+### MacOS Monterey Slider issue
+
+On MacOS Monterey, with Qt5, there is a bug that causes all sliders
+(including native Qt sliders) to not respond properly to drag events.  See:
+
+- https://bugreports.qt.io/browse/QTBUG-98093
+- https://github.com/napari/superqt/issues/74
+
+Superqt includes a workaround for this issue, but it is not perfect, and it requires using a custom stylesheet (which may interfere with your own styles).  Note that you
+may not see this issue if you're already using custom stylesheets.
+
+To opt in to the workaround, do any of the following:
+
+- set the environment variable `USE_MAC_SLIDER_PATCH=1` before importing superqt
+  (note: this is safe to use even if you're targeting more than just MacOS 12, it will only be applied when needed)
+- call the `applyMacStylePatch()` method on any of the superqt slider subclasses (note, this will override your slider styles)
+- apply the stylesheet manually:
+
+```python
+from superqt.sliders import MONTEREY_SLIDER_STYLES_FIX
+
+slider.setStyleSheet(MONTEREY_SLIDER_STYLES_FIX)
 ```
