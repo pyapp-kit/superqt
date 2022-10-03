@@ -17,6 +17,7 @@ from qtpy.QtWidgets import (
     QWidget,
 )
 
+from ..utils import signals_blocked
 from ._sliders import QDoubleRangeSlider, QDoubleSlider, QRangeSlider
 
 
@@ -118,6 +119,8 @@ def _handle_overloaded_slider_sig(args, kwargs):
 
 
 class QLabeledSlider(_SliderProxy, QAbstractSlider):
+    editingFinished = Signal()
+
     EdgeLabelMode = EdgeLabelMode
     _slider_class = QSlider
     _slider: QSlider
@@ -139,6 +142,7 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         self._slider.sliderReleased.connect(self.sliderReleased.emit)
         self._slider.valueChanged.connect(self._label.setValue)
         self._slider.valueChanged.connect(self.valueChanged.emit)
+        self._label.editingFinished.connect(self.editingFinished)
 
         self.setOrientation(orientation)
 
@@ -230,6 +234,8 @@ class QLabeledDoubleSlider(QLabeledSlider):
 
 class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
     _valueChanged = Signal(tuple)
+    editingFinished = Signal()
+
     LabelPosition = LabelPosition
     EdgeLabelMode = EdgeLabelMode
     _slider_class = QRangeSlider
@@ -262,6 +268,8 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
             alignment=Qt.AlignmentFlag.AlignRight,
             connect=self._max_label_edited,
         )
+        self._min_label.editingFinished.connect(self.editingFinished)
+        self._max_label.editingFinished.connect(self.editingFinished)
         self.setEdgeLabelMode(EdgeLabelMode.LabelIsRange)
 
         self._slider.valueChanged.connect(self._on_value_changed)
@@ -376,6 +384,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
             for n, val in enumerate(self._slider.value()):
                 _cb = partial(self._slider.setSliderPosition, index=n)
                 s = SliderLabel(self._slider, parent=self, connect=_cb)
+                s.editingFinished.connect(self.editingFinished)
                 s.setValue(val)
                 self._handle_labels.append(s)
         else:
@@ -491,8 +500,12 @@ class SliderLabel(QDoubleSpinBox):
         self.setStyleSheet("background:transparent; border: 0;")
         if connect is not None:
             self.editingFinished.connect(lambda: connect(self.value()))
-        self.editingFinished.connect(self.clearFocus)
+        self.editingFinished.connect(self._silent_clear_focus)
         self._update_size()
+
+    def _silent_clear_focus(self):
+        with signals_blocked(self):
+            self.clearFocus()
 
     def setDecimals(self, prec: int) -> None:
         super().setDecimals(prec)
