@@ -319,7 +319,10 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
         self._reposition_labels()
 
     def _reposition_labels(self):
-        if not self._handle_labels:
+        if (
+            not self._handle_labels
+            or self._handle_label_position == LabelPosition.NoLabel
+        ):
             return
 
         horizontal = self.orientation() == Qt.Orientation.Horizontal
@@ -351,6 +354,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
             label.move(pos)
             last_edge = pos
             label.clearFocus()
+            label.show()
         self.update()
 
     def _min_label_edited(self, val):
