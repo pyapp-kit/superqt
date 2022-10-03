@@ -7,13 +7,7 @@ from qtpy.QtWidgets import QStyle, QStyleOptionSlider
 
 from superqt.sliders._generic_slider import _GenericSlider, _sliderValueFromPosition
 
-from ._testutil import (
-    _hover_event,
-    _linspace,
-    _mouse_event,
-    _wheel_event,
-    skip_on_linux_qt6,
-)
+from ._testutil import _hover_event, _mouse_event, _wheel_event, skip_on_linux_qt6
 
 
 @pytest.fixture(params=[Qt.Orientation.Horizontal, Qt.Orientation.Vertical])
@@ -167,17 +161,6 @@ def test_steps(gslider: _GenericSlider, qtbot):
 
     gslider.setPageStep(1.5e30)
     assert gslider.pageStep() == 1.5e30
-
-
-@pytest.mark.parametrize("mag", list(range(4, 37, 4)) + list(range(-4, -37, -4)))
-def test_slider_extremes(gslider: _GenericSlider, mag, qtbot):
-    _mag = 10**mag
-    with qtbot.waitSignal(gslider.rangeChanged):
-        gslider.setRange(-_mag, _mag)
-    for i in _linspace(-_mag, _mag, 10):
-        gslider.setValue(i)
-        assert math.isclose(gslider.value(), i, rel_tol=1e-8)
-        gslider.initStyleOption(QStyleOptionSlider())
 
 
 # args are (min: float, max: float, position: int, span: int, upsideDown: bool)
