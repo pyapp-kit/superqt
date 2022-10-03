@@ -62,3 +62,17 @@ def test_labeled_signals(cls, qtbot):
         gslider.setRange(1, 2)
     mock.assert_called_once_with(1, 2)
     _assert_types(mock.call_args.args, type_)
+
+
+@pytest.mark.parametrize(
+    "cls", [QLabeledDoubleSlider, QLabeledRangeSlider, QLabeledSlider]
+)
+def test_editing_finished_signal(cls):
+    slider = cls()
+    mock = Mock()
+    slider.editingFinished.connect(mock)
+    if hasattr(slider, "_label"):
+        slider._label.editingFinished.emit()
+    else:
+        slider._min_label.editingFinished.emit()
+    mock.assert_called_once()
