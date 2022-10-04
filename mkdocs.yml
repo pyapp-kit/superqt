@@ -12,7 +12,7 @@ copyright: Copyright &copy; 2021 - 2022 Talley Lambert
 extra_css:
   - stylesheets/extra.css
 
-watch: 
+watch:
   - src
 
 theme:
