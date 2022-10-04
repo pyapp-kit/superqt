@@ -1,5 +1,7 @@
 # QDoubleRangeSlider
 
+Float variant of [`QRangeSlider`](qrangeslider.md). (see that page for more details).
+
 ```python
 from qtpy.QtCore import Qt
 from qtpy.QtWidgets import QApplication

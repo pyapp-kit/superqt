@@ -1,5 +1,8 @@
 # QElidingLabel
 
+`QLabel` variant that will elide text (i.e. add an ellipsis)
+if it is too long to fit in the available space.
+
 ```python
 from qtpy.QtWidgets import QApplication
 

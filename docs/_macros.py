@@ -41,40 +41,11 @@ def define_env(env: "MacrosPlugin"):
             _grab(dest, width)
         return f"![{page.title}](../images/{dest.name}){{ loading=lazy; width={width} }}\n\n"
 
-    # @env.macro
-    # @pass_context
-    # def insert_example(context, example: str, width: int = 500) -> list[Path]:
-    #     """Grab the top widgets of the application."""
-    #     if example.strip().startswith("```"):
-    #         src = dedent(example.strip())
-    #         src = "\n".join(src.split("\n")[1:-1])
-    #         key = context["page"].title
-    #     else:
-    #         if not example.endswith(".py"):
-    #             example += ".py"
-    #         src = (EXAMPLES / example).read_text()
-    #         key = example.replace(".py", "")
-    #     output = f"```python\n{src}\n```\n\n"
-
-    #     dest = IMAGES / f"{key}.png"
-    #     if not (dest).exists():
-    #         src = src.replace(
-    #             "QApplication([])", "QApplication.instance() or QApplication([])"
-    #         )
-    #         src = src.replace("app.exec_()", "")
-    #         _clear_widgets()
-    #         exec(src)
-    #         _grab(dest, width)
-
-    #     output += f"![Image title](../images/{dest.name}){{ loading=lazy; width={width} }}\n\n"
-    #     return output
-
     @env.macro
     def show_members(cls: str):
         # import class
         module, name = cls.rsplit(".", 1)
         _cls = getattr(import_module(module), name)
-        inheritted_members = set()
 
         first_q = next(
             (
@@ -85,8 +56,12 @@ def define_env(env: "MacrosPlugin"):
             None,
         )
 
-        for base in _cls.__bases__:
-            inheritted_members.update({k for k in dir(base) if not k.startswith("_")})
+        inherited_members = set()
+        for base in _cls.__mro__:
+            if issubclass(base, QObject) and ".Qt" in base.__module__:
+                inherited_members.update(
+                    {k for k in dir(base) if not k.startswith("_")}
+                )
 
         new_signals = {
             k
@@ -96,8 +71,8 @@ def define_env(env: "MacrosPlugin"):
 
         self_members = {
             k
-            for k in _cls.__dict__.keys()
-            if not k.startswith("_") and k not in inheritted_members | new_signals
+            for k in dir(_cls)
+            if not k.startswith("_") and k not in inherited_members | new_signals
         }
 
         enums = []
@@ -125,22 +100,25 @@ def define_env(env: "MacrosPlugin"):
                 for m in getattr(_cls, e):
                     out += f"- `{m.name}`\n\n"
 
-        out += dedent(
-            f"""
-        ## Methods
+        if self_members:
 
-        ::: {cls}
-            options:
-              heading_level: 3
-              show_source: False
-              show_inherited_members: false
-              show_signature_annotations: True
-              members: {self_members}
-              docstring_style: numpy
-              show_bases: False
-              show_root_toc_entry: False
-        """
-        )
+            out += dedent(
+                f"""
+            ## Methods
+
+            ::: {cls}
+                options:
+                  heading_level: 3
+                  show_source: False
+                  show_inherited_members: false
+                  show_signature_annotations: True
+                  members: {list(self_members)}
+                  docstring_style: numpy
+                  show_bases: False
+                  show_root_toc_entry: False
+                  show_root_heading: False
+            """
+            )
 
         return out
 

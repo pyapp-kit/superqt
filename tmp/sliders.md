@@ -16,19 +16,10 @@ Changing the value also changes the sliderPosition.
 
 ##### Access Functions:
 
-```python
-range_slider.value() -> Tuple[int, ...]
-```
 
-```python
-range_slider.setValue(val: Sequence[int]) -> None
-```
 
 ##### Notifier Signal:
 
-```python
-valueChanged(Tuple[int, ...])
-```
 
 ### `sliderPosition: Tuple[int, ...]`
 
@@ -36,15 +27,6 @@ This property holds the current slider positions.  It is a `tuple` with length e
 
 If [tracking](https://doc.qt.io/qt-5/qabstractslider.html#tracking-prop) is enabled (the default), this is identical to [`value`](#value--tupleint-).
 
-##### Access Functions:
-
-```python
-range_slider.sliderPosition() -> Tuple[int, ...]
-```
-
-```python
-range_slider.setSliderPosition(val: Sequence[int]) -> None
-```
 
 ##### Notifier Signal:
 

@@ -1,5 +1,7 @@
 # QCollapsible
 
+Collapsible `QFrame` that can be expanded or collapsed by clicking on the header.
+
 ```python
 from qtpy.QtWidgets import QApplication, QLabel, QPushButton
 

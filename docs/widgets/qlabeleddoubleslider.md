@@ -1,5 +1,8 @@
 # QLabeledDoubleSlider
 
+[`QDoubleSlider`](./qdoubleslider.md) variant that shows an editable (SpinBox) label next to the slider.
+
+
 ```python
 from qtpy.QtCore import Qt
 from qtpy.QtWidgets import QApplication

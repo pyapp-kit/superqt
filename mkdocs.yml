@@ -12,8 +12,8 @@ copyright: Copyright &copy; 2021 - 2022 Talley Lambert
 extra_css:
   - stylesheets/extra.css
 
-# watch:
-#   - src
+watch:
+  - src
 
 theme:
   name: material
@@ -48,3 +48,8 @@ plugins:
         python:
           import:
             - https://docs.python.org/3/objects.inv
+          options:
+              show_source: false
+              docstring_style: numpy
+              show_root_toc_entry: True
+              show_root_heading: True

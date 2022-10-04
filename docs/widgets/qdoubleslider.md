@@ -1,5 +1,7 @@
 # QDoubleSlider
 
+`QSlider` variant that accepts floating point values.
+
 ```python
 from qtpy.QtCore import Qt
 from qtpy.QtWidgets import QApplication

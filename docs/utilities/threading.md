@@ -1,48 +1,34 @@
 # Thread workers
 
+The objects in this module provide utilities for running tasks in a separate
+thread. In general (with the exception of `new_worker_qthread`), everything
+here wraps Qt's [QRunnable API](https://doc.qt.io/qt-6/qrunnable.html).
+
+The highest level object is the
+[`@thread_worker`][superqt.utils.thread_worker] decorator.  It was originally
+written for `napari`, and was later extracted into `superqt`.
+
+For additional control, you can create your own
+[`FunctionWorker`][superqt.utils.FunctionWorker] or
+[`GeneratorWorker`][superqt.utils.GeneratorWorker] objects.
+
+
 ::: superqt.utils.WorkerBase
-    options:
-        show_source: false
-        docstring_style: numpy
-        show_root_toc_entry: True
-        show_root_heading: True
 
 ::: superqt.utils.FunctionWorker
-    options:
-        show_source: false
-        docstring_style: numpy
-        show_root_toc_entry: True
-        show_root_heading: True
 
 ::: superqt.utils.GeneratorWorker
-    options:
-        show_source: false
-        docstring_style: numpy
-        show_root_toc_entry: True
-        show_root_heading: True
 
-## convenience functions
+## Convenience functions
+
+::: superqt.utils.thread_worker
+    options:
+        heading_level: 3
 
 ::: superqt.utils.create_worker
     options:
-        show_source: false
-        docstring_style: numpy
-        show_root_toc_entry: True
-        show_root_heading: True
         heading_level: 3
 
 ::: superqt.utils.new_worker_qthread
     options:
-        show_source: false
-        docstring_style: numpy
-        show_root_toc_entry: True
-        show_root_heading: True
-        heading_level: 3
-
-::: superqt.utils.thread_worker
-    options:
-        show_source: false
-        docstring_style: numpy
-        show_root_toc_entry: True
-        show_root_heading: True
         heading_level: 3

@@ -1,5 +1,7 @@
 # QLargeIntSpinBox
 
+`QSpinBox` variant that allows to enter large integers, without overflow.
+
 ```python
 from qtpy.QtCore import Qt
 from qtpy.QtWidgets import QApplication
