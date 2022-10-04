@@ -1,0 +1,40 @@
+site_name: superqt
+site_url: https://github.com/napari/superqt
+site_description: >-
+  missing widgets and components for PyQt/PySide
+# Repository
+repo_name: napari/superqt
+repo_url: https://github.com/napari/superqt
+
+# Copyright
+copyright: Copyright &copy; 2021 - 2022 Talley Lambert
+
+extra_css:
+  - stylesheets/extra.css
+
+watch: 
+  - src
+
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - search.highlight
+    - search.suggest
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - tables
+  - attr_list
+  - md_in_html
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+
+plugins:
+  - search
+  # - autorefs
+  - macros:
+      module_name: docs/_macros
