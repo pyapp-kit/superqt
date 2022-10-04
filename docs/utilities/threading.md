@@ -6,12 +6,14 @@ here wraps Qt's [QRunnable API](https://doc.qt.io/qt-6/qrunnable.html).
 
 The highest level object is the
 [`@thread_worker`][superqt.utils.thread_worker] decorator.  It was originally
-written for `napari`, and was later extracted into `superqt`.
+written for `napari`, and was later extracted into `superqt`.  You may also be
+interested in reading the [napari
+documentation](https://napari.org/stable/guides/threading.html#threading-in-napari-with-thread-worker) on this feature,
+which provides a more in-depth/introductory usage guide.
 
 For additional control, you can create your own
 [`FunctionWorker`][superqt.utils.FunctionWorker] or
 [`GeneratorWorker`][superqt.utils.GeneratorWorker] objects.
-
 
 ::: superqt.utils.WorkerBase
 
