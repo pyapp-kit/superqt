@@ -1,29 +1,9 @@
 # Sliders
 
-
 ![slider](images/slider.png)
-
-- `QRangeSlider` inherits from [`QSlider`](https://doc.qt.io/qt-5/qslider.html)
-  and attempts to match the Qt API as closely as possible
-- Uses platform-specific styles (for handle, groove, & ticks) but also supports
-  QSS style sheets.
-- Supports mouse wheel and keypress (soon) events
-- Supports more than 2 handles (e.g. `slider.setValue([0, 10, 60, 80])`)
 
 *Note: There is a Qt5 Bug that affects sliders in MacOS 12+, see fix at bottom of page.*
 
-## Range Slider
-
-```python
-from superqt import QRangeSlider
-
-# as usual:
-# you must create a QApplication before create a widget.
-range_slider = QRangeSlider()
-```
-
-As `QRangeSlider` inherits from `QtWidgets.QSlider`, you can use all of the
-same methods available in the [QSlider API](https://doc.qt.io/qt-5/qslider.html).  The major difference is that `value` and `sliderPosition` are reimplemented as `tuples` of `int` (where the length of the tuple is equal to the number of handles in the slider.)
 
 ### `value: Tuple[int, ...]`
 

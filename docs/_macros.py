@@ -26,12 +26,12 @@ def define_env(env: "MacrosPlugin"):
         if "build" in sys.argv:
             dest.unlink(missing_ok=True)
 
-            code = [
+            codeblocks = [
                 b[6:].strip()
                 for b in page.markdown.split("```")
                 if b.startswith("python")
             ]
-            src = "\n".join(code).strip()
+            src = codeblocks[0].strip()
             src = src.replace(
                 "QApplication([])", "QApplication.instance() or QApplication([])"
             )
@@ -131,7 +131,6 @@ def define_env(env: "MacrosPlugin"):
 
         ::: {cls}
             options:
-              show_root_toc_entry: True
               heading_level: 3
               show_source: False
               show_inherited_members: false

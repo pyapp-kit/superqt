@@ -806,17 +806,16 @@ def new_worker_qthread(
 ):
     """This is a convenience function to start a worker in a Qthread.
 
-    In most cases, the @thread_worker decorator is sufficient and preferable.
+    In most cases, the [thread_worker][superqt.utils.thread_worker] decorator is sufficient and preferable.
     But this allows the user to completely customize the Worker object.
     However, they must then maintain control over the thread and clean up
     appropriately.
 
-    It follows the pattern described here:
-    https://www.qt.io/blog/2010/06/17/youre-doing-it-wrong
-    and
-    https://doc.qt.io/qt-5/qthread.html#details
+    It follows the pattern described [here](https://www.qt.io/blog/2010/06/17/youre-doing-it-wrong)
+    and in the [qt thread docs](https://doc.qt.io/qt-5/qthread.html#details)
 
     see also:
+
     https://mayaposch.wordpress.com/2011/11/01/how-to-really-truly-use-qthreads-the-full-explanation/
 
     A QThread object is not a thread! It should be thought of as a class to

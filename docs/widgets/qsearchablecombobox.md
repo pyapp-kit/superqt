@@ -1,5 +1,11 @@
 # QSearchableComboBox
 
+`QSearchableComboBox` is a variant of
+[`QComboBox`](https://doc.qt.io/qt-5/qcombobox.html) that allow to filter list
+of options by enter part of text. It could be drop in replacement for
+`QComboBox`.
+
+
 ```python
 from qtpy.QtWidgets import QApplication
 

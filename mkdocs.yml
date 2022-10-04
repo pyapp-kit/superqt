@@ -20,6 +20,7 @@ theme:
   features:
     - navigation.instant
     - navigation.indexes
+    - navigation.expand
     # - navigation.tracking
     # - navigation.tabs
     - search.highlight

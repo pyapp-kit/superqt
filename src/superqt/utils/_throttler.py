@@ -103,7 +103,7 @@ class GenericSignalThrottler(QObject):
             self.timeoutChanged.emit(timeout)
 
     def timerType(self) -> Qt.TimerType:
-        """Return current Qt.TimerType."""
+        """Return current `Qt.TimerType`."""
         return self._timer.timerType()
 
     def setTimerType(self, timerType: Qt.TimerType) -> None:
@@ -136,11 +136,11 @@ class GenericSignalThrottler(QObject):
         assert self._timer.isActive()
 
     def cancel(self) -> None:
-        """ "Cancel and pending emissions."""
+        """Cancel any pending emissions."""
         self._hasPendingEmission = False
 
     def flush(self) -> None:
-        """ "Force emission of any pending emissions."""
+        """Force emission of any pending emissions."""
         self._maybeEmitTriggered()
 
     def _emitTriggered(self) -> None:
