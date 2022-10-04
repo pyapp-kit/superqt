@@ -6,14 +6,14 @@ The following are QWidget subclasses:
 
 | Widget                          | Description           |
 | -----------                     | --------------------- |
-| [`QDoubleSlider`]()             | Slider for float values |
-| [`QLabeledSlider`]()            | `QSlider` with editable `QSpinBox` that shows the current value |
-| [`QLabeledDoubleSlider`]()      | `QSlider` for float values with editable `QSpinBox` with the current value |
-| [`QRangeSlider`]()              | Multi-handle slider   |
-| [`QDoubleRangeSlider`]()        | Multi-handle slider for float values   |
-| [`QLabeledRangeSlider`]()       | `QRangeSlider` variant, with editable labels for each handle |
-| [`QLabeledDoubleRangeSlider`]() | `QDoubleRangeSlider` variant with editable labels for each handle |
-| [`QLargeIntSpinBox`]()          | `QSpinbox` that accepts arbitrarily large integers |
+| [`QDoubleSlider`](./qdoubleslider.md)             | Slider for float values |
+| [`QLabeledSlider`](./qlabeledslider.md)            | `QSlider` with editable `QSpinBox` that shows the current value |
+| [`QLabeledDoubleSlider`](./qlabeleddoubleslider.md)      | `QSlider` for float values with editable `QSpinBox` with the current value |
+| [`QRangeSlider`](./qrangeslider.md)              | Multi-handle slider   |
+| [`QDoubleRangeSlider`](./qdoublerangeslider.md)        | Multi-handle slider for float values   |
+| [`QLabeledRangeSlider`](./qlabeledrangeslider.md)       | `QRangeSlider` variant, with editable labels for each handle |
+| [`QLabeledDoubleRangeSlider`](./qlabeleddoublerangeslider.md) | `QDoubleRangeSlider` variant with editable labels for each handle |
+| [`QLargeIntSpinBox`](./qlargeintspinbox.md)          | `QSpinbox` that accepts arbitrarily large integers |
 
 ## Labels and categorical inputs
 

@@ -12,8 +12,8 @@ copyright: Copyright &copy; 2021 - 2022 Talley Lambert
 extra_css:
   - stylesheets/extra.css
 
-watch:
-  - src
+# watch:
+#   - src
 
 theme:
   name: material
@@ -35,6 +35,12 @@ markdown_extensions:
 
 plugins:
   - search
-  # - autorefs
+  - autorefs
+  - mkdocstrings
   - macros:
       module_name: docs/_macros
+  - mkdocstrings:
+      handlers:
+        python:
+          import:
+            - https://docs.python.org/3/objects.inv
