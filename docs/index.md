@@ -1,1 +1,1 @@
-# superqt documentation
+# superqt

@@ -1,3 +1,4 @@
+import sys
 from enum import EnumMeta
 from importlib import import_module
 from pathlib import Path
@@ -6,7 +7,6 @@ from typing import TYPE_CHECKING
 
 from jinja2 import pass_context
 from qtpy.QtCore import QObject, Signal
-from qtpy.QtWidgets import QApplication
 
 if TYPE_CHECKING:
     from mkdocs_macros.plugin import MacrosPlugin
@@ -14,38 +14,60 @@ if TYPE_CHECKING:
 EXAMPLES = Path(__file__).parent.parent / "examples"
 IMAGES = Path(__file__).parent / "images"
 IMAGES.mkdir(exist_ok=True, parents=True)
-# for p in IMAGES.glob("*.png"):
-#     p.unlink()
 
 
 def define_env(env: "MacrosPlugin"):
     @env.macro
     @pass_context
-    def insert_example(context, example: str, width: int = 500) -> list[Path]:
-        """Grab the top widgets of the application."""
-        if example.strip().startswith("```"):
-            src = dedent(example.strip())
-            src = "\n".join(src.split("\n")[1:-1])
-            key = context["page"].title
-        else:
-            if not example.endswith(".py"):
-                example += ".py"
-            src = (EXAMPLES / example).read_text()
-            key = example.replace(".py", "")
-        output = f"```python\n{src}\n```\n\n"
+    def show_widget(context, width: int = 500) -> list[Path]:
+        # extract all fenced code blocks starting with "python"
+        page = context["page"]
+        dest = IMAGES / f"{page.title}.png"
+        if "build" in sys.argv:
+            dest.unlink(missing_ok=True)
 
-        dest = IMAGES / f"{key}.png"
-        if not (dest).exists():
+            code = [
+                b[6:].strip()
+                for b in page.markdown.split("```")
+                if b.startswith("python")
+            ]
+            src = "\n".join(code).strip()
             src = src.replace(
                 "QApplication([])", "QApplication.instance() or QApplication([])"
             )
             src = src.replace("app.exec_()", "")
-            _clear_widgets()
+
             exec(src)
             _grab(dest, width)
+        return f"![{page.title}](../images/{dest.name}){{ loading=lazy; width={width} }}\n\n"
 
-        output += f"![Image title](../images/{dest.name}){{ loading=lazy; width={width} }}\n\n"
-        return output
+    # @env.macro
+    # @pass_context
+    # def insert_example(context, example: str, width: int = 500) -> list[Path]:
+    #     """Grab the top widgets of the application."""
+    #     if example.strip().startswith("```"):
+    #         src = dedent(example.strip())
+    #         src = "\n".join(src.split("\n")[1:-1])
+    #         key = context["page"].title
+    #     else:
+    #         if not example.endswith(".py"):
+    #             example += ".py"
+    #         src = (EXAMPLES / example).read_text()
+    #         key = example.replace(".py", "")
+    #     output = f"```python\n{src}\n```\n\n"
+
+    #     dest = IMAGES / f"{key}.png"
+    #     if not (dest).exists():
+    #         src = src.replace(
+    #             "QApplication([])", "QApplication.instance() or QApplication([])"
+    #         )
+    #         src = src.replace("app.exec_()", "")
+    #         _clear_widgets()
+    #         exec(src)
+    #         _grab(dest, width)
+
+    #     output += f"![Image title](../images/{dest.name}){{ loading=lazy; width={width} }}\n\n"
+    #     return output
 
     @env.macro
     def show_members(cls: str):
@@ -92,9 +114,9 @@ def define_env(env: "MacrosPlugin"):
         out += ""
 
         if new_signals:
-            out += "## New Signals\n\n"
+            out += "## Signals\n\n"
             for sig in new_signals:
-                out += f"### `{_cls.__name__}.{sig}`\n\n"
+                out += f"### `{sig}`\n\n"
 
         if enums:
             out += "## Enums\n\n"
@@ -117,6 +139,7 @@ def define_env(env: "MacrosPlugin"):
               members: {self_members}
               docstring_style: numpy
               show_bases: False
+              show_root_toc_entry: False
         """
         )
 
@@ -125,15 +148,20 @@ def define_env(env: "MacrosPlugin"):
 
 def _grab(dest: str | Path, width) -> list[Path]:
     """Grab the top widgets of the application."""
+    from qtpy.QtCore import QTimer
+    from qtpy.QtWidgets import QApplication
 
     w = QApplication.topLevelWidgets()[-1]
     w.setFixedWidth(width)
-    w.setMinimumHeight(50)
+    w.activateWindow()
+    w.setMinimumHeight(40)
     w.grab().save(str(dest))
 
-
-def _clear_widgets() -> None:
-    for i in QApplication.topLevelWidgets():
-        i.close()
-        i.deleteLater()
+    # hack to make sure the object is truly closed and deleted
+    while True:
+        QTimer.singleShot(10, w.deleteLater)
         QApplication.processEvents()
+        try:
+            w.parent()
+        except RuntimeError:
+            return

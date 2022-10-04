@@ -19,6 +19,9 @@ theme:
   name: material
   features:
     - navigation.instant
+    - navigation.indexes
+    # - navigation.tracking
+    # - navigation.tabs
     - search.highlight
     - search.suggest
 

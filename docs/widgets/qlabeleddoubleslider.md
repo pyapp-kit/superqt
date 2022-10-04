@@ -1,7 +1,5 @@
 # QLabeledDoubleSlider
 
-{{ insert_example('
-
 ```python
 from qtpy.QtCore import Qt
 from qtpy.QtWidgets import QApplication
@@ -18,6 +16,6 @@ slider.show()
 app.exec_()
 ```
 
-') }}
+{{ show_widget() }}
 
 {{ show_members('superqt.QLabeledDoubleSlider') }}

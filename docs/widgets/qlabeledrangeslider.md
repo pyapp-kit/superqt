@@ -1,14 +1,14 @@
-# QRangeSlider
+# QLabeledRangeSlider
 
 ```python
 from qtpy.QtCore import Qt
 from qtpy.QtWidgets import QApplication
 
-from superqt import QRangeSlider
+from superqt import QLabeledRangeSlider
 
 app = QApplication([])
 
-slider = QRangeSlider(Qt.Orientation.Horizontal)
+slider = QLabeledRangeSlider(Qt.Orientation.Horizontal)
 slider.setValue((20, 80))
 slider.show()
 
@@ -17,4 +17,4 @@ app.exec_()
 
 {{ show_widget() }}
 
-{{ show_members('superqt.QRangeSlider') }}
+{{ show_members('superqt.QLabeledRangeSlider') }}

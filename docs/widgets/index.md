@@ -6,23 +6,23 @@ The following are QWidget subclasses:
 
 | Widget                          | Description           |
 | -----------                     | --------------------- |
-| [`QDoubleSlider`](./qdoubleslider.md)             | Slider for float values |
-| [`QLabeledSlider`](./qlabeledslider.md)            | `QSlider` with editable `QSpinBox` that shows the current value |
-| [`QLabeledDoubleSlider`](./qlabeleddoubleslider.md)      | `QSlider` for float values with editable `QSpinBox` with the current value |
-| [`QRangeSlider`](./qrangeslider.md)              | Multi-handle slider   |
-| [`QDoubleRangeSlider`](./qdoublerangeslider.md)        | Multi-handle slider for float values   |
-| [`QLabeledRangeSlider`](./qlabeledrangeslider.md)       | `QRangeSlider` variant, with editable labels for each handle |
+| [`QDoubleRangeSlider`](./qdoublerangeslider.md) | Multi-handle slider for float values   |
+| [`QDoubleSlider`](./qdoubleslider.md) | Slider for float values |
 | [`QLabeledDoubleRangeSlider`](./qlabeleddoublerangeslider.md) | `QDoubleRangeSlider` variant with editable labels for each handle |
-| [`QLargeIntSpinBox`](./qlargeintspinbox.md)          | `QSpinbox` that accepts arbitrarily large integers |
+| [`QLabeledDoubleSlider`](./qlabeleddoubleslider.md) | `QSlider` for float values with editable `QSpinBox` with the current value |
+| [`QLabeledRangeSlider`](./qlabeledrangeslider.md) | `QRangeSlider` variant, with editable labels for each handle |
+| [`QLabeledSlider`](./qlabeledslider.md) | `QSlider` with editable `QSpinBox` that shows the current value |
+| [`QLargeIntSpinBox`](./qlargeintspinbox.md) | `QSpinbox` that accepts arbitrarily large integers |
+| [`QRangeSlider`](./qrangeslider.md) | Multi-handle slider   |
 
 ## Labels and categorical inputs
 
 | Widget                          | Description           |
 | -----------                     | --------------------- |
-| [`QSearchableListWidget`]()     | `QListWidget` variant with search field that filters available options |
-| [`QEnumComboBox`]()             | `QComboBox` that populates the combobox from a python `Enum` |
-| [`QSearchableComboBox`]()       | `QComboBox` variant that filters available options based on text input |
-| [`QElidingLabel`]()             | A `QLabel` variant that will elide text (add `…`) to fit width. |
+| [`QElidingLabel`](./qelidinglabel.md)             | A `QLabel` variant that will elide text (add `…`) to fit width. |
+| [`QEnumComboBox`](./qenumcombobox.md)             | `QComboBox` that populates the combobox from a python `Enum` |
+| [`QSearchableComboBox`](./qsearchablecombobox.md)       | `QComboBox` variant that filters available options based on text input |
+| [`QSearchableListWidget`](./qsearchablelistwidget.md)     | `QListWidget` variant with search field that filters available options |
 
 ## Frames and containers
 
