@@ -1,6 +1,5 @@
 # ![tiny](https://user-images.githubusercontent.com/1609449/120636353-8c3f3800-c43b-11eb-8732-a14dec578897.png)  superqt!
 
-
 [![License](https://img.shields.io/pypi/l/superqt.svg?color=green)](https://github.com/napari/superqt/raw/master/LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/superqt.svg?color=green)](https://pypi.org/project/superqt)
 [![Python
