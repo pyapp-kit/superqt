@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 Number = Union[int, float, "Decimal"]
 UREG = UnitRegistry()
 NULL_OPTION = "-----"
-QOVERFLOW = 2 - 1**31
+QOVERFLOW = 2**30
 SI_BASES = {
     "[length]": "meter",
     "[time]": "second",
