@@ -700,15 +700,15 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#superqt.sliders._generic_range_slider._GenericRangeSlider.applyMacStylePatch" class="md-nav__link">
-    applyMacStylePatch()
+  <a href="#superqt.sliders._generic_range_slider._GenericRangeSlider.setBarMovesAllHandles" class="md-nav__link">
+    setBarMovesAllHandles()
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#superqt.sliders._generic_range_slider._GenericRangeSlider.barMovesAllHandles" class="md-nav__link">
-    barMovesAllHandles()
+  <a href="#superqt.sliders._generic_range_slider._GenericRangeSlider.barIsRigid" class="md-nav__link">
+    barIsRigid()
   </a>
   
 </li>
@@ -721,8 +721,22 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#superqt.sliders._generic_range_slider._GenericRangeSlider.setBarMovesAllHandles" class="md-nav__link">
-    setBarMovesAllHandles()
+  <a href="#superqt.sliders._generic_range_slider._GenericRangeSlider.barMovesAllHandles" class="md-nav__link">
+    barMovesAllHandles()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#superqt.sliders._generic_range_slider._GenericRangeSlider.hideBar" class="md-nav__link">
+    hideBar()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#superqt.sliders._generic_range_slider._GenericRangeSlider.applyMacStylePatch" class="md-nav__link">
+    applyMacStylePatch()
   </a>
   
 </li>
@@ -737,20 +751,6 @@
           <li class="md-nav__item">
   <a href="#superqt.sliders._generic_range_slider._GenericRangeSlider.setBarVisible" class="md-nav__link">
     setBarVisible()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#superqt.sliders._generic_range_slider._GenericRangeSlider.hideBar" class="md-nav__link">
-    hideBar()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#superqt.sliders._generic_range_slider._GenericRangeSlider.barIsRigid" class="md-nav__link">
-    barIsRigid()
   </a>
   
 </li>
@@ -920,15 +920,15 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#superqt.sliders._generic_range_slider._GenericRangeSlider.applyMacStylePatch" class="md-nav__link">
-    applyMacStylePatch()
+  <a href="#superqt.sliders._generic_range_slider._GenericRangeSlider.setBarMovesAllHandles" class="md-nav__link">
+    setBarMovesAllHandles()
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#superqt.sliders._generic_range_slider._GenericRangeSlider.barMovesAllHandles" class="md-nav__link">
-    barMovesAllHandles()
+  <a href="#superqt.sliders._generic_range_slider._GenericRangeSlider.barIsRigid" class="md-nav__link">
+    barIsRigid()
   </a>
   
 </li>
@@ -941,8 +941,22 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#superqt.sliders._generic_range_slider._GenericRangeSlider.setBarMovesAllHandles" class="md-nav__link">
-    setBarMovesAllHandles()
+  <a href="#superqt.sliders._generic_range_slider._GenericRangeSlider.barMovesAllHandles" class="md-nav__link">
+    barMovesAllHandles()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#superqt.sliders._generic_range_slider._GenericRangeSlider.hideBar" class="md-nav__link">
+    hideBar()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#superqt.sliders._generic_range_slider._GenericRangeSlider.applyMacStylePatch" class="md-nav__link">
+    applyMacStylePatch()
   </a>
   
 </li>
@@ -957,20 +971,6 @@
           <li class="md-nav__item">
   <a href="#superqt.sliders._generic_range_slider._GenericRangeSlider.setBarVisible" class="md-nav__link">
     setBarVisible()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#superqt.sliders._generic_range_slider._GenericRangeSlider.hideBar" class="md-nav__link">
-    hideBar()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#superqt.sliders._generic_range_slider._GenericRangeSlider.barIsRigid" class="md-nav__link">
-    barIsRigid()
   </a>
   
 </li>
@@ -1291,16 +1291,15 @@ integers.</p>
 
 
 
-<h3 id="superqt.sliders._generic_range_slider._GenericRangeSlider.applyMacStylePatch" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">applyMacStylePatch</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span></code>
+<h3 id="superqt.sliders._generic_range_slider._GenericRangeSlider.setBarMovesAllHandles" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">setBarMovesAllHandles</span><span class="p">(</span><span class="n">val</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
 
 </h3>
 
 
   <div class="doc doc-contents ">
   
-      <p>Apply a QSS patch to fix sliders on macos&gt;=12 with QT &lt; 6.</p>
-<p>see <a href="../../faq/#sliders-not-dragging-properly-on-macos-12">FAQ</a> for more details.</p>
+      <p>Whether clicking on the bar moves all handles (default), or just the nearest.</p>
 
   </div>
 
@@ -1310,15 +1309,16 @@ integers.</p>
 
 
 
-<h3 id="superqt.sliders._generic_range_slider._GenericRangeSlider.barMovesAllHandles" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">barMovesAllHandles</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span></code>
+<h3 id="superqt.sliders._generic_range_slider._GenericRangeSlider.barIsRigid" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">barIsRigid</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span></code>
 
 </h3>
 
 
   <div class="doc doc-contents ">
   
-      <p>Whether clicking on the bar moves all handles (default), or just the nearest.</p>
+      <p>Whether bar length is constant when dragging the bar.</p>
+<p>If <code>False</code>, the bar can shorten when dragged beyond min/max. Default is <code>True</code>.</p>
 
   </div>
 
@@ -1347,8 +1347,8 @@ integers.</p>
 
 
 
-<h3 id="superqt.sliders._generic_range_slider._GenericRangeSlider.setBarMovesAllHandles" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">setBarMovesAllHandles</span><span class="p">(</span><span class="n">val</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+<h3 id="superqt.sliders._generic_range_slider._GenericRangeSlider.barMovesAllHandles" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">barMovesAllHandles</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span></code>
 
 </h3>
 
@@ -1356,6 +1356,43 @@ integers.</p>
   <div class="doc doc-contents ">
   
       <p>Whether clicking on the bar moves all handles (default), or just the nearest.</p>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="superqt.sliders._generic_range_slider._GenericRangeSlider.hideBar" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">hideBar</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Hide the bar between the first and last handle.</p>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="superqt.sliders._generic_range_slider._GenericRangeSlider.applyMacStylePatch" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">applyMacStylePatch</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Apply a QSS patch to fix sliders on macos&gt;=12 with QT &lt; 6.</p>
+<p>see <a href="../../faq/#sliders-not-dragging-properly-on-macos-12">FAQ</a> for more details.</p>
 
   </div>
 
@@ -1392,43 +1429,6 @@ integers.</p>
   <div class="doc doc-contents ">
   
       <p>Whether to show the bar between the first and last handle.</p>
-
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-
-<h3 id="superqt.sliders._generic_range_slider._GenericRangeSlider.hideBar" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">hideBar</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
-
-</h3>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Hide the bar between the first and last handle.</p>
-
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-
-<h3 id="superqt.sliders._generic_range_slider._GenericRangeSlider.barIsRigid" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">barIsRigid</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span></code>
-
-</h3>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Whether bar length is constant when dragging the bar.</p>
-<p>If <code>False</code>, the bar can shorten when dragged beyond min/max. Default is <code>True</code>.</p>
 
   </div>
 
