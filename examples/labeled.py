@@ -1,15 +1,16 @@
+from qtpy.QtCore import Qt
+from qtpy.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout, QWidget
+
 from superqt import (
     QLabeledDoubleRangeSlider,
     QLabeledDoubleSlider,
     QLabeledRangeSlider,
     QLabeledSlider,
 )
-from superqt.qtcompat.QtCore import Qt
-from superqt.qtcompat.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout, QWidget
 
 app = QApplication([])
 
-ORIENTATION = Qt.Horizontal
+ORIENTATION = Qt.Orientation.Horizontal
 
 w = QWidget()
 qls = QLabeledSlider(ORIENTATION)
@@ -35,7 +36,9 @@ qldrs.setSingleStep(0.01)
 qldrs.setValue((0.2, 0.7))
 
 
-w.setLayout(QVBoxLayout() if ORIENTATION == Qt.Horizontal else QHBoxLayout())
+w.setLayout(
+    QVBoxLayout() if ORIENTATION == Qt.Orientation.Horizontal else QHBoxLayout()
+)
 w.layout().addWidget(qls)
 w.layout().addWidget(qlds)
 w.layout().addWidget(qlrs)

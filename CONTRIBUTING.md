@@ -31,8 +31,6 @@ All widgets must be well-tested, and should work on:
 - PySide2 (5.11 and above) & PySide6
 - macOS, Windows, & Linux
 
-Until [qtpy](https://github.com/spyder-ide/qtpy) supports PyQt6/PySide6, imports
-should use (and modify if necessary) `superqt.qtcompat`.
 
 ## Style Guide
 

@@ -1,6 +1,5 @@
 ignore:
   - superqt/_version.py
-  - superqt/qtcompat/*
   - '*_tests*'
 coverage:
   status:

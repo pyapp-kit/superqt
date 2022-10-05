@@ -1,14 +1,15 @@
+from qtpy.QtCore import Qt
+from qtpy.QtWidgets import QApplication, QVBoxLayout, QWidget
+
 from superqt import QDoubleRangeSlider, QDoubleSlider, QRangeSlider
-from superqt.qtcompat.QtCore import Qt
-from superqt.qtcompat.QtWidgets import QApplication, QVBoxLayout, QWidget
 
 app = QApplication([])
 
 w = QWidget()
 
-sld1 = QDoubleSlider(Qt.Horizontal)
-sld2 = QDoubleRangeSlider(Qt.Horizontal)
-rs = QRangeSlider(Qt.Horizontal)
+sld1 = QDoubleSlider(Qt.Orientation.Horizontal)
+sld2 = QDoubleRangeSlider(Qt.Orientation.Horizontal)
+rs = QRangeSlider(Qt.Orientation.Horizontal)
 
 sld1.valueChanged.connect(lambda e: print("doubslider valuechanged", e))
 

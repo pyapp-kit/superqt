@@ -1,6 +1,12 @@
-from superqt import QRangeSlider
-from superqt.qtcompat import QtCore
-from superqt.qtcompat import QtWidgets as QtW
+import os
+
+from qtpy import QtCore
+from qtpy import QtWidgets as QtW
+
+# patch for Qt 5.15 on macos >= 12
+os.environ["USE_MAC_SLIDER_PATCH"] = "1"
+
+from superqt import QRangeSlider  # noqa
 
 QSS = """
 QSlider {
@@ -33,35 +39,37 @@ QRangeSlider {
 }
 """
 
+Horizontal = QtCore.Qt.Orientation.Horizontal
+
 
 class DemoWidget(QtW.QWidget):
     def __init__(self) -> None:
         super().__init__()
 
-        reg_hslider = QtW.QSlider(QtCore.Qt.Horizontal)
+        reg_hslider = QtW.QSlider(Horizontal)
         reg_hslider.setValue(50)
-        range_hslider = QRangeSlider(QtCore.Qt.Horizontal)
+        range_hslider = QRangeSlider(Horizontal)
         range_hslider.setValue((20, 80))
-        multi_range_hslider = QRangeSlider(QtCore.Qt.Horizontal)
+        multi_range_hslider = QRangeSlider(Horizontal)
         multi_range_hslider.setValue((11, 33, 66, 88))
-        multi_range_hslider.setTickPosition(QtW.QSlider.TicksAbove)
+        multi_range_hslider.setTickPosition(QtW.QSlider.TickPosition.TicksAbove)
 
-        styled_reg_hslider = QtW.QSlider(QtCore.Qt.Horizontal)
+        styled_reg_hslider = QtW.QSlider(Horizontal)
         styled_reg_hslider.setValue(50)
         styled_reg_hslider.setStyleSheet(QSS)
-        styled_range_hslider = QRangeSlider(QtCore.Qt.Horizontal)
+        styled_range_hslider = QRangeSlider(Horizontal)
         styled_range_hslider.setValue((20, 80))
         styled_range_hslider.setStyleSheet(QSS)
 
-        reg_vslider = QtW.QSlider(QtCore.Qt.Vertical)
+        reg_vslider = QtW.QSlider(QtCore.Qt.Orientation.Vertical)
         reg_vslider.setValue(50)
-        range_vslider = QRangeSlider(QtCore.Qt.Vertical)
+        range_vslider = QRangeSlider(QtCore.Qt.Orientation.Vertical)
         range_vslider.setValue((22, 77))
 
-        tick_vslider = QtW.QSlider(QtCore.Qt.Vertical)
+        tick_vslider = QtW.QSlider(QtCore.Qt.Orientation.Vertical)
         tick_vslider.setValue(55)
         tick_vslider.setTickPosition(QtW.QSlider.TicksRight)
-        range_tick_vslider = QRangeSlider(QtCore.Qt.Vertical)
+        range_tick_vslider = QRangeSlider(QtCore.Qt.Orientation.Vertical)
         range_tick_vslider.setValue((22, 77))
         range_tick_vslider.setTickPosition(QtW.QSlider.TicksLeft)
 

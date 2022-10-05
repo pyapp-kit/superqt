@@ -1,11 +1,12 @@
+from qtpy.QtCore import Qt
+from qtpy.QtWidgets import QApplication
+
 from superqt import QRangeSlider
-from superqt.qtcompat.QtCore import Qt
-from superqt.qtcompat.QtWidgets import QApplication
 
 app = QApplication([])
 
-slider = QRangeSlider(Qt.Horizontal)
-slider = QRangeSlider(Qt.Horizontal)
+slider = QRangeSlider(Qt.Orientation.Horizontal)
+slider = QRangeSlider(Qt.Orientation.Horizontal)
 
 slider.setValue((20, 80))
 slider.show()

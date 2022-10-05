@@ -1,0 +1,9 @@
+# run this with:
+# export CHANGELOG_GITHUB_TOKEN=......
+# github_changelog_generator --future-release vX.Y.Z
+user=napari
+project=superqt
+issues=false
+since-tag=v0.2.0
+exclude-labels=duplicate,question,invalid,wontfix,hide
+add-sections={"documentation":{"prefix":"**Documentation updates:**","labels":["documentation"]},"tests":{"prefix":"**Tests & CI:**","labels":["tests"]},"refactor":{"prefix":"**Refactors:**","labels":["refactor"]}}
