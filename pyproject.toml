@@ -7,4 +7,4 @@ build-backend = "setuptools.build_meta"
 write_to = "src/superqt/_version.py"
 
 [tool.check-manifest]
-ignore = ["src/superqt/_version.py"]
+ignore = ["src/superqt/_version.py", "mkdocs.yml"]

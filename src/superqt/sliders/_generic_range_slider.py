@@ -68,14 +68,14 @@ class _GenericRangeSlider(_GenericSlider[Tuple], Generic[_T]):
     def barIsRigid(self) -> bool:
         """Whether bar length is constant when dragging the bar.
 
-        If False, the bar can shorten when dragged beyond min/max. Default is True.
+        If `False`, the bar can shorten when dragged beyond min/max. Default is `True`.
         """
         return self._bar_is_rigid
 
     def setBarIsRigid(self, val: bool = True) -> None:
         """Whether bar length is constant when dragging the bar.
 
-        If False, the bar can shorten when dragged beyond min/max. Default is True.
+        If `False`, the bar can shorten when dragged beyond min/max. Default is `True`.
         """
         self._bar_is_rigid = bool(val)
 
@@ -96,12 +96,18 @@ class _GenericRangeSlider(_GenericSlider[Tuple], Generic[_T]):
         self._should_draw_bar = bool(val)
 
     def hideBar(self) -> None:
+        """Hide the bar between the first and last handle."""
         self.setBarVisible(False)
 
     def showBar(self) -> None:
+        """Show the bar between the first and last handle."""
         self.setBarVisible(True)
 
     def applyMacStylePatch(self) -> str:
+        """Apply a QSS patch to fix sliders on macos>=12 with QT < 6.
+
+        see [FAQ](../faq.md#sliders-not-dragging-properly-on-macos-12) for more details.
+        """
         super().applyMacStylePatch()
         self._style._macpatch = True
 
@@ -205,6 +211,7 @@ class _GenericRangeSlider(_GenericSlider[Tuple], Generic[_T]):
         self._style.brush_active = color
 
     barColor = Property(QtGui.QBrush, _getBarColor, _setBarColor)
+    """The color of the bar between the first and last handle."""
 
     def _offsetAllPositions(self, offset: float, ref=None) -> None:
         if ref is None:

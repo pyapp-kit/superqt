@@ -185,9 +185,11 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         self.setLayout(layout)
 
     def edgeLabelMode(self) -> EdgeLabelMode:
+        """Return current `EdgeLabelMode`."""
         return self._edge_label_mode
 
     def setEdgeLabelMode(self, opt: EdgeLabelMode) -> None:
+        """Set the `EdgeLabelMode`."""
         if opt is EdgeLabelMode.LabelIsRange:
             raise ValueError(
                 "mode must be one of 'EdgeLabelMode.NoLabel' or "
@@ -283,9 +285,11 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
         self.valueChanged = self._valueChanged
 
     def handleLabelPosition(self) -> LabelPosition:
+        """Return where/whether labels are shown adjacent to slider handles."""
         return self._handle_label_position
 
     def setHandleLabelPosition(self, opt: LabelPosition) -> LabelPosition:
+        """Set where/whether labels are shown adjacent to slider handles."""
         self._handle_label_position = opt
         for lbl in self._handle_labels:
             if not opt:
@@ -295,9 +299,11 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
         self.setOrientation(self.orientation())
 
     def edgeLabelMode(self) -> EdgeLabelMode:
+        """Return current `EdgeLabelMode`."""
         return self._edge_label_mode
 
     def setEdgeLabelMode(self, opt: EdgeLabelMode):
+        """Set `EdgeLabelMode`, controls what is shown at the min/max labels."""
         self._edge_label_mode = opt
         if not self._edge_label_mode:
             self._min_label.hide()
