@@ -45,6 +45,8 @@ superqt includes a number of utitlities for working with Qt, including:
 - tools and decorators for working with threads in qt.
 - `superqt.fonticon` for generating icons from font files (such as [Material Design Icons](https://materialdesignicons.com/) and [Font Awesome](https://fontawesome.com/))
 
+See the [utilities documentation](https://napari.org/superqt/utilities/) for a full list of widgets.
+
 ## Contributing
 
 We welcome contributions!
