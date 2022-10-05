@@ -29,10 +29,9 @@ superqt provides a variety of widgets that are not included in the native QtWidg
 
 See the [widgets documentation](https://napari.org/superqt/widgets) for a full list of widgets.
 
-- [Range Slider](docs/sliders.md#range-slider) (multi-handle slider)
+- [Range Slider](https://napari.org/superqt/widgets/qrangeslider/) (multi-handle slider)
 
 <img src="https://raw.githubusercontent.com/napari/superqt/main/docs/images/demo_darwin10.png" alt="range sliders" width=680>
-
 
 <img src="https://raw.githubusercontent.com/napari/superqt/main/docs/images/labeled_qslider.png" alt="range sliders" width=680>
 
@@ -45,7 +44,7 @@ superqt includes a number of utitlities for working with Qt, including:
 - tools and decorators for working with threads in qt.
 - `superqt.fonticon` for generating icons from font files (such as [Material Design Icons](https://materialdesignicons.com/) and [Font Awesome](https://fontawesome.com/))
 
-See the [utilities documentation](https://napari.org/superqt/utilities/) for a full list of widgets.
+See the [utilities documentation](https://napari.org/superqt/utilities/) for a full list of utilities.
 
 ## Contributing
 
