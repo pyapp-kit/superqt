@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from mkdocs_macros.plugin import MacrosPlugin
 
 EXAMPLES = Path(__file__).parent.parent / "examples"
-IMAGES = Path(__file__).parent / "images"
+IMAGES = Path(__file__).parent / "_auto_images"
 IMAGES.mkdir(exist_ok=True, parents=True)
 
 
@@ -39,7 +39,7 @@ def define_env(env: "MacrosPlugin"):
 
             exec(src)
             _grab(dest, width)
-        return f"![{page.title}](../images/{dest.name}){{ loading=lazy; width={width} }}\n\n"
+        return f"![{page.title}](../{dest.parent.name}/{dest.name}){{ loading=lazy; width={width} }}\n\n"
 
     @env.macro
     def show_members(cls: str):

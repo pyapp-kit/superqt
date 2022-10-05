@@ -21,6 +21,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://github.com/napari/superqt/utilities/fonticon/</loc>
+         <lastmod>2022-10-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://github.com/napari/superqt/utilities/qmessagehandler/</loc>
          <lastmod>2022-10-05</lastmod>
          <changefreq>daily</changefreq>

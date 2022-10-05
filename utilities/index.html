@@ -271,6 +271,8 @@
         
           
         
+          
+        
       
       
         
@@ -301,6 +303,20 @@
     <li class="md-nav__item">
       <a href="code_syntax_highlight/" class="md-nav__link">
         CodeSyntaxHighlight
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="fonticon/" class="md-nav__link">
+        Font icons
       </a>
     </li>
   
@@ -645,6 +661,35 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#font-icons" class="md-nav__link">
+    Font Icons
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#threading-tools" class="md-nav__link">
+    Threading tools
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#miscellaneous" class="md-nav__link">
+    Miscellaneous
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -664,6 +709,81 @@
 
 
 <h1 id="utilities">Utilities</h1>
+<h2 id="font-icons">Font Icons</h2>
+<table>
+<thead>
+<tr>
+<th>Object</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="fonticon/#superqt.fonticon.addFont"><code>addFont</code></a></td>
+<td>Add an <code>OTF/TTF</code> file at to the font registry.</td>
+</tr>
+<tr>
+<td><a href="fonticon/#superqt.fonticon.font"><code>font</code></a></td>
+<td>Create <code>QFont</code> for a given font-icon font family key</td>
+</tr>
+<tr>
+<td><a href="fonticon/#superqt.fonticon.icon"><code>icon</code></a></td>
+<td>Create a <code>QIcon</code> for font-con glyph key</td>
+</tr>
+<tr>
+<td><a href="fonticon/#superqt.fonticon.setTextIcon"><code>setTextIcon</code></a></td>
+<td>Set text on a <code>QWidget</code> to a specific font &amp; glyph.</td>
+</tr>
+<tr>
+<td><a href="fonticon/#superqt.fonticon.IconFont"><code>IconFont</code></a></td>
+<td>Helper class that provides a standard way to create an <code>IconFont</code>.</td>
+</tr>
+<tr>
+<td><a href="fonticon/#superqt.fonticon.IconOpts"><code>IconOpts</code></a></td>
+<td>Options for rendering an icon</td>
+</tr>
+<tr>
+<td><a href="fonticon/#superqt.fonticon.Animation"><code>Animation</code></a></td>
+<td>Base class for adding animations to a font-icon.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="threading-tools">Threading tools</h2>
+<table>
+<thead>
+<tr>
+<th>Object</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="thread_decorators/#ensure_main_thread"><code>ensure_main_thread</code></a></td>
+<td>Decorator that ensures a function is called in the main <code>QApplication</code> thread.</td>
+</tr>
+<tr>
+<td><a href="thread_decorators/#ensure_object_thread"><code>ensure_object_thread</code></a></td>
+<td>Decorator that ensures a <code>QObject</code> method is called in the object's thread.</td>
+</tr>
+<tr>
+<td><a href="threading/#superqt.utils.FunctionWorker"><code>FunctionWorker</code></a></td>
+<td><code>QRunnable</code> with signals that wraps a simple long-running function.</td>
+</tr>
+<tr>
+<td><a href="threading/#superqt.utils.GeneratorWorker"><code>GeneratorWorker</code></a></td>
+<td><code>QRunnable</code> with signals that wraps a long-running generator.</td>
+</tr>
+<tr>
+<td><a href="threading/#superqt.utils.create_worker"><code>create_worker</code></a></td>
+<td>Create a worker to run a target function in another thread.</td>
+</tr>
+<tr>
+<td><a href="threading/#superqt.utils.thread_worker"><code>thread_worker</code></a></td>
+<td>Decorator for <code>create_worker</code>, turn a function into a worker.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="miscellaneous">Miscellaneous</h2>
 <table>
 <thead>
 <tr>
@@ -675,14 +795,6 @@
 <tr>
 <td><a href="qmessagehandler/"><code>QMessageHandler</code></a></td>
 <td>A context manager to intercept messages from Qt.</td>
-</tr>
-<tr>
-<td><a href="thread_decorators/#ensure_main_thread"><code>ensure_main_thread</code></a></td>
-<td>Decorator that ensures a function is called in the main <code>QApplication</code> thread.</td>
-</tr>
-<tr>
-<td><a href="thread_decorators/#ensure_object_thread"><code>ensure_object_thread</code></a></td>
-<td>Decorator that ensures a <code>QObject</code> method is called in the object's thread.</td>
 </tr>
 <tr>
 <td><a href="code_syntax_highlight/"><code>CodeSyntaxHighlight</code></a></td>
