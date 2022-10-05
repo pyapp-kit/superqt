@@ -2,14 +2,15 @@ from __future__ import annotations
 
 __all__ = [
     "addFont",
+    "Animation",
     "ENTRY_POINT",
     "font",
     "icon",
     "IconFont",
     "IconFontMeta",
     "IconOpts",
-    "Animation",
     "pulse",
+    "setTextIcon",
     "spin",
 ]
 
@@ -49,10 +50,11 @@ def icon(
     The `glyph_key` (e.g. 'fa5s.smile') represents a Font-family & style, and a glpyh.
     In most cases, the key should be provided by a plugin in the environment, like:
 
-    https://github.com/tlambert03/fonticon-fontawesome5  ('fa5s' & 'fa5r' prefixes)
-    https://github.com/tlambert03/fonticon-materialdesignicons6  ('mdi6' prefix)
 
-    ...but fonts can also be added manually using :func:`addFont`.
+    - [fonticon-fontawesome5](https://pypi.org/project/fonticon-fontawesome5/) ('fa5s' & 'fa5r' prefixes)
+    - [fonticon-materialdesignicons6](https://pypi.org/project/fonticon-materialdesignicons6/) ('mdi6' prefix)
+
+    ...but fonts can also be added manually using [`addFont`][superqt.fonticon.addFont].
 
     Parameters
     ----------
@@ -96,19 +98,22 @@ def icon(
 
     Examples
     --------
-    # simple example (assumes the font-awesome5 plugin is installed)
+
+    simple example (using the string `'fa5s.smile'` assumes the `fonticon-fontawesome5`
+    plugin is installed)
+
     >>> btn = QPushButton()
     >>> btn.setIcon(icon('fa5s.smile'))
 
-    # can also directly import from fonticon_fa5
+    can also directly import from fonticon_fa5
     >>> from fonticon_fa5 import FA5S
     >>> btn.setIcon(icon(FA5S.smile))
 
-    # with animation
+    with animation
     >>> btn2 = QPushButton()
     >>> btn2.setIcon(icon(FA5S.spinner, animation=pulse(btn2)))
 
-    # complicated example
+    complicated example
     >>> btn = QPushButton()
     >>> btn.setIcon(
     ...     icon(
@@ -152,7 +157,7 @@ def setTextIcon(widget: QWidget, glyph_key: str, size: Optional[float] = None) -
 
     Parameters
     ----------
-    wdg : QWidget
+    widget : QWidget
         A widget supporting a `setText` method.
     glyph_key : str
         String encapsulating a font-family, style, and glyph. e.g. 'fa5s.smile'.
@@ -190,10 +195,12 @@ def addFont(
     to their unicode numbers. If a charmap is not provided, glyphs must be directly
     accessed with their unicode as something like `key.\uffff`.
 
-    NOTE: in most cases, users will not need this.
-    Instead, they should install a font plugin, like:
-    https://github.com/tlambert03/fonticon-fontawesome5
-    https://github.com/tlambert03/fonticon-materialdesignicons6
+    !!! Note
+        in most cases, users will not need this. Instead, they should install a
+        font plugin, like:
+
+        - [fonticon-fontawesome5](https://pypi.org/project/fonticon-fontawesome5/)
+        - [fonticon-materialdesignicons6](https://pypi.org/project/fonticon-materialdesignicons6/)
 
     Parameters
     ----------
