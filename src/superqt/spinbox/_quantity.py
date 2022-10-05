@@ -46,6 +46,20 @@ class QQuantity(QWidget):
 
     For this widget, `value()` returns a `pint.Quantity` object, while `setValue()`
     accepts either a number, `pint.Quantity`, a string that can be parsed by `pint`.
+
+    Parameters
+    ----------
+    value : Union[str, pint.Quantity, Number]
+        The initial value to display.  If a string, it will be parsed by `pint`.
+    units : Union[pint.util.UnitsContainer, str, pint.Quantity], optional
+        The units to use if `value` is a number.  If a string, it will be parsed by
+        `pint`.  If a `pint.Quantity`, the units will be extracted from it.
+    ureg : pint.UnitRegistry, optional
+        The unit registry to use.  If not provided, the registry will be extracted
+        from `value` if it is a `pint.Quantity`, otherwise the default registry will
+        be used.
+    parent : QWidget, optional
+        The parent widget, by default None
     """
 
     valueChanged = Signal(Quantity)
@@ -89,6 +103,7 @@ class QQuantity(QWidget):
         self.layout().setContentsMargins(6, 0, 0, 0)
 
     def unitRegistry(self) -> UnitRegistry:
+        """Return the pint UnitRegistry used by this widget."""
         return self._ureg
 
     def _update_units_combo_choices(self):
@@ -120,24 +135,34 @@ class QQuantity(QWidget):
         self._units_combo.setCurrentText(current)
 
     def value(self) -> Quantity:
+        """Return the current value as a `pint.Quantity`."""
         return self._value
 
     def magnitude(self) -> Union[float, int]:
+        """Return the magnitude of the current value."""
         return self._value.magnitude
 
     def units(self) -> Unit:
+        """Return the current units."""
         return self._value.units
 
     def dimensionality(self) -> UnitsContainer:
+        """Return the current dimensionality (cast to `str` for nice repr)."""
         return self._value.dimensionality
 
     def setDecimals(self, decimals: int) -> None:
+        """Set the number of decimals to display in the spinbox."""
         self._mag_spinbox.setDecimals(decimals)
         if self._value is not None:
             self._mag_spinbox.setValue(self._value.magnitude)
 
-    def setValue(self, quantity: Union[str, Quantity, Number]) -> None:
-        new_val = self._ureg.Quantity(quantity)
+    def setValue(
+        self,
+        value: Union[str, Quantity, Number],
+        units: Union[UnitsContainer, str, Quantity] = None,
+    ) -> None:
+        """Set the current value (will cast to a pint Quantity)."""
+        new_val = self._ureg.Quantity(value, units=units)
 
         mag_change = new_val.magnitude != self._value.magnitude
         units_change = new_val.units != self._value.units
@@ -162,9 +187,15 @@ class QQuantity(QWidget):
             self.valueChanged.emit(self._value)
 
     def setMagnitude(self, magnitude: Number) -> None:
+        """Set the magnitude of the current value."""
         self.setValue(self._ureg.Quantity(magnitude, self._value.units))
 
     def setUnits(self, units: Union[str, Unit, Quantity]) -> None:
+        """Set the units of the current value.
+
+        If `units` is `None`, will convert to a dimensionless quantity.
+        Otherwise, units must be compatible with the current dimensionality.
+        """
         if units is None:
             new_val = self._ureg.Quantity(self._value.magnitude)
         elif self.isDimensionless():
@@ -174,12 +205,15 @@ class QQuantity(QWidget):
         self.setValue(new_val)
 
     def isDimensionless(self) -> bool:
+        """Return `True` if the current value is dimensionless."""
         return self._value.dimensionless
 
     def magnitudeSpinBox(self) -> QDoubleSpinBox:
+        """Return the `QSpinBox` widget used to edit the magnitude."""
         return self._mag_spinbox
 
     def unitsComboBox(self) -> QComboBox:
+        """Return the `QCombBox` widget used to edit the units."""
         return self._units_combo
 
     def _format_units(self, u: Union[Unit, str]) -> str:

@@ -14,6 +14,7 @@ The following are QWidget subclasses:
 | [`QLabeledSlider`](./qlabeledslider.md) | `QSlider` with editable `QSpinBox` that shows the current value |
 | [`QLargeIntSpinBox`](./qlargeintspinbox.md) | `QSpinbox` that accepts arbitrarily large integers |
 | [`QRangeSlider`](./qrangeslider.md) | Multi-handle slider   |
+| [`QQuantity`](./qquantity.md) | Pint-backed quantity widget (magnitude combined with unit dropdown)   |
 
 ## Labels and categorical inputs
 
