@@ -138,6 +138,9 @@ class QQuantity(QWidget):
         """Return the current value as a `pint.Quantity`."""
         return self._value
 
+    def text(self) -> str:
+        return str(self._value)
+
     def magnitude(self) -> Union[float, int]:
         """Return the magnitude of the current value."""
         return self._value.magnitude
