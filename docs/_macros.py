@@ -112,7 +112,7 @@ def define_env(env: "MacrosPlugin"):
                   show_source: False
                   show_inherited_members: false
                   show_signature_annotations: True
-                  members: {list(self_members)}
+                  members: {sorted(self_members)}
                   docstring_style: numpy
                   show_bases: False
                   show_root_toc_entry: False
