@@ -20,6 +20,7 @@ if TYPE_CHECKING:
 Number = Union[int, float, "Decimal"]
 UREG = UnitRegistry()
 NULL_OPTION = "-----"
+QOVERFLOW = 2 - 1**31
 SI_BASES = {
     "[length]": "meter",
     "[time]": "second",
@@ -88,7 +89,7 @@ class QQuantity(QWidget):
 
         self._mag_spinbox = QDoubleSpinBox()
         self._mag_spinbox.setDecimals(3)
-        self._mag_spinbox.setRange(-9999999999999, 99999999999999)
+        self._mag_spinbox.setRange(-QOVERFLOW, QOVERFLOW - 1)
         self._mag_spinbox.setValue(float(self._value.magnitude))
         self._mag_spinbox.valueChanged.connect(self.setMagnitude)
 
