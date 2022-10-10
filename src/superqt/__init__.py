@@ -51,4 +51,4 @@ def __getattr__(name):
         from .spinbox._quantity import QQuantity
 
         return QQuantity
-    raise ImportError(f"cannot import name {name!r} from {__name__!r}")
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
