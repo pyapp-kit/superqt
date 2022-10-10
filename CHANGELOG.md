@@ -1,8 +1,25 @@
 # Changelog
 
-## [v0.3.6](https://github.com/napari/superqt/tree/v0.3.6) (2022-10-03)
+## [0.3.7](https://github.com/napari/superqt/tree/0.3.7) (2022-10-10)
 
-[Full Changelog](https://github.com/napari/superqt/compare/v0.3.5...v0.3.6)
+[Full Changelog](https://github.com/napari/superqt/compare/v0.3.6...0.3.7)
+
+**Implemented enhancements:**
+
+- feat: add Quantity widget \(using pint\) [\#126](https://github.com/napari/superqt/pull/126) ([tlambert03](https://github.com/tlambert03))
+
+## [v0.3.6](https://github.com/napari/superqt/tree/v0.3.6) (2022-10-05)
+
+[Full Changelog](https://github.com/napari/superqt/compare/v0.3.6rc0...v0.3.6)
+
+**Documentation updates:**
+
+- minor fix to readme [\#125](https://github.com/napari/superqt/pull/125) ([tlambert03](https://github.com/tlambert03))
+- Docs [\#124](https://github.com/napari/superqt/pull/124) ([tlambert03](https://github.com/tlambert03))
+
+## [v0.3.6rc0](https://github.com/napari/superqt/tree/v0.3.6rc0) (2022-10-03)
+
+[Full Changelog](https://github.com/napari/superqt/compare/v0.3.5...v0.3.6rc0)
 
 **Implemented enhancements:**
 
@@ -192,16 +209,12 @@
 
 ## [v0.2.1](https://github.com/napari/superqt/tree/v0.2.1) (2021-07-10)
 
-[Full Changelog](https://github.com/napari/superqt/compare/v0.2.0rc1...v0.2.1)
+[Full Changelog](https://github.com/napari/superqt/compare/v0.2.0rc0...v0.2.1)
 
 **Fixed bugs:**
 
 - Fix QLabeledRangeSlider API \(fix slider proxy\) [\#10](https://github.com/napari/superqt/pull/10) ([tlambert03](https://github.com/tlambert03))
 - Fix range slider with negative min range [\#9](https://github.com/napari/superqt/pull/9) ([tlambert03](https://github.com/tlambert03))
-
-## [v0.2.0rc1](https://github.com/napari/superqt/tree/v0.2.0rc1) (2021-06-26)
-
-[Full Changelog](https://github.com/napari/superqt/compare/v0.2.0rc0...v0.2.0rc1)
 
 ## [v0.2.0rc0](https://github.com/napari/superqt/tree/v0.2.0rc0) (2021-06-26)
 
