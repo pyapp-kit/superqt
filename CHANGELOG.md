@@ -1,8 +1,16 @@
 # Changelog
 
-## [0.3.7](https://github.com/napari/superqt/tree/0.3.7) (2022-10-10)
+## [0.3.8](https://github.com/napari/superqt/tree/0.3.8) (2022-10-10)
 
-[Full Changelog](https://github.com/napari/superqt/compare/v0.3.6...0.3.7)
+[Full Changelog](https://github.com/napari/superqt/compare/v0.3.7...0.3.8)
+
+**Fixed bugs:**
+
+- fix: allow submodule imports [\#128](https://github.com/napari/superqt/pull/128) ([kne42](https://github.com/kne42))
+
+## [v0.3.7](https://github.com/napari/superqt/tree/v0.3.7) (2022-10-10)
+
+[Full Changelog](https://github.com/napari/superqt/compare/v0.3.6...v0.3.7)
 
 **Implemented enhancements:**
 
