@@ -72,20 +72,11 @@ font-fa5 = ["fonticon-fontawesome5"]
 font-fa6 = ["fonticon-fontawesome6"]
 font-mi5 = ["fonticon-materialdesignicons5"]
 
-
 [project.urls]
 Source = "https://github.com/napari/superqt"
 Tracker = "https://github.com/napari/superqt/issues"
 Changelog = "https://github.com/napari/superqt/blob/main/CHANGELOG.md"
 
-# same as console_scripts entry point
-# [project.scripts]
-# spam-cli = "spam:main_cli"
-
-# Entry points
-# https://peps.python.org/pep-0621/#entry-points
-# [project.entry-points."spam.magical"]
-# tomatoes = "spam:main_tomatoes"
 
 # https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
 [tool.setuptools]
@@ -122,7 +113,6 @@ D401  # imperative mood
 W503  # line break before binary operator
 """
 per-file-ignores = ["tests/*:D"]
-
 
 # http://www.pydocstyle.org/en/stable/usage.html
 [tool.pydocstyle]
@@ -165,10 +155,6 @@ exclude_lines = [
     "@overload",
     "except ImportError",
 ]
-
-# https://github.com/cruft/cruft
-[tool.cruft]
-skip = ["tests"]
 
 # https://github.com/mgedmin/check-manifest#configuration
 [tool.check-manifest]
