@@ -6,7 +6,9 @@ on:
       - main
     tags:
       - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
-  pull_request: {}
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
