@@ -1,4 +1,5 @@
 import math
+import sys
 from itertools import product
 from typing import Any, Iterable
 from unittest.mock import Mock
@@ -217,7 +218,8 @@ def test_wheel(cls, orientation, qtbot):
 
 def _assert_types(args: Iterable[Any], type_: type):
     # sourcery skip: comprehension-to-generator
-    assert all([isinstance(v, type_) for v in args]), "invalid type"
+    if sys.version_info >= (3, 8):
+        assert all([isinstance(v, type_) for v in args]), "invalid type"
 
 
 @pytest.mark.parametrize("cls, orientation", ALL_SLIDER_COMBOS)
