@@ -1,3 +1,5 @@
+from pint import Quantity
+
 from superqt import QQuantity
 
 
@@ -29,3 +31,11 @@ def test_qquantity(qtbot):
     assert w.isDimensionless()
     assert w.unitsComboBox().currentText() == "-----"
     assert w.magnitude() == 1
+
+
+def test_change_qquantity_value(qtbot):
+    w = QQuantity()
+    qtbot.addWidget(w)
+    assert w.value() == Quantity(0)
+    w.setValue(Quantity("1 meter"))
+    assert w.value() == Quantity("1 meter")

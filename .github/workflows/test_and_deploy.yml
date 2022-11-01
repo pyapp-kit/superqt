@@ -115,7 +115,7 @@ jobs:
 
       - name: Install for screenshots
         if: matrix.screenshot
-        run: pip install . ${{ matrix.backend }}
+        run: pip install -e .[${{ matrix.backend }}]
 
       - name: Screenshots (Linux)
         if: runner.os == 'Linux' && matrix.screenshot
