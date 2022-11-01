@@ -47,6 +47,10 @@ jobs:
             backend: pyside6
             screenshot: 1
 
+          - python-version: "3.11"
+            platform: ubuntu-latest
+            backend: pyqt6
+
           # python 3.7
           - python-version: 3.7
             platform: macos-latest
