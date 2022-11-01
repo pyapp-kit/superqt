@@ -8,7 +8,7 @@ from qtpy.QtWidgets import QFrame, QPushButton, QVBoxLayout, QWidget
 class QCollapsible(QFrame):
     """A collapsible widget to hide and unhide child widgets.
 
-    Based on [https://stackoverflow.com/a/68141638](https://stackoverflow.com/a/68141638)
+    Based on https://stackoverflow.com/a/68141638
     """
 
     _EXPANDED = "▼  "

@@ -28,9 +28,9 @@ def test_message_handler_with_logger(caplog):
         QtCore.qCritical("critical")
 
     assert len(caplog.records) == 3
-    caplog.records[0].message == "debug"
-    caplog.records[0].levelno == logging.DEBUG
-    caplog.records[1].message == "warning"
-    caplog.records[1].levelno == logging.WARNING
-    caplog.records[2].message == "critical"
-    caplog.records[2].levelno == logging.CRITICAL
+    assert caplog.records[0].message == "debug"
+    assert caplog.records[0].levelno == logging.DEBUG
+    assert caplog.records[1].message == "warning"
+    assert caplog.records[1].levelno == logging.WARNING
+    assert caplog.records[2].message == "critical"
+    assert caplog.records[2].levelno == logging.CRITICAL

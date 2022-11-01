@@ -102,7 +102,6 @@ src_paths = ["src/superqt", "tests"]
 [tool.flake8]
 exclude = "docs,.eggs,examples,_version.py"
 max-line-length = 88
-ignore = "E203"
 min-python-version = "3.8.0"
 docstring-convention = "all" # use numpy convention, while allowing D417
 extend-ignore = """
@@ -111,6 +110,7 @@ D107,D203,D212,D213,D402,D413,D415,D416  # numpy
 D100  # missing docstring in public module
 D401  # imperative mood
 W503  # line break before binary operator
+E302,E704  # black will handle these when we want them
 """
 per-file-ignores = ["tests/*:D"]
 
@@ -140,6 +140,7 @@ disallow_any_generics = false
 disallow_subclassing_any = false
 show_error_codes = true
 pretty = true
+exclude = ['tests/**/*']
 
 [[tool.mypy.overrides]]
 module = ["superqt.qtcompat.*"]

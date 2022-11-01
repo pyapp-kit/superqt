@@ -80,11 +80,11 @@ class _GenericRangeSlider(_GenericSlider[Tuple], Generic[_T]):
         self._bar_is_rigid = bool(val)
 
     def barMovesAllHandles(self) -> bool:
-        """Whether clicking on the bar moves all handles (default), or just the nearest."""
+        """Whether clicking on the bar moves all handles, or just the nearest."""
         return self._bar_moves_all
 
     def setBarMovesAllHandles(self, val: bool = True) -> None:
-        """Whether clicking on the bar moves all handles (default), or just the nearest."""
+        """Whether clicking on the bar moves all handles, or just the nearest."""
         self._bar_moves_all = bool(val)
 
     def barIsVisible(self) -> bool:
