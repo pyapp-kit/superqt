@@ -170,7 +170,7 @@ jobs:
         run: |
           python -m pip install -U pip
           python -m pip install ./superqt
-          python -m pip install ./napari-repo[test,pyqt5]
+          python -m pip install ./napari-repo[testing,pyqt5]
 
       - name: Test napari
         uses: GabrielBB/xvfb-action@v1
