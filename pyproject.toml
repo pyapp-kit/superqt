@@ -68,9 +68,9 @@ pyside2 = ["pyside2"]
 pyside6 = ["pyside6<6.4.0"]
 pyqt5 = ["pyqt5"]
 pyqt6 = ["pyqt6"]
-font_fa5 = ["fonticon-fontawesome5"]
-font_fa6 = ["fonticon-fontawesome6"]
-font_mi5 = ["fonticon-materialdesignicons5"]
+font-fa5 = ["fonticon-fontawesome5"]
+font-fa6 = ["fonticon-fontawesome6"]
+font-mi5 = ["fonticon-materialdesignicons5"]
 
 
 [project.urls]
@@ -94,7 +94,7 @@ include-package-data = true
 packages = { find = { where = ["src"], exclude = [] } }
 
 [tool.setuptools.package-data]
-"*" = ["py.typed"]
+"*" = ["py.typed", "*.pyi"]
 
 
 # https://github.com/pypa/setuptools_scm/#pyprojecttoml-usage
@@ -179,4 +179,9 @@ ignore = [
     "tox.ini",
     "src/superqt/_version.py",
     "mkdocs.yml",
+    "docs/**/*",
+    "examples/**/*",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "codecov.yml",
 ]
