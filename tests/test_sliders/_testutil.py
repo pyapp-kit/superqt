@@ -20,10 +20,11 @@ def _mouse_event(pos=QPointF(), type_=QEvent.Type.MouseMove):
     """Create a mouse event of `type_` at `pos`."""
     return QMouseEvent(
         type_,
-        QPointF(pos),
-        Qt.MouseButton.LeftButton,
-        Qt.MouseButton.LeftButton,
-        Qt.KeyboardModifier.NoModifier,
+        QPointF(pos),  # localPos
+        QPointF(),  # windowPos / globalPos
+        Qt.MouseButton.LeftButton,  # button
+        Qt.MouseButton.LeftButton,  # buttons
+        Qt.KeyboardModifier.NoModifier,  # modifiers
     )
 
 
