@@ -360,7 +360,6 @@ class QFontIconStore(QObject):
             # QT6 drops this
             QApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
 
-
     @classmethod
     def instance(cls) -> QFontIconStore:
         if cls.__instance is None:
