@@ -356,10 +356,10 @@ class QFontIconStore(QObject):
 
     def __init__(self, parent: Optional[QObject] = None) -> None:
         super().__init__(parent=parent)
-        # QT6 drops this
-        dpi = getattr(Qt.ApplicationAttribute, "AA_UseHighDpiPixmaps", None)
-        if dpi:
-            QApplication.setAttribute(dpi)
+        if tuple(QT_VERSION.split(".")) < ("6", "0"):
+            # QT6 drops this
+            QApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
+
 
     @classmethod
     def instance(cls) -> QFontIconStore:
