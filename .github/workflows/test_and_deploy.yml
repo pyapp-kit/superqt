@@ -108,7 +108,7 @@ jobs:
           BACKEND: ${{ matrix.backend }}
 
       - name: Coverage
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
 
       - name: Install for screenshots
         if: matrix.screenshot
