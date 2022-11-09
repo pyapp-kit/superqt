@@ -51,7 +51,7 @@ jobs:
             backend: pyqt6
           - python-version: "3.11"
             platform: windows-latest
-            backend: pyside2
+            backend: pyqt5
           - python-version: "3.11"
             platform: macos-latest
             backend: pyside6
