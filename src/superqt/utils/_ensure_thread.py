@@ -1,7 +1,9 @@
 # https://gist.github.com/FlorianRhiem/41a1ad9b694c14fb9ac3
+from __future__ import annotations
+
 from concurrent.futures import Future
 from functools import wraps
-from typing import Callable, List, Optional
+from typing import TYPE_CHECKING, Callable, List, Optional, overload
 
 from qtpy.QtCore import (
     QCoreApplication,
@@ -13,10 +15,18 @@ from qtpy.QtCore import (
     Slot,
 )
 
+if TYPE_CHECKING:
+    from typing import TypeVar
+
+    from typing_extensions import Literal, ParamSpec
+
+    P = ParamSpec("P")
+    R = TypeVar("R")
+
 
 class CallCallable(QObject):
     finished = Signal(object)
-    instances: List["CallCallable"] = []
+    instances: List[CallCallable] = []
 
     def __init__(self, callable, *args, **kwargs):
         super().__init__()
@@ -30,6 +40,32 @@ class CallCallable(QObject):
         CallCallable.instances.remove(self)
         res = self._callable(*self._args, **self._kwargs)
         self.finished.emit(res)
+
+
+# fmt: off
+@overload
+def ensure_main_thread(
+    await_return: Literal[True],
+    timeout: int = 1000,
+) -> Callable[[Callable[P, R]], Callable[P, R]]: ...
+@overload
+def ensure_main_thread(
+    func: Callable[P, R],
+    await_return: Literal[True],
+    timeout: int = 1000,
+) -> Callable[P, R]: ...
+@overload
+def ensure_main_thread(
+    await_return: Literal[False] = False,
+    timeout: int = 1000,
+) -> Callable[[Callable[P, R]], Callable[P, Future[R]]]: ...
+@overload
+def ensure_main_thread(
+    func: Callable[P, R],
+    await_return: Literal[False] = False,
+    timeout: int = 1000,
+) -> Callable[P, Future[R]]: ...
+# fmt: on
 
 
 def ensure_main_thread(
@@ -65,9 +101,33 @@ def ensure_main_thread(
 
         return _func
 
-    if func is None:
-        return _out_func
-    return _out_func(func)
+    return _out_func if func is None else _out_func(func)
+
+
+# fmt: off
+@overload
+def ensure_object_thread(
+    await_return: Literal[True],
+    timeout: int = 1000,
+) -> Callable[[Callable[P, R]], Callable[P, R]]: ...
+@overload
+def ensure_object_thread(
+    func: Callable[P, R],
+    await_return: Literal[True],
+    timeout: int = 1000,
+) -> Callable[P, R]: ...
+@overload
+def ensure_object_thread(
+    await_return: Literal[False] = False,
+    timeout: int = 1000,
+) -> Callable[[Callable[P, R]], Callable[P, Future[R]]]: ...
+@overload
+def ensure_object_thread(
+    func: Callable[P, R],
+    await_return: Literal[False] = False,
+    timeout: int = 1000,
+) -> Callable[P, Future[R]]: ...
+# fmt: on
 
 
 def ensure_object_thread(
@@ -98,9 +158,7 @@ def ensure_object_thread(
 
         return _func
 
-    if func is None:
-        return _out_func
-    return _out_func(func)
+    return _out_func if func is None else _out_func(func)
 
 
 def _run_in_thread(
@@ -121,5 +179,5 @@ def _run_in_thread(
     f = CallCallable(func, *args, **kwargs)
     f.moveToThread(thread)
     f.finished.connect(future.set_result, Qt.ConnectionType.DirectConnection)
-    QMetaObject.invokeMethod(f, "call", Qt.ConnectionType.QueuedConnection)  # type: ignore
+    QMetaObject.invokeMethod(f, "call", Qt.ConnectionType.QueuedConnection)  # type: ignore  # noqa
     return future.result(timeout=timeout / 1000) if await_return else future

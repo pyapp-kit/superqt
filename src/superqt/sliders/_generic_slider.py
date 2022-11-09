@@ -19,10 +19,11 @@ So that's what `_GenericSlider` is below.
 scalar (with one handle per item), and it forms the basis of
 QRangeSlider.
 """
-
+import os
+import platform
 from typing import Generic, TypeVar
 
-from qtpy import QtGui
+from qtpy import QT_VERSION, QtGui
 from qtpy.QtCore import QEvent, QPoint, QPointF, QRect, Qt, Signal
 from qtpy.QtWidgets import (
     QApplication,
@@ -31,6 +32,8 @@ from qtpy.QtWidgets import (
     QStyleOptionSlider,
     QStylePainter,
 )
+
+from ._range_style import MONTEREY_SLIDER_STYLES_FIX
 
 _T = TypeVar("_T")
 
@@ -42,11 +45,23 @@ SC_TICKMARKS = QStyle.SubControl.SC_SliderTickmarks
 CC_SLIDER = QStyle.ComplexControl.CC_Slider
 QOVERFLOW = 2**31 - 1
 
+# whether to use the MONTEREY_SLIDER_STYLES_FIX QSS hack
+# for fixing sliders on macos>=12 with QT < 6
+# https://bugreports.qt.io/browse/QTBUG-98093
+# https://github.com/napari/superqt/issues/74
+USE_MAC_SLIDER_PATCH = (
+    QT_VERSION
+    and int(QT_VERSION.split(".")[0]) < 6
+    and platform.system() == "Darwin"
+    and int(platform.mac_ver()[0].split(".", maxsplit=1)[0]) >= 12
+    and os.getenv("USE_MAC_SLIDER_PATCH", "0") not in ("0", "False", "false")
+)
+
 
 class _GenericSlider(QSlider, Generic[_T]):
-    _fvalueChanged = Signal(float)
-    _fsliderMoved = Signal(float)
-    _frangeChanged = Signal(float, float)
+    _fvalueChanged = Signal(int)
+    _fsliderMoved = Signal(int)
+    _frangeChanged = Signal(int, int)
 
     MAX_DISPLAY = 5000
 
@@ -79,6 +94,16 @@ class _GenericSlider(QSlider, Generic[_T]):
         self.rangeChanged = self._frangeChanged
 
         self.setAttribute(Qt.WidgetAttribute.WA_Hover)
+        self.setStyleSheet("")
+        if USE_MAC_SLIDER_PATCH:
+            self.applyMacStylePatch()
+
+    def applyMacStylePatch(self) -> str:
+        """Apply a QSS patch to fix sliders on macos>=12 with QT < 6.
+
+        see [FAQ](../faq.md#sliders-not-dragging-properly-on-macos-12) for more details.
+        """
+        self.setStyleSheet(MONTEREY_SLIDER_STYLES_FIX)
 
     # ###############  QtOverrides  #######################
 
@@ -134,8 +159,8 @@ class _GenericSlider(QSlider, Generic[_T]):
         self.setRange(min(self._minimum, max), max)
 
     def setRange(self, min: float, max_: float) -> None:
-        oldMin, self._minimum = self._minimum, float(min)
-        oldMax, self._maximum = self._maximum, float(max(min, max_))
+        oldMin, self._minimum = self._minimum, self._type_cast(min)
+        oldMax, self._maximum = self._maximum, self._type_cast(max(min, max_))
 
         if oldMin != self._minimum or oldMax != self._maximum:
             self.sliderChange(self.SliderChange.SliderRangeChange)
@@ -271,6 +296,27 @@ class _GenericSlider(QSlider, Generic[_T]):
         if opt.tickPosition != QSlider.TickPosition.NoTicks:
             opt.subControls |= SC_TICKMARKS
         painter.drawComplexControl(CC_SLIDER, opt)
+
+        if (
+            opt.tickPosition != QSlider.TickPosition.NoTicks
+            and "MONTEREY_SLIDER_STYLES_FIX" in self.styleSheet()
+        ):
+            # draw tick marks manually because they are badly behaved with style sheets
+            interval = opt.tickInterval or int(self._pageStep)
+            _range = self._maximum - self._minimum
+            nticks = (_range + interval) // interval
+
+            painter.setPen(QtGui.QColor("#C7C7C7"))
+            half_height = 3
+            for i in range(int(nticks)):
+                if self.orientation() == Qt.Orientation.Vertical:
+                    y = int((self.height() - 8) * i / (nticks - 1)) + 1
+                    x = self.rect().center().x()
+                    painter.drawRect(x - half_height, y, 6, 1)
+                else:
+                    x = int((self.width() - 3) * i / (nticks - 1)) + 1
+                    y = self.rect().center().y()
+                    painter.drawRect(x, y - half_height, 1, 6)
 
         self._draw_handle(painter, opt)
 

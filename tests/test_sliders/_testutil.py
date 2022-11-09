@@ -15,15 +15,18 @@ skip_on_linux_qt6 = pytest.mark.skipif(
     reason="hover events not working on linux pyqt6",
 )
 
+_PointF = QPointF()
 
-def _mouse_event(pos=QPointF(), type_=QEvent.Type.MouseMove):
+
+def _mouse_event(pos=_PointF, type_=QEvent.Type.MouseMove):
     """Create a mouse event of `type_` at `pos`."""
     return QMouseEvent(
         type_,
-        QPointF(pos),
-        Qt.MouseButton.LeftButton,
-        Qt.MouseButton.LeftButton,
-        Qt.KeyboardModifier.NoModifier,
+        QPointF(pos),  # localPos
+        QPointF(),  # windowPos / globalPos
+        Qt.MouseButton.LeftButton,  # button
+        Qt.MouseButton.LeftButton,  # buttons
+        Qt.KeyboardModifier.NoModifier,  # modifiers
     )
 
 
@@ -79,7 +82,7 @@ def _hover_event(_type, position, old_position, widget=None):
     return QHoverEvent(_type, position, old_position)
 
 
-def _linspace(start, stop, n):
+def _linspace(start: int, stop: int, n: int):
     h = (stop - start) / (n - 1)
     for i in range(n):
         yield start + h * i

@@ -102,6 +102,23 @@ class IconOptionDict(TypedDict, total=False):
 # IconOptions are.
 @dataclass
 class IconOpts:
+    """Options for rendering an icon.
+
+    Parameters
+    ----------
+    glyph_key : str, optional
+        The key of the glyph to use, e.g. `'fa5s.smile'`, by default `None`
+    scale_factor : float, optional
+        The scale factor to use, by default `None`
+    color : ValidColor, optional
+        The color to use, by default `None`. Colors may be specified as a string,
+        `QColor`, `Qt.GlobalColor`, or a 3 or 4-tuple of integers.
+    opacity : float, optional
+        The opacity to use, by default `None`
+    animation : Animation, optional
+        The animation to use, by default `None`
+    """
+
     glyph_key: Union[str, Unset] = _Unset
     scale_factor: Union[float, Unset] = _Unset
     color: Union[ValidColor, Unset] = _Unset
@@ -339,10 +356,9 @@ class QFontIconStore(QObject):
 
     def __init__(self, parent: Optional[QObject] = None) -> None:
         super().__init__(parent=parent)
-        # QT6 drops this
-        dpi = getattr(Qt.ApplicationAttribute, "AA_UseHighDpiPixmaps", None)
-        if dpi:
-            QApplication.setAttribute(dpi)
+        if tuple(QT_VERSION.split(".")) < ("6", "0"):
+            # QT6 drops this
+            QApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
 
     @classmethod
     def instance(cls) -> QFontIconStore:
@@ -418,7 +434,7 @@ class QFontIconStore(QObject):
         If you'd like to later use a fontkey in the form of `key.some-name`, then
         `charmap` must be provided and provide a mapping for all of the glyph names
         to their unicode numbers. If a charmap is not provided, glyphs must be directly
-        accessed with their unicode as something like `key.\uffff`.
+        accessed with their unicode as something like `key.\\uffff`.
 
         Parameters
         ----------
@@ -486,7 +502,7 @@ class QFontIconStore(QObject):
         opacity: float = 1,
         animation: Optional[Animation] = None,
         transform: Optional[QTransform] = None,
-        states: Dict[str, Union[IconOptionDict, IconOpts]] = {},
+        states: Dict[str, Union[IconOptionDict, IconOpts]] | None = None,
     ) -> QFontIcon:
         self.key2glyph(glyph_key)  # make sure it's a valid glyph_key
         default_opts = _IconOptions(
@@ -498,7 +514,7 @@ class QFontIconStore(QObject):
             transform=transform,
         )
         icon = QFontIcon(default_opts)
-        for kw, options in states.items():
+        for kw, options in (states or {}).items():
             if isinstance(options, IconOpts):
                 options = default_opts._update(options).dict()
             icon.addState(*_norm_state_mode(kw), **options)
@@ -509,7 +525,7 @@ class QFontIconStore(QObject):
     ) -> None:
         """Sets text on a widget to a specific font & glyph.
 
-        This is an alternative to setting a QIcon with a pixmap.  It may
+        This is an alternative to setting a `QIcon` with a pixmap.  It may
         be easier to combine with dynamic stylesheets.
         """
         setText = getattr(widget, "setText", None)

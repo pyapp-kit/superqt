@@ -1,9 +1,13 @@
-"""superqt is a collection of QtWidgets for python."""
+"""superqt is a collection of Qt components for python."""
+from typing import TYPE_CHECKING
+
 try:
     from ._version import version as __version__
 except ImportError:
     __version__ = "unknown"
 
+if TYPE_CHECKING:
+    from .spinbox._quantity import QQuantity
 
 from ._eliding_label import QElidingLabel
 from .collapsible import QCollapsible
@@ -25,6 +29,7 @@ __all__ = [
     "ensure_main_thread",
     "ensure_object_thread",
     "QDoubleRangeSlider",
+    "QCollapsible",
     "QDoubleSlider",
     "QElidingLabel",
     "QEnumComboBox",
@@ -34,8 +39,16 @@ __all__ = [
     "QLabeledSlider",
     "QLargeIntSpinBox",
     "QMessageHandler",
+    "QQuantity",
+    "QRangeSlider",
     "QSearchableComboBox",
     "QSearchableListWidget",
-    "QRangeSlider",
-    "QCollapsible",
 ]
+
+
+def __getattr__(name):
+    if name == "QQuantity":
+        from .spinbox._quantity import QQuantity
+
+        return QQuantity
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

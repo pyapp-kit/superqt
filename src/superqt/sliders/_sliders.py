@@ -14,6 +14,10 @@ class _IntMixin:
 
 
 class _FloatMixin:
+    _fvalueChanged = Signal(float)
+    _fsliderMoved = Signal(float)
+    _frangeChanged = Signal(float, float)
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._singleStep = 0.01

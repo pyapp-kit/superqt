@@ -1,8 +1,61 @@
 # Changelog
 
-## [0.3.4](https://github.com/napari/superqt/tree/0.3.4) (2022-07-24)
+## [0.3.8](https://github.com/napari/superqt/tree/0.3.8) (2022-10-10)
 
-[Full Changelog](https://github.com/napari/superqt/compare/v0.3.3...0.3.4)
+[Full Changelog](https://github.com/napari/superqt/compare/v0.3.7...0.3.8)
+
+**Fixed bugs:**
+
+- fix: allow submodule imports [\#128](https://github.com/napari/superqt/pull/128) ([kne42](https://github.com/kne42))
+
+## [v0.3.7](https://github.com/napari/superqt/tree/v0.3.7) (2022-10-10)
+
+[Full Changelog](https://github.com/napari/superqt/compare/v0.3.6...v0.3.7)
+
+**Implemented enhancements:**
+
+- feat: add Quantity widget \(using pint\) [\#126](https://github.com/napari/superqt/pull/126) ([tlambert03](https://github.com/tlambert03))
+
+## [v0.3.6](https://github.com/napari/superqt/tree/v0.3.6) (2022-10-05)
+
+[Full Changelog](https://github.com/napari/superqt/compare/v0.3.6rc0...v0.3.6)
+
+**Documentation updates:**
+
+- minor fix to readme [\#125](https://github.com/napari/superqt/pull/125) ([tlambert03](https://github.com/tlambert03))
+- Docs [\#124](https://github.com/napari/superqt/pull/124) ([tlambert03](https://github.com/tlambert03))
+
+## [v0.3.6rc0](https://github.com/napari/superqt/tree/v0.3.6rc0) (2022-10-03)
+
+[Full Changelog](https://github.com/napari/superqt/compare/v0.3.5...v0.3.6rc0)
+
+**Implemented enhancements:**
+
+- feat: add editing finished signal to LabeledSliders [\#122](https://github.com/napari/superqt/pull/122) ([tlambert03](https://github.com/tlambert03))
+
+**Fixed bugs:**
+
+- fix: fix missing labels after setValue [\#123](https://github.com/napari/superqt/pull/123) ([tlambert03](https://github.com/tlambert03))
+- fix: Fix TypeError on slider rangeChanged signal [\#121](https://github.com/napari/superqt/pull/121) ([tlambert03](https://github.com/tlambert03))
+- Simple workaround for pyside 6 [\#119](https://github.com/napari/superqt/pull/119) ([Czaki](https://github.com/Czaki))
+- fix: Offer patch for \(unstyled\) QSliders on macos 12 and Qt \<6 [\#117](https://github.com/napari/superqt/pull/117) ([tlambert03](https://github.com/tlambert03))
+
+## [v0.3.5](https://github.com/napari/superqt/tree/v0.3.5) (2022-08-17)
+
+[Full Changelog](https://github.com/napari/superqt/compare/v0.3.4...v0.3.5)
+
+**Fixed bugs:**
+
+- fix range slider drag crash on PyQt6 [\#108](https://github.com/napari/superqt/pull/108) ([sfhbarnett](https://github.com/sfhbarnett))
+- Fix float value error in pyqt configuration [\#106](https://github.com/napari/superqt/pull/106) ([mstabrin](https://github.com/mstabrin))
+
+**Merged pull requests:**
+
+- chore: changelog v0.3.5 [\#110](https://github.com/napari/superqt/pull/110) ([tlambert03](https://github.com/tlambert03))
+
+## [v0.3.4](https://github.com/napari/superqt/tree/v0.3.4) (2022-07-24)
+
+[Full Changelog](https://github.com/napari/superqt/compare/v0.3.3...v0.3.4)
 
 **Fixed bugs:**
 
@@ -164,12 +217,16 @@
 
 ## [v0.2.1](https://github.com/napari/superqt/tree/v0.2.1) (2021-07-10)
 
-[Full Changelog](https://github.com/napari/superqt/compare/v0.2.0...v0.2.1)
+[Full Changelog](https://github.com/napari/superqt/compare/v0.2.0rc0...v0.2.1)
 
 **Fixed bugs:**
 
 - Fix QLabeledRangeSlider API \(fix slider proxy\) [\#10](https://github.com/napari/superqt/pull/10) ([tlambert03](https://github.com/tlambert03))
 - Fix range slider with negative min range [\#9](https://github.com/napari/superqt/pull/9) ([tlambert03](https://github.com/tlambert03))
+
+## [v0.2.0rc0](https://github.com/napari/superqt/tree/v0.2.0rc0) (2021-06-26)
+
+[Full Changelog](https://github.com/napari/superqt/compare/v0.2.0...v0.2.0rc0)
 
 
 
