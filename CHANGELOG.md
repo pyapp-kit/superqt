@@ -1,8 +1,26 @@
 # Changelog
 
-## [0.3.8](https://github.com/napari/superqt/tree/0.3.8) (2022-10-10)
+## [0.4.0](https://github.com/napari/superqt/tree/0.4.0) (2022-11-09)
 
-[Full Changelog](https://github.com/napari/superqt/compare/v0.3.7...0.3.8)
+[Full Changelog](https://github.com/napari/superqt/compare/v0.3.8...0.4.0)
+
+**Fixed bugs:**
+
+- fix: fix quantity set value and add test [\#131](https://github.com/napari/superqt/pull/131) ([tlambert03](https://github.com/tlambert03))
+
+**Refactors:**
+
+- refactor: update pyproject and ci, add py3.11 test [\#132](https://github.com/napari/superqt/pull/132) ([tlambert03](https://github.com/tlambert03))
+
+**Merged pull requests:**
+
+- ci\(dependabot\): bump actions/upload-artifact from 2 to 3 [\#135](https://github.com/napari/superqt/pull/135) ([dependabot[bot]](https://github.com/apps/dependabot))
+- ci\(dependabot\): bump codecov/codecov-action from 2 to 3 [\#134](https://github.com/napari/superqt/pull/134) ([dependabot[bot]](https://github.com/apps/dependabot))
+- build: unpin pyside6 [\#133](https://github.com/napari/superqt/pull/133) ([tlambert03](https://github.com/tlambert03))
+
+## [v0.3.8](https://github.com/napari/superqt/tree/v0.3.8) (2022-10-10)
+
+[Full Changelog](https://github.com/napari/superqt/compare/v0.3.7...v0.3.8)
 
 **Fixed bugs:**
 
@@ -217,12 +235,16 @@
 
 ## [v0.2.1](https://github.com/napari/superqt/tree/v0.2.1) (2021-07-10)
 
-[Full Changelog](https://github.com/napari/superqt/compare/v0.2.0rc0...v0.2.1)
+[Full Changelog](https://github.com/napari/superqt/compare/v0.2.0rc1...v0.2.1)
 
 **Fixed bugs:**
 
 - Fix QLabeledRangeSlider API \(fix slider proxy\) [\#10](https://github.com/napari/superqt/pull/10) ([tlambert03](https://github.com/tlambert03))
 - Fix range slider with negative min range [\#9](https://github.com/napari/superqt/pull/9) ([tlambert03](https://github.com/tlambert03))
+
+## [v0.2.0rc1](https://github.com/napari/superqt/tree/v0.2.0rc1) (2021-06-26)
+
+[Full Changelog](https://github.com/napari/superqt/compare/v0.2.0rc0...v0.2.0rc1)
 
 ## [v0.2.0rc0](https://github.com/napari/superqt/tree/v0.2.0rc0) (2021-06-26)
 
