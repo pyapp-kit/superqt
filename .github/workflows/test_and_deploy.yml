@@ -53,7 +53,7 @@ jobs:
           # python 3.7
           - python-version: 3.7
             platform: macos-latest
-            backend: pyqt
+            backend: pyqt5
           - python-version: 3.7
             platform: windows-latest
             backend: pyside2
