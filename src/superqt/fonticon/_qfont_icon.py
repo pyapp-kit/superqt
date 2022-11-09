@@ -502,7 +502,7 @@ class QFontIconStore(QObject):
         opacity: float = 1,
         animation: Optional[Animation] = None,
         transform: Optional[QTransform] = None,
-        states: Dict[str, Union[IconOptionDict, IconOpts]] = {},
+        states: Dict[str, Union[IconOptionDict, IconOpts]] | None = None,
     ) -> QFontIcon:
         self.key2glyph(glyph_key)  # make sure it's a valid glyph_key
         default_opts = _IconOptions(
@@ -514,7 +514,7 @@ class QFontIconStore(QObject):
             transform=transform,
         )
         icon = QFontIcon(default_opts)
-        for kw, options in states.items():
+        for kw, options in (states or {}).items():
             if isinstance(options, IconOpts):
                 options = default_opts._update(options).dict()
             icon.addState(*_norm_state_mode(kw), **options)

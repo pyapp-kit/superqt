@@ -43,16 +43,17 @@ def icon(
     opacity: float = 1,
     animation: Optional[Animation] = None,
     transform: Optional[QTransform] = None,
-    states: Dict[str, Union[IconOptionDict, IconOpts]] = {},
+    states: Dict[str, Union[IconOptionDict, IconOpts]] | None = None,
 ) -> QFontIcon:
     """Create a QIcon for `glyph_key`, with a number of optional settings
 
     The `glyph_key` (e.g. 'fa5s.smile') represents a Font-family & style, and a glpyh.
     In most cases, the key should be provided by a plugin in the environment, like:
 
-
-    - [fonticon-fontawesome5](https://pypi.org/project/fonticon-fontawesome5/) ('fa5s' & 'fa5r' prefixes)
-    - [fonticon-materialdesignicons6](https://pypi.org/project/fonticon-materialdesignicons6/) ('mdi6' prefix)
+    - [fonticon-fontawesome5](https://pypi.org/project/fonticon-fontawesome5/) ('fa5s' &
+      'fa5r' prefixes)
+    - [fonticon-materialdesignicons6](https://pypi.org/project/fonticon-materialdesignicons6/)
+      ('mdi6' prefix)
 
     ...but fonts can also be added manually using [`addFont`][superqt.fonticon.addFont].
 
@@ -137,7 +138,7 @@ def icon(
     >>> btn.setIconSize(QSize(256, 256))
     >>> btn.show()
 
-    """
+    """  # noqa: E501
     return _QFIS.instance().icon(
         glyph_key,
         scale_factor=scale_factor,
@@ -145,7 +146,7 @@ def icon(
         opacity=opacity,
         animation=animation,
         transform=transform,
-        states=states,
+        states=states or {},
     )
 
 
@@ -218,7 +219,7 @@ def addFont(
     Tuple[str, str], optional
         font-family and font-style for the file just registered, or `None` if
         something goes wrong.
-    """
+    """  # noqa: E501
     return _QFIS.instance().addFont(filepath, prefix, charmap)
 
 

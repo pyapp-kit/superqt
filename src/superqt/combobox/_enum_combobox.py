@@ -11,7 +11,7 @@ NONE_STRING = "----"
 
 
 def _get_name(enum_value: Enum):
-    """Create human readable name if user does not provide own implementation of __str__"""
+    """Create human readable name if user does not implement __str__"""
     if (
         enum_value.__str__.__module__ != "enum"
         and not enum_value.__str__.__module__.startswith("shibokensupport")
@@ -91,7 +91,8 @@ class QEnumComboBox(QComboBox):
             return
         if not isinstance(value, self._enum_class):
             raise TypeError(
-                f"setValue(self, Enum): argument 1 has unexpected type {type(value).__name__!r}"
+                "setValue(self, Enum): argument 1 has unexpected type "
+                f"{type(value).__name__!r}"
             )
         self.setCurrentText(_get_name(value))
 

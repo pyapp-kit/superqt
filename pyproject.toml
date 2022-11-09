@@ -1,10 +1,175 @@
-# pyproject.toml
+# https://peps.python.org/pep-0517/
 [build-system]
-requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.0"]
+requires = ["setuptools>=45", "wheel", "setuptools-scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
 
+# https://peps.python.org/pep-0621/
+[project]
+name = "superqt"
+description = "Missing widgets and components for PyQt/PySide"
+readme = "README.md"
+requires-python = ">=3.7"
+license = { text = "BSD 3-Clause License" }
+authors = [{ email = "talley.lambert@gmail.com" }, { name = "Talley Lambert" }]
+keywords = ["qt", "pyqt", "pyside", "widgets", "range slider", "components", "gui"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: X11 Applications :: Qt",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Desktop Environment",
+    "Topic :: Software Development :: User Interfaces",
+    "Topic :: Software Development :: Widget Sets",
+]
+dynamic = ["version"]
+dependencies = [
+    "packaging",
+    "pygments>=2.4.0",
+    "qtpy>=1.1.0",
+    "typing-extensions",
+]
+
+# extras
+# https://peps.python.org/pep-0621/#dependencies-optional-dependencies
+[project.optional-dependencies]
+test = ["pint", "pytest", "pytest-cov", "pytest-qt", "tox", "tox-conda"]
+dev = [
+    "black",
+    "flake8-bugbear",
+    "flake8-docstrings",
+    "flake8-pyprojecttoml",
+    "flake8-typing-imports",
+    "flake8",
+    "ipython",
+    "isort",
+    "jedi<0.18.0",
+    "mypy",
+    "pdbpp",
+    "pre-commit",
+    "pydocstyle",
+    "pyside2",
+    "pytest-cov",
+    "pytest-qt",
+    "pytest",
+    "rich",
+    "tox-conda",
+    "tox",
+]
+docs = ["mkdocs-macros-plugin", "mkdocs-material", "mkdocstrings[python]"]
+quantity = ["pint"]
+pyside2 = ["pyside2"]
+pyside6 = ["pyside6"]
+pyqt5 = ["pyqt5"]
+pyqt6 = ["pyqt6"]
+font-fa5 = ["fonticon-fontawesome5"]
+font-fa6 = ["fonticon-fontawesome6"]
+font-mi5 = ["fonticon-materialdesignicons5"]
+
+[project.urls]
+Source = "https://github.com/napari/superqt"
+Tracker = "https://github.com/napari/superqt/issues"
+Changelog = "https://github.com/napari/superqt/blob/main/CHANGELOG.md"
+
+
+# https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
+[tool.setuptools]
+zip-safe = false
+include-package-data = true
+packages = { find = { where = ["src"], exclude = [] } }
+
+[tool.setuptools.package-data]
+"*" = ["py.typed", "*.pyi"]
+
+
+# https://github.com/pypa/setuptools_scm/#pyprojecttoml-usage
 [tool.setuptools_scm]
 write_to = "src/superqt/_version.py"
 
+# https://pycqa.github.io/isort/docs/configuration/options.html
+[tool.isort]
+profile = "black"
+src_paths = ["src/superqt", "tests"]
+
+# https://flake8.pycqa.org/en/latest/user/options.html
+# https://gitlab.com/durko/flake8-pyprojecttoml
+[tool.flake8]
+exclude = "docs,.eggs,examples,_version.py"
+max-line-length = 88
+min-python-version = "3.8.0"
+docstring-convention = "all" # use numpy convention, while allowing D417
+extend-ignore = """
+E203  # whitespace before ':'
+D107,D203,D212,D213,D402,D413,D415,D416  # numpy
+D100  # missing docstring in public module
+D401  # imperative mood
+W503  # line break before binary operator
+E302,E704  # black will handle these when we want them
+"""
+per-file-ignores = ["tests/*:D"]
+
+# http://www.pydocstyle.org/en/stable/usage.html
+[tool.pydocstyle]
+match_dir = "src/superqt"
+convention = "numpy"
+add_select = "D402,D415,D417"
+ignore = "D100,D213,D401,D413,D107"
+
+# https://docs.pytest.org/en/6.2.x/customize.html
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = ["tests"]
+filterwarnings = [
+    "error",
+    "ignore:QPixmapCache.find:DeprecationWarning:",
+    "ignore:SelectableGroups dict interface:DeprecationWarning",
+    "ignore:The distutils package is deprecated:DeprecationWarning",
+]
+
+# https://mypy.readthedocs.io/en/stable/config_file.html
+[tool.mypy]
+files = "src/**/"
+strict = true
+disallow_any_generics = false
+disallow_subclassing_any = false
+show_error_codes = true
+pretty = true
+exclude = ['tests/**/*']
+
+[[tool.mypy.overrides]]
+module = ["superqt.qtcompat.*"]
+ignore_missing_imports = true
+warn_unused_ignores = false
+allow_redefinition = true
+
+# https://coverage.readthedocs.io/en/6.4/config.html
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "@overload",
+    "except ImportError",
+]
+
+# https://github.com/mgedmin/check-manifest#configuration
 [tool.check-manifest]
-ignore = ["src/superqt/_version.py", "mkdocs.yml"]
+ignore = [
+    ".github_changelog_generator",
+    ".pre-commit-config.yaml",
+    "tests/**/*",
+    "tox.ini",
+    "src/superqt/_version.py",
+    "mkdocs.yml",
+    "docs/**/*",
+    "examples/**/*",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "codecov.yml",
+]

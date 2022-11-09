@@ -15,8 +15,10 @@ skip_on_linux_qt6 = pytest.mark.skipif(
     reason="hover events not working on linux pyqt6",
 )
 
+_PointF = QPointF()
 
-def _mouse_event(pos=QPointF(), type_=QEvent.Type.MouseMove):
+
+def _mouse_event(pos=_PointF, type_=QEvent.Type.MouseMove):
     """Create a mouse event of `type_` at `pos`."""
     return QMouseEvent(
         type_,

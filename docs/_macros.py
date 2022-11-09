@@ -39,7 +39,10 @@ def define_env(env: "MacrosPlugin"):
 
             exec(src)
             _grab(dest, width)
-        return f"![{page.title}](../{dest.parent.name}/{dest.name}){{ loading=lazy; width={width} }}\n\n"
+        return (
+            f"![{page.title}](../{dest.parent.name}/{dest.name})"
+            f"{{ loading=lazy; width={width} }}\n\n"
+        )
 
     @env.macro
     def show_members(cls: str):

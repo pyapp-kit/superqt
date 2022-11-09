@@ -207,9 +207,9 @@ class WorkerBase(QRunnable, Generic[_R]):
 
         The end-user should never need to call this function.
         But subclasses must implement this method (See
-        [`GeneratorFunction.work`][superqt.utils._qthreading.GeneratorWorker.work] for an example implementation).
-        Minimally, it should check `self.abort_requested` periodically and
-        exit if True.
+        [`GeneratorFunction.work`][superqt.utils._qthreading.GeneratorWorker.work] for
+        an example implementation). Minimally, it should check `self.abort_requested`
+        periodically and exit if True.
 
         Examples
         --------
@@ -670,8 +670,10 @@ def thread_worker(
 ):
     """Decorator that runs a function in a separate thread when called.
 
-    When called, the decorated function returns a [`WorkerBase`][superqt.utils.WorkerBase].  See
-    [`create_worker`][superqt.utils.create_worker] for additional keyword arguments that can be used
+    When called, the decorated function returns a
+    [`WorkerBase`][superqt.utils.WorkerBase].  See
+    [`create_worker`][superqt.utils.create_worker] for additional keyword arguments that
+    can be used
     when calling the function.
 
     The returned worker will have these signals:
@@ -715,8 +717,9 @@ def thread_worker(
         worker class. by default None
     worker_class : Type[WorkerBase]
         The [`WorkerBase`][superqt.utils.WorkerBase] to instantiate, by default
-        [`FunctionWorker`][superqt.utils.FunctionWorker] will be used if `func` is a regular function,
-        and [`GeneratorWorker`][superqt.utils.GeneratorWorker] will be used if it is a generator.
+        [`FunctionWorker`][superqt.utils.FunctionWorker] will be used if `func` is a
+        regular function, and [`GeneratorWorker`][superqt.utils.GeneratorWorker] will be
+        used if it is a generator.
     ignore_errors : bool
         If `False` (the default), errors raised in the other thread will be
         reraised in the main thread (makes debugging significantly easier).
