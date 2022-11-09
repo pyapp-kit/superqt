@@ -124,7 +124,7 @@ jobs:
         if: runner.os != 'Linux' && matrix.screenshot
         run: python examples/demo_widget.py -snap
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: matrix.screenshot
         with:
           name: screenshots ${{ runner.os }}
