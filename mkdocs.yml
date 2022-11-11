@@ -1,10 +1,10 @@
 site_name: superqt
-site_url: https://github.com/napari/superqt
+site_url: https://github.com/pyapp-kit/superqt
 site_description: >-
   missing widgets and components for PyQt/PySide
 # Repository
-repo_name: napari/superqt
-repo_url: https://github.com/napari/superqt
+repo_name: pyapp-kit/superqt
+repo_url: https://github.com/pyapp-kit/superqt
 
 # Copyright
 copyright: Copyright &copy; 2021 - 2022 Talley Lambert

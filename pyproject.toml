@@ -74,9 +74,9 @@ font-fa6 = ["fonticon-fontawesome6"]
 font-mi5 = ["fonticon-materialdesignicons5"]
 
 [project.urls]
-Source = "https://github.com/napari/superqt"
-Tracker = "https://github.com/napari/superqt/issues"
-Changelog = "https://github.com/napari/superqt/blob/main/CHANGELOG.md"
+Source = "https://github.com/pyapp-kit/superqt"
+Tracker = "https://github.com/pyapp-kit/superqt/issues"
+Changelog = "https://github.com/pyapp-kit/superqt/blob/main/CHANGELOG.md"
 
 
 # https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
