@@ -1,123 +1,123 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://github.com/napari/superqt/</loc>
-         <lastmod>2022-10-10</lastmod>
+         <loc>https://github.com/pyapp-kit/superqt/</loc>
+         <lastmod>2022-11-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/napari/superqt/faq/</loc>
-         <lastmod>2022-10-10</lastmod>
+         <loc>https://github.com/pyapp-kit/superqt/faq/</loc>
+         <lastmod>2022-11-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/napari/superqt/utilities/</loc>
-         <lastmod>2022-10-10</lastmod>
+         <loc>https://github.com/pyapp-kit/superqt/utilities/</loc>
+         <lastmod>2022-11-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/napari/superqt/utilities/code_syntax_highlight/</loc>
-         <lastmod>2022-10-10</lastmod>
+         <loc>https://github.com/pyapp-kit/superqt/utilities/code_syntax_highlight/</loc>
+         <lastmod>2022-11-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/napari/superqt/utilities/fonticon/</loc>
-         <lastmod>2022-10-10</lastmod>
+         <loc>https://github.com/pyapp-kit/superqt/utilities/fonticon/</loc>
+         <lastmod>2022-11-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/napari/superqt/utilities/qmessagehandler/</loc>
-         <lastmod>2022-10-10</lastmod>
+         <loc>https://github.com/pyapp-kit/superqt/utilities/qmessagehandler/</loc>
+         <lastmod>2022-11-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/napari/superqt/utilities/thread_decorators/</loc>
-         <lastmod>2022-10-10</lastmod>
+         <loc>https://github.com/pyapp-kit/superqt/utilities/thread_decorators/</loc>
+         <lastmod>2022-11-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/napari/superqt/utilities/threading/</loc>
-         <lastmod>2022-10-10</lastmod>
+         <loc>https://github.com/pyapp-kit/superqt/utilities/threading/</loc>
+         <lastmod>2022-11-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/napari/superqt/utilities/throttling/</loc>
-         <lastmod>2022-10-10</lastmod>
+         <loc>https://github.com/pyapp-kit/superqt/utilities/throttling/</loc>
+         <lastmod>2022-11-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/napari/superqt/widgets/</loc>
-         <lastmod>2022-10-10</lastmod>
+         <loc>https://github.com/pyapp-kit/superqt/widgets/</loc>
+         <lastmod>2022-11-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/napari/superqt/widgets/qcollapsible/</loc>
-         <lastmod>2022-10-10</lastmod>
+         <loc>https://github.com/pyapp-kit/superqt/widgets/qcollapsible/</loc>
+         <lastmod>2022-11-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/napari/superqt/widgets/qdoublerangeslider/</loc>
-         <lastmod>2022-10-10</lastmod>
+         <loc>https://github.com/pyapp-kit/superqt/widgets/qdoublerangeslider/</loc>
+         <lastmod>2022-11-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/napari/superqt/widgets/qdoubleslider/</loc>
-         <lastmod>2022-10-10</lastmod>
+         <loc>https://github.com/pyapp-kit/superqt/widgets/qdoubleslider/</loc>
+         <lastmod>2022-11-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/napari/superqt/widgets/qelidinglabel/</loc>
-         <lastmod>2022-10-10</lastmod>
+         <loc>https://github.com/pyapp-kit/superqt/widgets/qelidinglabel/</loc>
+         <lastmod>2022-11-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/napari/superqt/widgets/qenumcombobox/</loc>
-         <lastmod>2022-10-10</lastmod>
+         <loc>https://github.com/pyapp-kit/superqt/widgets/qenumcombobox/</loc>
+         <lastmod>2022-11-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/napari/superqt/widgets/qlabeleddoublerangeslider/</loc>
-         <lastmod>2022-10-10</lastmod>
+         <loc>https://github.com/pyapp-kit/superqt/widgets/qlabeleddoublerangeslider/</loc>
+         <lastmod>2022-11-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/napari/superqt/widgets/qlabeleddoubleslider/</loc>
-         <lastmod>2022-10-10</lastmod>
+         <loc>https://github.com/pyapp-kit/superqt/widgets/qlabeleddoubleslider/</loc>
+         <lastmod>2022-11-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/napari/superqt/widgets/qlabeledrangeslider/</loc>
-         <lastmod>2022-10-10</lastmod>
+         <loc>https://github.com/pyapp-kit/superqt/widgets/qlabeledrangeslider/</loc>
+         <lastmod>2022-11-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/napari/superqt/widgets/qlabeledslider/</loc>
-         <lastmod>2022-10-10</lastmod>
+         <loc>https://github.com/pyapp-kit/superqt/widgets/qlabeledslider/</loc>
+         <lastmod>2022-11-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/napari/superqt/widgets/qlargeintspinbox/</loc>
-         <lastmod>2022-10-10</lastmod>
+         <loc>https://github.com/pyapp-kit/superqt/widgets/qlargeintspinbox/</loc>
+         <lastmod>2022-11-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/napari/superqt/widgets/qquantity/</loc>
-         <lastmod>2022-10-10</lastmod>
+         <loc>https://github.com/pyapp-kit/superqt/widgets/qquantity/</loc>
+         <lastmod>2022-11-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/napari/superqt/widgets/qrangeslider/</loc>
-         <lastmod>2022-10-10</lastmod>
+         <loc>https://github.com/pyapp-kit/superqt/widgets/qrangeslider/</loc>
+         <lastmod>2022-11-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/napari/superqt/widgets/qsearchablecombobox/</loc>
-         <lastmod>2022-10-10</lastmod>
+         <loc>https://github.com/pyapp-kit/superqt/widgets/qsearchablecombobox/</loc>
+         <lastmod>2022-11-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/napari/superqt/widgets/qsearchablelistwidget/</loc>
-         <lastmod>2022-10-10</lastmod>
+         <loc>https://github.com/pyapp-kit/superqt/widgets/qsearchablelistwidget/</loc>
+         <lastmod>2022-11-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
