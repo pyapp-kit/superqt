@@ -48,7 +48,7 @@ QOVERFLOW = 2**31 - 1
 # whether to use the MONTEREY_SLIDER_STYLES_FIX QSS hack
 # for fixing sliders on macos>=12 with QT < 6
 # https://bugreports.qt.io/browse/QTBUG-98093
-# https://github.com/napari/superqt/issues/74
+# https://github.com/pyapp-kit/superqt/issues/74
 USE_MAC_SLIDER_PATCH = (
     QT_VERSION
     and int(QT_VERSION.split(".")[0]) < 6

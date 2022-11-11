@@ -198,7 +198,7 @@ jobs:
     # and requires that you have put your twine API key in your
     # github secrets (see readme for details)
     needs: [test, check-manifest]
-    if: ${{ github.repository == 'napari/superqt' && contains(github.ref, 'tags') }}
+    if: ${{ github.repository == 'pyapp-kit/superqt' && contains(github.ref, 'tags') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
