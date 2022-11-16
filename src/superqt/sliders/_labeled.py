@@ -168,7 +168,7 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
             if self._edge_label_mode == EdgeLabelMode.NoLabel:
                 marg = (0, 0, 5, 0)
 
-            layout = QHBoxLayout()
+            layout = QHBoxLayout()  # type: ignore
             layout.addWidget(self._slider)
             layout.addWidget(self._label)
             self._label.setAlignment(Qt.AlignmentFlag.AlignRight)

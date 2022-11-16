@@ -94,7 +94,7 @@ class GenericSignalThrottler(QObject):
 
     def timeout(self) -> int:
         """Return current timeout in milliseconds."""
-        return self._timer.interval()  # type: ignore
+        return self._timer.interval()
 
     def setTimeout(self, timeout: int) -> None:
         """Set timeout in milliseconds."""

@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
+from typing import Optional
 
 from qtpy.QtCore import QRectF, QTimer
 from qtpy.QtGui import QPainter
 from qtpy.QtWidgets import QWidget
-from typing import Optional
 
 
 class Animation(ABC):

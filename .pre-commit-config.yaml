@@ -43,5 +43,7 @@ repos:
     hooks:
       - id: mypy
         exclude: tests|examples
+        additional_dependencies:
+          - types-Pygments
         stages:
           - manual

@@ -1,4 +1,4 @@
-from typing import Optional, Generic, List, Sequence, Tuple, TypeVar, Union
+from typing import Generic, List, Optional, Sequence, Tuple, TypeVar, Union
 
 from qtpy import QtGui
 from qtpy.QtCore import Property, QEvent, QPoint, QPointF, QRect, QRectF, Qt, Signal
@@ -233,7 +233,9 @@ class _GenericRangeSlider(_GenericSlider[Tuple], Generic[_T]):
 
     # SubControl Positions
 
-    def _handleRect(self, handle_index: int, opt: Optional[QStyleOptionSlider] = None) -> QRect:
+    def _handleRect(
+        self, handle_index: int, opt: Optional[QStyleOptionSlider] = None
+    ) -> QRect:
         """Return the QRect for all handles."""
         opt = opt or self._styleOption
         opt.sliderPosition = self._optSliderPositions[handle_index]

@@ -79,7 +79,7 @@ def _norm_state_mode(key: StateModeKey) -> Tuple[QIcon.State, QIcon.Mode]:
                 "off, active, disabled, selected, normal} separated by underscore"
             )
     else:
-        _sm = key if isinstance(key, abc.Sequence) else [key]  # type: ignore
+        _sm = key if isinstance(key, abc.Sequence) else [key]
 
     state = next((i for i in _sm if isinstance(i, QIcon.State)), QIcon.State.Off)
     mode = next((i for i in _sm if isinstance(i, QIcon.Mode)), QIcon.Mode.Normal)
@@ -346,7 +346,7 @@ class QFontIcon(QIcon):
 class QFontIconStore(QObject):
 
     # map of key -> (font_family, font_style)
-    _LOADED_KEYS: Dict[str, Tuple[str, Optional[str]]] = dict()
+    _LOADED_KEYS: Dict[str, Tuple[str, str]] = dict()
 
     # map of (font_family, font_style) -> character (char may include key)
     _CHARMAPS: Dict[Tuple[str, Optional[str]], Dict[str, str]] = dict()
@@ -356,7 +356,7 @@ class QFontIconStore(QObject):
 
     def __init__(self, parent: Optional[QObject] = None) -> None:
         super().__init__(parent=parent)
-        if tuple(QT_VERSION.split(".")) < ("6", "0"):
+        if tuple(cast(str, QT_VERSION).split(".")) < ("6", "0"):
             # QT6 drops this
             QApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
 
@@ -373,7 +373,7 @@ class QFontIconStore(QObject):
         QFontDatabase.removeAllApplicationFonts()
 
     @classmethod
-    def _key2family(cls, key: str) -> Tuple[str, Optional[str]]:
+    def _key2family(cls, key: str) -> Tuple[str, str]:
         """Return (family, style) given a font `key`."""
         key = key.split(".", maxsplit=1)[0]
         if key not in cls._LOADED_KEYS:
@@ -382,7 +382,7 @@ class QFontIconStore(QObject):
             try:
                 font_cls = _plugins.get_font_class(key)
                 result = cls.addFont(
-                    font_cls.__font_file__, key, charmap=font_cls.__dict__
+                    font_cls.__font_file__, key, charmap=dict(font_cls.__dict__)
                 )
                 if not result:  # pragma: no cover
                     raise Exception("Invalid font file")
@@ -475,12 +475,12 @@ class QFontIconStore(QObject):
 
         # in Qt6, everything becomes a static member
         QFd: Union[QFontDatabase, Type[QFontDatabase]] = (
-            QFontDatabase()  # type: ignore
-            if tuple(QT_VERSION.split(".")) < ("6", "0")
+            QFontDatabase()
+            if tuple(cast(str, QT_VERSION).split(".")) < ("6", "0")
             else QFontDatabase
         )
 
-        styles = QFd.styles(family)  # type: ignore
+        styles = QFd.styles(family)
         style: str = styles[-1] if styles else ""
         if not QFd.isSmoothlyScalable(family, style):  # pragma: no cover
             warnings.warn(
