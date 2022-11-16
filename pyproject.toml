@@ -1,7 +1,7 @@
 # https://peps.python.org/pep-0517/
 [build-system]
-requires = ["setuptools>=45", "wheel", "setuptools-scm[toml]>=6.2"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
 
 # https://peps.python.org/pep-0621/
 [project]
@@ -82,19 +82,8 @@ Source = "https://github.com/pyapp-kit/superqt"
 Tracker = "https://github.com/pyapp-kit/superqt/issues"
 Changelog = "https://github.com/pyapp-kit/superqt/blob/main/CHANGELOG.md"
 
-
-# https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
-[tool.setuptools]
-zip-safe = false
-include-package-data = true
-packages = { find = { where = ["src"], exclude = [] } }
-
-[tool.setuptools.package-data]
-"*" = ["py.typed", "*.pyi"]
-
-# https://github.com/pypa/setuptools_scm/#pyprojecttoml-usage
-[tool.setuptools_scm]
-write_to = "src/superqt/_version.py"
+[tool.hatch.version]
+source = "vcs"
 
 # https://pycqa.github.io/isort/docs/configuration/options.html
 [tool.isort]
