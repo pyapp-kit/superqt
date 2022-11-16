@@ -63,7 +63,7 @@ _SM_MAP: Dict[str, StateOrMode] = {
 
 
 def _norm_state_mode(key: StateModeKey) -> Tuple[QIcon.State, QIcon.Mode]:
-    """return state/mode tuple given a variety of valid inputs.
+    """Return state/mode tuple given a variety of valid inputs.
 
     Input can be either a string, or a sequence of state or mode enums.
     Strings can be any combination of on, off, normal, active, selected, disabled,
@@ -239,7 +239,7 @@ class _QFontIconEngine(QIconEngine):
         if isinstance(opts.color, tuple):
             color_args = opts.color
         else:
-            color_args = (opts.color,) if opts.color else ()  # type: ignore
+            color_args = (opts.color,) if opts.color else ()
 
         # animation
         if opts.animation is not None:
@@ -374,7 +374,7 @@ class QFontIconStore(QObject):
 
     @classmethod
     def _key2family(cls, key: str) -> Tuple[str, Optional[str]]:
-        """Return (family, style) given a font `key`"""
+        """Return (family, style) given a font `key`."""
         key = key.split(".", maxsplit=1)[0]
         if key not in cls._LOADED_KEYS:
             from . import _plugins
@@ -417,7 +417,7 @@ class QFontIconStore(QObject):
 
     @classmethod
     def key2glyph(cls, glyph_key: str) -> tuple[str, str, Optional[str]]:
-        """Return (char, family, style) given a `glyph_key`"""
+        """Return (char, family, style) given a `glyph_key`."""
         if "." not in glyph_key:
             raise ValueError("Glyph key must contain a period")
         font_key, char = glyph_key.split(".", maxsplit=1)
@@ -440,7 +440,7 @@ class QFontIconStore(QObject):
         ----------
         filepath : str
             Path to an OTF or TTF file containing the fonts
-        key : str
+        prefix : str
             A key that will represent this font file when used for lookup.  For example,
             'fa5s' for 'Font-Awesome 5 Solid'.
         charmap : Dict[str, str], optional
@@ -455,7 +455,7 @@ class QFontIconStore(QObject):
         """
         if prefix in cls._LOADED_KEYS:
             warnings.warn(f"Prefix {prefix} already loaded")
-            return
+            return None
 
         if not Path(filepath).exists():
             raise FileNotFoundError(f"Font file doesn't exist: {filepath}")
@@ -539,7 +539,7 @@ class QFontIconStore(QObject):
         setText(glyph)
 
     def font(self, font_prefix: str, size: Optional[int] = None) -> QFont:
-        """Create QFont for `font_prefix`"""
+        """Create QFont for `font_prefix`."""
         font_key, _ = font_prefix.split(".", maxsplit=1)
         family, style = self._key2family(font_key)
         font = QFont()
@@ -552,7 +552,7 @@ class QFontIconStore(QObject):
 
 
 def _ensure_identifier(name: str) -> str:
-    """Normalize string to valid identifier"""
+    """Normalize string to valid identifier."""
     import keyword
 
     if not name:

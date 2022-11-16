@@ -1,4 +1,4 @@
-"""A collapsible widget to hide and unhide child widgets"""
+"""A collapsible widget to hide and unhide child widgets."""
 from typing import Optional
 
 from qtpy.QtCore import QEasingCurve, QEvent, QMargins, QObject, QPropertyAnimation, Qt
@@ -68,7 +68,7 @@ class QCollapsible(QFrame):
         self._animation.setDuration(msecs)
 
     def setEasingCurve(self, easing: QEasingCurve):
-        """Set the easing curve for the collapse/expand animation"""
+        """Set the easing curve for the collapse/expand animation."""
         self._animation.setEasingCurve(easing)
 
     def addWidget(self, widget: QWidget):
@@ -82,24 +82,24 @@ class QCollapsible(QFrame):
         widget.removeEventFilter(self)
 
     def expand(self, animate: bool = True):
-        """Expand (show) the collapsible section"""
+        """Expand (show) the collapsible section."""
         self._expand_collapse(QPropertyAnimation.Direction.Forward, animate)
 
     def collapse(self, animate: bool = True):
-        """Collapse (hide) the collapsible section"""
+        """Collapse (hide) the collapsible section."""
         self._expand_collapse(QPropertyAnimation.Direction.Backward, animate)
 
     def isExpanded(self) -> bool:
-        """Return whether the collapsible section is visible"""
+        """Return whether the collapsible section is visible."""
         return self._toggle_btn.isChecked()
 
     def setLocked(self, locked: bool = True):
-        """Set whether collapse/expand is disabled"""
+        """Set whether collapse/expand is disabled."""
         self._locked = locked
         self._toggle_btn.setCheckable(not locked)
 
     def locked(self) -> bool:
-        """Return True if collapse/expand is disabled"""
+        """Return True if collapse/expand is disabled."""
         return self._locked
 
     def _expand_collapse(

@@ -1,6 +1,7 @@
 from qtpy import QT_VERSION
 from qtpy.QtCore import Qt, Signal
-from qtpy.QtWidgets import QComboBox, QCompleter
+from qtpy.QtWidgets import QComboBox, QCompleter, QWidget
+from typing import Optional
 
 try:
     is_qt_bellow_5_14 = tuple(int(x) for x in QT_VERSION.split(".")[:2]) < (5, 14)
@@ -9,14 +10,12 @@ except ValueError:
 
 
 class QSearchableComboBox(QComboBox):
-    """
-    ComboCox with completer for fast search in multiple options
-    """
+    """ComboCox with completer for fast search in multiple options."""
 
     if is_qt_bellow_5_14:
         textActivated = Signal(str)  # pragma: no cover
 
-    def __init__(self, parent=None):
+    def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
         self.setEditable(True)
         self.completer_object = QCompleter()

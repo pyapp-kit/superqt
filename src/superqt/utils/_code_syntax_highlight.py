@@ -12,12 +12,6 @@ from qtpy import QtGui
 
 
 def get_text_char_format(style):
-    """
-    Return a QTextCharFormat with the given attributes.
-
-    https://pygments.org/docs/formatterdevelopment/#html-3-2-formatter
-    """
-
     text_char_format = QtGui.QTextCharFormat()
     if hasattr(text_char_format, "setFontFamilies"):
         text_char_format.setFontFamilies(["monospace"])
@@ -48,7 +42,8 @@ class QFormatter(Formatter):
         self._style = {name: get_text_char_format(style) for name, style in self.style}
 
     def format(self, tokensource, outfile):
-        """
+        """Format the given token stream.
+
         `outfile` is argument from parent class, but
         in Qt we do not produce string output, but QTextCharFormat, so it needs to be
         collected using `self.data`.
@@ -56,12 +51,7 @@ class QFormatter(Formatter):
         self.data = []
 
         for token, value in tokensource:
-            self.data.extend(
-                [
-                    self._style[token],
-                ]
-                * len(value)
-            )
+            self.data.extend([self._style[token]] * len(value))
 
 
 class CodeSyntaxHighlight(QtGui.QSyntaxHighlighter):

@@ -28,7 +28,6 @@ class QMessageHandler:
 
     Examples
     --------
-
     >>> handler = QMessageHandler()
     >>> handler.install()  # now all Qt output will be available at mh.records
 
@@ -68,7 +67,7 @@ class QMessageHandler:
         return f"<{n} object at {hex(id(self))} with {len(self.records)} records>"
 
     def __enter__(self):
-        """Enter a context with this handler installed"""
+        """Enter a context with this handler installed."""
         self.install()
         return self
 

@@ -60,7 +60,6 @@ class IconFont(metaclass=IconFontMeta):
 
     Examples
     --------
-
         class FA5S(IconFont):
             __font_file__ = '...'
             some_char = 0xfa42

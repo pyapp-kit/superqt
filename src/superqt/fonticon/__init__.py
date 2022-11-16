@@ -45,7 +45,7 @@ def icon(
     transform: Optional[QTransform] = None,
     states: Dict[str, Union[IconOptionDict, IconOpts]] | None = None,
 ) -> QFontIcon:
-    """Create a QIcon for `glyph_key`, with a number of optional settings
+    """Create a QIcon for `glyph_key`, with a number of optional settings.
 
     The `glyph_key` (e.g. 'fa5s.smile') represents a Font-family & style, and a glpyh.
     In most cases, the key should be provided by a plugin in the environment, like:
@@ -99,7 +99,6 @@ def icon(
 
     Examples
     --------
-
     simple example (using the string `'fa5s.smile'` assumes the `fonticon-fontawesome5`
     plugin is installed)
 
@@ -169,7 +168,7 @@ def setTextIcon(widget: QWidget, glyph_key: str, size: Optional[float] = None) -
 
 
 def font(font_prefix: str, size: Optional[int] = None) -> QFont:
-    """Create QFont for `font_prefix`
+    """Create QFont for `font_prefix`.
 
     Parameters
     ----------

@@ -61,7 +61,7 @@ def as_generator_function(
     """Turns a regular function (single return) into a generator function."""
 
     @wraps(func)
-    def genwrapper(*args, **kwargs) -> Generator[None, None, _R]:
+    def genwrapper(*args: Any, **kwargs: Any) -> Generator[None, None, _R]:
         yield
         return func(*args, **kwargs)
 
@@ -148,7 +148,7 @@ class WorkerBase(QRunnable, Generic[_R]):
 
     @property
     def is_running(self) -> bool:
-        """Whether the worker has been started"""
+        """Whether the worker has been started."""
         return self._running
 
     def run(self) -> None:
@@ -179,7 +179,7 @@ class WorkerBase(QRunnable, Generic[_R]):
         try:
             with warnings.catch_warnings():
                 warnings.filterwarnings("always")
-                warnings.showwarning = lambda *w: self.warned.emit(w)
+                warnings.showwarning = lambda *w: self.warned.emit(w)  # noqa: E731
                 result = self.work()
             if isinstance(result, Exception):
                 if isinstance(result, RuntimeError):
@@ -521,7 +521,7 @@ def create_worker(
     ...
 
 
-def create_worker(
+def create_worker(  # noqa: D417
     func: Callable,
     *args,
     _start_thread: Optional[bool] = None,
@@ -799,29 +799,15 @@ if TYPE_CHECKING:
             ...
 
 
-def new_worker_qthread(
+def new_worker_qthread(  # noqa: D417
     Worker: Type[WorkerProtocol],
     *args,
     _start_thread: bool = False,
     _connect: Dict[str, Callable] = None,
     **kwargs,
 ):
-    """This is a convenience function to start a worker in a `QThread`.
+    """Convenience function to start a worker in a `QThread`.
 
-    In most cases, the [thread_worker][superqt.utils.thread_worker] decorator is
-    sufficient and preferable. But this allows the user to completely customize the
-    Worker object. However, they must then maintain control over the thread and clean up
-    appropriately.
-
-    It follows the pattern described
-    [here](https://www.qt.io/blog/2010/06/17/youre-doing-it-wrong) and in the [qt thread
-    docs](https://doc.qt.io/qt-5/qthread.html#details)
-
-    see also:
-
-    https://mayaposch.wordpress.com/2011/11/01/how-to-really-truly-use-qthreads-the-full-explanation/
-
-    A QThread object is not a thread! It should be thought of as a class to *manage* a
     thread, not as the actual code or object that runs in that
     thread.  The QThread object is created on the main thread and lives there.
 
@@ -892,7 +878,6 @@ def new_worker_qthread(
     )
     ```
     """
-
     if _connect and not isinstance(_connect, dict):
         raise TypeError("_connect parameter must be a dict")
 
