@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from qtpy.QtCore import QRectF, QTimer
 from qtpy.QtGui import QPainter
 from qtpy.QtWidgets import QWidget
+from typing import Optional
 
 
 class Animation(ABC):
@@ -42,5 +43,5 @@ class spin(Animation):
 class pulse(spin):
     """Animation that spins an icon in slower, discrete steps."""
 
-    def __init__(self, parent_widget: QWidget = None):
+    def __init__(self, parent_widget: Optional[QWidget] = None):
         super().__init__(parent_widget, interval=200, step=45)

@@ -230,7 +230,7 @@ def qthrottled(
 
 @overload
 def qthrottled(
-    func: "Literal[None]" = None,
+    func: Optional["Literal[None]"] = None,
     timeout: int = 100,
     leading: bool = True,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
@@ -289,7 +289,7 @@ def qdebounced(
 
 @overload
 def qdebounced(
-    func: "Literal[None]" = None,
+    func: Optional["Literal[None]"] = None,
     timeout: int = 100,
     leading: bool = False,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,

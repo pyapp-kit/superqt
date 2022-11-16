@@ -1,7 +1,8 @@
+from typing import Optional
+
 from qtpy import QT_VERSION
 from qtpy.QtCore import Qt, Signal
 from qtpy.QtWidgets import QComboBox, QCompleter, QWidget
-from typing import Optional
 
 try:
     is_qt_bellow_5_14 = tuple(int(x) for x in QT_VERSION.split(".")[:2]) < (5, 14)

@@ -498,7 +498,7 @@ class QFontIconStore(QObject):
         glyph_key: str,
         *,
         scale_factor: float = DEFAULT_SCALING_FACTOR,
-        color: ValidColor = None,
+        color: Optional[ValidColor] = None,
         opacity: float = 1,
         animation: Optional[Animation] = None,
         transform: Optional[QTransform] = None,

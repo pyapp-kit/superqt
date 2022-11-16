@@ -267,7 +267,7 @@ class WorkerBase(QRunnable, Generic[_R]):
         cls._worker_set.discard(obj)
 
     @classmethod
-    def await_workers(cls, msecs: int = None) -> None:
+    def await_workers(cls, msecs: Optional[int] = None) -> None:
         """Ask all workers to quit, and wait up to `msec` for quit.
 
         Attempts to clean up all running workers by calling `worker.quit()`
@@ -803,7 +803,7 @@ def new_worker_qthread(  # noqa: D417
     Worker: Type[WorkerProtocol],
     *args,
     _start_thread: bool = False,
-    _connect: Dict[str, Callable] = None,
+    _connect: Optional[Dict[str, Callable]] = None,
     **kwargs,
 ):
     """Convenience function to start a worker in a `QThread`.
