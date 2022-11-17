@@ -63,12 +63,12 @@ class QCollapsible(QFrame):
 
     def setText(self, text: str):
         """Set the text of the toggle button."""
-        current = self._toggle_btn.text()[: len(self._EXPANDED)]
+        current = self._toggle_btn.text()
         self._toggle_btn.setText(current + text)
 
     def text(self) -> str:
         """Return the text of the toggle button."""
-        return self._toggle_btn.text()[len(self._EXPANDED) :]
+        return self._toggle_btn.text()
 
     def setContent(self, content: QWidget):
         """Replace central widget (the widget that gets expanded/collapsed)."""
