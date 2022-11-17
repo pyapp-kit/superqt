@@ -84,8 +84,7 @@ def test_changing_text(qtbot):
     wdg = QCollapsible()
     wdg.setText("Hi new text")
     assert wdg.text() == "Hi new text"
-    assert wdg._toggle_btn.text() == QCollapsible._COLLAPSED + "Hi new text"
-
+    assert wdg._toggle_btn.text() == "Hi new text"
 
 def test_toggle_signal(qtbot):
     """Test that signal is emitted when widget expanded/collapsed."""
@@ -98,3 +97,4 @@ def test_toggle_signal(qtbot):
 
     with qtbot.waitSignal(wdg.toggled, timeout=500):
         wdg.collapse()
+    
