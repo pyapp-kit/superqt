@@ -38,7 +38,6 @@ class QCollapsible(QFrame):
         self._toggle_btn.setCheckable(True)
         self.set_collapsed_icon()
         self.set_expanded_icon()
-        self._toggle_btn.setIcon(self._COLLAPSED)
         self._toggle_btn.setStyleSheet("text-align: left; border: none; outline: none;")
         self._toggle_btn.toggled.connect(self._toggle)
 
@@ -120,6 +119,8 @@ class QCollapsible(QFrame):
 
             del painter
             del pixmap
+
+        self._toggle_btn.setIcon(self._COLLAPSED)
 
     def setDuration(self, msecs: int):
         """Set duration of the collapse/expand animation."""
