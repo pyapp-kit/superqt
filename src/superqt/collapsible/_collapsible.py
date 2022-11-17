@@ -9,7 +9,9 @@ from qtpy.QtCore import (
     QPropertyAnimation,
     Qt,
     Signal,
+    QRect,
 )
+from qtpy.QtGui import QIcon, QPainter, QPalette, QPixmap
 from qtpy.QtWidgets import QFrame, QPushButton, QVBoxLayout, QWidget
 
 
@@ -30,9 +32,13 @@ class QCollapsible(QFrame):
         super().__init__(parent)
         self._locked = False
         self._is_animating = False
+        self._text = title
 
-        self._toggle_btn = QPushButton(self._COLLAPSED + title)
+        self._toggle_btn = QPushButton(title)
         self._toggle_btn.setCheckable(True)
+        self.set_collapsed_icon()
+        self.set_expanded_icon()
+        self._toggle_btn.setIcon(self._COLLAPSED)
         self._toggle_btn.setStyleSheet("text-align: left; border: none; outline: none;")
         self._toggle_btn.toggled.connect(self._toggle)
 
@@ -74,6 +80,46 @@ class QCollapsible(QFrame):
     def content(self) -> QWidget:
         """Return the current content widget."""
         return self._content
+
+    def set_expanded_icon(self, icon=None):
+        """Set the icon on the toggle button when the widget is expanded."""
+
+        if icon:
+            self._EXPANDED = icon
+        else:
+            pixmap = QPixmap(16, 16)
+            pixmap.fill(Qt.transparent)
+            painter = QPainter(pixmap)
+            color = self._toggle_btn.palette().color(QPalette.WindowText)
+            painter.setPen(color)
+            symbol = "▼"
+            painter.drawText(QRect(0, 0, 16, 16), Qt.AlignCenter, symbol)
+            painter.end()
+
+            self._EXPANDED = QIcon(pixmap)
+
+            del painter
+            del pixmap
+
+    def set_collapsed_icon(self, icon=None):
+        """Set the icon on the toggle button when the widget is collapsed."""
+
+        if icon:
+            self._COLLAPSED = icon
+        else:
+            pixmap = QPixmap(16, 16)
+            pixmap.fill(Qt.transparent)
+            painter = QPainter(pixmap)
+            color = self._toggle_btn.palette().color(QPalette.WindowText)
+            painter.setPen(color)
+            symbol = "▲"
+            painter.drawText(QRect(0, 0, 16, 16), Qt.AlignCenter, symbol)
+            painter.end()
+
+            self._COLLAPSED = QIcon(pixmap)
+
+            del painter
+            del pixmap
 
     def setDuration(self, msecs: int):
         """Set duration of the collapse/expand animation."""
@@ -122,9 +168,9 @@ class QCollapsible(QFrame):
 
         forward = direction == QPropertyAnimation.Direction.Forward
         text = self._EXPANDED if forward else self._COLLAPSED
+        self._toggle_btn.setIcon(text)
 
         self._toggle_btn.setChecked(forward)
-        self._toggle_btn.setText(text + self._toggle_btn.text()[len(self._EXPANDED) :])
 
         _content_height = self._content.sizeHint().height() + 10
         if animate:
