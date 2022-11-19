@@ -28,7 +28,13 @@ class QCollapsible(QFrame):
 
     toggled = Signal(bool)
 
-    def __init__(self, title: str = "", parent: Optional[QWidget] = None):
+    def __init__(
+        self,
+        title: str = "",
+        parent: Optional[QWidget] = None,
+        expandedIcon: Optional[QIcon] = None,
+        collapsedIcon: Optional[QIcon] = None,
+    ):
         super().__init__(parent)
         self._locked = False
         self._is_animating = False
@@ -36,8 +42,8 @@ class QCollapsible(QFrame):
 
         self._toggle_btn = QPushButton(title)
         self._toggle_btn.setCheckable(True)
-        self.set_collapsed_icon()
-        self.set_expanded_icon()
+        self.setCollapsedIcon(icon=collapsedIcon)
+        self.setExpandedIcon(icon=expandedIcon)
         self._toggle_btn.setStyleSheet("text-align: left; border: none; outline: none;")
         self._toggle_btn.toggled.connect(self._toggle)
 
@@ -80,45 +86,33 @@ class QCollapsible(QFrame):
         """Return the current content widget."""
         return self._content
 
-    def set_expanded_icon(self, icon=None):
+    def _convert_symbol_to_icon(self, symbol: str) -> QIcon:
+        pixmap = QPixmap(16, 16)
+        pixmap.fill(Qt.transparent)
+        painter = QPainter(pixmap)
+        color = self._toggle_btn.palette().color(QPalette.WindowText)
+        painter.setPen(color)
+        painter.drawText(QRect(0, 0, 16, 16), Qt.AlignCenter, symbol)
+        painter.end()
+        return QIcon(pixmap)
+
+    def setExpandedIcon(self, icon=None):
         """Set the icon on the toggle button when the widget is expanded."""
 
-        if icon:
+        if icon and isinstance(icon, QIcon):
             self._EXPANDED = icon
         else:
-            pixmap = QPixmap(16, 16)
-            pixmap.fill(Qt.transparent)
-            painter = QPainter(pixmap)
-            color = self._toggle_btn.palette().color(QPalette.WindowText)
-            painter.setPen(color)
             symbol = "▼"
-            painter.drawText(QRect(0, 0, 16, 16), Qt.AlignCenter, symbol)
-            painter.end()
+            self._EXPANDED = self._convert_symbol_to_icon(symbol)
 
-            self._EXPANDED = QIcon(pixmap)
-
-            del painter
-            del pixmap
-
-    def set_collapsed_icon(self, icon=None):
+    def setCollapsedIcon(self, icon=None):
         """Set the icon on the toggle button when the widget is collapsed."""
 
-        if icon:
+        if icon and isinstance(icon, QIcon):
             self._COLLAPSED = icon
         else:
-            pixmap = QPixmap(16, 16)
-            pixmap.fill(Qt.transparent)
-            painter = QPainter(pixmap)
-            color = self._toggle_btn.palette().color(QPalette.WindowText)
-            painter.setPen(color)
             symbol = "▲"
-            painter.drawText(QRect(0, 0, 16, 16), Qt.AlignCenter, symbol)
-            painter.end()
-
-            self._COLLAPSED = QIcon(pixmap)
-
-            del painter
-            del pixmap
+            self._COLLAPSED = self._convert_symbol_to_icon(symbol)
 
         self._toggle_btn.setIcon(self._COLLAPSED)
 
