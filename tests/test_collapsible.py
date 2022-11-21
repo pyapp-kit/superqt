@@ -1,11 +1,12 @@
 """A test module for testing collapsible"""
 
 import pytest
-from napari._qt.qt_resources import QColoredSVGIcon
 from qtpy.QtCore import QEasingCurve,  Qt
+from fonticon_fa5 import FA5S
 from qtpy.QtWidgets import QPushButton
 
 from superqt import QCollapsible
+from superqt.fonticon import icon
 
 
 def test_checked_initialization(qtbot):
@@ -105,12 +106,12 @@ def test_toggle_signal(qtbot):
 def test_setting_icon(qtbot):
     """Test setting icon for toggle button."""
 
-    icon1 = QColoredSVGIcon.from_resources("right_arrow")
-    icon2 = QColoredSVGIcon.from_resources("right_arrow")
+    icon1 = icon(FA5S.smile, color="white")
+    icon2 = icon(FA5S.frown, color="white")
 
-    wdg = QCollapsible("test", expandedIcon=icon2, collapsedIcon=icon1)
-    assert wdg._EXPANDED == icon2
-    assert wdg._COLLAPSED == icon1
+    wdg = QCollapsible("test", expandedIcon=icon1, collapsedIcon=icon2)
+    assert wdg._EXPANDED == icon1
+    assert wdg._COLLAPSED == icon2
 
     icon2 = wdg._convert_symbol_to_icon("*")
     wdg.setCollapsedIcon(icon=icon2)
