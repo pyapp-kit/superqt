@@ -1,6 +1,8 @@
 """A test module for testing collapsible"""
 
-from qtpy.QtCore import QEasingCurve, Qt
+import pytest
+from napari._qt.qt_resources import QColoredSVGIcon
+from qtpy.QtCore import QEasingCurve,  Qt
 from qtpy.QtWidgets import QPushButton
 
 from superqt import QCollapsible
@@ -98,3 +100,20 @@ def test_toggle_signal(qtbot):
     with qtbot.waitSignal(wdg.toggled, timeout=500):
         wdg.collapse()
     
+
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+def test_setting_icon(qtbot):
+    """Test setting icon for toggle button."""
+
+    icon1 = QColoredSVGIcon.from_resources("right_arrow")
+    icon2 = QColoredSVGIcon.from_resources("right_arrow")
+
+    wdg = QCollapsible("test", expandedIcon=icon2, collapsedIcon=icon1)
+    assert wdg._EXPANDED == icon2
+    assert wdg._COLLAPSED == icon1
+
+    icon2 = wdg._convert_symbol_to_icon("*")
+    wdg.setCollapsedIcon(icon=icon2)
+    assert wdg._COLLAPSED == icon2
+    wdg.setExpandedIcon(icon=icon2)
+    assert wdg._EXPANDED == icon2
