@@ -1,12 +1,32 @@
 """A test module for testing collapsible"""
+from pathlib import Path
 
 import pytest
 from qtpy.QtCore import QEasingCurve,  Qt
-from fonticon_fa5 import FA5S
 from qtpy.QtWidgets import QPushButton
 
 from superqt import QCollapsible
 from superqt.fonticon import icon
+from superqt.fonticon._qfont_icon import QFontIconStore
+
+TEST_PREFIX = "ico"
+TEST_CHARNAME = "smiley"
+TEST_CHAR = "\ue900"
+TEST_GLYPHKEY = f"{TEST_PREFIX}.{TEST_CHARNAME}"
+FONT_FILE = Path(__file__).parent / "test_fonticon/icontest.ttf"
+
+
+@pytest.fixture
+def store(qapp):
+    store = QFontIconStore().instance()
+    yield store
+    store.clear()
+
+
+@pytest.fixture
+def full_store(store):
+    store.addFont(str(FONT_FILE), TEST_PREFIX, {TEST_CHARNAME: TEST_CHAR})
+    return store
 
 
 def test_checked_initialization(qtbot):
@@ -103,11 +123,10 @@ def test_toggle_signal(qtbot):
     
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
-def test_setting_icon(qtbot):
+def test_setting_icon(qtbot, full_store):
     """Test setting icon for toggle button."""
-
-    icon1 = icon(FA5S.smile, color="white")
-    icon2 = icon(FA5S.frown, color="white")
+    icon1 = icon(TEST_GLYPHKEY)
+    icon2 = icon(TEST_GLYPHKEY)
 
     wdg = QCollapsible("test", expandedIcon=icon1, collapsedIcon=icon2)
     assert wdg._EXPANDED == icon1
