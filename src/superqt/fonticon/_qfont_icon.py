@@ -346,10 +346,10 @@ class QFontIcon(QIcon):
 class QFontIconStore(QObject):
 
     # map of key -> (font_family, font_style)
-    _LOADED_KEYS: Dict[str, Tuple[str, str]] = dict()
+    _LOADED_KEYS: Dict[str, Tuple[str, str]] = {}
 
     # map of (font_family, font_style) -> character (char may include key)
-    _CHARMAPS: Dict[Tuple[str, Optional[str]], Dict[str, str]] = dict()
+    _CHARMAPS: Dict[Tuple[str, Optional[str]], Dict[str, str]] = {}
 
     # singleton instance, use `instance()` to retrieve
     __instance: Optional[QFontIconStore] = None

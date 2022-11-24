@@ -371,10 +371,10 @@ def _make_decorator(
             throttle.throttle()
             return future
 
-        setattr(inner, "cancel", throttle.cancel)
-        setattr(inner, "flush", throttle.flush)
-        setattr(inner, "set_timeout", throttle.setTimeout)
-        setattr(inner, "triggered", throttle.triggered)
+        inner.cancel = throttle.cancel
+        inner.flush = throttle.flush
+        inner.set_timeout = throttle.setTimeout
+        inner.triggered = throttle.triggered
         return inner  # type: ignore
 
     return deco(func) if func is not None else deco

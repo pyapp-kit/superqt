@@ -445,8 +445,8 @@ class GeneratorWorker(WorkerBase, Generic[_Y, _S, _R]):
                 self.paused.emit()
                 continue
             try:
-                input = self._next_value()
-                output = self._gen.send(input)
+                _input = self._next_value()
+                output = self._gen.send(_input)
                 self.yielded.emit(output)
             except StopIteration as exc:
                 return exc.value
@@ -521,7 +521,7 @@ def create_worker(
     ...
 
 
-def create_worker(  # noqa: D417
+def create_worker(
     func: Callable,
     *args,
     _start_thread: Optional[bool] = None,
@@ -799,7 +799,7 @@ if TYPE_CHECKING:
             ...
 
 
-def new_worker_qthread(  # noqa: D417
+def new_worker_qthread(
     Worker: Type[WorkerProtocol],
     *args,
     _start_thread: bool = False,
