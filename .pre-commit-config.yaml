@@ -11,24 +11,13 @@ repos:
       - id: end-of-file-fixer
       - id: trailing-whitespace
 
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.10.1
-    hooks:
-      - id: isort
-
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.2.2
-    hooks:
-      - id: pyupgrade
-        args: [--py37-plus, --keep-runtime-typing]
-
   - repo: https://github.com/psf/black
     rev: 22.10.0
     hooks:
       - id: black
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.0.120
+    rev: v0.0.137
     hooks:
       - id: ruff
         args: ["--fix"]
