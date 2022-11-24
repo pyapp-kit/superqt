@@ -18,7 +18,7 @@ sys.exit(1)
 #
 # To be removed once GitHub catches up.
 
-setup(
+setup(  # noqa: F821
     name="superqt",
     install_requires=[
         "packaging",

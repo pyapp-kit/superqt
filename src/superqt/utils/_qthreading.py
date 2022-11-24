@@ -179,7 +179,7 @@ class WorkerBase(QRunnable, Generic[_R]):
         try:
             with warnings.catch_warnings():
                 warnings.filterwarnings("always")
-                warnings.showwarning = lambda *w: self.warned.emit(w)  # noqa: E731
+                warnings.showwarning = lambda *w: self.warned.emit(w)
                 result = self.work()
             if isinstance(result, Exception):
                 if isinstance(result, RuntimeError):
