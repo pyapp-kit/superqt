@@ -87,12 +87,13 @@ class QCollapsible(QFrame):
         return self._content
 
     def _convert_symbol_to_icon(self, symbol: str) -> QIcon:
-        pixmap = QPixmap(16, 16)
+        size = self._toggle_btn.font().pointSize()
+        pixmap = QPixmap(size, size)
         pixmap.fill(Qt.transparent)
         painter = QPainter(pixmap)
         color = self._toggle_btn.palette().color(QPalette.WindowText)
         painter.setPen(color)
-        painter.drawText(QRect(0, 0, 16, 16), Qt.AlignCenter, symbol)
+        painter.drawText(QRect(0, 0, size, size), Qt.AlignCenter, symbol)
         painter.end()
         return QIcon(pixmap)
 
