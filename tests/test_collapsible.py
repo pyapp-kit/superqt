@@ -125,6 +125,7 @@ def test_setting_icon(qtbot):
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_setting_symbol_icon(qtbot):
+    """Test setting string as toggle button."""
     wdg = QCollapsible("test")
     icon1 = wdg._convert_symbol_to_icon("+")
     icon2 = wdg._convert_symbol_to_icon("-")
