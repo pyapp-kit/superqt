@@ -1,7 +1,15 @@
 """A collapsible widget to hide and unhide child widgets"""
 from typing import Optional
 
-from qtpy.QtCore import QEasingCurve, QEvent, QMargins, QObject, QPropertyAnimation, Qt
+from qtpy.QtCore import (
+    QEasingCurve,
+    QEvent,
+    QMargins,
+    QObject,
+    QPropertyAnimation,
+    Qt,
+    Signal,
+)
 from qtpy.QtWidgets import QFrame, QPushButton, QVBoxLayout, QWidget
 
 
@@ -13,6 +21,8 @@ class QCollapsible(QFrame):
 
     _EXPANDED = "▼  "
     _COLLAPSED = "▲  "
+
+    toggled = Signal()
 
     def __init__(self, title: str = "", parent: Optional[QWidget] = None):
         super().__init__(parent)
@@ -125,6 +135,7 @@ class QCollapsible(QFrame):
 
     def _toggle(self):
         self.expand() if self.isExpanded() else self.collapse()
+        self.toggled.emit()
 
     def eventFilter(self, a0: QObject, a1: QEvent) -> bool:
         """If a child widget resizes, we need to update our expanded height."""

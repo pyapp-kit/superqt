@@ -1,6 +1,6 @@
 """A test module for testing collapsible"""
 
-from qtpy.QtCore import QEasingCurve
+from qtpy.QtCore import QEasingCurve, Qt
 from qtpy.QtWidgets import QPushButton
 
 from superqt import QCollapsible
@@ -85,3 +85,10 @@ def test_changing_text(qtbot):
     wdg.setText("Hi new text")
     assert wdg.text() == "Hi new text"
     assert wdg._toggle_btn.text() == QCollapsible._COLLAPSED + "Hi new text"
+
+
+def test_toggle_signal(qtbot):
+    """Test that signal is emitted when widget expanded/collapsed."""
+    wdg = QCollapsible()
+    with qtbot.waitSignal(wdg.toggled, timeout=500):
+        qtbot.mouseClick(wdg._toggle_btn, Qt.LeftButton)
