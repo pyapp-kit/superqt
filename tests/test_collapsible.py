@@ -1,32 +1,23 @@
 """A test module for testing collapsible"""
-from pathlib import Path
 
 import pytest
 from qtpy.QtCore import QEasingCurve,  Qt
 from qtpy.QtWidgets import QPushButton
+from qtpy import PYQT6, PYSIDE6
+from qtpy.QtWidgets import QPushButton, QStyle, QWidget
 
 from superqt import QCollapsible
-from superqt.fonticon import icon
-from superqt.fonticon._qfont_icon import QFontIconStore
-
-TEST_PREFIX = "ico"
-TEST_CHARNAME = "smiley"
-TEST_CHAR = "\ue900"
-TEST_GLYPHKEY = f"{TEST_PREFIX}.{TEST_CHARNAME}"
-FONT_FILE = Path(__file__).parent / "icontest.ttf"
 
 
-@pytest.fixture
-def store(qapp):
-    store = QFontIconStore().instance()
-    yield store
-    store.clear()
+def _get_builtin_icon(name):
+    """Get a built-in icon from the Qt library."""
+    widget = QWidget()
+    if PYQT6 or PYSIDE6:
+        pixmap = getattr(QStyle.StandardPixmap, f"SP_{name}")
+    else:
+        pixmap = getattr(QStyle, f"SP_{name}")
 
-
-@pytest.fixture
-def full_store(store):
-    store.addFont(str(FONT_FILE), TEST_PREFIX, {TEST_CHARNAME: TEST_CHAR})
-    return store
+    return widget.style().standardIcon(pixmap)
 
 
 def test_checked_initialization(qtbot):
@@ -123,17 +114,21 @@ def test_toggle_signal(qtbot):
     
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
-def test_setting_icon(qtbot, full_store):
+def test_setting_icon(qtbot):
     """Test setting icon for toggle button."""
-    icon1 = icon(TEST_GLYPHKEY)
-    icon2 = icon(TEST_GLYPHKEY)
-
+    icon1 = _get_builtin_icon("ArrowRight")
+    icon2 = _get_builtin_icon("ArrowDown")
     wdg = QCollapsible("test", expandedIcon=icon1, collapsedIcon=icon2)
     assert wdg._EXPANDED == icon1
     assert wdg._COLLAPSED == icon2
 
-    icon2 = wdg._convert_symbol_to_icon("*")
-    wdg.setCollapsedIcon(icon=icon2)
-    assert wdg._COLLAPSED == icon2
+
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+def test_setting_symbol_icon(qtbot):
+    wdg = QCollapsible("test")
+    icon1 = wdg._convert_symbol_to_icon("+")
+    icon2 = wdg._convert_symbol_to_icon("-")
+    wdg.setCollapsedIcon(icon=icon1)
+    assert wdg._COLLAPSED == icon1
     wdg.setExpandedIcon(icon=icon2)
     assert wdg._EXPANDED == icon2
