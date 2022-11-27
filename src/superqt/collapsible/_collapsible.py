@@ -16,13 +16,15 @@ from qtpy.QtWidgets import QFrame, QPushButton, QVBoxLayout, QWidget
 class QCollapsible(QFrame):
     """A collapsible widget to hide and unhide child widgets.
 
+    A signal is emitted when the widget is expanded (True) or collapsed (False).
+
     Based on https://stackoverflow.com/a/68141638
     """
 
     _EXPANDED = "▼  "
     _COLLAPSED = "▲  "
 
-    toggled = Signal()
+    toggled = Signal(bool)
 
     def __init__(self, title: str = "", parent: Optional[QWidget] = None):
         super().__init__(parent)
@@ -94,10 +96,12 @@ class QCollapsible(QFrame):
     def expand(self, animate: bool = True):
         """Expand (show) the collapsible section"""
         self._expand_collapse(QPropertyAnimation.Direction.Forward, animate)
+        self.toggled.emit(True)
 
     def collapse(self, animate: bool = True):
         """Collapse (hide) the collapsible section"""
         self._expand_collapse(QPropertyAnimation.Direction.Backward, animate)
+        self.toggled.emit(False)
 
     def isExpanded(self) -> bool:
         """Return whether the collapsible section is visible"""
@@ -135,7 +139,6 @@ class QCollapsible(QFrame):
 
     def _toggle(self):
         self.expand() if self.isExpanded() else self.collapse()
-        self.toggled.emit()
 
     def eventFilter(self, a0: QObject, a1: QEvent) -> bool:
         """If a child widget resizes, we need to update our expanded height."""

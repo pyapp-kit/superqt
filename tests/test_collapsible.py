@@ -92,3 +92,9 @@ def test_toggle_signal(qtbot):
     wdg = QCollapsible()
     with qtbot.waitSignal(wdg.toggled, timeout=500):
         qtbot.mouseClick(wdg._toggle_btn, Qt.LeftButton)
+
+    with qtbot.waitSignal(wdg.toggled, timeout=500):
+        wdg.expand()
+
+    with qtbot.waitSignal(wdg.toggled, timeout=500):
+        wdg.collapse()
