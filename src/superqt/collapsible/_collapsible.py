@@ -1,18 +1,30 @@
 """A collapsible widget to hide and unhide child widgets"""
 from typing import Optional
 
-from qtpy.QtCore import QEasingCurve, QEvent, QMargins, QObject, QPropertyAnimation, Qt
+from qtpy.QtCore import (
+    QEasingCurve,
+    QEvent,
+    QMargins,
+    QObject,
+    QPropertyAnimation,
+    Qt,
+    Signal,
+)
 from qtpy.QtWidgets import QFrame, QPushButton, QVBoxLayout, QWidget
 
 
 class QCollapsible(QFrame):
     """A collapsible widget to hide and unhide child widgets.
 
+    A signal is emitted when the widget is expanded (True) or collapsed (False).
+
     Based on https://stackoverflow.com/a/68141638
     """
 
     _EXPANDED = "▼  "
     _COLLAPSED = "▲  "
+
+    toggled = Signal(bool)
 
     def __init__(self, title: str = "", parent: Optional[QWidget] = None):
         super().__init__(parent)
@@ -122,6 +134,8 @@ class QCollapsible(QFrame):
             self._animation.start()
         else:
             self._content.setMaximumHeight(_content_height if forward else 0)
+
+        self.toggled.emit(direction == QPropertyAnimation.Direction.Forward)
 
     def _toggle(self):
         self.expand() if self.isExpanded() else self.collapse()
