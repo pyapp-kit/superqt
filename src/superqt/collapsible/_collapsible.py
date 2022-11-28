@@ -96,12 +96,10 @@ class QCollapsible(QFrame):
     def expand(self, animate: bool = True):
         """Expand (show) the collapsible section"""
         self._expand_collapse(QPropertyAnimation.Direction.Forward, animate)
-        self.toggled.emit(True)
 
     def collapse(self, animate: bool = True):
         """Collapse (hide) the collapsible section"""
         self._expand_collapse(QPropertyAnimation.Direction.Backward, animate)
-        self.toggled.emit(False)
 
     def isExpanded(self) -> bool:
         """Return whether the collapsible section is visible"""
@@ -136,6 +134,8 @@ class QCollapsible(QFrame):
             self._animation.start()
         else:
             self._content.setMaximumHeight(_content_height if forward else 0)
+
+        self.toggled.emit(direction == QPropertyAnimation.Direction.Forward)
 
     def _toggle(self):
         self.expand() if self.isExpanded() else self.collapse()
