@@ -7,9 +7,9 @@ from qtpy.QtCore import (
     QMargins,
     QObject,
     QPropertyAnimation,
+    QRect,
     Qt,
     Signal,
-    QRect,
 )
 from qtpy.QtGui import QIcon, QPainter, QPalette, QPixmap
 from qtpy.QtWidgets import QFrame, QPushButton, QVBoxLayout, QWidget
@@ -23,8 +23,8 @@ class QCollapsible(QFrame):
     Based on https://stackoverflow.com/a/68141638
     """
 
-    _EXPANDED = "▼  "
-    _COLLAPSED = "▲  "
+    _expanded_icon = "▼  "
+    _collapsed_icon = "▲  "
 
     toggled = Signal(bool)
 
@@ -101,25 +101,25 @@ class QCollapsible(QFrame):
         """Set the icon on the toggle button when the widget is expanded."""
 
         if icon and isinstance(icon, QIcon):
-            self._EXPANDED = icon
+            self._expanded_icon = icon
         elif icon and isinstance(icon, str):
-            self._EXPANDED = self._convert_symbol_to_icon(icon)
+            self._expanded_icon = self._convert_symbol_to_icon(icon)
         else:
             symbol = "▼"
-            self._EXPANDED = self._convert_symbol_to_icon(symbol)
+            self._expanded_icon = self._convert_symbol_to_icon(symbol)
 
     def setCollapsedIcon(self, icon: Optional[Union[QIcon, str]] = None):
         """Set the icon on the toggle button when the widget is collapsed."""
 
         if icon and isinstance(icon, QIcon):
-            self._COLLAPSED = icon
+            self._collapsed_icon = icon
         elif icon and isinstance(icon, str):
-            self._COLLAPSED = self._convert_symbol_to_icon(icon)
+            self._collapsed_icon = self._convert_symbol_to_icon(icon)
         else:
             symbol = "▲"
-            self._COLLAPSED = self._convert_symbol_to_icon(symbol)
+            self._collapsed_icon = self._convert_symbol_to_icon(symbol)
 
-        self._toggle_btn.setIcon(self._COLLAPSED)
+        self._toggle_btn.setIcon(self._collapsed_icon)
 
     def setDuration(self, msecs: int):
         """Set duration of the collapse/expand animation."""
@@ -167,7 +167,7 @@ class QCollapsible(QFrame):
             return
 
         forward = direction == QPropertyAnimation.Direction.Forward
-        text = self._EXPANDED if forward else self._COLLAPSED
+        text = self._expanded_icon if forward else self._collapsed_icon
         self._toggle_btn.setIcon(text)
 
         self._toggle_btn.setChecked(forward)

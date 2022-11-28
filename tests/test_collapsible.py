@@ -1,9 +1,7 @@
 """A test module for testing collapsible"""
 
 import pytest
-from qtpy.QtCore import QEasingCurve,  Qt
-from qtpy.QtWidgets import QPushButton
-from qtpy import PYQT6, PYSIDE6
+from qtpy.QtCore import QEasingCurve, Qt
 from qtpy.QtWidgets import QPushButton, QStyle, QWidget
 
 from superqt import QCollapsible
@@ -12,9 +10,9 @@ from superqt import QCollapsible
 def _get_builtin_icon(name):
     """Get a built-in icon from the Qt library."""
     widget = QWidget()
-    if PYQT6 or PYSIDE6:
+    try:
         pixmap = getattr(QStyle.StandardPixmap, f"SP_{name}")
-    else:
+    except AttributeError:
         pixmap = getattr(QStyle, f"SP_{name}")
 
     return widget.style().standardIcon(pixmap)
@@ -100,6 +98,7 @@ def test_changing_text(qtbot):
     assert wdg.text() == "Hi new text"
     assert wdg._toggle_btn.text() == "Hi new text"
 
+
 def test_toggle_signal(qtbot):
     """Test that signal is emitted when widget expanded/collapsed."""
     wdg = QCollapsible()
@@ -111,7 +110,7 @@ def test_toggle_signal(qtbot):
 
     with qtbot.waitSignal(wdg.toggled, timeout=500):
         wdg.collapse()
-    
+
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_setting_icon(qtbot):
@@ -119,8 +118,8 @@ def test_setting_icon(qtbot):
     icon1 = _get_builtin_icon("ArrowRight")
     icon2 = _get_builtin_icon("ArrowDown")
     wdg = QCollapsible("test", expandedIcon=icon1, collapsedIcon=icon2)
-    assert wdg._EXPANDED == icon1
-    assert wdg._COLLAPSED == icon2
+    assert wdg._expanded_icon == icon1
+    assert wdg._collapsed_icon == icon2
 
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
@@ -130,6 +129,6 @@ def test_setting_symbol_icon(qtbot):
     icon1 = wdg._convert_symbol_to_icon("+")
     icon2 = wdg._convert_symbol_to_icon("-")
     wdg.setCollapsedIcon(icon=icon1)
-    assert wdg._COLLAPSED == icon1
+    assert wdg._collapsed_icon == icon1
     wdg.setExpandedIcon(icon=icon2)
-    assert wdg._EXPANDED == icon2
+    assert wdg._expanded_icon == icon2
