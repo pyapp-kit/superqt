@@ -2,6 +2,7 @@
 
 import pytest
 from qtpy.QtCore import QEasingCurve, Qt
+from qtpy.QtGui import QIcon
 from qtpy.QtWidgets import QPushButton, QStyle, QWidget
 
 from superqt import QCollapsible
@@ -116,8 +117,8 @@ def test_toggle_signal(qtbot):
 def test_getting_icon(qtbot):
     """Test setting string as toggle button."""
     wdg = QCollapsible("test")
-    wdg.expandedIcon()
-    wdg.collapsedIcon()
+    assert isinstance(wdg.expandedIcon(), QIcon)
+    assert isinstance(wdg.collapsedIcon(), QIcon)
 
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
