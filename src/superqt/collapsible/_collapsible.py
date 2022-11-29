@@ -23,9 +23,6 @@ class QCollapsible(QFrame):
     Based on https://stackoverflow.com/a/68141638
     """
 
-    _expanded_icon = "▼  "
-    _collapsed_icon = "▲  "
-
     toggled = Signal(bool)
 
     def __init__(
