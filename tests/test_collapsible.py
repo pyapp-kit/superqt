@@ -126,8 +126,8 @@ def test_setting_icon(qtbot):
 def test_setting_symbol_icon(qtbot):
     """Test setting string as toggle button."""
     wdg = QCollapsible("test")
-    icon1 = wdg._convert_symbol_to_icon("+")
-    icon2 = wdg._convert_symbol_to_icon("-")
+    icon1 = wdg._convert_string_to_icon("+")
+    icon2 = wdg._convert_string_to_icon("-")
     wdg.setCollapsedIcon(icon=icon1)
     assert wdg._collapsed_icon == icon1
     wdg.setExpandedIcon(icon=icon2)

@@ -83,7 +83,8 @@ class QCollapsible(QFrame):
         """Return the current content widget."""
         return self._content
 
-    def _convert_symbol_to_icon(self, symbol: str) -> QIcon:
+    def _convert_string_to_icon(self, symbol: str) -> QIcon:
+        """Create a QIcon from a string."""
         size = self._toggle_btn.font().pointSize()
         pixmap = QPixmap(size, size)
         pixmap.fill(Qt.transparent)
@@ -96,27 +97,33 @@ class QCollapsible(QFrame):
 
     def setExpandedIcon(self, icon: Optional[Union[QIcon, str]] = None):
         """Set the icon on the toggle button when the widget is expanded."""
-
         if icon and isinstance(icon, QIcon):
             self._expanded_icon = icon
         elif icon and isinstance(icon, str):
-            self._expanded_icon = self._convert_symbol_to_icon(icon)
+            self._expanded_icon = self._convert_string_to_icon(icon)
         else:
             symbol = "▼"
-            self._expanded_icon = self._convert_symbol_to_icon(symbol)
+            self._expanded_icon = self._convert_string_to_icon(symbol)
+
+    def expandedIcon(self):
+        """Returns the icon used when the widget is expanded."""
+        return self._expanded_icon
 
     def setCollapsedIcon(self, icon: Optional[Union[QIcon, str]] = None):
         """Set the icon on the toggle button when the widget is collapsed."""
-
         if icon and isinstance(icon, QIcon):
             self._collapsed_icon = icon
         elif icon and isinstance(icon, str):
-            self._collapsed_icon = self._convert_symbol_to_icon(icon)
+            self._collapsed_icon = self._convert_string_to_icon(icon)
         else:
             symbol = "▲"
-            self._collapsed_icon = self._convert_symbol_to_icon(symbol)
+            self._collapsed_icon = self._convert_string_to_icon(symbol)
 
         self._toggle_btn.setIcon(self._collapsed_icon)
+
+    def collapsedIcon(self):
+        """Returns the icon used when the widget is collapsed."""
+        return self._collapsed_icon
 
     def setDuration(self, msecs: int):
         """Set duration of the collapse/expand animation."""
