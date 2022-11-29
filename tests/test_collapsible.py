@@ -113,6 +113,14 @@ def test_toggle_signal(qtbot):
 
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
+def test_getting_icon(qtbot):
+    """Test setting string as toggle button."""
+    wdg = QCollapsible("test")
+    wdg.expandedIcon()
+    wdg.collapsedIcon()
+
+
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_setting_icon(qtbot):
     """Test setting icon for toggle button."""
     icon1 = _get_builtin_icon("ArrowRight")

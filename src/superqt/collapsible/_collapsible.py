@@ -29,8 +29,8 @@ class QCollapsible(QFrame):
         self,
         title: str = "",
         parent: Optional[QWidget] = None,
-        expandedIcon: Optional[Union[QIcon, str]] = None,
-        collapsedIcon: Optional[Union[QIcon, str]] = None,
+        expandedIcon: Optional[Union[QIcon, str]] = "▼",
+        collapsedIcon: Optional[Union[QIcon, str]] = "▲",
     ):
         super().__init__(parent)
         self._locked = False
@@ -101,9 +101,6 @@ class QCollapsible(QFrame):
             self._expanded_icon = icon
         elif icon and isinstance(icon, str):
             self._expanded_icon = self._convert_string_to_icon(icon)
-        else:
-            symbol = "▼"
-            self._expanded_icon = self._convert_string_to_icon(symbol)
 
     def expandedIcon(self):
         """Returns the icon used when the widget is expanded."""
@@ -115,9 +112,6 @@ class QCollapsible(QFrame):
             self._collapsed_icon = icon
         elif icon and isinstance(icon, str):
             self._collapsed_icon = self._convert_string_to_icon(icon)
-        else:
-            symbol = "▲"
-            self._collapsed_icon = self._convert_string_to_icon(symbol)
 
         self._toggle_btn.setIcon(self._collapsed_icon)
 
