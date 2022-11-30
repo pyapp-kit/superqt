@@ -115,7 +115,10 @@ class QCollapsible(QFrame):
         return self._locked
 
     def _expand_collapse(
-        self, direction: QPropertyAnimation.Direction, animate: bool = True
+        self,
+        direction: QPropertyAnimation.Direction,
+        animate: bool = True,
+        emit: bool = True,
     ):
         if self._locked:
             return
@@ -132,9 +135,10 @@ class QCollapsible(QFrame):
             self._animation.setEndValue(_content_height)
             self._is_animating = True
             self._animation.start()
-            self.toggled.emit(direction == QPropertyAnimation.Direction.Forward)
         else:
             self._content.setMaximumHeight(_content_height if forward else 0)
+        if emit:
+            self.toggled.emit(direction == QPropertyAnimation.Direction.Forward)
 
     def _toggle(self):
         self.expand() if self.isExpanded() else self.collapse()
@@ -146,7 +150,9 @@ class QCollapsible(QFrame):
             and self.isExpanded()
             and not self._is_animating
         ):
-            self._expand_collapse(QPropertyAnimation.Direction.Forward, animate=False)
+            self._expand_collapse(
+                QPropertyAnimation.Direction.Forward, animate=False, emit=False
+            )
         return False
 
     def _on_animation_done(self):
