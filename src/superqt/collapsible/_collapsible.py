@@ -115,8 +115,16 @@ class QCollapsible(QFrame):
         return self._locked
 
     def _expand_collapse(
-        self, direction: QPropertyAnimation.Direction, animate: bool = True
+        self,
+        direction: QPropertyAnimation.Direction,
+        animate: bool = True,
+        emit: bool = True,
     ):
+        """Set values for the widget based on whether it is expanding or collapsing.
+
+        An emit flag is included so that the toggle signal is only called once (it
+        was being emitted a few times via eventFilter when the widget was expanding
+        previously)."""
         if self._locked:
             return
 
@@ -134,8 +142,8 @@ class QCollapsible(QFrame):
             self._animation.start()
         else:
             self._content.setMaximumHeight(_content_height if forward else 0)
-
-        self.toggled.emit(direction == QPropertyAnimation.Direction.Forward)
+        if emit:
+            self.toggled.emit(direction == QPropertyAnimation.Direction.Forward)
 
     def _toggle(self):
         self.expand() if self.isExpanded() else self.collapse()
@@ -147,7 +155,9 @@ class QCollapsible(QFrame):
             and self.isExpanded()
             and not self._is_animating
         ):
-            self._expand_collapse(QPropertyAnimation.Direction.Forward, animate=False)
+            self._expand_collapse(
+                QPropertyAnimation.Direction.Forward, animate=False, emit=False
+            )
         return False
 
     def _on_animation_done(self):
