@@ -132,10 +132,9 @@ class QCollapsible(QFrame):
             self._animation.setEndValue(_content_height)
             self._is_animating = True
             self._animation.start()
+            self.toggled.emit(direction == QPropertyAnimation.Direction.Forward)
         else:
             self._content.setMaximumHeight(_content_height if forward else 0)
-
-        self.toggled.emit(direction == QPropertyAnimation.Direction.Forward)
 
     def _toggle(self):
         self.expand() if self.isExpanded() else self.collapse()
