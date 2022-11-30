@@ -120,6 +120,11 @@ class QCollapsible(QFrame):
         animate: bool = True,
         emit: bool = True,
     ):
+        """Set values for the widget based on whether it is expanding or collapsing.
+
+        An emit flag is included so that the toggle signal is only called once (it
+        was being emitted a few times via eventFilter when the widget was expanding
+        previously)."""
         if self._locked:
             return
 
