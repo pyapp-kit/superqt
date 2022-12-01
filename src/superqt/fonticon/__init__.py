@@ -14,7 +14,7 @@ __all__ = [
     "spin",
 ]
 
-from typing import TYPE_CHECKING, Dict, Optional, Tuple, Union
+from typing import TYPE_CHECKING
 
 from ._animations import Animation, pulse, spin
 from ._iconfont import IconFont, IconFontMeta
@@ -39,11 +39,11 @@ ENTRY_POINT = _FIM.ENTRY_POINT
 def icon(
     glyph_key: str,
     scale_factor: float = DEFAULT_SCALING_FACTOR,
-    color: Optional[ValidColor] = None,
+    color: ValidColor | None = None,
     opacity: float = 1,
-    animation: Optional[Animation] = None,
-    transform: Optional[QTransform] = None,
-    states: Dict[str, Union[IconOptionDict, IconOpts]] | None = None,
+    animation: Animation | None = None,
+    transform: QTransform | None = None,
+    states: dict[str, IconOptionDict | IconOpts] | None = None,
 ) -> QFontIcon:
     """Create a QIcon for `glyph_key`, with a number of optional settings.
 
@@ -149,7 +149,7 @@ def icon(
     )
 
 
-def setTextIcon(widget: QWidget, glyph_key: str, size: Optional[float] = None) -> None:
+def setTextIcon(widget: QWidget, glyph_key: str, size: float | None = None) -> None:
     """Set text on a widget to a specific font & glyph.
 
     This is an alternative to setting a QIcon with a pixmap.  It may be easier to
@@ -167,7 +167,7 @@ def setTextIcon(widget: QWidget, glyph_key: str, size: Optional[float] = None) -
     return _QFIS.instance().setTextIcon(widget, glyph_key, size)
 
 
-def font(font_prefix: str, size: Optional[int] = None) -> QFont:
+def font(font_prefix: str, size: int | None = None) -> QFont:
     """Create QFont for `font_prefix`.
 
     Parameters
@@ -186,8 +186,8 @@ def font(font_prefix: str, size: Optional[int] = None) -> QFont:
 
 
 def addFont(
-    filepath: str, prefix: str, charmap: Optional[Dict[str, str]] = None
-) -> Optional[Tuple[str, str]]:
+    filepath: str, prefix: str, charmap: dict[str, str] | None = None
+) -> tuple[str, str] | None:
     """Add OTF/TTF file at `filepath` to the registry under `prefix`.
 
     If you'd like to later use a fontkey in the form of `prefix.some-name`, then

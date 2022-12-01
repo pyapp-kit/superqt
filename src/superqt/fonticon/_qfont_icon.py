@@ -4,7 +4,7 @@ import warnings
 from collections import abc
 from dataclasses import dataclass
 from pathlib import Path
-from typing import DefaultDict, Dict, Optional, Sequence, Tuple, Type, Union, cast
+from typing import DefaultDict, Sequence, Union, cast
 
 from qtpy import QT_VERSION
 from qtpy.QtCore import QObject, QPoint, QRect, QSize, Qt
@@ -45,14 +45,14 @@ ValidColor = Union[
     int,
     str,
     Qt.GlobalColor,
-    Tuple[int, int, int, int],
-    Tuple[int, int, int],
+    tuple[int, int, int, int],
+    tuple[int, int, int],
     None,
 ]
 
 StateOrMode = Union[QIcon.State, QIcon.Mode]
 StateModeKey = Union[StateOrMode, str, Sequence[StateOrMode]]
-_SM_MAP: Dict[str, StateOrMode] = {
+_SM_MAP: dict[str, StateOrMode] = {
     "on": QIcon.State.On,
     "off": QIcon.State.Off,
     "normal": QIcon.Mode.Normal,
@@ -62,7 +62,7 @@ _SM_MAP: Dict[str, StateOrMode] = {
 }
 
 
-def _norm_state_mode(key: StateModeKey) -> Tuple[QIcon.State, QIcon.Mode]:
+def _norm_state_mode(key: StateModeKey) -> tuple[QIcon.State, QIcon.Mode]:
     """Return state/mode tuple given a variety of valid inputs.
 
     Input can be either a string, or a sequence of state or mode enums.
@@ -73,11 +73,11 @@ def _norm_state_mode(key: StateModeKey) -> Tuple[QIcon.State, QIcon.Mode]:
     if isinstance(key, str):
         try:
             _sm = [_SM_MAP[k.lower()] for k in key.split("_")]
-        except KeyError:
+        except KeyError as e:
             raise ValueError(
                 f"{key!r} is not a valid state key, must be a combination of {{on, "
                 "off, active, disabled, selected, normal} separated by underscore"
-            )
+            ) from e
     else:
         _sm = key if isinstance(key, abc.Sequence) else [key]
 
@@ -91,8 +91,8 @@ class IconOptionDict(TypedDict, total=False):
     scale_factor: float
     color: ValidColor
     opacity: float
-    animation: Optional[Animation]
-    transform: Optional[QTransform]
+    animation: Animation | None
+    transform: QTransform | None
 
 
 # public facing, for a nicer IDE experience than a dict
@@ -119,12 +119,12 @@ class IconOpts:
         The animation to use, by default `None`
     """
 
-    glyph_key: Union[str, Unset] = _Unset
-    scale_factor: Union[float, Unset] = _Unset
-    color: Union[ValidColor, Unset] = _Unset
-    opacity: Union[float, Unset] = _Unset
-    animation: Union[Animation, Unset, None] = _Unset
-    transform: Union[QTransform, Unset, None] = _Unset
+    glyph_key: str | Unset = _Unset
+    scale_factor: float | Unset = _Unset
+    color: ValidColor | Unset = _Unset
+    opacity: float | Unset = _Unset
+    animation: Animation | Unset | None = _Unset
+    transform: QTransform | Unset | None = _Unset
 
     def dict(self) -> IconOptionDict:
         # not using asdict due to pickle errors on animation
@@ -140,8 +140,8 @@ class _IconOptions:
     scale_factor: float = DEFAULT_SCALING_FACTOR
     color: ValidColor = None
     opacity: float = DEFAULT_OPACITY
-    animation: Optional[Animation] = None
-    transform: Optional[QTransform] = None
+    animation: Animation | None = None
+    transform: QTransform | None = None
 
     def _update(self, icon_opts: IconOpts) -> _IconOptions:
         return _IconOptions(**{**vars(self), **icon_opts.dict()})
@@ -157,7 +157,7 @@ class _QFontIconEngine(QIconEngine):
     def __init__(self, options: _IconOptions):
         super().__init__()
         self._opts: DefaultDict[
-            QIcon.State, Dict[QIcon.Mode, Optional[_IconOptions]]
+            QIcon.State, dict[QIcon.Mode, _IconOptions | None]
         ] = DefaultDict(dict)
         self._opts[QIcon.State.Off][QIcon.Mode.Normal] = options
         self.update_hash()
@@ -321,12 +321,12 @@ class QFontIcon(QIcon):
         self,
         state: QIcon.State = QIcon.State.Off,
         mode: QIcon.Mode = QIcon.Mode.Normal,
-        glyph_key: Union[str, Unset] = _Unset,
-        scale_factor: Union[float, Unset] = _Unset,
-        color: Union[ValidColor, Unset] = _Unset,
-        opacity: Union[float, Unset] = _Unset,
-        animation: Union[Animation, Unset, None] = _Unset,
-        transform: Union[QTransform, Unset, None] = _Unset,
+        glyph_key: str | Unset = _Unset,
+        scale_factor: float | Unset = _Unset,
+        color: ValidColor | Unset = _Unset,
+        opacity: float | Unset = _Unset,
+        animation: Animation | Unset | None = _Unset,
+        transform: QTransform | Unset | None = _Unset,
     ) -> None:
         """Set icon options for a specific mode/state."""
         if glyph_key is not _Unset:
@@ -346,15 +346,15 @@ class QFontIcon(QIcon):
 class QFontIconStore(QObject):
 
     # map of key -> (font_family, font_style)
-    _LOADED_KEYS: Dict[str, Tuple[str, str]] = {}
+    _LOADED_KEYS: dict[str, tuple[str, str]] = {}
 
     # map of (font_family, font_style) -> character (char may include key)
-    _CHARMAPS: Dict[Tuple[str, Optional[str]], Dict[str, str]] = {}
+    _CHARMAPS: dict[tuple[str, str | None], dict[str, str]] = {}
 
     # singleton instance, use `instance()` to retrieve
-    __instance: Optional[QFontIconStore] = None
+    __instance: QFontIconStore | None = None
 
-    def __init__(self, parent: Optional[QObject] = None) -> None:
+    def __init__(self, parent: QObject | None = None) -> None:
         super().__init__(parent=parent)
         if tuple(cast(str, QT_VERSION).split(".")) < ("6", "0"):
             # QT6 drops this
@@ -373,7 +373,7 @@ class QFontIconStore(QObject):
         QFontDatabase.removeAllApplicationFonts()
 
     @classmethod
-    def _key2family(cls, key: str) -> Tuple[str, str]:
+    def _key2family(cls, key: str) -> tuple[str, str]:
         """Return (family, style) given a font `key`."""
         key = key.split(".", maxsplit=1)[0]
         if key not in cls._LOADED_KEYS:
@@ -402,8 +402,10 @@ class QFontIconStore(QObject):
             return char
         try:
             charmap = cls._CHARMAPS[(family, style)]
-        except KeyError:
-            raise KeyError(f"No charmap registered for font '{family} ({style})'")
+        except KeyError as e:
+            raise KeyError(
+                f"No charmap registered for font '{family} ({style})'"
+            ) from e
         if char in charmap:
             # split in case the charmap includes the key
             return charmap[char].split(".", maxsplit=1)[-1]
@@ -416,7 +418,7 @@ class QFontIconStore(QObject):
         raise ValueError(f"Font '{family} ({style})' has no glyph with the key {ident}")
 
     @classmethod
-    def key2glyph(cls, glyph_key: str) -> tuple[str, str, Optional[str]]:
+    def key2glyph(cls, glyph_key: str) -> tuple[str, str, str | None]:
         """Return (char, family, style) given a `glyph_key`."""
         if "." not in glyph_key:
             raise ValueError("Glyph key must contain a period")
@@ -427,8 +429,8 @@ class QFontIconStore(QObject):
 
     @classmethod
     def addFont(
-        cls, filepath: str, prefix: str, charmap: Optional[Dict[str, str]] = None
-    ) -> Optional[Tuple[str, str]]:
+        cls, filepath: str, prefix: str, charmap: dict[str, str] | None = None
+    ) -> tuple[str, str] | None:
         """Add font at `filepath` to the registry under `key`.
 
         If you'd like to later use a fontkey in the form of `key.some-name`, then
@@ -474,7 +476,7 @@ class QFontIconStore(QObject):
         family: str = families[0]
 
         # in Qt6, everything becomes a static member
-        QFd: Union[QFontDatabase, Type[QFontDatabase]] = (
+        QFd: QFontDatabase | type[QFontDatabase] = (
             QFontDatabase()
             if tuple(cast(str, QT_VERSION).split(".")) < ("6", "0")
             else QFontDatabase
@@ -498,11 +500,11 @@ class QFontIconStore(QObject):
         glyph_key: str,
         *,
         scale_factor: float = DEFAULT_SCALING_FACTOR,
-        color: Optional[ValidColor] = None,
+        color: ValidColor | None = None,
         opacity: float = 1,
-        animation: Optional[Animation] = None,
-        transform: Optional[QTransform] = None,
-        states: Dict[str, Union[IconOptionDict, IconOpts]] | None = None,
+        animation: Animation | None = None,
+        transform: QTransform | None = None,
+        states: dict[str, IconOptionDict | IconOpts] | None = None,
     ) -> QFontIcon:
         self.key2glyph(glyph_key)  # make sure it's a valid glyph_key
         default_opts = _IconOptions(
@@ -521,7 +523,7 @@ class QFontIconStore(QObject):
         return icon
 
     def setTextIcon(
-        self, widget: QWidget, glyph_key: str, size: Optional[float] = None
+        self, widget: QWidget, glyph_key: str, size: float | None = None
     ) -> None:
         """Sets text on a widget to a specific font & glyph.
 
@@ -538,7 +540,7 @@ class QFontIconStore(QObject):
         widget.setFont(self.font(glyph_key, int(size)))
         setText(glyph)
 
-    def font(self, font_prefix: str, size: Optional[int] = None) -> QFont:
+    def font(self, font_prefix: str, size: int | None = None) -> QFont:
         """Create QFont for `font_prefix`."""
         font_key, _ = font_prefix.split(".", maxsplit=1)
         family, style = self._key2family(font_key)

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from concurrent.futures import Future
 from functools import wraps
-from typing import TYPE_CHECKING, Callable, List, Optional, overload
+from typing import TYPE_CHECKING, Callable, overload
 
 from qtpy.QtCore import (
     QCoreApplication,
@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 
 class CallCallable(QObject):
     finished = Signal(object)
-    instances: List[CallCallable] = []
+    instances: list[CallCallable] = []
 
     def __init__(self, callable, *args, **kwargs):
         super().__init__()
@@ -69,7 +69,7 @@ def ensure_main_thread(
 
 
 def ensure_main_thread(
-    func: Optional[Callable] = None, await_return: bool = False, timeout: int = 1000
+    func: Callable | None = None, await_return: bool = False, timeout: int = 1000
 ):
     """Decorator that ensures a function is called in the main QApplication thread.
 
@@ -131,7 +131,7 @@ def ensure_object_thread(
 
 
 def ensure_object_thread(
-    func: Optional[Callable] = None, await_return: bool = False, timeout: int = 1000
+    func: Callable | None = None, await_return: bool = False, timeout: int = 1000
 ):
     """Decorator that ensures a QObject method is called in the object's thread.
 
