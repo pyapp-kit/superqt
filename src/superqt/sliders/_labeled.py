@@ -147,10 +147,7 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         self.setOrientation(orientation)
 
     def _setValue(self, value: float):
-        """
-        Convert the value from float to int before
-        setting the slider value
-        """
+        """Convert the value from float to int before setting the slider value."""
         self._slider.setValue(int(value))
 
     def _rename_signals(self):
@@ -171,7 +168,7 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
             if self._edge_label_mode == EdgeLabelMode.NoLabel:
                 marg = (0, 0, 5, 0)
 
-            layout = QHBoxLayout()
+            layout = QHBoxLayout()  # type: ignore
             layout.addWidget(self._slider)
             layout.addWidget(self._label)
             self._label.setAlignment(Qt.AlignmentFlag.AlignRight)
@@ -421,7 +418,6 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
 
     def setOrientation(self, orientation):
         """Set orientation, value will be 'horizontal' or 'vertical'."""
-
         self._slider.setOrientation(orientation)
         if orientation == Qt.Orientation.Vertical:
             layout = QVBoxLayout()

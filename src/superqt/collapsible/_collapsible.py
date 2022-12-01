@@ -1,4 +1,4 @@
-"""A collapsible widget to hide and unhide child widgets"""
+"""A collapsible widget to hide and unhide child widgets."""
 from typing import Optional, Union
 
 from qtpy.QtCore import (
@@ -150,7 +150,7 @@ class QCollapsible(QFrame):
         self._expand_collapse(QPropertyAnimation.Direction.Backward, animate)
 
     def isExpanded(self) -> bool:
-        """Return whether the collapsible section is visible"""
+        """Return whether the collapsible section is visible."""
         return self._toggle_btn.isChecked()
 
     def setLocked(self, locked: bool = True) -> None:
@@ -159,7 +159,7 @@ class QCollapsible(QFrame):
         self._toggle_btn.setCheckable(not locked)
 
     def locked(self) -> bool:
-        """Return True if collapse/expand is disabled"""
+        """Return True if collapse/expand is disabled."""
         return self._locked
 
     def _expand_collapse(
