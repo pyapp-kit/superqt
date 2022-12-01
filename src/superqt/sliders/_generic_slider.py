@@ -1,4 +1,4 @@
-"""Generic Sliders with internal python-based models
+"""Generic Sliders with internal python-based models.
 
 This module reimplements most of the logic from qslider.cpp in python:
 https://code.woboq.org/qt5/qtbase/src/widgets/widgets/qslider.cpp.html
@@ -48,7 +48,7 @@ QOVERFLOW = 2**31 - 1
 # whether to use the MONTEREY_SLIDER_STYLES_FIX QSS hack
 # for fixing sliders on macos>=12 with QT < 6
 # https://bugreports.qt.io/browse/QTBUG-98093
-# https://github.com/napari/superqt/issues/74
+# https://github.com/pyapp-kit/superqt/issues/74
 USE_MAC_SLIDER_PATCH = (
     QT_VERSION
     and int(QT_VERSION.split(".")[0]) < 6
@@ -522,16 +522,7 @@ def _event_position(ev: QEvent) -> QPoint:
 def _sliderValueFromPosition(
     min: float, max: float, position: int, span: int, upsideDown: bool = False
 ) -> float:
-    """Converts the given pixel `position` to a value.
-
-    0 maps to the `min` parameter, `span` maps to `max` and other values are
-    distributed evenly in-between.
-
-    By default, this function assumes that the maximum value is on the right
-    for horizontal items and on the bottom for vertical items. Set the
-    `upsideDown` parameter to True to reverse this behavior.
-    """
-
+    """Converts the given pixel `position` to a value."""
     if span <= 0 or position <= 0:
         return max if upsideDown else min
     if position >= span:

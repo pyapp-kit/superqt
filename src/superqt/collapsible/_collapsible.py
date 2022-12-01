@@ -1,26 +1,46 @@
-"""A collapsible widget to hide and unhide child widgets"""
-from typing import Optional
+"""A collapsible widget to hide and unhide child widgets."""
+from typing import Optional, Union
 
-from qtpy.QtCore import QEasingCurve, QEvent, QMargins, QObject, QPropertyAnimation, Qt
+from qtpy.QtCore import (
+    QEasingCurve,
+    QEvent,
+    QMargins,
+    QObject,
+    QPropertyAnimation,
+    QRect,
+    Qt,
+    Signal,
+)
+from qtpy.QtGui import QIcon, QPainter, QPalette, QPixmap
 from qtpy.QtWidgets import QFrame, QPushButton, QVBoxLayout, QWidget
 
 
 class QCollapsible(QFrame):
     """A collapsible widget to hide and unhide child widgets.
 
+    A signal is emitted when the widget is expanded (True) or collapsed (False).
+
     Based on https://stackoverflow.com/a/68141638
     """
 
-    _EXPANDED = "▼  "
-    _COLLAPSED = "▲  "
+    toggled = Signal(bool)
 
-    def __init__(self, title: str = "", parent: Optional[QWidget] = None):
+    def __init__(
+        self,
+        title: str = "",
+        parent: Optional[QWidget] = None,
+        expandedIcon: Optional[Union[QIcon, str]] = "▼",
+        collapsedIcon: Optional[Union[QIcon, str]] = "▲",
+    ):
         super().__init__(parent)
         self._locked = False
         self._is_animating = False
+        self._text = title
 
-        self._toggle_btn = QPushButton(self._COLLAPSED + title)
+        self._toggle_btn = QPushButton(title)
         self._toggle_btn.setCheckable(True)
+        self.setCollapsedIcon(icon=collapsedIcon)
+        self.setExpandedIcon(icon=expandedIcon)
         self._toggle_btn.setStyleSheet("text-align: left; border: none; outline: none;")
         self._toggle_btn.toggled.connect(self._toggle)
 
@@ -44,16 +64,16 @@ class QCollapsible(QFrame):
         _content.layout().setContentsMargins(QMargins(5, 0, 0, 0))
         self.setContent(_content)
 
-    def setText(self, text: str):
+    def setText(self, text: str) -> None:
         """Set the text of the toggle button."""
-        current = self._toggle_btn.text()[: len(self._EXPANDED)]
+        current = self._toggle_btn.text()
         self._toggle_btn.setText(current + text)
 
     def text(self) -> str:
         """Return the text of the toggle button."""
-        return self._toggle_btn.text()[len(self._EXPANDED) :]
+        return self._toggle_btn.text()
 
-    def setContent(self, content: QWidget):
+    def setContent(self, content: QWidget) -> None:
         """Replace central widget (the widget that gets expanded/collapsed)."""
         self._content = content
         self.layout().addWidget(self._content)
@@ -63,56 +83,103 @@ class QCollapsible(QFrame):
         """Return the current content widget."""
         return self._content
 
-    def setDuration(self, msecs: int):
+    def _convert_string_to_icon(self, symbol: str) -> QIcon:
+        """Create a QIcon from a string."""
+        size = self._toggle_btn.font().pointSize()
+        pixmap = QPixmap(size, size)
+        pixmap.fill(Qt.GlobalColor.transparent)
+        painter = QPainter(pixmap)
+        color = self._toggle_btn.palette().color(QPalette.ColorRole.WindowText)
+        painter.setPen(color)
+        painter.drawText(QRect(0, 0, size, size), Qt.AlignmentFlag.AlignCenter, symbol)
+        painter.end()
+        return QIcon(pixmap)
+
+    def expandedIcon(self) -> QIcon:
+        """Returns the icon used when the widget is expanded."""
+        return self._expanded_icon
+
+    def setExpandedIcon(self, icon: Optional[Union[QIcon, str]] = None) -> None:
+        """Set the icon on the toggle button when the widget is expanded."""
+        if icon and isinstance(icon, QIcon):
+            self._expanded_icon = icon
+        elif icon and isinstance(icon, str):
+            self._expanded_icon = self._convert_string_to_icon(icon)
+
+        if self.isExpanded():
+            self._toggle_btn.setIcon(self._expanded_icon)
+
+    def collapsedIcon(self) -> QIcon:
+        """Returns the icon used when the widget is collapsed."""
+        return self._collapsed_icon
+
+    def setCollapsedIcon(self, icon: Optional[Union[QIcon, str]] = None) -> None:
+        """Set the icon on the toggle button when the widget is collapsed."""
+        if icon and isinstance(icon, QIcon):
+            self._collapsed_icon = icon
+        elif icon and isinstance(icon, str):
+            self._collapsed_icon = self._convert_string_to_icon(icon)
+
+        if not self.isExpanded():
+            self._toggle_btn.setIcon(self._collapsed_icon)
+
+    def setDuration(self, msecs: int) -> None:
         """Set duration of the collapse/expand animation."""
         self._animation.setDuration(msecs)
 
-    def setEasingCurve(self, easing: QEasingCurve):
+    def setEasingCurve(self, easing: QEasingCurve) -> None:
         """Set the easing curve for the collapse/expand animation"""
         self._animation.setEasingCurve(easing)
 
-    def addWidget(self, widget: QWidget):
+    def addWidget(self, widget: QWidget) -> None:
         """Add a widget to the central content widget's layout."""
         widget.installEventFilter(self)
         self._content.layout().addWidget(widget)
 
-    def removeWidget(self, widget: QWidget):
+    def removeWidget(self, widget: QWidget) -> None:
         """Remove widget from the central content widget's layout."""
         self._content.layout().removeWidget(widget)
         widget.removeEventFilter(self)
 
-    def expand(self, animate: bool = True):
+    def expand(self, animate: bool = True) -> None:
         """Expand (show) the collapsible section"""
         self._expand_collapse(QPropertyAnimation.Direction.Forward, animate)
 
-    def collapse(self, animate: bool = True):
+    def collapse(self, animate: bool = True) -> None:
         """Collapse (hide) the collapsible section"""
         self._expand_collapse(QPropertyAnimation.Direction.Backward, animate)
 
     def isExpanded(self) -> bool:
-        """Return whether the collapsible section is visible"""
+        """Return whether the collapsible section is visible."""
         return self._toggle_btn.isChecked()
 
-    def setLocked(self, locked: bool = True):
+    def setLocked(self, locked: bool = True) -> None:
         """Set whether collapse/expand is disabled"""
         self._locked = locked
         self._toggle_btn.setCheckable(not locked)
 
     def locked(self) -> bool:
-        """Return True if collapse/expand is disabled"""
+        """Return True if collapse/expand is disabled."""
         return self._locked
 
     def _expand_collapse(
-        self, direction: QPropertyAnimation.Direction, animate: bool = True
-    ):
+        self,
+        direction: QPropertyAnimation.Direction,
+        animate: bool = True,
+        emit: bool = True,
+    ) -> None:
+        """Set values for the widget based on whether it is expanding or collapsing.
+
+        An emit flag is included so that the toggle signal is only called once (it
+        was being emitted a few times via eventFilter when the widget was expanding
+        previously)."""
         if self._locked:
             return
 
         forward = direction == QPropertyAnimation.Direction.Forward
-        text = self._EXPANDED if forward else self._COLLAPSED
-
+        icon = self._expanded_icon if forward else self._collapsed_icon
+        self._toggle_btn.setIcon(icon)
         self._toggle_btn.setChecked(forward)
-        self._toggle_btn.setText(text + self._toggle_btn.text()[len(self._EXPANDED) :])
 
         _content_height = self._content.sizeHint().height() + 10
         if animate:
@@ -122,8 +189,10 @@ class QCollapsible(QFrame):
             self._animation.start()
         else:
             self._content.setMaximumHeight(_content_height if forward else 0)
+        if emit:
+            self.toggled.emit(direction == QPropertyAnimation.Direction.Forward)
 
-    def _toggle(self):
+    def _toggle(self) -> None:
         self.expand() if self.isExpanded() else self.collapse()
 
     def eventFilter(self, a0: QObject, a1: QEvent) -> bool:
@@ -133,8 +202,10 @@ class QCollapsible(QFrame):
             and self.isExpanded()
             and not self._is_animating
         ):
-            self._expand_collapse(QPropertyAnimation.Direction.Forward, animate=False)
+            self._expand_collapse(
+                QPropertyAnimation.Direction.Forward, animate=False, emit=False
+            )
         return False
 
-    def _on_animation_done(self):
+    def _on_animation_done(self) -> None:
         self._is_animating = False

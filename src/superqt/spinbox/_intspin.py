@@ -24,7 +24,7 @@ class _AnyIntValidator(QValidator):
 
 
 class QLargeIntSpinBox(QAbstractSpinBox):
-    """An integer spinboxes backed by unbound python integer
+    """An integer spinboxes backed by unbound python integer.
 
     Qt's built-in ``QSpinBox`` is backed by a signed 32-bit integer.
     This could become limiting, particularly in large dense segmentations.

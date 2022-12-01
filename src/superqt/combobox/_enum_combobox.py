@@ -11,7 +11,7 @@ NONE_STRING = "----"
 
 
 def _get_name(enum_value: Enum):
-    """Create human readable name if user does not implement __str__"""
+    """Create human readable name if user does not implement `__str__`."""
     if (
         enum_value.__str__.__module__ != "enum"
         and not enum_value.__str__.__module__.startswith("shibokensupport")
@@ -24,8 +24,7 @@ def _get_name(enum_value: Enum):
 
 
 class QEnumComboBox(QComboBox):
-    """
-    ComboBox presenting options from a python Enum.
+    """ComboBox presenting options from a python Enum.
 
     If the Enum class does not implement `__str__` then a human readable name
     is created from the name of the enum member, replacing underscores with spaces.
@@ -44,9 +43,7 @@ class QEnumComboBox(QComboBox):
         self.currentIndexChanged.connect(self._emit_signal)
 
     def setEnumClass(self, enum: Optional[EnumMeta], allow_none=False):
-        """
-        Set enum class from which members value should be selected
-        """
+        """Set enum class from which members value should be selected."""
         self.clear()
         self._enum_class = enum
         self._allow_none = allow_none and enum is not None
@@ -55,11 +52,11 @@ class QEnumComboBox(QComboBox):
         super().addItems(list(map(_get_name, self._enum_class.__members__.values())))
 
     def enumClass(self) -> Optional[EnumMeta]:
-        """return current Enum class"""
+        """return current Enum class."""
         return self._enum_class
 
     def isOptional(self) -> bool:
-        """return if current enum is with optional annotation"""
+        """return if current enum is with optional annotation."""
         return self._allow_none
 
     def clear(self):
@@ -68,7 +65,7 @@ class QEnumComboBox(QComboBox):
         super().clear()
 
     def currentEnum(self) -> Optional[EnumType]:
-        """current value as Enum member"""
+        """Current value as Enum member."""
         if self._enum_class is not None:
             if self._allow_none:
                 if self.currentText() == NONE_STRING:

@@ -45,7 +45,6 @@ nosetests.xml
 coverage.xml
 *,cover
 .hypothesis/
-.napari_cache
 
 # Translations
 *.mo

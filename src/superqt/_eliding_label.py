@@ -56,7 +56,7 @@ class QElidingLabel(QLabel):
     # Reimplemented QT methods
 
     def text(self) -> str:
-        """This property holds the label's text.
+        """Return the label's text.
 
         If no text has been set this will return an empty string.
         """
@@ -90,7 +90,7 @@ class QElidingLabel(QLabel):
     # private implementation methods
 
     def _elidedText(self) -> str:
-        """Return `self._text` elided to `width`"""
+        """Return `self._text` elided to `width`."""
         fm = QFontMetrics(self.font())
         # the 2 is a magic number that prevents the ellipses from going missing
         # in certain cases (?)

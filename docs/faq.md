@@ -7,7 +7,7 @@
     (including native Qt sliders) to not respond properly to drag events.  See:
 
     - [https://bugreports.qt.io/browse/QTBUG-98093](https://bugreports.qt.io/browse/QTBUG-98093)
-    - [https://github.com/napari/superqt/issues/74](https://github.com/napari/superqt/issues/74)
+    - [https://github.com/pyapp-kit/superqt/issues/74](https://github.com/pyapp-kit/superqt/issues/74)
 
     Superqt includes a workaround for this issue, but it is not perfect, and it requires using a custom stylesheet (which may interfere with your own styles).  Note that you
     may not see this issue if you're already using custom stylesheets.

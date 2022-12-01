@@ -60,7 +60,6 @@ class IconFont(metaclass=IconFontMeta):
 
     Examples
     --------
-
         class FA5S(IconFont):
             __font_file__ = '...'
             some_char = 0xfa42
@@ -76,7 +75,7 @@ def namespace2font(namespace: Union[Mapping, Type], name: str) -> Type[IconFont]
         assert isinstance(
             getattr(namespace, FONTFILE_ATTR), str
         ), "Not a valid font type"
-        return namespace  # type: ignore
+        return namespace
     elif hasattr(namespace, "__dict__"):
         ns = dict(namespace.__dict__)
     else:

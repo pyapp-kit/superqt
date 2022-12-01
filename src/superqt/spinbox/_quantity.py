@@ -70,7 +70,7 @@ class QQuantity(QWidget):
     def __init__(
         self,
         value: Union[str, Quantity, Number] = 0,
-        units: Union[UnitsContainer, str, Quantity] = None,
+        units: Optional[Union[UnitsContainer, str, Quantity]] = None,
         ureg: Optional[UnitRegistry] = None,
         parent: Optional[QWidget] = None,
     ) -> None:
@@ -163,7 +163,7 @@ class QQuantity(QWidget):
     def setValue(
         self,
         value: Union[str, Quantity, Number],
-        units: Union[UnitsContainer, str, Quantity] = None,
+        units: Optional[Union[UnitsContainer, str, Quantity]] = None,
     ) -> None:
         """Set the current value (will cast to a pint Quantity)."""
         if isinstance(value, Quantity):

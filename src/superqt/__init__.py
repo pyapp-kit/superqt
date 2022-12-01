@@ -1,5 +1,5 @@
 """superqt is a collection of Qt components for python."""
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 try:
     from ._version import version as __version__
@@ -46,7 +46,7 @@ __all__ = [
 ]
 
 
-def __getattr__(name):
+def __getattr__(name: str) -> Any:
     if name == "QQuantity":
         from .spinbox._quantity import QQuantity
 

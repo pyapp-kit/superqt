@@ -8,15 +8,10 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Callable,
-    Dict,
     Generator,
     Generic,
-    Optional,
     Sequence,
-    Set,
-    Type,
     TypeVar,
-    Union,
     overload,
 )
 
@@ -27,7 +22,7 @@ if TYPE_CHECKING:
 
     class SigInst(Generic[_T]):
         @staticmethod
-        def connect(slot: Callable[[_T], Any], type: Optional[type] = ...) -> None:
+        def connect(slot: Callable[[_T], Any], type: type | None = ...) -> None:
             ...
 
         @staticmethod
@@ -61,7 +56,7 @@ def as_generator_function(
     """Turns a regular function (single return) into a generator function."""
 
     @wraps(func)
-    def genwrapper(*args, **kwargs) -> Generator[None, None, _R]:
+    def genwrapper(*args: Any, **kwargs: Any) -> Generator[None, None, _R]:
         yield
         return func(*args, **kwargs)
 
@@ -93,7 +88,7 @@ class WorkerBase(QRunnable, Generic[_R]):
     """
 
     #: A set of Workers.  Add to set using `WorkerBase.start`
-    _worker_set: Set[WorkerBase] = set()
+    _worker_set: set[WorkerBase] = set()
     returned: SigInst[_R]
     errored: SigInst[Exception]
     warned: SigInst[tuple]
@@ -102,8 +97,8 @@ class WorkerBase(QRunnable, Generic[_R]):
 
     def __init__(
         self,
-        func: Optional[Callable[_P, _R]] = None,
-        SignalsClass: Type[WorkerBaseSignals] = WorkerBaseSignals,
+        func: Callable[_P, _R] | None = None,
+        SignalsClass: type[WorkerBaseSignals] = WorkerBaseSignals,
     ) -> None:
         super().__init__()
         self._abort_requested = False
@@ -148,7 +143,7 @@ class WorkerBase(QRunnable, Generic[_R]):
 
     @property
     def is_running(self) -> bool:
-        """Whether the worker has been started"""
+        """Whether the worker has been started."""
         return self._running
 
     def run(self) -> None:
@@ -202,7 +197,7 @@ class WorkerBase(QRunnable, Generic[_R]):
         self.finished.emit()
         self._finished.emit(self)
 
-    def work(self) -> Union[Exception, _R]:
+    def work(self) -> Exception | _R:
         """Main method to execute the worker.
 
         The end-user should never need to call this function.
@@ -267,7 +262,7 @@ class WorkerBase(QRunnable, Generic[_R]):
         cls._worker_set.discard(obj)
 
     @classmethod
-    def await_workers(cls, msecs: int = None) -> None:
+    def await_workers(cls, msecs: int | None = None) -> None:
         """Ask all workers to quit, and wait up to `msec` for quit.
 
         Attempts to clean up all running workers by calling `worker.quit()`
@@ -397,9 +392,9 @@ class GeneratorWorker(WorkerBase, Generic[_Y, _S, _R]):
 
     def __init__(
         self,
-        func: Callable[_P, Generator[_Y, Optional[_S], _R]],
+        func: Callable[_P, Generator[_Y, _S | None, _R]],
         *args,
-        SignalsClass: Type[WorkerBaseSignals] = GeneratorWorkerSignals,
+        SignalsClass: type[WorkerBaseSignals] = GeneratorWorkerSignals,
         **kwargs,
     ):
         if not inspect.isgeneratorfunction(func):
@@ -410,7 +405,7 @@ class GeneratorWorker(WorkerBase, Generic[_Y, _S, _R]):
         super().__init__(SignalsClass=SignalsClass)
 
         self._gen = func(*args, **kwargs)
-        self._incoming_value: Optional[_S] = None
+        self._incoming_value: _S | None = None
         self._pause_requested = False
         self._resume_requested = False
         self._paused = False
@@ -419,7 +414,7 @@ class GeneratorWorker(WorkerBase, Generic[_Y, _S, _R]):
         self._pause_interval = 0.01
         self.pbar = None
 
-    def work(self) -> Union[Optional[_R], Exception]:
+    def work(self) -> _R | None | Exception:
         """Core event loop that calls the original function.
 
         Enters a continual loop, yielding and returning from the original
@@ -445,8 +440,8 @@ class GeneratorWorker(WorkerBase, Generic[_Y, _S, _R]):
                 self.paused.emit()
                 continue
             try:
-                input = self._next_value()
-                output = self._gen.send(input)
+                _input = self._next_value()
+                output = self._gen.send(_input)
                 self.yielded.emit(output)
             except StopIteration as exc:
                 return exc.value
@@ -460,7 +455,7 @@ class GeneratorWorker(WorkerBase, Generic[_Y, _S, _R]):
         """Send a value into the function (if a generator was used)."""
         self._incoming_value = value
 
-    def _next_value(self) -> Optional[_S]:
+    def _next_value(self) -> _S | None:
         out = None
         if self._incoming_value is not None:
             out = self._incoming_value
@@ -499,9 +494,9 @@ class GeneratorWorker(WorkerBase, Generic[_Y, _S, _R]):
 def create_worker(
     func: Callable[_P, Generator[_Y, _S, _R]],
     *args,
-    _start_thread: Optional[bool] = None,
-    _connect: Optional[Dict[str, Union[Callable, Sequence[Callable]]]] = None,
-    _worker_class: Union[Type[GeneratorWorker], Type[FunctionWorker], None] = None,
+    _start_thread: bool | None = None,
+    _connect: dict[str, Callable | Sequence[Callable]] | None = None,
+    _worker_class: type[GeneratorWorker] | type[FunctionWorker] | None = None,
     _ignore_errors: bool = False,
     **kwargs,
 ) -> GeneratorWorker[_Y, _S, _R]:
@@ -512,9 +507,9 @@ def create_worker(
 def create_worker(
     func: Callable[_P, _R],
     *args,
-    _start_thread: Optional[bool] = None,
-    _connect: Optional[Dict[str, Union[Callable, Sequence[Callable]]]] = None,
-    _worker_class: Union[Type[GeneratorWorker], Type[FunctionWorker], None] = None,
+    _start_thread: bool | None = None,
+    _connect: dict[str, Callable | Sequence[Callable]] | None = None,
+    _worker_class: type[GeneratorWorker] | type[FunctionWorker] | None = None,
     _ignore_errors: bool = False,
     **kwargs,
 ) -> FunctionWorker[_R]:
@@ -524,12 +519,12 @@ def create_worker(
 def create_worker(
     func: Callable,
     *args,
-    _start_thread: Optional[bool] = None,
-    _connect: Optional[Dict[str, Union[Callable, Sequence[Callable]]]] = None,
-    _worker_class: Union[Type[GeneratorWorker], Type[FunctionWorker], None] = None,
+    _start_thread: bool | None = None,
+    _connect: dict[str, Callable | Sequence[Callable]] | None = None,
+    _worker_class: type[GeneratorWorker] | type[FunctionWorker] | None = None,
     _ignore_errors: bool = False,
     **kwargs,
-) -> Union[FunctionWorker, GeneratorWorker]:
+) -> FunctionWorker | GeneratorWorker:
     """Convenience function to start a function in another thread.
 
     By default, uses `FunctionWorker` for functions and `GeneratorWorker` for
@@ -584,7 +579,7 @@ def create_worker(
     worker = create_worker(long_function, 10)
     ```
     """
-    worker: Union[FunctionWorker, GeneratorWorker]
+    worker: FunctionWorker | GeneratorWorker
 
     if not _worker_class:
         if inspect.isgeneratorfunction(func):
@@ -631,9 +626,9 @@ def create_worker(
 @overload
 def thread_worker(
     function: Callable[_P, Generator[_Y, _S, _R]],
-    start_thread: Optional[bool] = None,
-    connect: Optional[Dict[str, Union[Callable, Sequence[Callable]]]] = None,
-    worker_class: Optional[Type[WorkerBase]] = None,
+    start_thread: bool | None = None,
+    connect: dict[str, Callable | Sequence[Callable]] | None = None,
+    worker_class: type[WorkerBase] | None = None,
     ignore_errors: bool = False,
 ) -> Callable[_P, GeneratorWorker[_Y, _S, _R]]:
     ...
@@ -642,9 +637,9 @@ def thread_worker(
 @overload
 def thread_worker(
     function: Callable[_P, _R],
-    start_thread: Optional[bool] = None,
-    connect: Optional[Dict[str, Union[Callable, Sequence[Callable]]]] = None,
-    worker_class: Optional[Type[WorkerBase]] = None,
+    start_thread: bool | None = None,
+    connect: dict[str, Callable | Sequence[Callable]] | None = None,
+    worker_class: type[WorkerBase] | None = None,
     ignore_errors: bool = False,
 ) -> Callable[_P, FunctionWorker[_R]]:
     ...
@@ -653,19 +648,19 @@ def thread_worker(
 @overload
 def thread_worker(
     function: Literal[None] = None,
-    start_thread: Optional[bool] = None,
-    connect: Optional[Dict[str, Union[Callable, Sequence[Callable]]]] = None,
-    worker_class: Optional[Type[WorkerBase]] = None,
+    start_thread: bool | None = None,
+    connect: dict[str, Callable | Sequence[Callable]] | None = None,
+    worker_class: type[WorkerBase] | None = None,
     ignore_errors: bool = False,
-) -> Callable[[Callable], Callable[_P, Union[FunctionWorker, GeneratorWorker]]]:
+) -> Callable[[Callable], Callable[_P, FunctionWorker | GeneratorWorker]]:
     ...
 
 
 def thread_worker(
-    function: Optional[Callable] = None,
-    start_thread: Optional[bool] = None,
-    connect: Optional[Dict[str, Union[Callable, Sequence[Callable]]]] = None,
-    worker_class: Optional[Type[WorkerBase]] = None,
+    function: Callable | None = None,
+    start_thread: bool | None = None,
+    connect: dict[str, Callable | Sequence[Callable]] | None = None,
+    worker_class: type[WorkerBase] | None = None,
     ignore_errors: bool = False,
 ):
     """Decorator that runs a function in a separate thread when called.
@@ -800,28 +795,14 @@ if TYPE_CHECKING:
 
 
 def new_worker_qthread(
-    Worker: Type[WorkerProtocol],
+    Worker: type[WorkerProtocol],
     *args,
     _start_thread: bool = False,
-    _connect: Dict[str, Callable] = None,
+    _connect: dict[str, Callable] | None = None,
     **kwargs,
 ):
-    """This is a convenience function to start a worker in a `QThread`.
+    """Convenience function to start a worker in a `QThread`.
 
-    In most cases, the [thread_worker][superqt.utils.thread_worker] decorator is
-    sufficient and preferable. But this allows the user to completely customize the
-    Worker object. However, they must then maintain control over the thread and clean up
-    appropriately.
-
-    It follows the pattern described
-    [here](https://www.qt.io/blog/2010/06/17/youre-doing-it-wrong) and in the [qt thread
-    docs](https://doc.qt.io/qt-5/qthread.html#details)
-
-    see also:
-
-    https://mayaposch.wordpress.com/2011/11/01/how-to-really-truly-use-qthreads-the-full-explanation/
-
-    A QThread object is not a thread! It should be thought of as a class to *manage* a
     thread, not as the actual code or object that runs in that
     thread.  The QThread object is created on the main thread and lives there.
 
@@ -892,7 +873,6 @@ def new_worker_qthread(
     )
     ```
     """
-
     if _connect and not isinstance(_connect, dict):
         raise TypeError("_connect parameter must be a dict")
 
