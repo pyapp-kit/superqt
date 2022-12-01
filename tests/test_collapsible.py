@@ -1,6 +1,5 @@
 """A test module for testing collapsible"""
 
-import pytest
 from qtpy.QtCore import QEasingCurve, Qt
 from qtpy.QtGui import QIcon
 from qtpy.QtWidgets import QPushButton, QStyle, QWidget
@@ -8,7 +7,7 @@ from qtpy.QtWidgets import QPushButton, QStyle, QWidget
 from superqt import QCollapsible
 
 
-def _get_builtin_icon(name):
+def _get_builtin_icon(name: str) -> QIcon:
     """Get a built-in icon from the Qt library."""
     widget = QWidget()
     try:
@@ -113,7 +112,6 @@ def test_toggle_signal(qtbot):
         wdg.collapse()
 
 
-@pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_getting_icon(qtbot):
     """Test setting string as toggle button."""
     wdg = QCollapsible("test")
@@ -121,7 +119,6 @@ def test_getting_icon(qtbot):
     assert isinstance(wdg.collapsedIcon(), QIcon)
 
 
-@pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_setting_icon(qtbot):
     """Test setting icon for toggle button."""
     icon1 = _get_builtin_icon("ArrowRight")
@@ -131,7 +128,6 @@ def test_setting_icon(qtbot):
     assert wdg._collapsed_icon == icon2
 
 
-@pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_setting_symbol_icon(qtbot):
     """Test setting string as toggle button."""
     wdg = QCollapsible("test")
