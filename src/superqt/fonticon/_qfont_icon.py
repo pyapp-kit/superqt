@@ -476,7 +476,7 @@ class QFontIconStore(QObject):
         family: str = families[0]
 
         # in Qt6, everything becomes a static member
-        QFd: QFontDatabase | type[QFontDatabase] = (
+        QFd: QFontDatabase | "type[QFontDatabase]" = (
             QFontDatabase()
             if tuple(cast(str, QT_VERSION).split(".")) < ("6", "0")
             else QFontDatabase
