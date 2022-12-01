@@ -183,4 +183,5 @@ ignore = [
     "CONTRIBUTING.md",
     "codecov.yml",
     ".ruff_cache/**/*",
+    "setup.py"
 ]
