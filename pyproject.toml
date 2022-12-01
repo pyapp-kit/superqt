@@ -85,6 +85,9 @@ Changelog = "https://github.com/pyapp-kit/superqt/blob/main/CHANGELOG.md"
 [tool.hatch.version]
 source = "vcs"
 
+[tool.hatch.build.targets.sdist]
+include = ["src", "tests", "CHANGELOG.md"]
+
 # https://pycqa.github.io/isort/docs/configuration/options.html
 [tool.isort]
 profile = "black"
