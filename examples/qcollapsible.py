@@ -6,6 +6,8 @@ from superqt import QCollapsible
 app = QApplication([])
 
 collapsible = QCollapsible("Advanced analysis")
+collapsible.setCollapsedIcon("+")
+collapsible.setExpandedIcon("-")
 collapsible.addWidget(QLabel("This is the inside of the collapsible frame"))
 for i in range(10):
     collapsible.addWidget(QPushButton(f"Content button {i + 1}"))
