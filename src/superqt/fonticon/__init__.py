@@ -2,18 +2,19 @@ from __future__ import annotations
 
 __all__ = [
     "addFont",
+    "Animation",
     "ENTRY_POINT",
     "font",
     "icon",
     "IconFont",
     "IconFontMeta",
     "IconOpts",
-    "Animation",
     "pulse",
+    "setTextIcon",
     "spin",
 ]
 
-from typing import TYPE_CHECKING, Dict, Optional, Tuple, Union
+from typing import TYPE_CHECKING
 
 from ._animations import Animation, pulse, spin
 from ._iconfont import IconFont, IconFontMeta
@@ -38,21 +39,23 @@ ENTRY_POINT = _FIM.ENTRY_POINT
 def icon(
     glyph_key: str,
     scale_factor: float = DEFAULT_SCALING_FACTOR,
-    color: ValidColor = None,
+    color: ValidColor | None = None,
     opacity: float = 1,
-    animation: Optional[Animation] = None,
-    transform: Optional[QTransform] = None,
-    states: Dict[str, Union[IconOptionDict, IconOpts]] = {},
+    animation: Animation | None = None,
+    transform: QTransform | None = None,
+    states: dict[str, IconOptionDict | IconOpts] | None = None,
 ) -> QFontIcon:
-    """Create a QIcon for `glyph_key`, with a number of optional settings
+    """Create a QIcon for `glyph_key`, with a number of optional settings.
 
     The `glyph_key` (e.g. 'fa5s.smile') represents a Font-family & style, and a glpyh.
     In most cases, the key should be provided by a plugin in the environment, like:
 
-    https://github.com/tlambert03/fonticon-fontawesome5  ('fa5s' & 'fa5r' prefixes)
-    https://github.com/tlambert03/fonticon-materialdesignicons6  ('mdi6' prefix)
+    - [fonticon-fontawesome5](https://pypi.org/project/fonticon-fontawesome5/) ('fa5s' &
+      'fa5r' prefixes)
+    - [fonticon-materialdesignicons6](https://pypi.org/project/fonticon-materialdesignicons6/)
+      ('mdi6' prefix)
 
-    ...but fonts can also be added manually using :func:`addFont`.
+    ...but fonts can also be added manually using [`addFont`][superqt.fonticon.addFont].
 
     Parameters
     ----------
@@ -96,19 +99,21 @@ def icon(
 
     Examples
     --------
-    # simple example (assumes the font-awesome5 plugin is installed)
+    simple example (using the string `'fa5s.smile'` assumes the `fonticon-fontawesome5`
+    plugin is installed)
+
     >>> btn = QPushButton()
     >>> btn.setIcon(icon('fa5s.smile'))
 
-    # can also directly import from fonticon_fa5
+    can also directly import from fonticon_fa5
     >>> from fonticon_fa5 import FA5S
     >>> btn.setIcon(icon(FA5S.smile))
 
-    # with animation
+    with animation
     >>> btn2 = QPushButton()
     >>> btn2.setIcon(icon(FA5S.spinner, animation=pulse(btn2)))
 
-    # complicated example
+    complicated example
     >>> btn = QPushButton()
     >>> btn.setIcon(
     ...     icon(
@@ -132,7 +137,7 @@ def icon(
     >>> btn.setIconSize(QSize(256, 256))
     >>> btn.show()
 
-    """
+    """  # noqa: E501
     return _QFIS.instance().icon(
         glyph_key,
         scale_factor=scale_factor,
@@ -140,11 +145,11 @@ def icon(
         opacity=opacity,
         animation=animation,
         transform=transform,
-        states=states,
+        states=states or {},
     )
 
 
-def setTextIcon(widget: QWidget, glyph_key: str, size: Optional[float] = None) -> None:
+def setTextIcon(widget: QWidget, glyph_key: str, size: float | None = None) -> None:
     """Set text on a widget to a specific font & glyph.
 
     This is an alternative to setting a QIcon with a pixmap.  It may be easier to
@@ -152,7 +157,7 @@ def setTextIcon(widget: QWidget, glyph_key: str, size: Optional[float] = None) -
 
     Parameters
     ----------
-    wdg : QWidget
+    widget : QWidget
         A widget supporting a `setText` method.
     glyph_key : str
         String encapsulating a font-family, style, and glyph. e.g. 'fa5s.smile'.
@@ -162,8 +167,8 @@ def setTextIcon(widget: QWidget, glyph_key: str, size: Optional[float] = None) -
     return _QFIS.instance().setTextIcon(widget, glyph_key, size)
 
 
-def font(font_prefix: str, size: Optional[int] = None) -> QFont:
-    """Create QFont for `font_prefix`
+def font(font_prefix: str, size: int | None = None) -> QFont:
+    """Create QFont for `font_prefix`.
 
     Parameters
     ----------
@@ -181,8 +186,8 @@ def font(font_prefix: str, size: Optional[int] = None) -> QFont:
 
 
 def addFont(
-    filepath: str, prefix: str, charmap: Optional[Dict[str, str]] = None
-) -> Optional[Tuple[str, str]]:
+    filepath: str, prefix: str, charmap: dict[str, str] | None = None
+) -> tuple[str, str] | None:
     """Add OTF/TTF file at `filepath` to the registry under `prefix`.
 
     If you'd like to later use a fontkey in the form of `prefix.some-name`, then
@@ -190,10 +195,12 @@ def addFont(
     to their unicode numbers. If a charmap is not provided, glyphs must be directly
     accessed with their unicode as something like `key.\uffff`.
 
-    NOTE: in most cases, users will not need this.
-    Instead, they should install a font plugin, like:
-    https://github.com/tlambert03/fonticon-fontawesome5
-    https://github.com/tlambert03/fonticon-materialdesignicons6
+    !!! Note
+        in most cases, users will not need this. Instead, they should install a
+        font plugin, like:
+
+        - [fonticon-fontawesome5](https://pypi.org/project/fonticon-fontawesome5/)
+        - [fonticon-materialdesignicons6](https://pypi.org/project/fonticon-materialdesignicons6/)
 
     Parameters
     ----------
@@ -211,7 +218,7 @@ def addFont(
     Tuple[str, str], optional
         font-family and font-style for the file just registered, or `None` if
         something goes wrong.
-    """
+    """  # noqa: E501
     return _QFIS.instance().addFont(filepath, prefix, charmap)
 
 

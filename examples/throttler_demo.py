@@ -85,12 +85,10 @@ class DrawSignalsWidget(QWidget):
         self.update()
 
     def scrollAndCut(self, v: Deque[int], cutoff: int):
-        x = 0
         L = len(v)
         for p in range(L):
             v[p] += 1
             if v[p] > cutoff:
-                x = p
                 break
 
         # TODO: fix this... delete old ones

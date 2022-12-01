@@ -1,10 +1,14 @@
 import math
+import sys
+from itertools import product
+from typing import Any, Iterable
+from unittest.mock import Mock
 
 import pytest
 from qtpy.QtCore import QEvent, QPoint, QPointF, Qt
 from qtpy.QtWidgets import QStyle, QStyleOptionSlider
 
-from superqt import QDoubleRangeSlider, QRangeSlider
+from superqt import QDoubleRangeSlider, QLabeledRangeSlider, QRangeSlider
 
 from ._testutil import (
     _hover_event,
@@ -14,161 +18,240 @@ from ._testutil import (
     skip_on_linux_qt6,
 )
 
+ALL_SLIDER_COMBOS = list(
+    product(
+        [QDoubleRangeSlider, QRangeSlider, QLabeledRangeSlider],
+        [Qt.Orientation.Horizontal, Qt.Orientation.Vertical],
+    )
+)
+FLOAT_SLIDERS = [c for c in ALL_SLIDER_COMBOS if c[0] == QDoubleRangeSlider]
 
-@pytest.fixture(params=[Qt.Orientation.Horizontal, Qt.Orientation.Vertical])
-def gslider(qtbot, request):
-    slider = QDoubleRangeSlider(request.param)
-    qtbot.addWidget(slider)
+
+@pytest.mark.parametrize("cls, orientation", ALL_SLIDER_COMBOS)
+def test_slider_init(qtbot, cls, orientation):
+    slider = cls(orientation)
     assert slider.value() == (20, 80)
     assert slider.minimum() == 0
     assert slider.maximum() == 99
-    yield slider
-    slider.initStyleOption(QStyleOptionSlider())
+    slider.show()
+    qtbot.addWidget(slider)
 
 
-def test_change_floatslider_range(gslider: QRangeSlider, qtbot):
-    with qtbot.waitSignals([gslider.rangeChanged, gslider.valueChanged]):
-        gslider.setMinimum(30)
+@pytest.mark.parametrize("cls, orientation", ALL_SLIDER_COMBOS)
+def test_change_floatslider_range(cls, orientation, qtbot):
+    sld = cls(orientation)
+    qtbot.addWidget(sld)
 
-    assert gslider.value()[0] == 30 == gslider.minimum()
-    assert gslider.maximum() == 99
+    with qtbot.waitSignals([sld.rangeChanged, sld.valueChanged]):
+        sld.setMinimum(30)
 
-    with qtbot.waitSignal(gslider.rangeChanged):
-        gslider.setMaximum(70)
-    assert gslider.value()[0] == 30 == gslider.minimum()
-    assert gslider.value()[1] == 70 == gslider.maximum()
+    assert sld.value()[0] == 30 == sld.minimum()
+    assert sld.maximum() == 99
 
-    with qtbot.waitSignals([gslider.rangeChanged, gslider.valueChanged]):
-        gslider.setRange(40, 60)
-    assert gslider.value()[0] == 40 == gslider.minimum()
-    assert gslider.maximum() == 60
+    with qtbot.waitSignal(sld.rangeChanged):
+        sld.setMaximum(70)
+    assert sld.value()[0] == 30 == sld.minimum()
+    assert sld.value()[1] == 70 == sld.maximum()
 
-    with qtbot.waitSignal(gslider.valueChanged):
-        gslider.setValue([40, 50])
-    assert gslider.value()[0] == 40 == gslider.minimum()
-    assert gslider.value()[1] == 50
+    with qtbot.waitSignals([sld.rangeChanged, sld.valueChanged]):
+        sld.setRange(40, 60)
+    assert sld.value()[0] == 40 == sld.minimum()
+    assert sld.maximum() == 60
 
-    with qtbot.waitSignals([gslider.rangeChanged, gslider.valueChanged]):
-        gslider.setMaximum(45)
-    assert gslider.value()[0] == 40 == gslider.minimum()
-    assert gslider.value()[1] == 45 == gslider.maximum()
+    with qtbot.waitSignal(sld.valueChanged):
+        sld.setValue([40, 50])
+    assert sld.value()[0] == 40 == sld.minimum()
+    assert sld.value()[1] == 50
 
-
-def test_float_values(gslider: QRangeSlider, qtbot):
-    with qtbot.waitSignal(gslider.rangeChanged):
-        gslider.setRange(0.1, 0.9)
-    assert gslider.minimum() == 0.1
-    assert gslider.maximum() == 0.9
-
-    with qtbot.waitSignal(gslider.valueChanged):
-        gslider.setValue([0.4, 0.6])
-    assert gslider.value() == (0.4, 0.6)
-
-    with qtbot.waitSignal(gslider.valueChanged):
-        gslider.setValue([0, 1.9])
-    assert gslider.value()[0] == 0.1 == gslider.minimum()
-    assert gslider.value()[1] == 0.9 == gslider.maximum()
+    with qtbot.waitSignals([sld.rangeChanged, sld.valueChanged]):
+        sld.setMaximum(45)
+    assert sld.value()[0] == 40 == sld.minimum()
+    assert sld.value()[1] == 45 == sld.maximum()
 
 
-def test_position(gslider: QRangeSlider, qtbot):
-    gslider.setSliderPosition([10, 80])
-    assert gslider.sliderPosition() == (10, 80)
+@pytest.mark.parametrize("cls, orientation", FLOAT_SLIDERS)
+def test_float_values(cls, orientation, qtbot):
+    sld = cls(orientation)
+    qtbot.addWidget(sld)
+
+    with qtbot.waitSignal(sld.rangeChanged):
+        sld.setRange(0.1, 0.9)
+    assert sld.minimum() == 0.1
+    assert sld.maximum() == 0.9
+
+    with qtbot.waitSignal(sld.valueChanged):
+        sld.setValue([0.4, 0.6])
+    assert sld.value() == (0.4, 0.6)
+
+    with qtbot.waitSignal(sld.valueChanged):
+        sld.setValue([0, 1.9])
+    assert sld.value()[0] == 0.1 == sld.minimum()
+    assert sld.value()[1] == 0.9 == sld.maximum()
 
 
-def test_steps(gslider: QRangeSlider, qtbot):
-    gslider.setSingleStep(0.1)
-    assert gslider.singleStep() == 0.1
+@pytest.mark.parametrize("cls, orientation", ALL_SLIDER_COMBOS)
+def test_position(cls, orientation, qtbot):
+    sld = cls(orientation)
+    qtbot.addWidget(sld)
 
-    gslider.setSingleStep(1.5e20)
-    assert gslider.singleStep() == 1.5e20
+    sld.setSliderPosition([10, 80])
+    assert sld.sliderPosition() == (10, 80)
 
-    gslider.setPageStep(0.2)
-    assert gslider.pageStep() == 0.2
 
-    gslider.setPageStep(1.5e30)
-    assert gslider.pageStep() == 1.5e30
+@pytest.mark.parametrize("cls, orientation", ALL_SLIDER_COMBOS)
+def test_steps(cls, orientation, qtbot):
+    sld = cls(orientation)
+    qtbot.addWidget(sld)
+
+    sld.setSingleStep(0.1)
+    assert sld.singleStep() == 0.1
+
+    sld.setSingleStep(1.5e20)
+    assert sld.singleStep() == 1.5e20
+
+    sld.setPageStep(0.2)
+    assert sld.pageStep() == 0.2
+
+    sld.setPageStep(1.5e30)
+    assert sld.pageStep() == 1.5e30
 
 
 @pytest.mark.parametrize("mag", list(range(4, 37, 4)) + list(range(-4, -37, -4)))
-def test_slider_extremes(gslider: QRangeSlider, mag, qtbot):
+@pytest.mark.parametrize("cls, orientation", FLOAT_SLIDERS)
+def test_slider_extremes(cls, orientation, qtbot, mag):
+    sld = cls(orientation)
+    qtbot.addWidget(sld)
+
     _mag = 10**mag
-    with qtbot.waitSignal(gslider.rangeChanged):
-        gslider.setRange(-_mag, _mag)
+    with qtbot.waitSignal(sld.rangeChanged):
+        sld.setRange(-_mag, _mag)
     for i in _linspace(-_mag, _mag, 10):
-        gslider.setValue((i, _mag))
-        assert math.isclose(gslider.value()[0], i, rel_tol=1e-8)
-        gslider.initStyleOption(QStyleOptionSlider())
+        sld.setValue((i, _mag))
+        assert math.isclose(sld.value()[0], i, rel_tol=0.0001)
+        sld.initStyleOption(QStyleOptionSlider())
 
 
-def test_ticks(gslider: QRangeSlider, qtbot):
-    gslider.setTickInterval(0.3)
-    assert gslider.tickInterval() == 0.3
-    gslider.setTickPosition(gslider.TickPosition.TicksAbove)
-    gslider.show()
+@pytest.mark.parametrize("cls, orientation", ALL_SLIDER_COMBOS)
+def test_ticks(cls, orientation, qtbot):
+    sld = cls(orientation)
+    qtbot.addWidget(sld)
+
+    sld.setTickInterval(0.3)
+    assert sld.tickInterval() == 0.3
+    sld.setTickPosition(sld.TickPosition.TicksAbove)
+    sld.show()
 
 
-def test_show(gslider, qtbot):
-    gslider.show()
+@pytest.mark.parametrize("cls, orientation", FLOAT_SLIDERS)
+def test_press_move_release(cls, orientation, qtbot):
+    sld = cls(orientation)
+    qtbot.addWidget(sld)
 
-
-def test_press_move_release(gslider: QRangeSlider, qtbot):
     # this fail on vertical came with pyside6.2 ... need to debug
     # still works in practice, but test fails to catch signals
-    if gslider.orientation() == Qt.Orientation.Vertical:
+    if sld.orientation() == Qt.Orientation.Vertical:
         pytest.xfail()
 
-    assert gslider._pressedControl == QStyle.SubControl.SC_None
+    assert sld._pressedControl == QStyle.SubControl.SC_None
 
     opt = QStyleOptionSlider()
-    gslider.initStyleOption(opt)
-    style = gslider.style()
+    sld.initStyleOption(opt)
+    style = sld.style()
     hrect = style.subControlRect(
         QStyle.ComplexControl.CC_Slider, opt, QStyle.SubControl.SC_SliderHandle
     )
-    handle_pos = gslider.mapToGlobal(hrect.center())
+    handle_pos = sld.mapToGlobal(hrect.center())
 
-    with qtbot.waitSignal(gslider.sliderPressed):
-        qtbot.mousePress(gslider, Qt.MouseButton.LeftButton, pos=handle_pos)
+    with qtbot.waitSignal(sld.sliderPressed):
+        qtbot.mousePress(sld, Qt.MouseButton.LeftButton, pos=handle_pos)
 
-    assert gslider._pressedControl == QStyle.SubControl.SC_SliderHandle
+    assert sld._pressedControl == QStyle.SubControl.SC_SliderHandle
 
-    with qtbot.waitSignals([gslider.sliderMoved, gslider.valueChanged]):
+    with qtbot.waitSignals([sld.sliderMoved, sld.valueChanged]):
         shift = (
             QPoint(0, -8)
-            if gslider.orientation() == Qt.Orientation.Vertical
+            if sld.orientation() == Qt.Orientation.Vertical
             else QPoint(8, 0)
         )
-        gslider.mouseMoveEvent(_mouse_event(handle_pos + shift))
+        sld.mouseMoveEvent(_mouse_event(handle_pos + shift))
 
-    with qtbot.waitSignal(gslider.sliderReleased):
-        qtbot.mouseRelease(gslider, Qt.MouseButton.LeftButton, pos=handle_pos)
+    with qtbot.waitSignal(sld.sliderReleased):
+        qtbot.mouseRelease(sld, Qt.MouseButton.LeftButton, pos=handle_pos)
 
-    assert gslider._pressedControl == QStyle.SubControl.SC_None
+    assert sld._pressedControl == QStyle.SubControl.SC_None
 
-    gslider.show()
-    with qtbot.waitSignal(gslider.sliderPressed):
-        qtbot.mousePress(gslider, Qt.MouseButton.LeftButton, pos=handle_pos)
+    sld.show()
+    with qtbot.waitSignal(sld.sliderPressed):
+        qtbot.mousePress(sld, Qt.MouseButton.LeftButton, pos=handle_pos)
 
 
 @skip_on_linux_qt6
-def test_hover(gslider: QRangeSlider):
+@pytest.mark.parametrize("cls, orientation", FLOAT_SLIDERS)
+def test_hover(cls, orientation, qtbot):
+    sld = cls(orientation)
+    qtbot.addWidget(sld)
 
-    hrect = gslider._handleRect(0)
-    handle_pos = QPointF(gslider.mapToGlobal(hrect.center()))
+    hrect = sld._handleRect(0)
+    handle_pos = QPointF(sld.mapToGlobal(hrect.center()))
 
-    assert gslider._hoverControl == QStyle.SubControl.SC_None
+    assert sld._hoverControl == QStyle.SubControl.SC_None
 
-    gslider.event(_hover_event(QEvent.Type.HoverEnter, handle_pos, QPointF(), gslider))
-    assert gslider._hoverControl == QStyle.SubControl.SC_SliderHandle
+    sld.event(_hover_event(QEvent.Type.HoverEnter, handle_pos, QPointF(), sld))
+    assert sld._hoverControl == QStyle.SubControl.SC_SliderHandle
 
-    gslider.event(
-        _hover_event(QEvent.Type.HoverLeave, QPointF(-1000, -1000), handle_pos, gslider)
+    sld.event(
+        _hover_event(QEvent.Type.HoverLeave, QPointF(-1000, -1000), handle_pos, sld)
     )
-    assert gslider._hoverControl == QStyle.SubControl.SC_None
+    assert sld._hoverControl == QStyle.SubControl.SC_None
 
 
-def test_wheel(gslider: QRangeSlider, qtbot):
-    with qtbot.waitSignal(gslider.valueChanged):
-        gslider.wheelEvent(_wheel_event(120))
+@pytest.mark.parametrize("cls, orientation", FLOAT_SLIDERS)
+def test_wheel(cls, orientation, qtbot):
+    sld = cls(orientation)
+    qtbot.addWidget(sld)
 
-    gslider.wheelEvent(_wheel_event(0))
+    with qtbot.waitSignal(sld.valueChanged):
+        sld.wheelEvent(_wheel_event(120))
+
+    sld.wheelEvent(_wheel_event(0))
+
+
+def _assert_types(args: Iterable[Any], type_: type):
+    # sourcery skip: comprehension-to-generator
+    if sys.version_info >= (3, 8):
+        assert all([isinstance(v, type_) for v in args]), "invalid type"
+
+
+@pytest.mark.parametrize("cls, orientation", ALL_SLIDER_COMBOS)
+def test_rangeslider_signals(cls, orientation, qtbot):
+    sld = cls(orientation)
+    qtbot.addWidget(sld)
+
+    type_ = float if cls == QDoubleRangeSlider else int
+
+    mock = Mock()
+    sld.valueChanged.connect(mock)
+    with qtbot.waitSignal(sld.valueChanged):
+        sld.setValue((20, 40))
+    mock.assert_called_once_with((20, 40))
+    _assert_types(mock.call_args.args, tuple)
+    _assert_types(mock.call_args.args[0], type_)
+
+    mock = Mock()
+    sld.rangeChanged.connect(mock)
+    with qtbot.waitSignal(sld.rangeChanged):
+        sld.setMinimum(3)
+    mock.assert_called_once_with(3, 99)
+    _assert_types(mock.call_args.args, type_)
+
+    mock.reset_mock()
+    with qtbot.waitSignal(sld.rangeChanged):
+        sld.setMaximum(15)
+    mock.assert_called_once_with(3, 15)
+    _assert_types(mock.call_args.args, type_)
+
+    mock.reset_mock()
+    with qtbot.waitSignal(sld.rangeChanged):
+        sld.setRange(1, 2)
+    mock.assert_called_once_with(1, 2)
+    _assert_types(mock.call_args.args, type_)

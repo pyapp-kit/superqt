@@ -3,13 +3,11 @@ name: Test
 on:
   push:
     branches:
-      - master
       - main
     tags:
       - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
   pull_request:
     branches:
-      - master
       - main
   workflow_dispatch:
 
@@ -17,60 +15,54 @@ jobs:
   test:
     name: ${{ matrix.platform }} py${{ matrix.python-version }} ${{ matrix.backend }}
     runs-on: ${{ matrix.platform }}
-    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
         platform: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: [3.7, 3.8, 3.9]
+        python-version: ["3.8", "3.9", "3.10"]
         backend: [pyqt5, pyside2]
         include:
           # pyqt6 and pyside6 on latest platforms
-          - python-version: 3.9
+          - python-version: "3.10"
+            platform: ubuntu-latest
+            backend: pyqt6
+          - python-version: "3.10"
+            platform: windows-latest
+            backend: pyqt6
+          - python-version: "3.10"
+            platform: macos-latest
+            backend: pyqt6
+          # also take screenshots
+          - python-version: "3.10"
             platform: ubuntu-latest
             backend: pyside6
             screenshot: 1
-          - python-version: 3.9
+          - python-version: "3.10"
             platform: windows-latest
             backend: pyside6
             screenshot: 1
-          - python-version: 3.9
-            platform: macos-11.0
+          - python-version: "3.10"
+            platform: macos-latest
             backend: pyside6
             screenshot: 1
-          - python-version: 3.9
+
+          - python-version: "3.11"
             platform: ubuntu-latest
             backend: pyqt6
-          - python-version: 3.9
+          - python-version: "3.11"
             platform: windows-latest
-            backend: pyqt6
-          - python-version: 3.9
-            platform: macos-11.0
-            backend: pyqt6
-          # py3.10
-          - python-version: "3.10"
-            platform: ubuntu-latest
+            backend: pyqt5
+          - python-version: "3.11"
+            platform: macos-latest
             backend: pyside6
-          - python-version: "3.10"
-            platform: ubuntu-latest
+
+          # python 3.7
+          - python-version: 3.7
+            platform: macos-latest
             backend: pyqt5
-          - python-version: "3.10"
-            platform: ubuntu-latest
-            backend: pyqt6
-
-          # big sur, 3.9
-          - python-version: 3.9
-            platform: macos-11.0
+          - python-version: 3.7
+            platform: windows-latest
             backend: pyside2
-          - python-version: 3.9
-            platform: macos-11.0
-            backend: pyqt5
-
-          # legacy OS
-          - python-version: 3.8
-            platform: ubuntu-18.04
-            backend: pyside2
-
           # legacy Qt
           - python-version: 3.7
             platform: ubuntu-latest
@@ -83,14 +75,19 @@ jobs:
             backend: pyqt514
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.11.0
+        with:
+          access_token: ${{ github.token }}
+
+      - uses: actions/checkout@v3
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
-      - uses: tlambert03/setup-qt-libs@v1
+      - uses: tlambert03/setup-qt-libs@v1.4
 
       - name: Linux opengl
         if: runner.os == 'Linux' && ( matrix.backend == 'pyside6' || matrix.backend == 'pyqt6' )
@@ -111,11 +108,11 @@ jobs:
           BACKEND: ${{ matrix.backend }}
 
       - name: Coverage
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
 
       - name: Install for screenshots
         if: matrix.screenshot
-        run: pip install . ${{ matrix.backend }}
+        run: pip install -e .[${{ matrix.backend }}]
 
       - name: Screenshots (Linux)
         if: runner.os == 'Linux' && matrix.screenshot
@@ -127,7 +124,7 @@ jobs:
         if: runner.os != 'Linux' && matrix.screenshot
         run: python examples/demo_widget.py -snap
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: matrix.screenshot
         with:
           name: screenshots ${{ runner.os }}
@@ -137,79 +134,76 @@ jobs:
     name: qtpy minreq
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: tlambert03/setup-qt-libs@v1
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v3
+      - uses: tlambert03/setup-qt-libs@v1.4
+      - uses: actions/setup-python@v4
         with:
-          python-version: '3.8'
+          python-version: "3.8"
 
       - name: install
         run: |
           python -m pip install -U pip
-          python -m pip install -e .[testing,pyqt5]
+          python -m pip install -e .[test,pyqt5]
           python -m pip install qtpy==1.1.0 typing-extensions==3.10.0.0
 
-      - name: Test napari magicgui
+      - name: Test
         uses: GabrielBB/xvfb-action@v1
         with:
           run: python -m pytest --color=yes
-
 
   test_napari:
     name: napari tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
           path: superqt
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           repository: napari/napari
-          path: napari
+          path: napari-repo
           fetch-depth: 2
 
       - uses: tlambert03/setup-qt-libs@v1
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: "3.10"
 
       - name: install
         run: |
           python -m pip install -U pip
-          python -m pip install -e ./napari[testing,pyqt5]
-          python -m pip install -e ./superqt
+          python -m pip install ./superqt
+          python -m pip install ./napari-repo[testing,pyqt5]
 
-      - name: Test napari magicgui
+      - name: Test napari
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: python -m pytest --color=yes napari/napari/_qt
+          working-directory: napari-repo
+          run: python -m pytest --color=yes napari/_qt
 
-  check_manifest:
+  check-manifest:
+    name: Check Manifest
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: "3.x"
-      - name: Check manifest
-        run: |
-          python -m pip install --upgrade pip
-          pip install check-manifest
-          check-manifest
+      - run: pip install check-manifest && check-manifest
 
   deploy:
     # this will run when you have tagged a commit, starting with "v*"
     # and requires that you have put your twine API key in your
     # github secrets (see readme for details)
-    needs: [test, check_manifest]
-    if: ${{ github.repository == 'napari/superqt' && contains(github.ref, 'tags') }}
+    needs: [test, check-manifest]
+    if: ${{ github.repository == 'pyapp-kit/superqt' && contains(github.ref, 'tags') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: "3.x"
       - name: Install dependencies

@@ -1,9 +1,21 @@
 """A test module for testing collapsible"""
 
-from qtpy.QtCore import QEasingCurve
-from qtpy.QtWidgets import QPushButton
+from qtpy.QtCore import QEasingCurve, Qt
+from qtpy.QtGui import QIcon
+from qtpy.QtWidgets import QPushButton, QStyle, QWidget
 
 from superqt import QCollapsible
+
+
+def _get_builtin_icon(name: str) -> QIcon:
+    """Get a built-in icon from the Qt library."""
+    widget = QWidget()
+    try:
+        pixmap = getattr(QStyle.StandardPixmap, f"SP_{name}")
+    except AttributeError:
+        pixmap = getattr(QStyle, f"SP_{name}")
+
+    return widget.style().standardIcon(pixmap)
 
 
 def test_checked_initialization(qtbot):
@@ -84,4 +96,44 @@ def test_changing_text(qtbot):
     wdg = QCollapsible()
     wdg.setText("Hi new text")
     assert wdg.text() == "Hi new text"
-    assert wdg._toggle_btn.text() == QCollapsible._COLLAPSED + "Hi new text"
+    assert wdg._toggle_btn.text() == "Hi new text"
+
+
+def test_toggle_signal(qtbot):
+    """Test that signal is emitted when widget expanded/collapsed."""
+    wdg = QCollapsible()
+    with qtbot.waitSignal(wdg.toggled, timeout=500):
+        qtbot.mouseClick(wdg._toggle_btn, Qt.LeftButton)
+
+    with qtbot.waitSignal(wdg.toggled, timeout=500):
+        wdg.expand()
+
+    with qtbot.waitSignal(wdg.toggled, timeout=500):
+        wdg.collapse()
+
+
+def test_getting_icon(qtbot):
+    """Test setting string as toggle button."""
+    wdg = QCollapsible("test")
+    assert isinstance(wdg.expandedIcon(), QIcon)
+    assert isinstance(wdg.collapsedIcon(), QIcon)
+
+
+def test_setting_icon(qtbot):
+    """Test setting icon for toggle button."""
+    icon1 = _get_builtin_icon("ArrowRight")
+    icon2 = _get_builtin_icon("ArrowDown")
+    wdg = QCollapsible("test", expandedIcon=icon1, collapsedIcon=icon2)
+    assert wdg._expanded_icon == icon1
+    assert wdg._collapsed_icon == icon2
+
+
+def test_setting_symbol_icon(qtbot):
+    """Test setting string as toggle button."""
+    wdg = QCollapsible("test")
+    icon1 = wdg._convert_string_to_icon("+")
+    icon2 = wdg._convert_string_to_icon("-")
+    wdg.setCollapsedIcon(icon=icon1)
+    assert wdg._collapsed_icon == icon1
+    wdg.setExpandedIcon(icon=icon2)
+    assert wdg._expanded_icon == icon2

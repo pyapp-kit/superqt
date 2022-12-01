@@ -1,10 +1,187 @@
-# pyproject.toml
+# https://peps.python.org/pep-0517/
 [build-system]
-requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.0"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
 
-[tool.setuptools_scm]
-write_to = "src/superqt/_version.py"
+# https://peps.python.org/pep-0621/
+[project]
+name = "superqt"
+description = "Missing widgets and components for PyQt/PySide"
+readme = "README.md"
+requires-python = ">=3.7"
+license = { text = "BSD 3-Clause License" }
+authors = [{ email = "talley.lambert@gmail.com" }, { name = "Talley Lambert" }]
+keywords = [
+    "qt",
+    "pyqt",
+    "pyside",
+    "widgets",
+    "range slider",
+    "components",
+    "gui",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: X11 Applications :: Qt",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Desktop Environment",
+    "Topic :: Software Development :: User Interfaces",
+    "Topic :: Software Development :: Widget Sets",
+]
+dynamic = ["version"]
+dependencies = [
+    "packaging",
+    "pygments>=2.4.0",
+    "qtpy>=1.1.0",
+    "typing-extensions",
+]
 
+# extras
+# https://peps.python.org/pep-0621/#dependencies-optional-dependencies
+[project.optional-dependencies]
+test = ["pint", "pytest", "pytest-cov", "pytest-qt", "tox", "tox-conda"]
+dev = [
+    "black",
+    "ipython",
+    "isort",
+    "jedi<0.18.0",
+    "mypy",
+    "pdbpp",
+    "pre-commit",
+    "pydocstyle",
+    "pyside2",
+    "pytest-cov",
+    "pytest-qt",
+    "pytest",
+    "rich",
+    "tox-conda",
+    "tox",
+    "types-Pygments",
+]
+docs = ["mkdocs-macros-plugin", "mkdocs-material", "mkdocstrings[python]"]
+quantity = ["pint"]
+pyside2 = ["pyside2"]
+pyside6 = ["pyside6"]
+pyqt5 = ["pyqt5"]
+pyqt6 = ["pyqt6"]
+font-fa5 = ["fonticon-fontawesome5"]
+font-fa6 = ["fonticon-fontawesome6"]
+font-mi5 = ["fonticon-materialdesignicons5"]
+
+[project.urls]
+Source = "https://github.com/pyapp-kit/superqt"
+Tracker = "https://github.com/pyapp-kit/superqt/issues"
+Changelog = "https://github.com/pyapp-kit/superqt/blob/main/CHANGELOG.md"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.targets.sdist]
+include = ["src", "tests", "CHANGELOG.md"]
+
+# https://pycqa.github.io/isort/docs/configuration/options.html
+[tool.isort]
+profile = "black"
+src_paths = ["src/superqt", "tests"]
+
+# https://github.com/charliermarsh/ruff
+[tool.ruff]
+line-length = 88
+target-version = "py37"
+src = ["src","tests"]
+extend-select = [
+    "E",    # style errors
+    "F",    # flakes
+    # "D",    # pydocstyle
+    "I001", # isort
+    "U",    # pyupgrade
+    # "N",  # pep8-naming
+    # "S",  # bandit
+    "C",    # flake8-comprehensions
+    "B",    # flake8-bugbear
+    "A001", # flake8-builtins
+    "RUF",  # ruff-specific rules
+    "M001", # Unused noqa directive
+]
+extend-ignore = [
+    "D100", # Missing docstring in public module
+    "D107", # Missing docstring in __init__
+    "D203", # 1 blank line required before class docstring
+    "D212", # Multi-line docstring summary should start at the first line
+    "D213", # Multi-line docstring summary should start at the second line
+    "D413", # Missing blank line after last section
+    "D416", # Section name should end with a colon
+    "C901", # Function is too complex
+]
+
+
+[tool.ruff.per-file-ignores]
+"tests/*.py" = ["D"]
+"examples/demo_widget.py" = ["E501"]
+"examples/*.py" = ["B"]
+
+# https://docs.pytest.org/en/6.2.x/customize.html
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = ["tests"]
+filterwarnings = [
+    "error",
+    "ignore:QPixmapCache.find:DeprecationWarning:",
+    "ignore:SelectableGroups dict interface:DeprecationWarning",
+    "ignore:The distutils package is deprecated:DeprecationWarning",
+]
+
+# https://mypy.readthedocs.io/en/stable/config_file.html
+[tool.mypy]
+files = "src/**/*.py"
+strict = true
+disallow_untyped_defs = false
+disallow_untyped_calls = false
+disallow_any_generics = false
+disallow_subclassing_any = false
+show_error_codes = true
+pretty = true
+exclude = ['tests/**/*']
+
+
+[[tool.mypy.overrides]]
+module = ["superqt.qtcompat.*"]
+ignore_missing_imports = true
+warn_unused_ignores = false
+allow_redefinition = true
+
+# https://coverage.readthedocs.io/en/6.4/config.html
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "@overload",
+    "except ImportError",
+]
+
+# https://github.com/mgedmin/check-manifest#configuration
 [tool.check-manifest]
-ignore = ["src/superqt/_version.py"]
+ignore = [
+    ".github_changelog_generator",
+    ".pre-commit-config.yaml",
+    "tests/**/*",
+    "tox.ini",
+    "src/superqt/_version.py",
+    "mkdocs.yml",
+    "docs/**/*",
+    "examples/**/*",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "codecov.yml",
+    ".ruff_cache/**/*",
+    "setup.py"
+]

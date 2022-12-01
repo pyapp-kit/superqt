@@ -1,11 +1,15 @@
-from typing import Generic, List, Sequence, Tuple, TypeVar, Union
+from typing import Generic, List, Optional, Sequence, Tuple, TypeVar, Union
 
 from qtpy import QtGui
 from qtpy.QtCore import Property, QEvent, QPoint, QPointF, QRect, QRectF, Qt, Signal
 from qtpy.QtWidgets import QSlider, QStyle, QStyleOptionSlider, QStylePainter
 
 from ._generic_slider import CC_SLIDER, SC_GROOVE, SC_HANDLE, SC_NONE, _GenericSlider
-from ._range_style import RangeSliderStyle, update_styles_from_stylesheet
+from ._range_style import (
+    MONTEREY_SLIDER_STYLES_FIX,
+    RangeSliderStyle,
+    update_styles_from_stylesheet,
+)
 
 _T = TypeVar("_T")
 
@@ -32,6 +36,8 @@ class _GenericRangeSlider(_GenericSlider[Tuple], Generic[_T]):
     _slidersMoved = Signal(tuple)
 
     def __init__(self, *args, **kwargs):
+        self._style = RangeSliderStyle()
+
         super().__init__(*args, **kwargs)
         self.valueChanged = self._valuesChanged
         self.sliderMoved = self._slidersMoved
@@ -55,32 +61,30 @@ class _GenericRangeSlider(_GenericSlider[Tuple], Generic[_T]):
 
         # color
 
-        self._style = RangeSliderStyle()
         self.setStyleSheet("")
-        update_styles_from_stylesheet(self)
 
     # ###############  New Public API  #######################
 
     def barIsRigid(self) -> bool:
         """Whether bar length is constant when dragging the bar.
 
-        If False, the bar can shorten when dragged beyond min/max. Default is True.
+        If `False`, the bar can shorten when dragged beyond min/max. Default is `True`.
         """
         return self._bar_is_rigid
 
     def setBarIsRigid(self, val: bool = True) -> None:
         """Whether bar length is constant when dragging the bar.
 
-        If False, the bar can shorten when dragged beyond min/max. Default is True.
+        If `False`, the bar can shorten when dragged beyond min/max. Default is `True`.
         """
         self._bar_is_rigid = bool(val)
 
     def barMovesAllHandles(self) -> bool:
-        """Whether clicking on the bar moves all handles (default), or just the nearest."""
+        """Whether clicking on the bar moves all handles, or just the nearest."""
         return self._bar_moves_all
 
     def setBarMovesAllHandles(self, val: bool = True) -> None:
-        """Whether clicking on the bar moves all handles (default), or just the nearest."""
+        """Whether clicking on the bar moves all handles, or just the nearest."""
         self._bar_moves_all = bool(val)
 
     def barIsVisible(self) -> bool:
@@ -92,10 +96,20 @@ class _GenericRangeSlider(_GenericSlider[Tuple], Generic[_T]):
         self._should_draw_bar = bool(val)
 
     def hideBar(self) -> None:
+        """Hide the bar between the first and last handle."""
         self.setBarVisible(False)
 
     def showBar(self) -> None:
+        """Show the bar between the first and last handle."""
         self.setBarVisible(True)
+
+    def applyMacStylePatch(self) -> str:
+        """Apply a QSS patch to fix sliders on macos>=12 with QT < 6.
+
+        see [FAQ](../faq.md#sliders-not-dragging-properly-on-macos-12) for more details.
+        """
+        super().applyMacStylePatch()
+        self._style._macpatch = True
 
     # ###############  QtOverrides  #######################
 
@@ -131,12 +145,21 @@ class _GenericRangeSlider(_GenericSlider[Tuple], Generic[_T]):
         self._doSliderMove()
 
     def setStyleSheet(self, styleSheet: str) -> None:
+        return super().setStyleSheet(self._patch_style(styleSheet))
+
+    def _patch_style(self, style: str):
+        """Override to patch style options before painting."""
         # sub-page styles render on top of the lower sliders and don't work here.
+        if self._style._macpatch and not style:
+            style = MONTEREY_SLIDER_STYLES_FIX
+
         override = f"""
-            \n{type(self).__name__}::sub-page:horizontal {{background: none}}
-            \n{type(self).__name__}::sub-page:vertical {{background: none}}
+            \n{type(self).__name__}::sub-page:horizontal
+                {{background: none; border: none}}
+            \n{type(self).__name__}::add-page:vertical
+                {{background: none; border: none}}
         """
-        return super().setStyleSheet(styleSheet + override)
+        return style + override
 
     def event(self, ev: QEvent) -> bool:
         if ev.type() == QEvent.Type.StyleChange:
@@ -146,10 +169,16 @@ class _GenericRangeSlider(_GenericSlider[Tuple], Generic[_T]):
     def mouseMoveEvent(self, ev: QtGui.QMouseEvent) -> None:
         if self._pressedControl == SC_BAR:
             ev.accept()
-            delta = self._clickOffset - self._pixelPosToRangeValue(self._pick(ev.pos()))
+            delta = self._clickOffset - self._pixelPosToRangeValue(
+                self._pick(self._event_position(ev))
+            )
             self._offsetAllPositions(-delta, self._sldPosAtPress)
         else:
             super().mouseMoveEvent(ev)
+
+    def _event_position(self, event):
+        # API changes between PyQt5 (.pos()) and PyQt6 (.position())
+        return event.pos() if hasattr(event, "pos") else event.position()
 
     # ###############  Implementation Details  #######################
 
@@ -182,6 +211,7 @@ class _GenericRangeSlider(_GenericSlider[Tuple], Generic[_T]):
         self._style.brush_active = color
 
     barColor = Property(QtGui.QBrush, _getBarColor, _setBarColor)
+    """The color of the bar between the first and last handle."""
 
     def _offsetAllPositions(self, offset: float, ref=None) -> None:
         if ref is None:
@@ -203,7 +233,9 @@ class _GenericRangeSlider(_GenericSlider[Tuple], Generic[_T]):
 
     # SubControl Positions
 
-    def _handleRect(self, handle_index: int, opt: QStyleOptionSlider = None) -> QRect:
+    def _handleRect(
+        self, handle_index: int, opt: Optional[QStyleOptionSlider] = None
+    ) -> QRect:
         """Return the QRect for all handles."""
         opt = opt or self._styleOption
         opt.sliderPosition = self._optSliderPositions[handle_index]
@@ -280,7 +312,7 @@ class _GenericRangeSlider(_GenericSlider[Tuple], Generic[_T]):
 
     # NOTE: this is very much tied to mousepress... not a generic "get control"
     def _getControlAtPos(
-        self, pos: QPoint, opt: QStyleOptionSlider = None
+        self, pos: QPoint, opt: Optional[QStyleOptionSlider] = None
     ) -> Tuple[QStyle.SubControl, int]:
         """Update self._pressedControl based on ev.pos()."""
         opt = opt or self._styleOption

@@ -1,3 +1,8 @@
+# QDoubleSlider
+
+`QSlider` variant that accepts floating point values.
+
+```python
 from qtpy.QtCore import Qt
 from qtpy.QtWidgets import QApplication
 
@@ -11,3 +16,8 @@ slider.setValue(0.5)
 slider.show()
 
 app.exec_()
+```
+
+{{ show_widget() }}
+
+{{ show_members('superqt.QDoubleSlider') }}

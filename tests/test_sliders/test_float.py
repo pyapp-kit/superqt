@@ -1,7 +1,9 @@
+import math
 import os
 
 import pytest
 from qtpy import API_NAME
+from qtpy.QtWidgets import QStyleOptionSlider
 
 from superqt import (
     QDoubleRangeSlider,
@@ -9,6 +11,8 @@ from superqt import (
     QLabeledDoubleRangeSlider,
     QLabeledDoubleSlider,
 )
+
+from ._testutil import _linspace
 
 range_types = {QDoubleRangeSlider, QLabeledDoubleRangeSlider}
 
@@ -122,3 +126,15 @@ def test_signals(ds, qtbot):
 
     with qtbot.waitSignal(ds.rangeChanged):
         ds.setRange(1.2, 3.3)
+
+
+@pytest.mark.parametrize("mag", list(range(4, 37, 4)) + list(range(-4, -37, -4)))
+def test_slider_extremes(mag, qtbot):
+    sld = QDoubleSlider()
+    _mag = 10**mag
+    with qtbot.waitSignal(sld.rangeChanged):
+        sld.setRange(-_mag, _mag)
+    for i in _linspace(-_mag, _mag, 10):
+        sld.setValue(i)
+        assert math.isclose(sld.value(), i, rel_tol=1e-8)
+        sld.initStyleOption(QStyleOptionSlider())

@@ -1,4 +1,4 @@
-"""Adapted for python from the KDToolBox
+"""Adapted for python from the KDToolBox.
 
 https://github.com/KDAB/KDToolBox/tree/master/qt/KDSignalThrottler
 
@@ -94,16 +94,16 @@ class GenericSignalThrottler(QObject):
 
     def timeout(self) -> int:
         """Return current timeout in milliseconds."""
-        return self._timer.interval()  # type: ignore
+        return self._timer.interval()
 
     def setTimeout(self, timeout: int) -> None:
-        """Set timeout in milliseconds"""
+        """Set timeout in milliseconds."""
         if self._timer.interval() != timeout:
             self._timer.setInterval(timeout)
             self.timeoutChanged.emit(timeout)
 
     def timerType(self) -> Qt.TimerType:
-        """Return current Qt.TimerType."""
+        """Return current `Qt.TimerType`."""
         return self._timer.timerType()
 
     def setTimerType(self, timerType: Qt.TimerType) -> None:
@@ -136,11 +136,11 @@ class GenericSignalThrottler(QObject):
         assert self._timer.isActive()
 
     def cancel(self) -> None:
-        """ "Cancel and pending emissions."""
+        """Cancel any pending emissions."""
         self._hasPendingEmission = False
 
     def flush(self) -> None:
-        """ "Force emission of any pending emissions."""
+        """Force emission of any pending emissions."""
         self._maybeEmitTriggered()
 
     def _emitTriggered(self) -> None:
@@ -230,7 +230,7 @@ def qthrottled(
 
 @overload
 def qthrottled(
-    func: "Literal[None]" = None,
+    func: Optional["Literal[None]"] = None,
     timeout: int = 100,
     leading: bool = True,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
@@ -289,7 +289,7 @@ def qdebounced(
 
 @overload
 def qdebounced(
-    func: "Literal[None]" = None,
+    func: Optional["Literal[None]"] = None,
     timeout: int = 100,
     leading: bool = False,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
@@ -371,10 +371,10 @@ def _make_decorator(
             throttle.throttle()
             return future
 
-        setattr(inner, "cancel", throttle.cancel)
-        setattr(inner, "flush", throttle.flush)
-        setattr(inner, "set_timeout", throttle.setTimeout)
-        setattr(inner, "triggered", throttle.triggered)
+        inner.cancel = throttle.cancel
+        inner.flush = throttle.flush
+        inner.set_timeout = throttle.setTimeout
+        inner.triggered = throttle.triggered
         return inner  # type: ignore
 
     return deco(func) if func is not None else deco

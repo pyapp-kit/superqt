@@ -1,7 +1,7 @@
 # run this with:
 # export CHANGELOG_GITHUB_TOKEN=......
 # github_changelog_generator --future-release vX.Y.Z
-user=napari
+user=pyapp-kit
 project=superqt
 issues=false
 since-tag=v0.2.0

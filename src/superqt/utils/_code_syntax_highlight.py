@@ -6,19 +6,17 @@ from pygments.lexers import find_lexer_class, get_lexer_by_name
 from pygments.util import ClassNotFound
 from qtpy import QtGui
 
-# inspired by  https://github.com/Vector35/snippets/blob/master/QCodeEditor.py (MIT license) and
+# inspired by  https://github.com/Vector35/snippets/blob/master/QCodeEditor.py
+# (MIT license) and
 # https://pygments.org/docs/formatterdevelopment/#html-3-2-formatter
 
 
 def get_text_char_format(style):
-    """
-    Return a QTextCharFormat with the given attributes.
-
-    https://pygments.org/docs/formatterdevelopment/#html-3-2-formatter
-    """
-
     text_char_format = QtGui.QTextCharFormat()
-    text_char_format.setFontFamily("monospace")
+    if hasattr(text_char_format, "setFontFamilies"):
+        text_char_format.setFontFamilies(["monospace"])
+    else:
+        text_char_format.setFontFamily("monospace")
     if style.get("color"):
         text_char_format.setForeground(QtGui.QColor(f"#{style['color']}"))
 
@@ -44,7 +42,8 @@ class QFormatter(Formatter):
         self._style = {name: get_text_char_format(style) for name, style in self.style}
 
     def format(self, tokensource, outfile):
-        """
+        """Format the given token stream.
+
         `outfile` is argument from parent class, but
         in Qt we do not produce string output, but QTextCharFormat, so it needs to be
         collected using `self.data`.
@@ -52,12 +51,7 @@ class QFormatter(Formatter):
         self.data = []
 
         for token, value in tokensource:
-            self.data.extend(
-                [
-                    self._style[token],
-                ]
-                * len(value)
-            )
+            self.data.extend([self._style[token]] * len(value))
 
 
 class CodeSyntaxHighlight(QtGui.QSyntaxHighlighter):
@@ -85,7 +79,8 @@ class CodeSyntaxHighlight(QtGui.QSyntaxHighlighter):
 
         # dirty, dirty hack
         # The core problem is that pygemnts by default use string streams,
-        # that will not handle QTextCharFormat, so wee need use `data` property to work around this.
+        # that will not handle QTextCharFormat, so wee need use `data` property to
+        # work around this.
         for i in range(len(text)):
             try:
                 self.setFormat(i, 1, self.formatter.data[p + i - enters])

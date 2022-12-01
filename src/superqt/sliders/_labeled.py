@@ -17,6 +17,7 @@ from qtpy.QtWidgets import (
     QWidget,
 )
 
+from ..utils import signals_blocked
 from ._sliders import QDoubleRangeSlider, QDoubleSlider, QRangeSlider
 
 
@@ -118,6 +119,8 @@ def _handle_overloaded_slider_sig(args, kwargs):
 
 
 class QLabeledSlider(_SliderProxy, QAbstractSlider):
+    editingFinished = Signal()
+
     EdgeLabelMode = EdgeLabelMode
     _slider_class = QSlider
     _slider: QSlider
@@ -128,7 +131,7 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         super().__init__(parent)
 
         self._slider = self._slider_class()
-        self._label = SliderLabel(self._slider, connect=self._slider.setValue)
+        self._label = SliderLabel(self._slider, connect=self._setValue)
         self._edge_label_mode: EdgeLabelMode = EdgeLabelMode.LabelIsValue
 
         self._rename_signals()
@@ -139,8 +142,13 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         self._slider.sliderReleased.connect(self.sliderReleased.emit)
         self._slider.valueChanged.connect(self._label.setValue)
         self._slider.valueChanged.connect(self.valueChanged.emit)
+        self._label.editingFinished.connect(self.editingFinished)
 
         self.setOrientation(orientation)
+
+    def _setValue(self, value: float):
+        """Convert the value from float to int before setting the slider value."""
+        self._slider.setValue(int(value))
 
     def _rename_signals(self):
         # for subclasses
@@ -160,7 +168,7 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
             if self._edge_label_mode == EdgeLabelMode.NoLabel:
                 marg = (0, 0, 5, 0)
 
-            layout = QHBoxLayout()
+            layout = QHBoxLayout()  # type: ignore
             layout.addWidget(self._slider)
             layout.addWidget(self._label)
             self._label.setAlignment(Qt.AlignmentFlag.AlignRight)
@@ -174,9 +182,11 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         self.setLayout(layout)
 
     def edgeLabelMode(self) -> EdgeLabelMode:
+        """Return current `EdgeLabelMode`."""
         return self._edge_label_mode
 
     def setEdgeLabelMode(self, opt: EdgeLabelMode) -> None:
+        """Set the `EdgeLabelMode`."""
         if opt is EdgeLabelMode.LabelIsRange:
             raise ValueError(
                 "mode must be one of 'EdgeLabelMode.NoLabel' or "
@@ -223,6 +233,8 @@ class QLabeledDoubleSlider(QLabeledSlider):
 
 class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
     _valueChanged = Signal(tuple)
+    editingFinished = Signal()
+
     LabelPosition = LabelPosition
     EdgeLabelMode = EdgeLabelMode
     _slider_class = QRangeSlider
@@ -255,6 +267,8 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
             alignment=Qt.AlignmentFlag.AlignRight,
             connect=self._max_label_edited,
         )
+        self._min_label.editingFinished.connect(self.editingFinished)
+        self._max_label.editingFinished.connect(self.editingFinished)
         self.setEdgeLabelMode(EdgeLabelMode.LabelIsRange)
 
         self._slider.valueChanged.connect(self._on_value_changed)
@@ -268,9 +282,11 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
         self.valueChanged = self._valueChanged
 
     def handleLabelPosition(self) -> LabelPosition:
+        """Return where/whether labels are shown adjacent to slider handles."""
         return self._handle_label_position
 
     def setHandleLabelPosition(self, opt: LabelPosition) -> LabelPosition:
+        """Set where/whether labels are shown adjacent to slider handles."""
         self._handle_label_position = opt
         for lbl in self._handle_labels:
             if not opt:
@@ -280,9 +296,11 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
         self.setOrientation(self.orientation())
 
     def edgeLabelMode(self) -> EdgeLabelMode:
+        """Return current `EdgeLabelMode`."""
         return self._edge_label_mode
 
     def setEdgeLabelMode(self, opt: EdgeLabelMode):
+        """Set `EdgeLabelMode`, controls what is shown at the min/max labels."""
         self._edge_label_mode = opt
         if not self._edge_label_mode:
             self._min_label.hide()
@@ -304,7 +322,10 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
         self._reposition_labels()
 
     def _reposition_labels(self):
-        if not self._handle_labels:
+        if (
+            not self._handle_labels
+            or self._handle_label_position == LabelPosition.NoLabel
+        ):
             return
 
         horizontal = self.orientation() == Qt.Orientation.Horizontal
@@ -336,6 +357,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
             label.move(pos)
             last_edge = pos
             label.clearFocus()
+            label.show()
         self.update()
 
     def _min_label_edited(self, val):
@@ -369,6 +391,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
             for n, val in enumerate(self._slider.value()):
                 _cb = partial(self._slider.setSliderPosition, index=n)
                 s = SliderLabel(self._slider, parent=self, connect=_cb)
+                s.editingFinished.connect(self.editingFinished)
                 s.setValue(val)
                 self._handle_labels.append(s)
         else:
@@ -395,7 +418,6 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
 
     def setOrientation(self, orientation):
         """Set orientation, value will be 'horizontal' or 'vertical'."""
-
         self._slider.setOrientation(orientation)
         if orientation == Qt.Orientation.Vertical:
             layout = QVBoxLayout()
@@ -484,8 +506,12 @@ class SliderLabel(QDoubleSpinBox):
         self.setStyleSheet("background:transparent; border: 0;")
         if connect is not None:
             self.editingFinished.connect(lambda: connect(self.value()))
-        self.editingFinished.connect(self.clearFocus)
+        self.editingFinished.connect(self._silent_clear_focus)
         self._update_size()
+
+    def _silent_clear_focus(self):
+        with signals_blocked(self):
+            self.clearFocus()
 
     def setDecimals(self, prec: int) -> None:
         super().setDecimals(prec)

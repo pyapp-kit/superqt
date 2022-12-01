@@ -45,7 +45,6 @@ nosetests.xml
 coverage.xml
 *,cover
 .hypothesis/
-.napari_cache
 
 # Translations
 *.mo
@@ -82,3 +81,4 @@ src/superqt/_version.py
 screenshots
 
 .mypy_cache
+docs/_auto_images/
