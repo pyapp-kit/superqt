@@ -96,7 +96,7 @@ src_paths = ["src/superqt", "tests"]
 # https://github.com/charliermarsh/ruff
 [tool.ruff]
 line-length = 88
-target-version = "py38"
+target-version = "py37"
 src = ["src","tests"]
 extend-select = [
     "E",    # style errors

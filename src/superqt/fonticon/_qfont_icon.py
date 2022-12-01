@@ -4,7 +4,7 @@ import warnings
 from collections import abc
 from dataclasses import dataclass
 from pathlib import Path
-from typing import DefaultDict, Sequence, Union, cast
+from typing import DefaultDict, Sequence, Tuple, Union, cast
 
 from qtpy import QT_VERSION
 from qtpy.QtCore import QObject, QPoint, QRect, QSize, Qt
@@ -45,8 +45,8 @@ ValidColor = Union[
     int,
     str,
     Qt.GlobalColor,
-    tuple[int, int, int, int],
-    tuple[int, int, int],
+    Tuple[int, int, int, int],  # noqa: U006
+    Tuple[int, int, int],  # noqa: U006
     None,
 ]
 
