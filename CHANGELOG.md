@@ -1,8 +1,26 @@
 # Changelog
 
-## [0.4.0](https://github.com/pyapp-kit/superqt/tree/0.4.0) (2022-11-09)
+## [0.4.1](https://github.com/pyapp-kit/superqt/tree/0.4.1) (2022-12-01)
 
-[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.3.8...0.4.0)
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.4.0...0.4.1)
+
+**Implemented enhancements:**
+
+- feat: Add signal to QCollapsible [\#142](https://github.com/pyapp-kit/superqt/pull/142) ([ppwadhwa](https://github.com/ppwadhwa))
+- feat: Change icon used in Collapsible widget [\#140](https://github.com/pyapp-kit/superqt/pull/140) ([ppwadhwa](https://github.com/ppwadhwa))
+
+**Fixed bugs:**
+
+- Move QCollapsible toggle signal emit [\#144](https://github.com/pyapp-kit/superqt/pull/144) ([ppwadhwa](https://github.com/ppwadhwa))
+
+**Merged pull requests:**
+
+- build: use hatch for build backend, and use ruff for linting [\#139](https://github.com/pyapp-kit/superqt/pull/139) ([tlambert03](https://github.com/tlambert03))
+- chore: rename napari org to pyapp-kit [\#137](https://github.com/pyapp-kit/superqt/pull/137) ([tlambert03](https://github.com/tlambert03))
+
+## [v0.4.0](https://github.com/pyapp-kit/superqt/tree/v0.4.0) (2022-11-09)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.3.8...v0.4.0)
 
 **Fixed bugs:**
 
@@ -14,6 +32,7 @@
 
 **Merged pull requests:**
 
+- chore: changelog v0.4.0 [\#136](https://github.com/pyapp-kit/superqt/pull/136) ([tlambert03](https://github.com/tlambert03))
 - ci\(dependabot\): bump actions/upload-artifact from 2 to 3 [\#135](https://github.com/pyapp-kit/superqt/pull/135) ([dependabot[bot]](https://github.com/apps/dependabot))
 - ci\(dependabot\): bump codecov/codecov-action from 2 to 3 [\#134](https://github.com/pyapp-kit/superqt/pull/134) ([dependabot[bot]](https://github.com/apps/dependabot))
 - build: unpin pyside6 [\#133](https://github.com/pyapp-kit/superqt/pull/133) ([tlambert03](https://github.com/tlambert03))
