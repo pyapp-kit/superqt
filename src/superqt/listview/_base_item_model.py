@@ -7,9 +7,9 @@ from collections.abc import MutableSequence
 from typing import TYPE_CHECKING, Any, Generic, Tuple, TypeVar, Union
 
 from qtpy.QtCore import QAbstractItemModel, QModelIndex, Qt
+from psygnal.containers import SelectableEventedList
 
 if TYPE_CHECKING:
-    from psygnal.containers import SelectableEventedList
     from qtpy.QtWidgets import QWidget
 
 ItemType = TypeVar("ItemType")
@@ -41,7 +41,8 @@ class _BaseEventedItemModel(QAbstractItemModel, Generic[ItemType]):
 
     _root: SelectableEventedList[ItemType]
 
-    def __init__(self, root: SelectableEventedList[ItemType], parent: QWidget = None):
+    def __init__(self, root: SelectableEventedList[ItemType],
+                 parent: QWidget = None):
         super().__init__(parent=parent)
         self.setRoot(root)
 
@@ -154,7 +155,8 @@ class _BaseEventedItemModel(QAbstractItemModel, Generic[ItemType]):
     def setRoot(self, root: SelectableEventedList[ItemType]):
         """Call during __init__, to set the Python model and connecions."""
         if not isinstance(root, SelectableEventedList):
-            raise TypeError(f"root must be an instance of {SelectableEventedList}")
+            raise TypeError(
+                f"root must be an instance of {SelectableEventedList}")
         current_root = getattr(self, "_root", None)
         if root is current_root:
             return
@@ -195,7 +197,8 @@ class _BaseEventedItemModel(QAbstractItemModel, Generic[ItemType]):
         parent_index, index = self._split_nested_index(index)
         self.beginInsertRows(parent_index, index, index)
 
-    def _on_end_insert(self, index: Union[int, Tuple[int, ...]], value: Any) -> None:
+    def _on_end_insert(self, index: Union[int, Tuple[int, ...]],
+                       value: Any) -> None:
         """Must be called after insert operatios to update model."""
         self.endInsertRows()
 
@@ -208,12 +211,13 @@ class _BaseEventedItemModel(QAbstractItemModel, Generic[ItemType]):
         parent_index, index = self._split_nested_index(index)
         self.beginRemoveRows(parent_index, index, index)
 
-    def _on_end_remove(self, index: Union[int, Tuple[int, ...]], value: Any) -> None:
+    def _on_end_remove(self, index: Union[int, Tuple[int, ...]],
+                       value: Any) -> None:
         """Must be called after row removal to update model."""
         self.endRemoveRows()
 
     def _on_begin_moving(
-        self, index: Union[int, Tuple[int, ...]], new_index: Union[int, Tuple[int, ...]]
+        self, index: Union[int, Tuple[int, ...]]
     ) -> None:
         """Begins a row move operation.
 
