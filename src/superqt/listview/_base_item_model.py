@@ -1,13 +1,14 @@
-"""A QAbstractItemModel designed to work with `psygnal.containers.SelectableEventedList`.
+"""A QAbstractItemModel designed to work with
+`psygnal.containers.SelectableEventedList`.
 """
 
 from __future__ import annotations
 
 from collections.abc import MutableSequence
-from typing import TYPE_CHECKING, Any, Generic, Tuple, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
-from qtpy.QtCore import QAbstractItemModel, QModelIndex, Qt
 from psygnal.containers import SelectableEventedList
+from qtpy.QtCore import QAbstractItemModel, QModelIndex, Qt
 
 if TYPE_CHECKING:
     from qtpy.QtWidgets import QWidget
@@ -26,23 +27,24 @@ _BASE_FLAGS = (
 
 
 class _BaseEventedItemModel(QAbstractItemModel, Generic[ItemType]):
-    """A QAbstractItemModel designed to work with `psygnal.containers.SelectableEventedList`.
+    """A QAbstractItemModel designed to work with
+    `psygnal.containers.SelectableEventedList`.
 
-    `SelectableEventedList` is a model for a Python list which supports the concept of
-    "currently selected/active items".
+    `SelectableEventedList` is a model for a Python list which supports the
+    concept of "currently selected/active items".
 
-    This module contains a class which acts as an adapter between the `SelectableEventedList`
-    and Qt's `QAbstractItemModel` interface (see `Qt Model/View Programming
-    <https://doc.qt.io/qt-6/modelview.html>`_). In this way, it allows Python users
-    to interact with the list in the "usual" Python ways and simultaneously updates
-    any Qt views onto the list model. Conversely, it also updates the list model if any GUI
-    events occur in the view.
+    This module contains a class which acts as an adapter between the
+    `SelectableEventedList` and Qt's `QAbstractItemModel` interface (see `Qt
+    Model/View Programming <https://doc.qt.io/qt-6/modelview.html>`_). In
+    this way, it allows Python users to interact with the list in the "usual"
+    Python ways and simultaneously updates any Qt views onto the list model.
+    Conversely, it also updates the list model if any GUI events occur in the
+    view.
     """
 
     _root: SelectableEventedList[ItemType]
 
-    def __init__(self, root: SelectableEventedList[ItemType],
-                 parent: QWidget = None):
+    def __init__(self, root: SelectableEventedList[ItemType], parent: QWidget = None):
         super().__init__(parent=parent)
         self.setRoot(root)
 
@@ -155,8 +157,7 @@ class _BaseEventedItemModel(QAbstractItemModel, Generic[ItemType]):
     def setRoot(self, root: SelectableEventedList[ItemType]):
         """Call during __init__, to set the Python model and connecions."""
         if not isinstance(root, SelectableEventedList):
-            raise TypeError(
-                f"root must be an instance of {SelectableEventedList}")
+            raise TypeError(f"root must be an instance of {SelectableEventedList}")
         current_root = getattr(self, "_root", None)
         if root is current_root:
             return
@@ -173,8 +174,8 @@ class _BaseEventedItemModel(QAbstractItemModel, Generic[ItemType]):
         self._root.events.moved.connect(self._on_end_move)
 
     def _split_nested_index(
-        self, index: Union[int, Tuple[int, ...]]
-    ) -> Tuple[QModelIndex, int]:
+        self, index: int | tuple[int, ...]
+    ) -> tuple[QModelIndex, int]:
         """Return (parent_index, row) for a given `index`.
 
         Tuple indexes are used in `NestableEventedList`, we support them here
@@ -188,7 +189,7 @@ class _BaseEventedItemModel(QAbstractItemModel, Generic[ItemType]):
             parent_index = self.index(i, 0, parent_index)
         return parent_index, index
 
-    def _on_begin_inserting(self, index: Union[int, Tuple[int, ...]]) -> None:
+    def _on_begin_inserting(self, index: int | tuple[int, ...]) -> None:
         """Begins a row insertion operation.
 
         See Qt documentation:
@@ -197,12 +198,11 @@ class _BaseEventedItemModel(QAbstractItemModel, Generic[ItemType]):
         parent_index, index = self._split_nested_index(index)
         self.beginInsertRows(parent_index, index, index)
 
-    def _on_end_insert(self, index: Union[int, Tuple[int, ...]],
-                       value: Any) -> None:
+    def _on_end_insert(self, index: int | tuple[int, ...], value: Any) -> None:
         """Must be called after insert operatios to update model."""
         self.endInsertRows()
 
-    def _on_begin_removing(self, index: Union[int, Tuple[int, ...]]) -> None:
+    def _on_begin_removing(self, index: int | tuple[int, ...]) -> None:
         """Begins a row removal operation.
 
         See Qt documentation:
@@ -211,14 +211,11 @@ class _BaseEventedItemModel(QAbstractItemModel, Generic[ItemType]):
         parent_index, index = self._split_nested_index(index)
         self.beginRemoveRows(parent_index, index, index)
 
-    def _on_end_remove(self, index: Union[int, Tuple[int, ...]],
-                       value: Any) -> None:
+    def _on_end_remove(self, index: int | tuple[int, ...], value: Any) -> None:
         """Must be called after row removal to update model."""
         self.endRemoveRows()
 
-    def _on_begin_moving(
-        self, index: Union[int, Tuple[int, ...]]
-    ) -> None:
+    def _on_begin_moving(self, index: int | tuple[int, ...]) -> None:
         """Begins a row move operation.
 
         See Qt documentation:
@@ -228,7 +225,7 @@ class _BaseEventedItemModel(QAbstractItemModel, Generic[ItemType]):
         dest_parent, dest_index = self._split_nested_index(index)
         self.beginMoveRows(src_parent, src_index, dest_parent, dest_index)
 
-    def _on_end_move(self, indexes: Tuple, value: Any) -> None:
+    def _on_end_move(self, indexes: tuple, value: Any) -> None:
         """Must be called after move operation to update model."""
         self.endMoveRows()
 
