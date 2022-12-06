@@ -17,7 +17,8 @@ from qtpy.QtWidgets import (
     QWidget,
 )
 
-from ..utils import signals_blocked
+from superqt.utils import signals_blocked
+
 from ._sliders import QDoubleRangeSlider, QDoubleSlider, QRangeSlider
 
 

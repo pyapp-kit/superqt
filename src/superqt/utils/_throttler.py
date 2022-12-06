@@ -133,8 +133,6 @@ class GenericSignalThrottler(QObject):
         elif self._kind is Kind.Debouncer:
             self._timer.start()  # restart
 
-        assert self._timer.isActive()
-
     def cancel(self) -> None:
         """Cancel any pending emissions."""
         self._hasPendingEmission = False
