@@ -23,7 +23,8 @@ from qtpy.QtGui import (
 from qtpy.QtWidgets import QApplication, QStyleOption, QWidget
 from typing_extensions import TypedDict
 
-from ..utils import QMessageHandler
+from superqt.utils import QMessageHandler
+
 from ._animations import Animation
 
 
@@ -45,8 +46,8 @@ ValidColor = Union[
     int,
     str,
     Qt.GlobalColor,
-    Tuple[int, int, int, int],  # noqa: U006
-    Tuple[int, int, int],  # noqa: U006
+    Tuple[int, int, int, int],
+    Tuple[int, int, int],
     None,
 ]
 
@@ -571,5 +572,6 @@ def _ensure_identifier(name: str) -> str:
     # replace dashes and spaces with underscores
     name = name.replace("-", "_").replace(" ", "_")
 
-    assert str.isidentifier(name), f"Could not canonicalize name: {name}"
+    if not str.isidentifier(name):
+        raise ValueError(f"Could not canonicalize name: {name!r}. (not an identifier)")
     return name

@@ -11,7 +11,7 @@ except ImportError as e:
 from qtpy.QtCore import Signal
 from qtpy.QtWidgets import QComboBox, QDoubleSpinBox, QHBoxLayout, QSizePolicy, QWidget
 
-from ..utils import signals_blocked
+from superqt.utils import signals_blocked
 
 if TYPE_CHECKING:
     from decimal import Decimal
@@ -78,7 +78,10 @@ class QQuantity(QWidget):
         if ureg is None:
             ureg = value._REGISTRY if isinstance(value, Quantity) else UREG
         else:
-            assert isinstance(ureg, UnitRegistry)
+            if not isinstance(ureg, UnitRegistry):
+                raise TypeError(
+                    f"ureg must be a pint.UnitRegistry, not {type(ureg).__name__}"
+                )
 
         self._ureg = ureg
         self._value: Quantity = self._ureg.Quantity(value, units=units)
