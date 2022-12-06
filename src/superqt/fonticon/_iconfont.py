@@ -72,9 +72,10 @@ class IconFont(metaclass=IconFontMeta):
 def namespace2font(namespace: Union[Mapping, Type], name: str) -> Type[IconFont]:
     """Convenience to convert a namespace (class, module, dict) into an IconFont."""
     if isinstance(namespace, type):
-        assert isinstance(
-            getattr(namespace, FONTFILE_ATTR), str
-        ), "Not a valid font type"
+        if not isinstance(getattr(namespace, FONTFILE_ATTR), str):
+            raise TypeError(
+                f"Invalid Font: must declare {FONTFILE_ATTR!r} attribute or classmethod"
+            )
         return namespace
     elif hasattr(namespace, "__dict__"):
         ns = dict(namespace.__dict__)
