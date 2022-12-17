@@ -231,7 +231,7 @@ class _QFontIconEngine(QIconEngine):
 
         # font
         font = QFont()
-        font.setFamily(family)  # set sepeartely for Qt6
+        font.setFamily(family)  # set separately for Qt6
         font.setPixelSize(round(rect.height() * opts.scale_factor))
         if style:
             font.setStyleName(style)

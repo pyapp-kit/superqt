@@ -47,7 +47,7 @@ def icon(
 ) -> QFontIcon:
     """Create a QIcon for `glyph_key`, with a number of optional settings.
 
-    The `glyph_key` (e.g. 'fa5s.smile') represents a Font-family & style, and a glpyh.
+    The `glyph_key` (e.g. 'fa5s.smile') represents a Font-family & style, and a glyph.
     In most cases, the key should be provided by a plugin in the environment, like:
 
     - [fonticon-fontawesome5](https://pypi.org/project/fonticon-fontawesome5/) ('fa5s' &
@@ -89,7 +89,7 @@ def icon(
           `animation`, etc...)
 
         Missing keys in the state dicts will be taken from the default options, provided
-        by the paramters above.
+        by the parameters above.
 
     Returns
     -------
