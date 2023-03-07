@@ -9,7 +9,6 @@ except ImportError:
 
 
 class FontIconManager:
-
     ENTRY_POINT = "superqt.fonticon"
     _PLUGINS: Dict[str, EntryPoint] = {}
     _LOADED: Dict[str, IconFontMeta] = {}
