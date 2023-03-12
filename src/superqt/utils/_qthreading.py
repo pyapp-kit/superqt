@@ -67,7 +67,7 @@ class WorkerBaseSignals(QObject):
 
     started = Signal()  # emitted when the work is started
     finished = Signal()  # emitted when the work is finished
-    _finished = Signal(object)  # emitted when the work is finished ro delete
+    _finished = Signal(object)  # emitted when the work is finished to delete
     returned = Signal(object)  # emitted with return value
     errored = Signal(object)  # emitted with error object on Exception
     warned = Signal(tuple)  # emitted with showwarning args on warning

@@ -80,7 +80,7 @@ class CodeSyntaxHighlight(QtGui.QSyntaxHighlighter):
 
         # dirty, dirty hack
         # The core problem is that pygemnts by default use string streams,
-        # that will not handle QTextCharFormat, so wee need use `data` property to
+        # that will not handle QTextCharFormat, so we need use `data` property to
         # work around this.
         for i in range(len(text)):
             try:
