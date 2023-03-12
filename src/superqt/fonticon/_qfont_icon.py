@@ -345,7 +345,6 @@ class QFontIcon(QIcon):
 
 
 class QFontIconStore(QObject):
-
     # map of key -> (font_family, font_style)
     _LOADED_KEYS: dict[str, tuple[str, str]] = {}
 
@@ -398,7 +397,7 @@ class QFontIconStore(QObject):
 
     @classmethod
     def _ensure_char(cls, char: str, family: str, style: str) -> str:
-        """make sure that `char` is a glyph provided by `family` and `style`."""
+        """Make sure that `char` is a glyph provided by `family` and `style`."""
         if len(char) == 1 and ord(char) > 256:
             return char
         try:
@@ -432,7 +431,7 @@ class QFontIconStore(QObject):
     def addFont(
         cls, filepath: str, prefix: str, charmap: dict[str, str] | None = None
     ) -> tuple[str, str] | None:
-        """Add font at `filepath` to the registry under `key`.
+        r"""Add font at `filepath` to the registry under `key`.
 
         If you'd like to later use a fontkey in the form of `key.some-name`, then
         `charmap` must be provided and provide a mapping for all of the glyph names
@@ -477,7 +476,7 @@ class QFontIconStore(QObject):
         family: str = families[0]
 
         # in Qt6, everything becomes a static member
-        QFd: QFontDatabase | "type[QFontDatabase]" = (
+        QFd: QFontDatabase | type[QFontDatabase] = (
             QFontDatabase()
             if tuple(cast(str, QT_VERSION).split(".")) < ("6", "0")
             else QFontDatabase

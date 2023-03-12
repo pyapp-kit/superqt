@@ -1,3 +1,4 @@
+import contextlib
 from enum import IntEnum
 from functools import partial
 from typing import Any
@@ -566,10 +567,8 @@ class SliderLabel(QDoubleSpinBox):
         if opt == EdgeLabelMode.LabelIsRange:
             self.setMinimum(-9999999)
             self.setMaximum(9999999)
-            try:
+            with contextlib.suppress(Exception):
                 self._slider.rangeChanged.disconnect(self.setRange)
-            except Exception:
-                pass
         else:
             self.setMinimum(self._slider.minimum())
             self.setMaximum(self._slider.maximum())
