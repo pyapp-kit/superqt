@@ -6,6 +6,7 @@ from pygments.lexers import find_lexer_class, get_lexer_by_name
 from pygments.util import ClassNotFound
 from qtpy import QtGui
 
+
 # inspired by  https://github.com/Vector35/snippets/blob/master/QCodeEditor.py
 # (MIT license) and
 # https://pygments.org/docs/formatterdevelopment/#html-3-2-formatter
@@ -79,7 +80,7 @@ class CodeSyntaxHighlight(QtGui.QSyntaxHighlighter):
 
         # dirty, dirty hack
         # The core problem is that pygemnts by default use string streams,
-        # that will not handle QTextCharFormat, so wee need use `data` property to
+        # that will not handle QTextCharFormat, so we need use `data` property to
         # work around this.
         for i in range(len(text)):
             try:

@@ -1,4 +1,4 @@
-"""Adapted for python from the KDToolBox
+"""Adapted for python from the KDToolBox.
 
 https://github.com/KDAB/KDToolBox/tree/master/qt/KDSignalThrottler
 
