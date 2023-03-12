@@ -39,7 +39,7 @@ See the [widgets documentation](https://pyapp-kit.github.io/superqt/widgets) for
 
 ## Utilities
 
-superqt includes a number of utitlities for working with Qt, including:
+superqt includes a number of utilities for working with Qt, including:
 
 - tools and decorators for working with threads in qt.
 - `superqt.fonticon` for generating icons from font files (such as [Material Design Icons](https://materialdesignicons.com/) and [Font Awesome](https://fontawesome.com/))

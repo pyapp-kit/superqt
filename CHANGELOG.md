@@ -200,7 +200,7 @@
 **Fixed bugs:**
 
 - Fix some small linting issues. [\#41](https://github.com/pyapp-kit/superqt/pull/41) ([tlambert03](https://github.com/tlambert03))
-- Use functools.wraps insterad of \_\_wraped\_\_ and manual proxing \_\_name\_\_ [\#29](https://github.com/pyapp-kit/superqt/pull/29) ([Czaki](https://github.com/Czaki))
+- Use functools.wraps instead of \_\_wraped\_\_ and manual proxing \_\_name\_\_ [\#29](https://github.com/pyapp-kit/superqt/pull/29) ([Czaki](https://github.com/Czaki))
 - Propagate function name in `ensure_main_thread` and `ensure_object_thread` [\#28](https://github.com/pyapp-kit/superqt/pull/28) ([Czaki](https://github.com/Czaki))
 
 **Tests & CI:**

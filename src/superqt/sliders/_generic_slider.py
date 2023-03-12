@@ -4,7 +4,7 @@ This module reimplements most of the logic from qslider.cpp in python:
 https://code.woboq.org/qt5/qtbase/src/widgets/widgets/qslider.cpp.html
 
 This probably looks like tremendous overkill at first (and it may be!),
-since a it's possible to acheive a very reasonable "float slider" by
+since a it's possible to achieve a very reasonable "float slider" by
 scaling input float values to some internal integer range for the QSlider,
 and converting back to float when getting `value()`.  However, one still
 runs into overflow limitations due to the internal integer model.

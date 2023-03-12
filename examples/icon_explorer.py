@@ -219,7 +219,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.previewGroupBox.setLayout(layout)
 
     def createGlyphBox(self):
-        self.glyphGroupBox = QtWidgets.QGroupBox("Glpyhs")
+        self.glyphGroupBox = QtWidgets.QGroupBox("Glyphs")
         self.glyphGroupBox.setMinimumSize(480, 200)
         self.glyphTable = QtWidgets.QTableWidget()
         self.glyphTable.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
