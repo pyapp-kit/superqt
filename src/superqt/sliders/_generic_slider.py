@@ -66,7 +66,6 @@ class _GenericSlider(QSlider, Generic[_T]):
     MAX_DISPLAY = 5000
 
     def __init__(self, *args, **kwargs) -> None:
-
         self._minimum = 0.0
         self._maximum = 99.0
         self._pageStep = 10.0
@@ -276,7 +275,6 @@ class _GenericSlider(QSlider, Generic[_T]):
         self.update()
 
     def wheelEvent(self, e: QtGui.QWheelEvent) -> None:
-
         e.ignore()
         vertical = bool(e.angleDelta().y())
         delta = e.angleDelta().y() if vertical else e.angleDelta().x()

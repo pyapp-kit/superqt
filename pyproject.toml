@@ -98,25 +98,27 @@ src_paths = ["src/superqt", "tests"]
 line-length = 88
 target-version = "py37"
 src = ["src","tests"]
-extend-select = [
+select = [
     "E",    # style errors
     "F",    # flakes
     "D",    # pydocstyle
     "I",    # isort
-    "U",    # pyupgrade
-    # "N",  # pep8-naming
+    "UP",   # pyupgrade
     "S",    # bandit
     "C",    # flake8-comprehensions
     "B",    # flake8-bugbear
     "A001", # flake8-builtins
     "RUF",  # ruff-specific rules
 ]
-extend-ignore = [
+ignore = [
     "D100", # Missing docstring in public module
+    "D101", # Missing docstring in public class
+    "D104", # Missing docstring in public package
     "D107", # Missing docstring in __init__
     "D203", # 1 blank line required before class docstring
     "D212", # Multi-line docstring summary should start at the first line
     "D213", # Multi-line docstring summary should start at the second line
+    "D401", # First line should be in imperative mood
     "D413", # Missing blank line after last section
     "D416", # Section name should end with a colon
     "C901", # Function is too complex

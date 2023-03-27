@@ -52,11 +52,11 @@ class QEnumComboBox(QComboBox):
         super().addItems(list(map(_get_name, self._enum_class.__members__.values())))
 
     def enumClass(self) -> Optional[EnumMeta]:
-        """return current Enum class."""
+        """Return current Enum class."""
         return self._enum_class
 
     def isOptional(self) -> bool:
-        """return if current enum is with optional annotation."""
+        """Return if current enum is with optional annotation."""
         return self._allow_none
 
     def clear(self):

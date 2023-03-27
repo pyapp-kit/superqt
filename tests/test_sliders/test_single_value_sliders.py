@@ -154,7 +154,6 @@ def test_press_move_release(sld: _GenericSlider, qtbot):
 
 @skip_on_linux_qt6
 def test_hover(sld: _GenericSlider):
-
     _real_sld = getattr(sld, "_slider", sld)
 
     opt = QStyleOptionSlider()
@@ -179,7 +178,6 @@ def test_hover(sld: _GenericSlider):
 
 
 def test_wheel(sld: _GenericSlider, qtbot):
-
     if type(sld) is QLabeledSlider and QT_VERSION < (5, 12):
         pytest.skip()
 
@@ -200,7 +198,6 @@ def test_position(sld: _GenericSlider, qtbot):
 
 
 def test_steps(sld: _GenericSlider, qtbot):
-
     sld.setSingleStep(11)
     assert sld.singleStep() == 11
 
@@ -208,7 +205,6 @@ def test_steps(sld: _GenericSlider, qtbot):
     assert sld.pageStep() == 16
 
     if type(sld) is not QLabeledSlider:
-
         sld.setSingleStep(0.1)
         assert sld.singleStep() == 0.1
 

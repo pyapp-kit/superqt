@@ -6,7 +6,6 @@ from pygments.lexers import find_lexer_class, get_lexer_by_name
 from pygments.util import ClassNotFound
 from qtpy import QtGui
 
-
 # inspired by  https://github.com/Vector35/snippets/blob/master/QCodeEditor.py
 # (MIT license) and
 # https://pygments.org/docs/formatterdevelopment/#html-3-2-formatter
