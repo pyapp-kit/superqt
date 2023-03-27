@@ -62,7 +62,6 @@ class EmissionPolicy(IntFlag):
 
 
 class GenericSignalThrottler(QObject):
-
     triggered = Signal()
     timeoutChanged = Signal(int)
     timerTypeChanged = Signal(Qt.TimerType)

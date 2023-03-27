@@ -104,7 +104,6 @@ def define_env(env: "MacrosPlugin"):
                     out += f"- `{m.name}`\n\n"
 
         if self_members:
-
             out += dedent(
                 f"""
             ## Methods

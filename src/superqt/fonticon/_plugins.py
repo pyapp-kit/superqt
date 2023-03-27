@@ -1,3 +1,4 @@
+import contextlib
 from typing import Dict, List, Set, Tuple
 
 from ._iconfont import IconFontMeta, namespace2font
@@ -9,7 +10,6 @@ except ImportError:
 
 
 class FontIconManager:
-
     ENTRY_POINT = "superqt.fonticon"
     _PLUGINS: Dict[str, EntryPoint] = {}
     _LOADED: Dict[str, IconFontMeta] = {}
@@ -98,10 +98,8 @@ def loaded(load_all=False) -> Dict[str, List[str]]:
     if load_all:
         discover()
         for x in available():
-            try:
+            with contextlib.suppress(Exception):
                 _manager._get_font_class(x)
-            except Exception:
-                continue
     return {
         key: sorted(filter(lambda x: not x.startswith("_"), cls.__dict__))
         for key, cls in _manager._LOADED.items()

@@ -12,7 +12,7 @@ FIXTURES = Path(__file__).parent / "fixtures"
 
 @pytest.fixture
 def plugin_store(qapp, monkeypatch):
-    _path = [str(FIXTURES)] + sys.path.copy()
+    _path = [str(FIXTURES), *sys.path.copy()]
     store = QFontIconStore().instance()
     with monkeypatch.context() as m:
         m.setattr(sys, "path", _path)
