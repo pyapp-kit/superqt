@@ -13,7 +13,7 @@ def test_init_text_eliding_line_edit(qtbot):
     oldsize = QSize(100, 20)
     wdg.resize(oldsize)
     assert wdg._elidedText().endswith(ELLIPSIS)
-    newsize = QSize(300, 20)
+    newsize = QSize(500, 20)
     wdg.resize(newsize)
     wdg.resizeEvent(QResizeEvent(oldsize, newsize))  # for test coverage
     assert wdg._elidedText() == TEXT
@@ -23,6 +23,7 @@ def test_init_text_eliding_line_edit(qtbot):
 def test_set_text_eliding_line_edit(qtbot):
     wdg = QElidingLineEdit()
     qtbot.addWidget(wdg)
+    wdg.resize(500, 20)
     wdg.setText(TEXT)
     assert not wdg._elidedText().endswith(ELLIPSIS)
     wdg.resize(100, 20)
@@ -32,6 +33,7 @@ def test_set_text_eliding_line_edit(qtbot):
 def test_set_elide_mode_eliding_line_edit(qtbot):
     wdg = QElidingLineEdit()
     qtbot.addWidget(wdg)
+    wdg.resize(500, 20)
     wdg.setText(TEXT)
     assert not wdg._elidedText().endswith(ELLIPSIS)
     wdg.resize(100, 20)
@@ -51,7 +53,7 @@ def test_set_elide_mode_eliding_line_edit(qtbot):
 def test_set_elipses_width_eliding_line_edit(qtbot):
     wdg = QElidingLineEdit()
     qtbot.addWidget(wdg)
-    wdg.resize(QSize(300, 20))
+    wdg.resize(500, 20)
     wdg.setText(TEXT)
     assert not wdg._elidedText().endswith(ELLIPSIS)
     wdg.setEllipsesWidth(int(wdg.width() / 2))
