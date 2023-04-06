@@ -137,7 +137,7 @@ def icon(
     >>> btn.setIconSize(QSize(256, 256))
     >>> btn.show()
 
-    """  # noqa: E501
+    """
     return _QFIS.instance().icon(
         glyph_key,
         scale_factor=scale_factor,
@@ -218,7 +218,7 @@ def addFont(
     Tuple[str, str], optional
         font-family and font-style for the file just registered, or `None` if
         something goes wrong.
-    """  # noqa: E501
+    """
     return _QFIS.instance().addFont(filepath, prefix, charmap)
 
 
