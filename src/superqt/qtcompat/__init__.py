@@ -6,7 +6,8 @@ from qtpy import *  # noqa
 
 warnings.warn(
     "The superqt.qtcompat module is deprecated as of v0.3.0. "
-    "Please import from `qtpy` instead."
+    "Please import from `qtpy` instead.",
+    stacklevel=2,
 )
 
 
