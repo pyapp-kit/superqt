@@ -456,7 +456,7 @@ class QFontIconStore(QObject):
             something goes wrong.
         """
         if prefix in cls._LOADED_KEYS:
-            warnings.warn(f"Prefix {prefix} already loaded")
+            warnings.warn(f"Prefix {prefix} already loaded", stacklevel=2)
             return None
 
         if not Path(filepath).exists():
@@ -466,12 +466,12 @@ class QFontIconStore(QObject):
 
         fontId = QFontDatabase.addApplicationFont(str(Path(filepath).absolute()))
         if fontId < 0:  # pragma: no cover
-            warnings.warn(f"Cannot load font file: {filepath}")
+            warnings.warn(f"Cannot load font file: {filepath}", stacklevel=2)
             return None
 
         families = QFontDatabase.applicationFontFamilies(fontId)
         if not families:  # pragma: no cover
-            warnings.warn(f"Font file is empty!: {filepath}")
+            warnings.warn(f"Font file is empty!: {filepath}", stacklevel=2)
             return None
         family: str = families[0]
 
@@ -487,7 +487,8 @@ class QFontIconStore(QObject):
         if not QFd.isSmoothlyScalable(family, style):  # pragma: no cover
             warnings.warn(
                 f"Registered font {family} ({style}) is not smoothly scalable. "
-                "Icons may not look attractive."
+                "Icons may not look attractive.",
+                stacklevel=2,
             )
 
         cls._LOADED_KEYS[prefix] = (family, style)
