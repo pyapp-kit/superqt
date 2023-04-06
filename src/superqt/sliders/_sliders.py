@@ -27,11 +27,11 @@ class _FloatMixin:
         return float(value)
 
 
-class QDoubleSlider(_FloatMixin, _GenericSlider[float]):
+class QDoubleSlider(_FloatMixin, _GenericSlider):
     pass
 
 
-class QIntSlider(_IntMixin, _GenericSlider[int]):
+class QIntSlider(_IntMixin, _GenericSlider):
     # mostly just an example... use QSlider instead.
     valueChanged = Signal(int)
 

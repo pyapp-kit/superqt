@@ -58,7 +58,7 @@ USE_MAC_SLIDER_PATCH = (
 )
 
 
-class _GenericSlider(QSlider, Generic[_T]):
+class _GenericSlider(QSlider):
     _fvalueChanged = Signal(int)
     _fsliderMoved = Signal(int)
     _frangeChanged = Signal(int, int)

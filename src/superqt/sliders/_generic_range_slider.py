@@ -17,7 +17,7 @@ _T = TypeVar("_T")
 SC_BAR = QStyle.SubControl.SC_ScrollBarSubPage
 
 
-class _GenericRangeSlider(_GenericSlider[Tuple], Generic[_T]):
+class _GenericRangeSlider(_GenericSlider):
     """MultiHandle Range Slider widget.
 
     Same API as QSlider, but `value`, `setValue`, `sliderPosition`, and
