@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 from ._eliding_label import QElidingLabel
 from .collapsible import QCollapsible
-from .combobox import QEnumComboBox, QSearchableComboBox
+from .combobox import QCheckComboBox, QEnumComboBox, QSearchableComboBox
 from .selection import QSearchableListWidget
 from .sliders import (
     QDoubleRangeSlider,
@@ -28,6 +28,7 @@ from .utils import QMessageHandler, ensure_main_thread, ensure_object_thread
 __all__ = [
     "ensure_main_thread",
     "ensure_object_thread",
+    "QCheckComboBox",
     "QDoubleRangeSlider",
     "QCollapsible",
     "QDoubleSlider",
