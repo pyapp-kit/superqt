@@ -10,7 +10,7 @@ class QSearchableTreeWidget(QWidget):
         super().__init__(parent)
 
         self.tree_widget = QTreeWidget()
-        self.tree_widget.setHeaderLabels(('Key', 'Value'))
+        self.tree_widget.setHeaderLabels(("Key", "Value"))
 
         self.filter_widget = QLineEdit()
         self.filter_widget.textChanged.connect(self.onlyShowMatchedItems)
@@ -26,8 +26,10 @@ class QSearchableTreeWidget(QWidget):
         self.tree_widget.addTopLevelItems(top_level_items)
 
     def onlyShowMatchedItems(self, text: str) -> None:
-        matched_items = tuple(self.tree_widget.findItems(text, Qt.MatchContains | Qt.MatchRecursive))
-        logging.debug('matched_items: %s', tuple(m.text(0) for m in matched_items))
+        matched_items = tuple(
+            self.tree_widget.findItems(text, Qt.MatchContains | Qt.MatchRecursive)
+        )
+        logging.debug("matched_items: %s", tuple(m.text(0) for m in matched_items))
         for i in range(self.tree_widget.topLevelItemCount()):
             top_level_item = self.tree_widget.topLevelItem(i)
             _only_show_matched_items(top_level_item, matched_items)
@@ -43,11 +45,13 @@ def _to_item(name: str, value: Any) -> QTreeWidgetItem:
         for i, v in enumerate(value):
             child = _to_item(str(i), v)
             item.addChild(child)
-    logging.debug('to_item: %s, %s', item.text(0), item.text(1))
+    logging.debug("to_item: %s, %s", item.text(0), item.text(1))
     return item
 
 
-def _only_show_matched_items(item: QTreeWidgetItem, matched_items: Tuple[QTreeWidgetItem, ...]) -> bool:
+def _only_show_matched_items(
+    item: QTreeWidgetItem, matched_items: Tuple[QTreeWidgetItem, ...]
+) -> bool:
     is_hidden = item not in matched_items
     for i in range(item.childCount()):
         child_item = item.child(i)
@@ -55,5 +59,5 @@ def _only_show_matched_items(item: QTreeWidgetItem, matched_items: Tuple[QTreeWi
         are_descendants_hidden = _only_show_matched_items(child_item, matched_items)
         is_hidden = is_hidden and are_descendants_hidden
     item.setHidden(is_hidden)
-    logging.debug('is_hidden: %s, %s', item.text(0), is_hidden)
+    logging.debug("is_hidden: %s, %s", item.text(0), is_hidden)
     return is_hidden
