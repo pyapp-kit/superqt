@@ -32,6 +32,12 @@ class QSearchableTreeWidget(QWidget):
             top_level_item = self.tree_widget.topLevelItem(i)
             _only_show_matched_items(top_level_item, matched_items)
 
+    @classmethod
+    def fromDict(cls, data: dict, *, parent: QWidget = None) -> 'QSearchableTreeWidget':
+        widget = cls(parent)
+        widget.setData(data)
+        return widget
+
 
 def _to_item(name: str, value: Any) -> QTreeWidgetItem:
     item = QTreeWidgetItem((name, str(value)))

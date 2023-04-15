@@ -22,8 +22,7 @@ data = {
 
 app = QApplication([])
 
-tree = QSearchableTreeWidget()
-tree.setData(data)
+tree = QSearchableTreeWidget.fromDict(data)
 tree.show()
 
 app.exec_()
