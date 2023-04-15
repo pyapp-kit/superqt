@@ -20,7 +20,7 @@ class QSearchableTreeWidget(QWidget):
         layout.addWidget(self.tree_widget)
         self.setLayout(layout)
 
-    def _setData(self, data: dict) -> None:
+    def setData(self, data: dict) -> None:
         self.tree_widget.clear()
         top_level_items = [_to_item(k, v) for k, v in data.items()]
         self.tree_widget.addTopLevelItems(top_level_items)
@@ -34,7 +34,7 @@ class QSearchableTreeWidget(QWidget):
     @classmethod
     def fromDict(cls, data: dict, *, parent: QWidget = None) -> 'QSearchableTreeWidget':
         widget = cls(parent)
-        widget._setData(data)
+        widget.setData(data)
         return widget
 
 
