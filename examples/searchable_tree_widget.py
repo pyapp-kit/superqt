@@ -1,6 +1,12 @@
+import logging
 from qtpy.QtWidgets import QApplication
 
 from superqt import QSearchableTreeWidget
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s : %(levelname)s : %(filename)s : %(message)s"
+)
 
 data = {
     'kermit': 'favorite child',
