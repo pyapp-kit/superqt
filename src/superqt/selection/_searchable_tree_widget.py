@@ -22,6 +22,7 @@ class QSearchableTreeWidget(QWidget):
 
     def setData(self, data: dict) -> None:
         self.tree_widget.clear()
+        self.filter_widget.clear()
         top_level_items = [_to_item(k, v) for k, v in data.items()]
         self.tree_widget.addTopLevelItems(top_level_items)
 
