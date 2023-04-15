@@ -24,11 +24,12 @@ class QSearchableTreeWidget(QWidget):
         Used to filter items in the tree by matching their key against a
         regular expression.
     """
+
     def __init__(self, parent=None):
         super().__init__(parent)
 
         self.tree_widget = QTreeWidget()
-        self.tree_widget.setHeaderLabels(('Key', 'Value'))
+        self.tree_widget.setHeaderLabels(("Key", "Value"))
 
         self.filter_widget = QLineEdit()
         self.filter_widget.textChanged.connect(self._updateVisibleItems)
@@ -53,7 +54,9 @@ class QSearchableTreeWidget(QWidget):
             _update_visible_items(top_level_item, expression)
 
     @classmethod
-    def fromData(cls, data: Mapping, *, parent: QWidget = None) -> 'QSearchableTreeWidget':
+    def fromData(
+        cls, data: Mapping, *, parent: QWidget = None
+    ) -> "QSearchableTreeWidget":
         """Make a searchable tree widget from a mapping."""
         widget = cls(parent)
         widget.setData(data)
@@ -76,11 +79,13 @@ def _make_item(*, name: str, value: Any) -> QTreeWidgetItem:
         for i, v in enumerate(value):
             child = _make_item(name=str(i), value=v)
             item.addChild(child)
-    logging.debug('_make_item: %s, %s', item.text(0), item.text(1))
+    logging.debug("_make_item: %s, %s", item.text(0), item.text(1))
     return item
 
 
-def _update_visible_items(item: QTreeWidgetItem, expression: QRegularExpression, parent_visible: bool = False) -> bool:
+def _update_visible_items(
+    item: QTreeWidgetItem, expression: QRegularExpression, parent_visible: bool = False
+) -> bool:
     """Recursively update the visibility of a tree item based on a expression.
 
     An item is visible if it, its parent, or any of its descendants match the expression.
@@ -94,5 +99,5 @@ def _update_visible_items(item: QTreeWidgetItem, expression: QRegularExpression,
         descendants_visible = _update_visible_items(child, expression, visible)
         visible = visible or descendants_visible
     item.setHidden(not visible)
-    logging.debug('visible: %s, %s', text, visible)
+    logging.debug("visible: %s, %s", text, visible)
     return visible
