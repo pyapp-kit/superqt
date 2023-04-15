@@ -53,16 +53,17 @@ def _to_item(name: str, value: Any) -> QTreeWidgetItem:
     return item
 
 
-def _update_visible_items(item: QTreeWidgetItem, expression: QRegularExpression) -> bool:
+def _update_visible_items(item: QTreeWidgetItem, expression: QRegularExpression, parent_visible: bool = False) -> bool:
     """Recursively update the visibility of a tree item by matching against a regular expression.
-    An item is visible if it or any of its descendants are visible.
+    An item is visible if it, its parent, or any of its descendants match the expression.
+    The text of the item's first column is used to match the expression.
     Returns True if the item is visible, False otherwise.
     """
     text = item.text(0)
-    visible = expression.match(text).hasMatch()
+    visible = parent_visible or expression.match(text).hasMatch()
     for i in range(item.childCount()):
         child = item.child(i)
-        descendants_visible = _update_visible_items(child, expression)
+        descendants_visible = _update_visible_items(child, expression, visible)
         visible = visible or descendants_visible
     item.setHidden(not visible)
     logging.debug('visible: %s, %s', text, visible)
