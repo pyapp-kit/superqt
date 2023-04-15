@@ -1,7 +1,7 @@
 import logging
-from typing import Any, Tuple
+from typing import Any
 
-from qtpy.QtCore import Qt
+from qtpy.QtCore import QRegularExpression
 from qtpy.QtWidgets import QLineEdit, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget
 
 
@@ -26,11 +26,10 @@ class QSearchableTreeWidget(QWidget):
         self.tree_widget.addTopLevelItems(top_level_items)
 
     def onlyShowMatchedItems(self, text: str) -> None:
-        matched_items = tuple(self.tree_widget.findItems(text, Qt.MatchContains | Qt.MatchRecursive))
-        logging.debug('matched_items: %s', tuple(m.text(0) for m in matched_items))
+        expression = QRegularExpression(text)
         for i in range(self.tree_widget.topLevelItemCount()):
             top_level_item = self.tree_widget.topLevelItem(i)
-            _only_show_matched_items(top_level_item, matched_items)
+            _update_visible_items(top_level_item, expression)
 
     @classmethod
     def fromDict(cls, data: dict, *, parent: QWidget = None) -> 'QSearchableTreeWidget':
@@ -53,13 +52,13 @@ def _to_item(name: str, value: Any) -> QTreeWidgetItem:
     return item
 
 
-def _only_show_matched_items(item: QTreeWidgetItem, matched_items: Tuple[QTreeWidgetItem, ...]) -> bool:
-    is_hidden = item not in matched_items
+def _update_visible_items(item: QTreeWidgetItem, expression: QRegularExpression) -> bool:
+    text = item.text(0)
+    is_hidden = not expression.match(text).hasMatch()
     for i in range(item.childCount()):
-        child_item = item.child(i)
-        child_item.setHidden(child_item not in matched_items)
-        are_descendants_hidden = _only_show_matched_items(child_item, matched_items)
-        is_hidden = is_hidden and are_descendants_hidden
+        child = item.child(i)
+        descendants_hidden = _update_visible_items(child, expression)
+        is_hidden = is_hidden and descendants_hidden
     item.setHidden(is_hidden)
-    logging.debug('is_hidden: %s, %s', item.text(0), is_hidden)
+    logging.debug('is_hidden: %s, %s', text, is_hidden)
     return is_hidden
