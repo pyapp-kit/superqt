@@ -9,13 +9,13 @@ from superqt import QSearchableTreeWidget
 @pytest.fixture
 def data() -> dict:
     return {
-        'null': None,
-        'string': 'test',
-        'number': 42,
-        'array': [2, 3, 5],
-        'object': {
-            'a': 1,
-            'q': (22, 99),
+        'none': None,
+        'str': 'test',
+        'int': 42,
+        'list': [2, 3, 5],
+        'dict': {
+            'float': 0.5,
+            'tuple': (22, 99),
         },
     }
 
@@ -54,31 +54,31 @@ def test_from_data(qtbot: QtBot, data: dict):
 
     assert tree.topLevelItemCount() == 5
 
-    null_item = tree.topLevelItem(0)
-    assert_item_equal(null_item, 'null', None)
-    assert null_item.childCount() == 0
+    none_item = tree.topLevelItem(0)
+    assert_item_equal(none_item, 'none', None)
+    assert none_item.childCount() == 0
 
-    string_item = tree.topLevelItem(1)
-    assert_item_equal(string_item, 'string', 'test')
-    assert string_item.childCount() == 0
+    str_item = tree.topLevelItem(1)
+    assert_item_equal(str_item, 'str', 'test')
+    assert str_item.childCount() == 0
 
-    number_item = tree.topLevelItem(2)
-    assert_item_equal(number_item, 'number', 42)
-    assert number_item.childCount() == 0
+    int_item = tree.topLevelItem(2)
+    assert_item_equal(int_item, 'int', 42)
+    assert int_item.childCount() == 0
     
-    array_item = tree.topLevelItem(3)
-    assert_item_equal(array_item, 'array', [2, 3, 5])
-    assert array_item.childCount() == 3
-    assert_item_equal(array_item.child(0), '0', 2)
-    assert_item_equal(array_item.child(1), '1', 3)
-    assert_item_equal(array_item.child(2), '2', 5)
+    list_item = tree.topLevelItem(3)
+    assert_item_equal(list_item, 'list', [2, 3, 5])
+    assert list_item.childCount() == 3
+    assert_item_equal(list_item.child(0), '0', 2)
+    assert_item_equal(list_item.child(1), '1', 3)
+    assert_item_equal(list_item.child(2), '2', 5)
 
-    object_item = tree.topLevelItem(4)
-    assert_item_equal(object_item, 'object', {'a': 1, 'q': (22, 99)})
-    assert object_item.childCount() == 2
-    assert_item_equal(object_item.child(0), 'a', 1)
-    tuple_item = object_item.child(1)
-    assert_item_equal(tuple_item, 'q', (22, 99))
+    dict_item = tree.topLevelItem(4)
+    assert_item_equal(dict_item, 'dict', {'float': 0.5, 'tuple': (22, 99)})
+    assert dict_item.childCount() == 2
+    assert_item_equal(dict_item.child(0), 'float', 0.5)
+    tuple_item = dict_item.child(1)
+    assert_item_equal(tuple_item, 'tuple', (22, 99))
     assert tuple_item.childCount() == 2
     assert_item_equal(tuple_item.child(0), '0', 22)
     assert_item_equal(tuple_item.child(1), '1', 99)
@@ -108,36 +108,35 @@ def test_search_all_match(widget: QSearchableTreeWidget):
 
 
 def test_search_match_one(widget: QSearchableTreeWidget):
-    widget.filter_widget.setText('number')
+    widget.filter_widget.setText('int')
     shown_items = get_shown_items(widget.tree_widget)
     assert len(shown_items) == 1
-    assert_item_equal(shown_items[0], 'number', 42)
+    assert_item_equal(shown_items[0], 'int', 42)
 
 
 def test_search_match_many(widget: QSearchableTreeWidget):
     widget.filter_widget.setText('n')
     shown_items = get_shown_items(widget.tree_widget)
-    assert len(shown_items) == 3
-    assert_item_equal(shown_items[0], 'null', None)
-    assert_item_equal(shown_items[1], 'string', 'test')
-    assert_item_equal(shown_items[2], 'number', 42)
+    assert len(shown_items) == 2
+    assert_item_equal(shown_items[0], 'none', None)
+    assert_item_equal(shown_items[1], 'int', 42)
 
 
 def test_search_match_one_show_unmatched_descendants(widget: QSearchableTreeWidget):
-    widget.filter_widget.setText('array')
+    widget.filter_widget.setText('list')
     shown_items = get_shown_items(widget.tree_widget)
     assert len(shown_items) == 4
-    assert_item_equal(shown_items[0], 'array', [2, 3, 5])
+    assert_item_equal(shown_items[0], 'list', [2, 3, 5])
     assert_item_equal(shown_items[1], '0', 2)
     assert_item_equal(shown_items[2], '1', 3)
     assert_item_equal(shown_items[3], '2', 5)
 
 
 def test_search_match_one_show_unmatched_ancestors(widget: QSearchableTreeWidget):
-    widget.filter_widget.setText('q')
+    widget.filter_widget.setText('tuple')
     shown_items = get_shown_items(widget.tree_widget)
     assert len(shown_items) == 4
-    assert_item_equal(shown_items[0], 'object', {'a': 1, 'q': (22, 99)})
-    assert_item_equal(shown_items[1], 'q', (22, 99))
+    assert_item_equal(shown_items[0], 'dict', {'float': 0.5, 'tuple': (22, 99)})
+    assert_item_equal(shown_items[1], 'tuple', (22, 99))
     assert_item_equal(shown_items[2], '0', 22)
     assert_item_equal(shown_items[3], '1', 99)
