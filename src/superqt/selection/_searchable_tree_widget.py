@@ -69,15 +69,18 @@ def _make_item(*, name: str, value: Any) -> QTreeWidgetItem:
     add child items and build a tree. In this case, mappings use keys
     as their names whereas other iterables use their enumerated index.
     """
-    item = QTreeWidgetItem((name, str(value)))
     if isinstance(value, Mapping):
+        item = QTreeWidgetItem([name, type(value).__name__])
         for k, v in value.items():
             child = _make_item(name=k, value=v)
             item.addChild(child)
     elif isinstance(value, Iterable) and not isinstance(value, str):
+        item = QTreeWidgetItem([name, type(value).__name__])
         for i, v in enumerate(value):
             child = _make_item(name=str(i), value=v)
             item.addChild(child)
+    else:
+        item = QTreeWidgetItem([name, str(value)])
     logging.debug("_make_item: %s, %s", item.text(0), item.text(1))
     return item
 
@@ -98,5 +101,5 @@ def _update_visible_items(
         descendants_visible = _update_visible_items(child, expression, visible)
         visible = visible or descendants_visible
     item.setHidden(not visible)
-    logging.debug("visible: %s, %s", text, visible)
+    logging.debug("_update_visible_items: %s, %s", text, visible)
     return visible

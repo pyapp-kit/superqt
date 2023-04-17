@@ -10,15 +10,14 @@ logging.basicConfig(
 )
 
 data = {
-    "kermit": "favorite child",
-    "momo": ["loves", "to", "eat"],
-    "requests": {
-        "belly": "rubs",
-        "treats": "please",
-        "bowl": ["full", "of", "food"],
+    'none': None,
+    'str': 'test',
+    'int': 42,
+    'list': [2, 3, 5],
+    'dict': {
+        'float': 0.5,
+        'tuple': (22, 99),
     },
-    "cuteness": 10,
-    "sleep": None,
 }
 
 app = QApplication([])
