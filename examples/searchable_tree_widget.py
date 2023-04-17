@@ -10,14 +10,14 @@ logging.basicConfig(
 )
 
 data = {
-    'none': None,
-    'str': 'test',
-    'int': 42,
-    'list': [2, 3, 5],
-    'dict': {
-        'float': 0.5,
-        'tuple': (22, 99),
-        'bool': False,
+    "none": None,
+    "str": "test",
+    "int": 42,
+    "list": [2, 3, 5],
+    "dict": {
+        "float": 0.5,
+        "tuple": (22, 99),
+        "bool": False,
     },
 }
 
