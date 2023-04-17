@@ -90,9 +90,10 @@ def _make_item(*, name: str, value: Any) -> QTreeWidgetItem:
 def _update_visible_items(
     item: QTreeWidgetItem, expression: QRegularExpression, ancestor_match: bool = False
 ) -> bool:
-    """Recursively update the visibility of a tree item based on a expression.
+    """Recursively update the visibility of a tree item based on an expression.
 
-    An item is visible if it or any of its ancestors or descendants match the expression.
+    An item is visible if it, any of its ancestors, or any of its descendants
+    match the expression.
     The text of an item's first column is used to match the expression.
     Returns True if the item is visible, False otherwise.
     """

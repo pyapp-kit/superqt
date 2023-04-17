@@ -16,6 +16,7 @@ def data() -> dict:
         'dict': {
             'float': 0.5,
             'tuple': (22, 99),
+            'bool': False,
         },
     }
 
@@ -74,13 +75,14 @@ def test_from_data(qtbot: QtBot, data: dict):
 
     dict_item = tree.topLevelItem(4)
     assert columns(dict_item) == ('dict', 'dict')
-    assert dict_item.childCount() == 2
+    assert dict_item.childCount() == 3
     assert columns(dict_item.child(0)) == ('float', '0.5')
     tuple_item = dict_item.child(1)
     assert columns(tuple_item) == ('tuple', 'tuple')
     assert tuple_item.childCount() == 2
     assert columns(tuple_item.child(0)) == ('0', '22')
     assert columns(tuple_item.child(1)) == ('1', '99')
+    assert columns(dict_item.child(2)) == ('bool', 'False')
 
 
 def test_set_data(widget: QSearchableTreeWidget):

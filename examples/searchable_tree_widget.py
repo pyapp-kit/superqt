@@ -17,6 +17,7 @@ data = {
     'dict': {
         'float': 0.5,
         'tuple': (22, 99),
+        'bool': False,
     },
 }
 
