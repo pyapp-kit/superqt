@@ -43,13 +43,13 @@ def shown_items(tree: QTreeWidget) -> List[QTreeWidgetItem]:
 def test_init(qtbot: QtBot):
     widget = QSearchableTreeWidget()
     qtbot.addWidget(widget)
-    assert widget.tree_widget.topLevelItemCount() == 0
+    assert widget.tree.topLevelItemCount() == 0
 
 
 def test_from_data(qtbot: QtBot, data: dict):
     widget = QSearchableTreeWidget.fromData(data)
     qtbot.addWidget(widget)
-    tree = widget.tree_widget
+    tree = widget.tree
 
     assert tree.topLevelItemCount() == 5
 
@@ -84,7 +84,7 @@ def test_from_data(qtbot: QtBot, data: dict):
 
 
 def test_set_data(widget: QSearchableTreeWidget):
-    tree = widget.tree_widget
+    tree = widget.tree
     assert tree.topLevelItemCount() != 1
 
     widget.setData({'test': 'reset'})
@@ -94,35 +94,35 @@ def test_set_data(widget: QSearchableTreeWidget):
 
 
 def test_search_no_match(widget: QSearchableTreeWidget):
-    widget.filter_widget.setText('no match here')
-    items = shown_items(widget.tree_widget)
+    widget.filter.setText('no match here')
+    items = shown_items(widget.tree)
     assert len(items) == 0
 
 
 def test_search_all_match(widget: QSearchableTreeWidget):
-    widget.filter_widget.setText('')
-    tree = widget.tree_widget
+    widget.filter.setText('')
+    tree = widget.tree
     assert all_items(tree) == shown_items(tree)
 
 
 def test_search_match_one(widget: QSearchableTreeWidget):
-    widget.filter_widget.setText('int')
-    items = shown_items(widget.tree_widget)
+    widget.filter.setText('int')
+    items = shown_items(widget.tree)
     assert len(items) == 1
     assert columns(items[0]) == ('int', '42')
 
 
 def test_search_match_many(widget: QSearchableTreeWidget):
-    widget.filter_widget.setText('n')
-    items = shown_items(widget.tree_widget)
+    widget.filter.setText('n')
+    items = shown_items(widget.tree)
     assert len(items) == 2
     assert columns(items[0]) == ('none', 'None')
     assert columns(items[1]) == ('int', '42')
 
 
 def test_search_match_one_show_unmatched_descendants(widget: QSearchableTreeWidget):
-    widget.filter_widget.setText('list')
-    items = shown_items(widget.tree_widget)
+    widget.filter.setText('list')
+    items = shown_items(widget.tree)
     assert len(items) == 4
     assert columns(items[0]) == ('list', 'list')
     assert columns(items[1]) == ('0', '2')
@@ -131,8 +131,8 @@ def test_search_match_one_show_unmatched_descendants(widget: QSearchableTreeWidg
 
 
 def test_search_match_one_show_unmatched_ancestors(widget: QSearchableTreeWidget):
-    widget.filter_widget.setText('tuple')
-    items = shown_items(widget.tree_widget)
+    widget.filter.setText('tuple')
+    items = shown_items(widget.tree)
     assert len(items) == 4
     assert columns(items[0]) == ('dict', 'dict')
     assert columns(items[1]) == ('tuple', 'tuple')

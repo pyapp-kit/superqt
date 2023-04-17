@@ -13,14 +13,14 @@ class QSearchableTreeWidget(QWidget):
     If the mapping changes, the easiest way to update this is by calling `setData`.
 
     The tree can be searched by entering a regular expression pattern
-    into the `filter_widget` line edit. An item is only shown if its key
+    into the `filter` line edit. An item is only shown if its key
     or any of its ancestors' or descendants' keys match this pattern.
 
     Attributes
     ----------
-    tree_widget : QTreeWidget
+    tree : QTreeWidget
         Shows the mapping as a tree of items.
-    filter_widget : QLineEdit
+    filter : QLineEdit
         Used to filter items in the tree by matching their key against a
         regular expression.
     """
@@ -28,29 +28,29 @@ class QSearchableTreeWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.tree_widget: QTreeWidget = QTreeWidget(self)
-        self.tree_widget.setHeaderLabels(("Key", "Value"))
-        self.tree_widget.setUniformRowHeights(True)
+        self.tree: QTreeWidget = QTreeWidget(self)
+        self.tree.setHeaderLabels(("Key", "Value"))
+        self.tree.setUniformRowHeights(True)
 
-        self.filter_widget: QLineEdit = QLineEdit(self)
-        self.filter_widget.textChanged.connect(self._updateVisibleItems)
+        self.filter: QLineEdit = QLineEdit(self)
+        self.filter.textChanged.connect(self._updateVisibleItems)
 
         layout = QVBoxLayout(self)
-        layout.addWidget(self.filter_widget)
-        layout.addWidget(self.tree_widget)
+        layout.addWidget(self.filter)
+        layout.addWidget(self.tree)
 
     def setData(self, data: Mapping) -> None:
         """Update the mapping data shown by the tree."""
-        self.tree_widget.clear()
-        self.filter_widget.clear()
+        self.tree.clear()
+        self.filter.clear()
         top_level_items = [_make_item(name=k, value=v) for k, v in data.items()]
-        self.tree_widget.addTopLevelItems(top_level_items)
+        self.tree.addTopLevelItems(top_level_items)
 
     def _updateVisibleItems(self, pattern: str) -> None:
         """Recursively update the visibility of the items in the tree based on the given pattern."""
         expression = QRegularExpression(pattern)
-        for i in range(self.tree_widget.topLevelItemCount()):
-            top_level_item = self.tree_widget.topLevelItem(i)
+        for i in range(self.tree.topLevelItemCount()):
+            top_level_item = self.tree.topLevelItem(i)
             _update_visible_items(top_level_item, expression)
 
     @classmethod
@@ -88,20 +88,21 @@ def _make_item(*, name: str, value: Any) -> QTreeWidgetItem:
 
 
 def _update_visible_items(
-    item: QTreeWidgetItem, expression: QRegularExpression, parent_visible: bool = False
+    item: QTreeWidgetItem, expression: QRegularExpression, ancestor_match: bool = False
 ) -> bool:
     """Recursively update the visibility of a tree item based on a expression.
 
-    An item is visible if it, its parent, or any of its descendants match the expression.
-    The text of the item's first column is used to match the expression.
+    An item is visible if it or any of its ancestors or descendants match the expression.
+    The text of an item's first column is used to match the expression.
     Returns True if the item is visible, False otherwise.
     """
     text = item.text(0)
-    visible = parent_visible or expression.match(text).hasMatch()
+    match = ancestor_match or expression.match(text).hasMatch()
+    visible = match
     for i in range(item.childCount()):
         child = item.child(i)
-        descendants_visible = _update_visible_items(child, expression, visible)
-        visible = visible or descendants_visible
+        descendant_visible = _update_visible_items(child, expression, match)
+        visible = visible or descendant_visible
     item.setHidden(not visible)
     logging.debug("_update_visible_items: %s, %s", text, visible)
     return visible
