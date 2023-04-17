@@ -1,7 +1,7 @@
 import logging
 from typing import Any, Iterable, Mapping
 
-from qtpy.QtCore import QRegularExpression
+from qtpy.QtCore import QRegularExpression, Qt
 from qtpy.QtWidgets import QLineEdit, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget
 
 
@@ -30,6 +30,7 @@ class QSearchableTreeWidget(QWidget):
 
         self.tree_widget: QTreeWidget = QTreeWidget(self)
         self.tree_widget.setHeaderLabels(("Key", "Value"))
+        self.tree_widget.setUniformRowHeights(True)
 
         self.filter_widget: QLineEdit = QLineEdit(self)
         self.filter_widget.textChanged.connect(self._updateVisibleItems)
@@ -81,7 +82,8 @@ def _make_item(*, name: str, value: Any) -> QTreeWidgetItem:
             item.addChild(child)
     else:
         item = QTreeWidgetItem([name, str(value)])
-    logging.debug("_make_item: %s, %s", item.text(0), item.text(1))
+        item.setFlags(item.flags() | Qt.ItemNeverHasChildren)
+    logging.debug("_make_item: %s, %s, %s", item.text(0), item.text(1), item.flags())
     return item
 
 
