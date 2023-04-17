@@ -28,16 +28,15 @@ class QSearchableTreeWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.tree_widget = QTreeWidget()
+        self.tree_widget: QTreeWidget = QTreeWidget(self)
         self.tree_widget.setHeaderLabels(("Key", "Value"))
 
-        self.filter_widget = QLineEdit()
+        self.filter_widget: QLineEdit = QLineEdit(self)
         self.filter_widget.textChanged.connect(self._updateVisibleItems)
 
-        layout = QVBoxLayout()
+        layout = QVBoxLayout(self)
         layout.addWidget(self.filter_widget)
         layout.addWidget(self.tree_widget)
-        self.setLayout(layout)
 
     def setData(self, data: Mapping) -> None:
         """Update the mapping data shown by the tree."""
