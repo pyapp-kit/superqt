@@ -47,7 +47,7 @@ class QSearchableTreeWidget(QWidget):
         self.tree.addTopLevelItems(top_level_items)
 
     def _updateVisibleItems(self, pattern: str) -> None:
-        """Recursively update the visibility of the items in the tree based on the given pattern."""
+        """Recursively update the visibility of items based on the given pattern."""
         expression = QRegularExpression(pattern)
         for i in range(self.tree.topLevelItemCount()):
             top_level_item = self.tree.topLevelItem(i)
