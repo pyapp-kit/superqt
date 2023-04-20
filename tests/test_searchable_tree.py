@@ -109,14 +109,21 @@ def test_search_all_match(widget: QSearchableTreeWidget):
     assert all_items(tree) == shown_items(tree)
 
 
-def test_search_match_one(widget: QSearchableTreeWidget):
+def test_search_match_one_key(widget: QSearchableTreeWidget):
     widget.filter.setText("int")
     items = shown_items(widget.tree)
     assert len(items) == 1
     assert columns(items[0]) == ("int", "42")
 
 
-def test_search_match_many(widget: QSearchableTreeWidget):
+def test_search_match_one_value(widget: QSearchableTreeWidget):
+    widget.filter.setText("test")
+    items = shown_items(widget.tree)
+    assert len(items) == 1
+    assert columns(items[0]) == ("str", "test")
+
+
+def test_search_match_many_keys(widget: QSearchableTreeWidget):
     widget.filter.setText("n")
     items = shown_items(widget.tree)
     assert len(items) == 2

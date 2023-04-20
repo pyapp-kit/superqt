@@ -9,12 +9,12 @@ class QSearchableTreeWidget(QWidget):
     """A tree widget for showing a mapping that can be searched by key.
 
     This is intended to be used with a read-only mapping and be conveniently
-    created using `QSearchableTreeWidget.fromMapping(data)`.
+    created using `QSearchableTreeWidget.fromData(data)`.
     If the mapping changes, the easiest way to update this is by calling `setData`.
 
-    The tree can be searched by entering a regular expression pattern
-    into the `filter` line edit. An item is only shown if its key
-    or any of its ancestors' or descendants' keys match this pattern.
+    The tree can be searched by entering a regular expression pattern.
+    into the `filter` line edit. An item is only shown if its, any of its ancestors,
+    or any of its descendants' keys or values match this pattern.
 
     Attributes
     ----------
@@ -93,18 +93,16 @@ def _update_visible_items(
 ) -> bool:
     """Recursively update the visibility of a tree item based on an expression.
 
-    An item is visible if it, any of its ancestors, or any of its descendants
-    match the expression.
-    The text of an item's first column is used to match the expression.
+    An item is visible if any of its, any of its ancestors', or any of its descendants'
+    column's text matches the expression.
     Returns True if the item is visible, False otherwise.
     """
-    text = item.text(0)
-    match = ancestor_match or expression.match(text).hasMatch()
+    match = ancestor_match or any(expression.match(item.text(i)).hasMatch() for i in range(item.columnCount()))
     visible = match
     for i in range(item.childCount()):
         child = item.child(i)
         descendant_visible = _update_visible_items(child, expression, match)
         visible = visible or descendant_visible
     item.setHidden(not visible)
-    logging.debug("_update_visible_items: %s, %s", text, visible)
+    logging.debug("_update_visible_items: %s, %s", tuple(item.text(i) for i in range(item.columnCount())), visible)
     return visible
