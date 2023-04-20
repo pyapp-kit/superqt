@@ -97,12 +97,19 @@ def _update_visible_items(
     column's text matches the expression.
     Returns True if the item is visible, False otherwise.
     """
-    match = ancestor_match or any(expression.match(item.text(i)).hasMatch() for i in range(item.columnCount()))
+    match = ancestor_match or any(
+        expression.match(item.text(i)).hasMatch()
+        for i in range(item.columnCount())
+    )
     visible = match
     for i in range(item.childCount()):
         child = item.child(i)
         descendant_visible = _update_visible_items(child, expression, match)
         visible = visible or descendant_visible
     item.setHidden(not visible)
-    logging.debug("_update_visible_items: %s, %s", tuple(item.text(i) for i in range(item.columnCount())), visible)
+    logging.debug(
+        "_update_visible_items: %s, %s",
+        tuple(item.text(i) for i in range(item.columnCount())),
+        visible,
+    )
     return visible
