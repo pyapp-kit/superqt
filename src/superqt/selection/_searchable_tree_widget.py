@@ -1,7 +1,7 @@
 import logging
 from typing import Any, Iterable, Mapping
 
-from qtpy.QtCore import QRegularExpression, Qt
+from qtpy.QtCore import QRegularExpression
 from qtpy.QtWidgets import QLineEdit, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget
 
 
@@ -12,9 +12,11 @@ class QSearchableTreeWidget(QWidget):
     created using `QSearchableTreeWidget.fromData(data)`.
     If the mapping changes, the easiest way to update this is by calling `setData`.
 
-    The tree can be searched by entering a regular expression pattern.
-    into the `filter` line edit. An item is only shown if its, any of its ancestors,
+    The tree can be searched by entering a regular expression pattern
+    into the `filter` line edit. An item is only shown if its, any of its ancestors',
     or any of its descendants' keys or values match this pattern.
+    The regular expression follows the conventions described by the Qt docs:
+    https://doc.qt.io/qt-5/qregularexpression.html#details
 
     Attributes
     ----------
@@ -30,7 +32,6 @@ class QSearchableTreeWidget(QWidget):
 
         self.tree: QTreeWidget = QTreeWidget(self)
         self.tree.setHeaderLabels(("Key", "Value"))
-        self.tree.setUniformRowHeights(True)
 
         self.filter: QLineEdit = QLineEdit(self)
         self.filter.setClearButtonEnabled(True)
@@ -83,7 +84,6 @@ def _make_item(*, name: str, value: Any) -> QTreeWidgetItem:
             item.addChild(child)
     else:
         item = QTreeWidgetItem([name, str(value)])
-        item.setFlags(item.flags() | Qt.ItemNeverHasChildren)
     logging.debug("_make_item: %s, %s, %s", item.text(0), item.text(1), item.flags())
     return item
 
