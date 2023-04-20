@@ -33,6 +33,7 @@ class QSearchableTreeWidget(QWidget):
         self.tree.setUniformRowHeights(True)
 
         self.filter: QLineEdit = QLineEdit(self)
+        self.filter.setClearButtonEnabled(True)
         self.filter.textChanged.connect(self._updateVisibleItems)
 
         layout = QVBoxLayout(self)
