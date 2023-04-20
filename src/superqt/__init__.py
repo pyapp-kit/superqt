@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 from ._eliding_label import QElidingLabel
 from .collapsible import QCollapsible
 from .combobox import QEnumComboBox, QSearchableComboBox
-from .selection import QSearchableListWidget
+from .selection import QSearchableListWidget, QSearchableTreeWidget
 from .sliders import (
     QDoubleRangeSlider,
     QDoubleSlider,
@@ -43,6 +43,7 @@ __all__ = [
     "QRangeSlider",
     "QSearchableComboBox",
     "QSearchableListWidget",
+    "QSearchableTreeWidget",
 ]
 
 
