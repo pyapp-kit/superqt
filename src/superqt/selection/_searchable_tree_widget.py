@@ -98,8 +98,7 @@ def _update_visible_items(
     Returns True if the item is visible, False otherwise.
     """
     match = ancestor_match or any(
-        expression.match(item.text(i)).hasMatch()
-        for i in range(item.columnCount())
+        expression.match(item.text(i)).hasMatch() for i in range(item.columnCount())
     )
     visible = match
     for i in range(item.childCount()):
