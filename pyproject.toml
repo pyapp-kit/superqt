@@ -52,30 +52,24 @@ test = ["pint", "pytest", "pytest-cov", "pytest-qt", "tox", "tox-conda"]
 dev = [
     "black",
     "ipython",
-    "isort",
-    "jedi<0.18.0",
+    "ruff",
     "mypy",
     "pdbpp",
     "pre-commit",
     "pydocstyle",
-    "pyside2",
-    "pytest-cov",
-    "pytest-qt",
-    "pytest",
     "rich",
-    "tox-conda",
-    "tox",
     "types-Pygments",
 ]
 docs = ["mkdocs-macros-plugin", "mkdocs-material", "mkdocstrings[python]"]
 quantity = ["pint"]
 pyside2 = ["pyside2"]
-pyside6 = ["pyside6"]
+pyside6 = ["pyside6<6.5"]
 pyqt5 = ["pyqt5"]
 pyqt6 = ["pyqt6"]
 font-fa5 = ["fonticon-fontawesome5"]
 font-fa6 = ["fonticon-fontawesome6"]
-font-mi5 = ["fonticon-materialdesignicons5"]
+font-mi6 = ["fonticon-materialdesignicons6"]
+font-mi7 = ["fonticon-materialdesignicons7"]
 
 [project.urls]
 Source = "https://github.com/pyapp-kit/superqt"
@@ -97,7 +91,7 @@ src_paths = ["src/superqt", "tests"]
 [tool.ruff]
 line-length = 88
 target-version = "py37"
-src = ["src","tests"]
+src = ["src", "tests"]
 select = [
     "E",    # style errors
     "F",    # flakes
@@ -184,5 +178,5 @@ ignore = [
     "CONTRIBUTING.md",
     "codecov.yml",
     ".ruff_cache/**/*",
-    "setup.py"
+    "setup.py",
 ]
