@@ -56,10 +56,9 @@ def test_drag_handles(qtbot):
     assert rs._pressedIndex == 0
 
     # drag the left handle
-    with qtbot.waitSignals([rs.sliderMoved] * 13):  # couple less signals
-        for _ in range(15):
-            pos.setX(pos.x() + 2)
-            qtbot.mouseMove(rs, pos)
+    pos.setX(pos.x() + 30)
+    with qtbot.waitSignal(rs.sliderMoved):
+        qtbot.mouseMove(rs, pos)
 
     with qtbot.waitSignal(rs.sliderReleased):
         qtbot.mouseRelease(rs, Qt.MouseButton.LeftButton)
@@ -76,10 +75,10 @@ def test_drag_handles(qtbot):
     assert rs._pressedIndex == 1
 
     # drag the right handle
-    with qtbot.waitSignals([rs.sliderMoved] * 13):  # couple less signals
-        for _ in range(15):
-            pos.setX(pos.x() - 2)
-            qtbot.mouseMove(rs, pos)
+    with qtbot.waitSignal(rs.sliderMoved):
+        pos.setX(pos.x() - 30)
+        qtbot.mouseMove(rs, pos)
+
     with qtbot.waitSignal(rs.sliderReleased):
         qtbot.mouseRelease(rs, Qt.MouseButton.LeftButton)
 
@@ -105,8 +104,8 @@ def test_drag_handles_beyond_edge(qtbot):
     assert rs._pressedIndex == 1
 
     # drag the handle off the right edge and make sure the value gets to the max
-    for _ in range(7):
-        pos.setX(pos.x() + 10)
+    with qtbot.waitSignal(rs.sliderMoved):
+        pos.setX(pos.x() + 70)
         qtbot.mouseMove(rs, pos)
 
     with qtbot.waitSignal(rs.sliderReleased):
@@ -132,8 +131,8 @@ def test_bar_drag_beyond_edge(qtbot):
     assert rs._pressedIndex == 1
 
     # drag the handle off the right edge and make sure the value gets to the max
-    for _ in range(15):
-        pos.setX(pos.x() + 10)
+    with qtbot.waitSignal(rs.sliderMoved):
+        pos.setX(pos.x() + 150)
         qtbot.mouseMove(rs, pos)
 
     with qtbot.waitSignal(rs.sliderReleased):
