@@ -184,6 +184,7 @@ class WorkerBase(QRunnable, Generic[_R]):
                     warnings.warn(
                         f"RuntimeError in aborted thread: {result}",
                         RuntimeWarning,
+                        stacklevel=2,
                     )
                     return
                 else:

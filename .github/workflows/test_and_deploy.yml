@@ -99,7 +99,7 @@ jobs:
           python -m pip install setuptools tox tox-gh-actions
 
       - name: Test with tox
-        uses: GabrielBB/xvfb-action@v1
+        uses: aganders3/headless-gui@v1.2
         timeout-minutes: 3
         with:
           run: python -m tox
@@ -116,7 +116,7 @@ jobs:
 
       - name: Screenshots (Linux)
         if: runner.os == 'Linux' && matrix.screenshot
-        uses: GabrielBB/xvfb-action@v1
+        uses: aganders3/headless-gui@v1.2
         with:
           run: python examples/demo_widget.py -snap
 
@@ -147,7 +147,7 @@ jobs:
           python -m pip install qtpy==1.1.0 typing-extensions==3.10.0.0
 
       - name: Test
-        uses: GabrielBB/xvfb-action@v1
+        uses: aganders3/headless-gui@v1.2
         with:
           run: python -m pytest --color=yes
 
@@ -178,7 +178,7 @@ jobs:
           python -m pip install ./napari-repo[testing,pyqt5]
 
       - name: Test napari
-        uses: GabrielBB/xvfb-action@v1
+        uses: aganders3/headless-gui@v1.2
         with:
           working-directory: napari-repo
           run: python -m pytest --color=yes napari/_qt

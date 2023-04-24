@@ -98,9 +98,9 @@ def test_thread_warns(qtbot):
     @qthreading.thread_worker(connect={"warned": check_warning}, start_thread=False)
     def func():
         yield 1
-        warnings.warn("hey!")
+        warnings.warn("hey!")  # noqa: B028
         yield 3
-        warnings.warn("hey!")
+        warnings.warn("hey!")  # noqa: B028
         return 1
 
     wrkr = func()
@@ -236,7 +236,7 @@ def test_worker_base_attribute(qapp):
     assert obj.returned is not None
     assert obj.errored is not None
     with pytest.raises(AttributeError):
-        obj.aa
+        _ = obj.aa
 
 
 def test_abort_does_not_return(qtbot):
