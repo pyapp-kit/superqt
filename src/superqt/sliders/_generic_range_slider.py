@@ -1,6 +1,6 @@
 from typing import List, Optional, Sequence, Tuple, TypeVar, Union
 
-from qtpy import QtGui
+from qtpy import API, QtGui
 from qtpy.QtCore import Property, QEvent, QPoint, QPointF, QRect, QRectF, Qt, Signal
 from qtpy.QtWidgets import QSlider, QStyle, QStyleOptionSlider, QStylePainter
 
@@ -210,8 +210,15 @@ class _GenericRangeSlider(_GenericSlider):
     def _setBarColor(self, color):
         self._style.brush_active = color
 
-    barColor = Property(QtGui.QBrush, _getBarColor, _setBarColor)
-    """The color of the bar between the first and last handle."""
+    # FIXME:
+    # without this, I'm getting:
+    # gc:0: ResourceWarning: gc: 1 uncollectable objects at shutdown
+    #   [<PySide6.QtCore.Property object at ...>]
+    if API != "pyside6":
+        barColor = Property(QtGui.QBrush, _getBarColor, _setBarColor)
+        """The color of the bar between the first and last handle."""
+    else:
+        barColor = property(_getBarColor, _setBarColor)
 
     def _offsetAllPositions(self, offset: float, ref=None) -> None:
         if ref is None:
