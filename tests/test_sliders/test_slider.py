@@ -8,9 +8,9 @@ from superqt import QRangeSlider
 from superqt.sliders._generic_range_slider import SC_BAR, SC_HANDLE, SC_NONE
 
 LINUX = platform.system() == "Linux"
-PYQT6 = API_NAME == "PyQt6"
+NOT_PYQT6 = API_NAME != "PyQt6"
 
-skipmouse = pytest.mark.skipif(LINUX or PYQT6, reason="mouse tests finicky")
+skipmouse = pytest.mark.skipif(LINUX or NOT_PYQT6, reason="mouse tests finicky")
 
 
 @pytest.mark.parametrize("orientation", ["Horizontal", "Vertical"])
