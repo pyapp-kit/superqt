@@ -33,7 +33,7 @@ def test_range(qtbot, orientation):
     assert rs.maximum() == 20
 
 
-@pytest.mark.skipif(os.getenv("CI"), reason="mouse tests finicky")
+@pytest.mark.skipif(bool(os.getenv("CI")), reason="mouse tests finicky")
 def test_drag_handles(qtbot):
     rs = QRangeSlider(Qt.Orientation.Horizontal)
     qtbot.addWidget(rs)
@@ -82,7 +82,7 @@ def test_drag_handles(qtbot):
     assert rs._pressedControl == SC_NONE
 
 
-@pytest.mark.skipif(os.getenv("CI"), reason="mouse tests finicky")
+@pytest.mark.skipif(bool(os.getenv("CI")), reason="mouse tests finicky")
 def test_drag_handles_beyond_edge(qtbot):
     rs = QRangeSlider(Qt.Orientation.Horizontal)
     qtbot.addWidget(rs)
@@ -109,7 +109,7 @@ def test_drag_handles_beyond_edge(qtbot):
     assert rs.value()[1] == 99
 
 
-@pytest.mark.skipif(os.getenv("CI"), reason="mouse tests finicky")
+@pytest.mark.skipif(bool(os.getenv("CI")), reason="mouse tests finicky")
 def test_bar_drag_beyond_edge(qtbot):
     rs = QRangeSlider(Qt.Orientation.Horizontal)
     qtbot.addWidget(rs)
