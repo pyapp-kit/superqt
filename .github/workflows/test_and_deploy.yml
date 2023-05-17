@@ -21,6 +21,9 @@ jobs:
         platform: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ["3.8", "3.9", "3.10", "3.11"]
         backend: [pyqt5, pyside2, pyqt6]
+        exclude:
+          - platform: ubuntu-latest
+            backend: pyqt6
         include:
           - python-version: "3.11"
             platform: macos-latest
