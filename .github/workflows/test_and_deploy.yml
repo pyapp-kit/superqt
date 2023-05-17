@@ -78,8 +78,7 @@ jobs:
           python -m pip install ${{ matrix.backend }}
 
       - name: Test
-        # uses: aganders3/headless-gui@v1.2
-        uses: coactions/setup-xvfb@v1
+        uses: aganders3/headless-gui@v1.2
         with:
           run: python -m pytest --color=yes --cov=superqt --cov-report=xml
 
