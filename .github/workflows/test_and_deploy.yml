@@ -81,7 +81,7 @@ jobs:
         # uses: aganders3/headless-gui@v1.2
         uses: coactions/setup-xvfb@v1
         with:
-          run: pytest --color=yes --cov=superqt --cov-report=xml
+          run: python -m pytest --color=yes --cov=superqt --cov-report=xml
 
       - name: Coverage
         uses: codecov/codecov-action@v3
