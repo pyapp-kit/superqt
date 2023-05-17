@@ -24,6 +24,10 @@ jobs:
         exclude:
           - platform: ubuntu-latest
             backend: pyqt6
+          - platform: windows-latest
+            python-version: "3.11"
+            backend: pyside2
+
         include:
           - python-version: "3.11"
             platform: macos-latest
