@@ -1,10 +1,16 @@
-import os
+import platform
 
 import pytest
+from qtpy import API_NAME
 from qtpy.QtCore import Qt
 
 from superqt import QRangeSlider
 from superqt.sliders._generic_range_slider import SC_BAR, SC_HANDLE, SC_NONE
+
+LINUX = platform.system() == "Linux"
+PYQT6 = API_NAME == "PyQt6"
+
+skipmouse = pytest.mark.skipif(LINUX or PYQT6, reason="mouse tests finicky")
 
 
 @pytest.mark.parametrize("orientation", ["Horizontal", "Vertical"])
@@ -33,7 +39,7 @@ def test_range(qtbot, orientation):
     assert rs.maximum() == 20
 
 
-# @pytest.mark.skipif(bool(os.getenv("CI")), reason="mouse tests finicky")
+@skipmouse
 def test_drag_handles(qtbot):
     rs = QRangeSlider(Qt.Orientation.Horizontal)
     qtbot.addWidget(rs)
@@ -82,7 +88,7 @@ def test_drag_handles(qtbot):
     assert rs._pressedControl == SC_NONE
 
 
-@pytest.mark.skipif(bool(os.getenv("CI")), reason="mouse tests finicky")
+@skipmouse
 def test_drag_handles_beyond_edge(qtbot):
     rs = QRangeSlider(Qt.Orientation.Horizontal)
     qtbot.addWidget(rs)
@@ -109,7 +115,7 @@ def test_drag_handles_beyond_edge(qtbot):
     assert rs.value()[1] == 99
 
 
-@pytest.mark.skipif(bool(os.getenv("CI")), reason="mouse tests finicky")
+@skipmouse
 def test_bar_drag_beyond_edge(qtbot):
     rs = QRangeSlider(Qt.Orientation.Horizontal)
     qtbot.addWidget(rs)
