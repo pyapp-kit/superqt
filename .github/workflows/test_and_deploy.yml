@@ -22,8 +22,8 @@ jobs:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
         backend: [pyqt5, pyside2, pyqt6]
         exclude:
-          - platform: ubuntu-latest
-            backend: pyqt6
+          # - platform: ubuntu-latest
+          #   backend: pyqt6
           - platform: windows-latest
             python-version: "3.11"
             backend: pyside2
@@ -78,7 +78,8 @@ jobs:
           python -m pip install ${{ matrix.backend }}
 
       - name: Test
-        uses: aganders3/headless-gui@v1.2
+        # uses: aganders3/headless-gui@v1.2
+        uses: coactions/setup-xvfb@v1
         with:
           run: pytest --color=yes --cov=superqt --cov-report=xml
 
