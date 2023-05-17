@@ -48,7 +48,7 @@ dependencies = [
 # extras
 # https://peps.python.org/pep-0621/#dependencies-optional-dependencies
 [project.optional-dependencies]
-test = ["pint", "pytest", "pytest-cov", "pytest-qt", "tox", "tox-conda"]
+test = ["pint", "pytest", "pytest-cov", "pytest-qt"]
 dev = [
     "black",
     "ipython",
@@ -169,7 +169,6 @@ ignore = [
     ".github_changelog_generator",
     ".pre-commit-config.yaml",
     "tests/**/*",
-    "tox.ini",
     "src/superqt/_version.py",
     "mkdocs.yml",
     "docs/**/*",

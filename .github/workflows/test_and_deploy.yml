@@ -19,39 +19,9 @@ jobs:
       fail-fast: false
       matrix:
         platform: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ["3.8", "3.9", "3.10"]
-        backend: [pyqt5, pyside2]
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+        backend: [pyqt5, pyside2, pyqt6]
         include:
-          # pyqt6 and pyside6 on latest platforms
-          - python-version: "3.10"
-            platform: ubuntu-latest
-            backend: pyqt6
-          - python-version: "3.10"
-            platform: windows-latest
-            backend: pyqt6
-          - python-version: "3.10"
-            platform: macos-latest
-            backend: pyqt6
-          # also take screenshots
-          - python-version: "3.10"
-            platform: ubuntu-latest
-            backend: pyside6
-            screenshot: 1
-          - python-version: "3.10"
-            platform: windows-latest
-            backend: pyside6
-            screenshot: 1
-          - python-version: "3.10"
-            platform: macos-latest
-            backend: pyside6
-            screenshot: 1
-
-          - python-version: "3.11"
-            platform: ubuntu-latest
-            backend: pyqt6
-          - python-version: "3.11"
-            platform: windows-latest
-            backend: pyqt5
           - python-version: "3.11"
             platform: macos-latest
             backend: pyside6
@@ -63,16 +33,17 @@ jobs:
           - python-version: 3.7
             platform: windows-latest
             backend: pyside2
+
           # legacy Qt
-          - python-version: 3.7
+          - python-version: 3.8
             platform: ubuntu-latest
-            backend: pyqt512
-          - python-version: 3.7
+            backend: "pyqt5==5.12.*"
+          - python-version: 3.8
             platform: ubuntu-latest
-            backend: pyqt513
-          - python-version: 3.7
+            backend: "pyqt5==5.13.*"
+          - python-version: 3.8
             platform: ubuntu-latest
-            backend: pyqt514
+            backend: "pyqt5==5.14.*"
 
     steps:
       - name: Cancel Previous Runs
@@ -96,39 +67,16 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install setuptools tox tox-gh-actions
+          python -m pip install -e .[test]
+          python -m pip install ${{ matrix.backend }}
 
-      - name: Test with tox
+      - name: Test
         uses: aganders3/headless-gui@v1.2
-        timeout-minutes: 3
         with:
-          run: python -m tox
-        env:
-          PLATFORM: ${{ matrix.platform }}
-          BACKEND: ${{ matrix.backend }}
+          run: pytest --color=yes --cov=superqt --cov-report=xml
 
       - name: Coverage
         uses: codecov/codecov-action@v3
-
-      - name: Install for screenshots
-        if: matrix.screenshot
-        run: pip install -e .[${{ matrix.backend }}]
-
-      - name: Screenshots (Linux)
-        if: runner.os == 'Linux' && matrix.screenshot
-        uses: aganders3/headless-gui@v1.2
-        with:
-          run: python examples/demo_widget.py -snap
-
-      - name: Screenshots (macOS/Win)
-        if: runner.os != 'Linux' && matrix.screenshot
-        run: python examples/demo_widget.py -snap
-
-      - uses: actions/upload-artifact@v3
-        if: matrix.screenshot
-        with:
-          name: screenshots ${{ runner.os }}
-          path: screenshots
 
   test_old_qtpy:
     name: qtpy minreq
