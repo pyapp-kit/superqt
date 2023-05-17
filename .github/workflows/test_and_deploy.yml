@@ -80,7 +80,7 @@ jobs:
       - name: Test
         uses: aganders3/headless-gui@v1.2
         with:
-          run: python -m pytest --color=yes --cov=superqt --cov-report=xml
+          run: python -m pytest
 
       - name: Coverage
         uses: codecov/codecov-action@v3
