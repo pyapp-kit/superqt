@@ -33,7 +33,7 @@ def test_range(qtbot, orientation):
     assert rs.maximum() == 20
 
 
-@pytest.mark.skipif(bool(os.getenv("CI")), reason="mouse tests finicky")
+# @pytest.mark.skipif(bool(os.getenv("CI")), reason="mouse tests finicky")
 def test_drag_handles(qtbot):
     rs = QRangeSlider(Qt.Orientation.Horizontal)
     qtbot.addWidget(rs)
