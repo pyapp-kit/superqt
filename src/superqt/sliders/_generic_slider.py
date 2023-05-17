@@ -21,7 +21,7 @@ QRangeSlider.
 """
 import os
 import platform
-from typing import Generic, TypeVar
+from typing import TypeVar
 
 from qtpy import QT_VERSION, QtGui
 from qtpy.QtCore import QEvent, QPoint, QPointF, QRect, Qt, Signal
@@ -58,7 +58,7 @@ USE_MAC_SLIDER_PATCH = (
 )
 
 
-class _GenericSlider(QSlider, Generic[_T]):
+class _GenericSlider(QSlider):
     _fvalueChanged = Signal(int)
     _fsliderMoved = Signal(int)
     _frangeChanged = Signal(int, int)

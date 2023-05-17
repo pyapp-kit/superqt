@@ -1,4 +1,4 @@
-from typing import Generic, List, Optional, Sequence, Tuple, TypeVar, Union
+from typing import List, Optional, Sequence, Tuple, TypeVar, Union
 
 from qtpy import QtGui
 from qtpy.QtCore import Property, QEvent, QPoint, QPointF, QRect, QRectF, Qt, Signal
@@ -17,7 +17,7 @@ _T = TypeVar("_T")
 SC_BAR = QStyle.SubControl.SC_ScrollBarSubPage
 
 
-class _GenericRangeSlider(_GenericSlider[Tuple], Generic[_T]):
+class _GenericRangeSlider(_GenericSlider):
     """MultiHandle Range Slider widget.
 
     Same API as QSlider, but `value`, `setValue`, `sliderPosition`, and
