@@ -67,9 +67,10 @@ def test_labeled_signals(cls, qtbot):
 @pytest.mark.parametrize(
     "cls", [QLabeledDoubleSlider, QLabeledRangeSlider, QLabeledSlider]
 )
-def test_editing_finished_signal(cls):
-    slider = cls()
+def test_editing_finished_signal(cls, qtbot):
     mock = Mock()
+    slider = cls()
+    qtbot.addWidget(slider)
     slider.editingFinished.connect(mock)
     if hasattr(slider, "_label"):
         slider._label.editingFinished.emit()
