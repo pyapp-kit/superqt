@@ -48,5 +48,4 @@ All widgets should try to match the native Qt API as much as possible:
 
 ## Testing
 
-Tests can be run in the current environment with `pytest`.  Or, to run tests
-against all supported python & Qt versions, run `tox`.
+Tests can be run in the current environment with `pytest`.
