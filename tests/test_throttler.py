@@ -1,4 +1,6 @@
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
+
+import pytest
 
 from superqt.utils import qdebounced, qthrottled
 
@@ -41,3 +43,17 @@ def test_throttled(qtbot):
     qtbot.wait(5)
     assert mock1.call_count == 2
     assert mock2.call_count == 10
+
+
+@pytest.mark.usefixtures("disable_throttling")
+@patch("qtpy.QtCore.QTimer.start")
+def test_disable_throttle(start_mock):
+    mock = Mock()
+
+    @qthrottled(timeout=5)
+    def f() -> str:
+        mock()
+
+    f()
+    start_mock.assert_not_called()
+    mock.assert_called_once()
