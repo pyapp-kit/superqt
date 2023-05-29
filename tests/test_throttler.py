@@ -2,7 +2,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from superqt.utils import qdebounced, qthrottled
+from superqt.utils import disable_throttling, qdebounced, qthrottled
 
 
 def test_debounced(qtbot):
@@ -45,7 +45,13 @@ def test_throttled(qtbot):
     assert mock2.call_count == 10
 
 
-@pytest.mark.usefixtures("disable_throttling")
+@pytest.fixture()
+def diable_throttling_fixture():
+    with disable_throttling():
+        yield
+
+
+@pytest.mark.usefixtures("diable_throttling_fixture")
 @patch("qtpy.QtCore.QTimer.start")
 def test_disable_throttle(start_mock):
     mock = Mock()

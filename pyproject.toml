@@ -71,9 +71,6 @@ font-fa6 = ["fonticon-fontawesome6"]
 font-mi6 = ["fonticon-materialdesignicons6"]
 font-mi7 = ["fonticon-materialdesignicons7"]
 
-[project.entry-points.pytest11]
-superqt = "superqt._pytest_plugin"
-
 [project.urls]
 Source = "https://github.com/pyapp-kit/superqt"
 Tracker = "https://github.com/pyapp-kit/superqt/issues"

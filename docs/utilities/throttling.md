@@ -50,5 +50,5 @@ For background on throttling and debouncing, see:
 
 The throttlers are using internally timers to schedule proper calls. It is helpful
 in normal usage but may be problematic in tests. To avoid this problem, this package
-provides `disable_throttling` fixture that disables all throttlers and debouncers.
-The effect is that signals are emitted immediately and the timer is not used.
+provides `superqt.utils.disable_throttling` context manager. It disables all throttlers
+by directly calling `triggered` signal. It is not recommended o use it outside tests.

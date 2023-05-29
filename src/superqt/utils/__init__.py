@@ -1,6 +1,7 @@
 __all__ = (
     "CodeSyntaxHighlight",
     "create_worker",
+    "disable_throttling",
     "ensure_main_thread",
     "ensure_object_thread",
     "FunctionWorker",
@@ -28,4 +29,5 @@ from ._qthreading import (
     new_worker_qthread,
     thread_worker,
 )
+from ._test_utils import disable_throttling
 from ._throttler import QSignalDebouncer, QSignalThrottler, qdebounced, qthrottled
