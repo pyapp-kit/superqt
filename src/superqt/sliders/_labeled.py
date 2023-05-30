@@ -221,6 +221,10 @@ class QLabeledDoubleSlider(QLabeledSlider):
         super().__init__(*args, **kwargs)
         self.setDecimals(2)
 
+    def _setValue(self, value: float):
+        """Convert the value from float to int before setting the slider value."""
+        self._slider.setValue(value)
+
     def _rename_signals(self):
         self.valueChanged = self._fvalueChanged
         self.sliderMoved = self._fsliderMoved
