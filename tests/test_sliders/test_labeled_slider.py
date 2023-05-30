@@ -77,3 +77,11 @@ def test_editing_finished_signal(cls, qtbot):
     else:
         slider._min_label.editingFinished.emit()
     mock.assert_called_once()
+
+
+def test_editing_float(qtbot):
+    slider = QLabeledDoubleSlider()
+    qtbot.addWidget(slider)
+    slider._label.setValue(0.5)
+    slider._label.editingFinished.emit()
+    assert slider.value() == 0.5
