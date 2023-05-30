@@ -32,16 +32,16 @@ jobs:
         include:
           - python-version: "3.10"
             platform: macos-latest
-            backend: pyside6
+            backend: pyside6==6.5.0
           - python-version: "3.11"
             platform: macos-latest
-            backend: pyside6
+            backend: pyside6==6.5.0
           - python-version: "3.10"
             platform: windows-latest
-            backend: pyside6
+            backend: pyside6==6.5.0
           - python-version: "3.11"
             platform: windows-latest
-            backend: pyside6
+            backend: pyside6==6.5.0
 
           # python 3.7
           - python-version: 3.7
@@ -78,7 +78,7 @@ jobs:
       - uses: tlambert03/setup-qt-libs@v1.4
 
       - name: Linux opengl
-        if: runner.os == 'Linux' && ( matrix.backend == 'pyside6' || matrix.backend == 'pyqt6' )
+        if: runner.os == 'Linux' && ( startsWith(matrix.backend, 'pyside6') || startsWith(matrix.backend, 'pyqt6') )
         run: sudo apt-get install -y libopengl0 libegl1-mesa libxcb-xinput0
 
       - name: Install dependencies
