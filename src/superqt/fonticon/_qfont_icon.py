@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from collections import abc
+from collections import abc, defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 from typing import DefaultDict, Sequence, Tuple, Union, cast
@@ -157,7 +157,7 @@ class _QFontIconEngine(QIconEngine):
 
     def __init__(self, options: _IconOptions):
         super().__init__()
-        self._opts: DefaultDict[
+        self._opts: defaultdict[
             QIcon.State, dict[QIcon.Mode, _IconOptions | None]
         ] = DefaultDict(dict)
         self._opts[QIcon.State.Off][QIcon.Mode.Normal] = options
