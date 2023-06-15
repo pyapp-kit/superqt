@@ -5,7 +5,7 @@ from qtpy.QtWidgets import QLineEdit
 from ._eliding import _GenericEliding
 
 
-class QElidingLineEdit(QLineEdit, _GenericEliding):
+class QElidingLineEdit(_GenericEliding, QLineEdit):
     """A QLineEdit variant that will elide text (could add '…') to fit width.
 
     QElidingLineEdit()

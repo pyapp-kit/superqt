@@ -5,7 +5,7 @@ from qtpy.QtWidgets import QLabel
 from ._eliding import _GenericEliding
 
 
-class QElidingLabel(QLabel, _GenericEliding):
+class QElidingLabel(_GenericEliding, QLabel):
     """
     A QLabel variant that will elide text (could add '…') to fit width.
 
