@@ -27,7 +27,7 @@ def test_slider_connect_works(qtbot):
 def _assert_types(args: Iterable[Any], type_: type):
     # sourcery skip: comprehension-to-generator
     if sys.version_info >= (3, 8):
-        assert all([isinstance(v, type_) for v in args]), "invalid type"
+        assert all(isinstance(v, type_) for v in args), "invalid type"
 
 
 @pytest.mark.parametrize("cls", [QLabeledDoubleSlider, QLabeledSlider])
@@ -67,12 +67,21 @@ def test_labeled_signals(cls, qtbot):
 @pytest.mark.parametrize(
     "cls", [QLabeledDoubleSlider, QLabeledRangeSlider, QLabeledSlider]
 )
-def test_editing_finished_signal(cls):
-    slider = cls()
+def test_editing_finished_signal(cls, qtbot):
     mock = Mock()
+    slider = cls()
+    qtbot.addWidget(slider)
     slider.editingFinished.connect(mock)
     if hasattr(slider, "_label"):
         slider._label.editingFinished.emit()
     else:
         slider._min_label.editingFinished.emit()
     mock.assert_called_once()
+
+
+def test_editing_float(qtbot):
+    slider = QLabeledDoubleSlider()
+    qtbot.addWidget(slider)
+    slider._label.setValue(0.5)
+    slider._label.editingFinished.emit()
+    assert slider.value() == 0.5

@@ -35,7 +35,7 @@ def ds(qtbot, request):
     def assert_val_type():
         type_ = float
         if cls in range_types:
-            assert all([isinstance(i, type_) for i in wdg.value()])  # sourcery skip
+            assert all(isinstance(i, type_) for i in wdg.value())  # sourcery skip
         else:
             assert isinstance(wdg.value(), type_)
 

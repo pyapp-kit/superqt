@@ -7,10 +7,10 @@ from qtpy.QtCore import Qt
 from superqt import QRangeSlider
 from superqt.sliders._generic_range_slider import SC_BAR, SC_HANDLE, SC_NONE
 
-NOT_LINUX = platform.system() != "Linux"
-NOT_PYSIDE2 = API_NAME != "PySide2"
+LINUX = platform.system() == "Linux"
+NOT_PYQT6 = API_NAME != "PyQt6"
 
-skipmouse = pytest.mark.skipif(NOT_LINUX or NOT_PYSIDE2, reason="mouse tests finicky")
+skipmouse = pytest.mark.skipif(LINUX or NOT_PYQT6, reason="mouse tests finicky")
 
 
 @pytest.mark.parametrize("orientation", ["Horizontal", "Vertical"])

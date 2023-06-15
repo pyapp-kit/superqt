@@ -78,7 +78,7 @@ class GenericSignalThrottler(QObject):
         self._emissionPolicy = emissionPolicy
         self._hasPendingEmission = False
 
-        self._timer = QTimer()
+        self._timer = QTimer(parent=self)
         self._timer.setSingleShot(True)
         self._timer.setTimerType(Qt.TimerType.PreciseTimer)
         self._timer.timeout.connect(self._maybeEmitTriggered)
