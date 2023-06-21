@@ -153,6 +153,8 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         value = int(value)
         if self._slider.maximum() < value:
             self._slider.setMaximum(value)
+        elif self._slider.minimum() > value:
+            self._slider.setMinimum(value)
         self._slider.setValue(int(value))
 
     def _rename_signals(self):
