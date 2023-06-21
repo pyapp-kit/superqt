@@ -85,3 +85,43 @@ def test_editing_float(qtbot):
     slider._label.setValue(0.5)
     slider._label.editingFinished.emit()
     assert slider.value() == 0.5
+
+
+@pytest.mark.parametrize("cls", [QLabeledSlider, QLabeledDoubleSlider])
+def test_extended_label_spinbox_range(cls, qtbot):
+    slider = cls()
+    mock = Mock()
+    qtbot.addWidget(slider)
+    slider.setRange(0, 10)
+    slider.rangeChanged.connect(mock)
+    assert slider._label.minimum() == 0
+    assert slider._label.maximum() == 10
+    assert slider.minimum() == 0
+    assert slider.maximum() == 10
+
+    # changing slider value without changing spinbox range should return a clipped value
+    # slider._label.setValue(20)
+    # slider._label.editingFinished.emit()  # simulate editing the label manually
+    # qtbot.wait(20)
+    # assert slider.value() == 10
+    # assert slider.maximum() == 10
+
+    # after changing label range, setting the label to a value outside the range should
+    # update the slider min/max as appropriate
+    slider.setLabelSpinBoxRange(-10, 20)
+
+    with qtbot.waitSignal(slider.rangeChanged):
+        slider._label.setValue(15)
+        assert slider._label.minimum() == -10
+        slider._label.editingFinished.emit()  # simulate editing the label manually
+        assert slider._label.minimum() == -10
+    assert slider.value() == 15
+    assert slider.minimum() == 0  # unchanged
+    assert slider.maximum() == 15  # changed
+
+    with qtbot.waitSignal(slider.rangeChanged):
+        slider._label.setValue(-5)
+        slider._label.editingFinished.emit()  # simulate editing the label manually
+    assert slider.value() == -5
+    assert slider.minimum() == -5  # changed
+    assert slider.maximum() == 15  # unchanged
