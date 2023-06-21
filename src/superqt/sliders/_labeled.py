@@ -150,6 +150,9 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
 
     def _setValue(self, value: float):
         """Convert the value from float to int before setting the slider value."""
+        value = int(value)
+        if self._slider.maximum() < value:
+            self._slider.setMaximum(value)
         self._slider.setValue(int(value))
 
     def _rename_signals(self):
