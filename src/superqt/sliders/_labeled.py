@@ -432,9 +432,9 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
             self._max_label.setValue(max)
         self._reposition_labels()
 
-    def setValue(self, value) -> None:
-        super().setValue(value)
-        self.sliderChange(QSlider.SliderValueChange)
+    # def setValue(self, value) -> None:
+    #     super().setValue(value)
+    #     self.sliderChange(QSlider.SliderValueChange)
 
     def setRange(self, min, max) -> None:
         self._on_range_changed(min, max)
