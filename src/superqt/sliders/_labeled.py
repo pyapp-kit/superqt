@@ -134,7 +134,7 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         # accept focus events
         fp = self.style().styleHint(QStyle.StyleHint.SH_Button_FocusPolicy)
         self.setFocusPolicy(Qt.FocusPolicy(fp))
-        
+
         self._slider = self._slider_class()
         self._label = SliderLabel(self._slider, connect=self._setValue)
         self._edge_label_mode: EdgeLabelMode = EdgeLabelMode.LabelIsValue
