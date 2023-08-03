@@ -4,7 +4,7 @@ import warnings
 from collections import abc, defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import DefaultDict, Sequence, Tuple, Union, cast
+from typing import ClassVar, DefaultDict, Sequence, Tuple, Union, cast
 
 from qtpy import QT_VERSION
 from qtpy.QtCore import QObject, QPoint, QRect, QSize, Qt
@@ -346,13 +346,13 @@ class QFontIcon(QIcon):
 
 class QFontIconStore(QObject):
     # map of key -> (font_family, font_style)
-    _LOADED_KEYS: dict[str, tuple[str, str]] = {}
+    _LOADED_KEYS: ClassVar[dict[str, tuple[str, str]]] = {}
 
     # map of (font_family, font_style) -> character (char may include key)
-    _CHARMAPS: dict[tuple[str, str | None], dict[str, str]] = {}
+    _CHARMAPS: ClassVar[dict[tuple[str, str | None], dict[str, str]]] = {}
 
     # singleton instance, use `instance()` to retrieve
-    __instance: QFontIconStore | None = None
+    __instance: ClassVar[QFontIconStore | None] = None
 
     def __init__(self, parent: QObject | None = None) -> None:
         super().__init__(parent=parent)

@@ -1,5 +1,5 @@
 import contextlib
-from typing import Dict, List, Set, Tuple
+from typing import ClassVar, Dict, List, Set, Tuple
 
 from ._iconfont import IconFontMeta, namespace2font
 
@@ -10,10 +10,10 @@ except ImportError:
 
 
 class FontIconManager:
-    ENTRY_POINT = "superqt.fonticon"
-    _PLUGINS: Dict[str, EntryPoint] = {}
-    _LOADED: Dict[str, IconFontMeta] = {}
-    _BLOCKED: Set[EntryPoint] = set()
+    ENTRY_POINT: ClassVar[str] = "superqt.fonticon"
+    _PLUGINS: ClassVar[Dict[str, EntryPoint]] = {}
+    _LOADED: ClassVar[Dict[str, IconFontMeta]] = {}
+    _BLOCKED: ClassVar[Set[EntryPoint]] = set()
 
     def _discover_fonts(self) -> None:
         self._PLUGINS.clear()
