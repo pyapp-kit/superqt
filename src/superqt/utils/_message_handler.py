@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import logging
 from contextlib import suppress
-from typing import ClassVar, List, NamedTuple, Optional
+from typing import ClassVar, NamedTuple
 
 from qtpy.QtCore import QMessageLogContext, QtMsgType, qInstallMessageHandler
 
@@ -48,10 +50,10 @@ class QMessageHandler:
         QtMsgType.QtSystemMsg: logging.CRITICAL,
     }
 
-    def __init__(self, logger: Optional[logging.Logger] = None):
-        self.records: List[Record] = []
+    def __init__(self, logger: logging.Logger | None = None):
+        self.records: list[Record] = []
         self._logger = logger
-        self._previous_handler: Optional[object] = "__uninstalled__"
+        self._previous_handler: object | None = "__uninstalled__"
 
     def install(self):
         """Install this handler (override the current QtMessageHandler)."""
