@@ -1,6 +1,6 @@
 import logging
 from contextlib import suppress
-from typing import List, NamedTuple, Optional
+from typing import ClassVar, List, NamedTuple, Optional
 
 from qtpy.QtCore import QMessageLogContext, QtMsgType, qInstallMessageHandler
 
@@ -39,7 +39,7 @@ class QMessageHandler:
     ...    ...
     """
 
-    _qt2loggertype = {
+    _qt2loggertype: ClassVar[dict[QtMsgType, int]] = {
         QtMsgType.QtDebugMsg: logging.DEBUG,
         QtMsgType.QtInfoMsg: logging.INFO,
         QtMsgType.QtWarningMsg: logging.WARNING,

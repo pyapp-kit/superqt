@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from concurrent.futures import Future
 from functools import wraps
-from typing import TYPE_CHECKING, Callable, overload
+from typing import TYPE_CHECKING, Callable, ClassVar, overload
 
 from qtpy.QtCore import (
     QCoreApplication,
@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 
 class CallCallable(QObject):
     finished = Signal(object)
-    instances: list[CallCallable] = []
+    instances: ClassVar[list[CallCallable]] = []
 
     def __init__(self, callable, *args, **kwargs):
         super().__init__()
