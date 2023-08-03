@@ -158,8 +158,8 @@ def test_names(qapp):
     assert ob.check_object_thread_return_future.__doc__ == "sample docstring"
     signature = inspect.signature(ob.check_object_thread_return_future)
     assert len(signature.parameters) == 1
-    assert list(signature.parameters.values())[0].name == "a"
-    assert list(signature.parameters.values())[0].annotation == int
+    assert next(iter(signature.parameters.values())).name == "a"
+    assert next(iter(signature.parameters.values())).annotation == int
     assert ob.check_main_thread_return.__name__ == "check_main_thread_return"
 
 

@@ -8,6 +8,7 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Callable,
+    ClassVar,
     Generator,
     Generic,
     Sequence,
@@ -87,7 +88,7 @@ class WorkerBase(QRunnable, Generic[_R]):
     """
 
     #: A set of Workers.  Add to set using `WorkerBase.start`
-    _worker_set: set[WorkerBase] = set()
+    _worker_set: ClassVar[set[WorkerBase]] = set()
     returned: SigInst[_R]
     errored: SigInst[Exception]
     warned: SigInst[tuple]
