@@ -31,14 +31,14 @@ def test_wrapped_eliding_label(qtbot):
     qtbot.addWidget(wdg)
     assert not wdg.wordWrap()
     assert 630 < wdg.sizeHint().width() < 640
-    assert wdg._elidedText().endswith("…")
+    assert wdg._elidedText().endswith(ELLIPSIS)
     wdg.resize(QSize(200, 100))
     assert wdg.text() == TEXT
-    assert wdg._elidedText().endswith("…")
+    assert wdg._elidedText().endswith(ELLIPSIS)
     wdg.setWordWrap(True)
     assert wdg.wordWrap()
     assert wdg.text() == TEXT
-    assert wdg._elidedText().endswith("…")
+    assert wdg._elidedText().endswith(ELLIPSIS)
     # just empirically from CI ... stupid
     if platform.system() == "Linux":
         assert wdg.sizeHint() in (QSize(200, 198), QSize(200, 154))

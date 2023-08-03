@@ -9,9 +9,9 @@ except ImportError:
 if TYPE_CHECKING:
     from .spinbox._quantity import QQuantity
 
-from ._eliding_label import QElidingLabel
 from .collapsible import QCollapsible
 from .combobox import QEnumComboBox, QSearchableComboBox
+from .elidable import QElidingLabel, QElidingLineEdit
 from .selection import QSearchableListWidget, QSearchableTreeWidget
 from .sliders import (
     QDoubleRangeSlider,
@@ -32,6 +32,7 @@ __all__ = [
     "QCollapsible",
     "QDoubleSlider",
     "QElidingLabel",
+    "QElidingLineEdit",
     "QEnumComboBox",
     "QLabeledDoubleRangeSlider",
     "QLabeledDoubleSlider",
