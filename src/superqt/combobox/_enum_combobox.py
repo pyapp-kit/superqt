@@ -1,5 +1,5 @@
-from enum import Enum, EnumMeta
-from typing import Optional, TypeVar
+from enum import Enum
+from typing import Generic, Optional, Type, TypeVar
 
 from qtpy.QtCore import Signal
 from qtpy.QtWidgets import QComboBox
@@ -23,7 +23,7 @@ def _get_name(enum_value: Enum):
     return name
 
 
-class QEnumComboBox(QComboBox):
+class QEnumComboBox(QComboBox, Generic[EnumType]):
     """ComboBox presenting options from a python Enum.
 
     If the Enum class does not implement `__str__` then a human readable name
@@ -33,25 +33,26 @@ class QEnumComboBox(QComboBox):
     currentEnumChanged = Signal(object)
 
     def __init__(
-        self, parent=None, enum_class: Optional[EnumMeta] = None, allow_none=False
+        self, parent=None, enum_class: Optional[Type[EnumType]] = None, allow_none=False
     ):
         super().__init__(parent)
-        self._enum_class = None
+        self._enum_class: Optional[Type[EnumType]] = None
         self._allow_none = False
         if enum_class is not None:
             self.setEnumClass(enum_class, allow_none)
         self.currentIndexChanged.connect(self._emit_signal)
 
-    def setEnumClass(self, enum: Optional[EnumMeta], allow_none=False):
+    def setEnumClass(self, enum: Optional[Type[EnumType]], allow_none=False):
         """Set enum class from which members value should be selected."""
         self.clear()
         self._enum_class = enum
         self._allow_none = allow_none and enum is not None
         if allow_none:
             super().addItem(NONE_STRING)
-        super().addItems(list(map(_get_name, self._enum_class.__members__.values())))
+        if enum is not None:
+            super().addItems(list(map(_get_name, enum.__members__.values())))
 
-    def enumClass(self) -> Optional[EnumMeta]:
+    def enumClass(self) -> Optional[Type[EnumType]]:
         """Return current Enum class."""
         return self._enum_class
 
