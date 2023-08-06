@@ -1,8 +1,40 @@
 # Changelog
 
-## [0.4.1](https://github.com/pyapp-kit/superqt/tree/0.4.1) (2022-12-01)
+## [v0.5.0](https://github.com/pyapp-kit/superqt/tree/v0.5.0) (2023-08-06)
 
-[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.4.0...0.4.1)
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.4.1...v0.5.0)
+
+**Implemented enhancements:**
+
+- feat: add stepType to largeInt spinbox [\#179](https://github.com/pyapp-kit/superqt/pull/179) ([tlambert03](https://github.com/tlambert03))
+- Searchable tree widget from a mapping [\#158](https://github.com/pyapp-kit/superqt/pull/158) ([andy-sweet](https://github.com/andy-sweet))
+- Add `QElidingLineEdit` class for elidable `QLineEdit`s [\#154](https://github.com/pyapp-kit/superqt/pull/154) ([dalthviz](https://github.com/dalthviz))
+
+**Fixed bugs:**
+
+- fix: focus events on QLabeledSlider [\#175](https://github.com/pyapp-kit/superqt/pull/175) ([tlambert03](https://github.com/tlambert03))
+- Set parent of timer in throttler [\#171](https://github.com/pyapp-kit/superqt/pull/171) ([Czaki](https://github.com/Czaki))
+- fix: fix double slider label editing [\#168](https://github.com/pyapp-kit/superqt/pull/168) ([tlambert03](https://github.com/tlambert03))
+
+**Documentation updates:**
+
+- Fix typos [\#147](https://github.com/pyapp-kit/superqt/pull/147) ([kianmeng](https://github.com/kianmeng))
+
+**Tests & CI:**
+
+- tests: add qtbot to test to fix windows segfault [\#165](https://github.com/pyapp-kit/superqt/pull/165) ([tlambert03](https://github.com/tlambert03))
+- test: fixing tests \[wip\] [\#164](https://github.com/pyapp-kit/superqt/pull/164) ([tlambert03](https://github.com/tlambert03))
+
+**Merged pull requests:**
+
+- build: unpin pyside6.5 [\#178](https://github.com/pyapp-kit/superqt/pull/178) ([tlambert03](https://github.com/tlambert03))
+- build: pin pyside6 to \<6.5.1 [\#169](https://github.com/pyapp-kit/superqt/pull/169) ([tlambert03](https://github.com/tlambert03))
+- pin pyside6\<6.5 [\#160](https://github.com/pyapp-kit/superqt/pull/160) ([tlambert03](https://github.com/tlambert03))
+- ci: \[pre-commit.ci\] autoupdate [\#146](https://github.com/pyapp-kit/superqt/pull/146) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
+
+## [v0.4.1](https://github.com/pyapp-kit/superqt/tree/v0.4.1) (2022-12-01)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.4.0...v0.4.1)
 
 **Implemented enhancements:**
 
@@ -200,7 +232,7 @@
 **Fixed bugs:**
 
 - Fix some small linting issues. [\#41](https://github.com/pyapp-kit/superqt/pull/41) ([tlambert03](https://github.com/tlambert03))
-- Use functools.wraps instead of \_\_wraped\_\_ and manual proxing \_\_name\_\_ [\#29](https://github.com/pyapp-kit/superqt/pull/29) ([Czaki](https://github.com/Czaki))
+- Use functools.wraps insterad of \_\_wraped\_\_ and manual proxing \_\_name\_\_ [\#29](https://github.com/pyapp-kit/superqt/pull/29) ([Czaki](https://github.com/Czaki))
 - Propagate function name in `ensure_main_thread` and `ensure_object_thread` [\#28](https://github.com/pyapp-kit/superqt/pull/28) ([Czaki](https://github.com/Czaki))
 
 **Tests & CI:**
@@ -254,20 +286,12 @@
 
 ## [v0.2.1](https://github.com/pyapp-kit/superqt/tree/v0.2.1) (2021-07-10)
 
-[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.2.0rc1...v0.2.1)
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.2.0...v0.2.1)
 
 **Fixed bugs:**
 
 - Fix QLabeledRangeSlider API \(fix slider proxy\) [\#10](https://github.com/pyapp-kit/superqt/pull/10) ([tlambert03](https://github.com/tlambert03))
 - Fix range slider with negative min range [\#9](https://github.com/pyapp-kit/superqt/pull/9) ([tlambert03](https://github.com/tlambert03))
-
-## [v0.2.0rc1](https://github.com/pyapp-kit/superqt/tree/v0.2.0rc1) (2021-06-26)
-
-[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.2.0rc0...v0.2.0rc1)
-
-## [v0.2.0rc0](https://github.com/pyapp-kit/superqt/tree/v0.2.0rc0) (2021-06-26)
-
-[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.2.0...v0.2.0rc0)
 
 
 
