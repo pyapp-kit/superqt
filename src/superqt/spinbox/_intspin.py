@@ -1,3 +1,4 @@
+import math
 from enum import Enum
 
 from qtpy.QtCore import QSize, Qt, Signal
@@ -42,6 +43,9 @@ class QLargeIntSpinBox(QAbstractSpinBox):
         self._minimum: int = 0
         self._maximum: int = 2**64 - 1
         self._single_step: int = 1
+        self._step_type: QAbstractSpinBox.StepType = (
+            QAbstractSpinBox.StepType.DefaultStepType
+        )
         self._pending_emit = False
         validator = _AnyIntValidator(self)
         self.lineEdit().setValidator(validator)
@@ -78,7 +82,13 @@ class QLargeIntSpinBox(QAbstractSpinBox):
     def setSingleStep(self, step):
         self._single_step = int(step)
 
-    # TODO: add prefix/suffix/stepType
+    def setStepType(self, stepType: QAbstractSpinBox.StepType) -> None:
+        self._step_type = stepType
+
+    def stepType(self) -> QAbstractSpinBox.StepType:
+        return self._step_type
+
+    # TODO: add prefix/suffix
 
     # ###############  QtOverrides  #######################
 
@@ -102,13 +112,16 @@ class QLargeIntSpinBox(QAbstractSpinBox):
         return super().keyPressEvent(e)
 
     def stepBy(self, steps: int) -> None:
-        step = self._single_step
         old = self._value
         e = _EmitPolicy.EmitIfChanged
         if self._pending_emit:
             self._interpret(_EmitPolicy.NeverEmit)
             if self._value != old:
                 e = _EmitPolicy.AlwaysEmit
+        if self._step_type == QAbstractSpinBox.StepType.AdaptiveDecimalStepType:
+            step = self._calculate_adaptive_decimal_step(steps)
+        else:
+            step = self._single_step
         self._setValue(self._bound(self._value + (step * steps)), e)
 
     def stepEnabled(self):
@@ -164,9 +177,12 @@ class QLargeIntSpinBox(QAbstractSpinBox):
         v = int(text)
         self._setValue(v, policy)
 
-    def _editor_text_changed(self, t):
+    def _editor_text_changed(self, t: str) -> None:
         if self.keyboardTracking():
-            self._setValue(int(t), _EmitPolicy.EmitIfChanged)
+            try:
+                self._setValue(int(t), _EmitPolicy.EmitIfChanged)
+            except ValueError:
+                pass
             self.lineEdit().setFocus()
             self._pending_emit = False
         else:
@@ -174,3 +190,15 @@ class QLargeIntSpinBox(QAbstractSpinBox):
 
     def _bound(self, value):
         return max(self._minimum, min(self._maximum, value))
+
+    def _calculate_adaptive_decimal_step(self, steps: int) -> int:
+        abs_value = abs(self._value)
+        if abs_value < 100:
+            return 1
+
+        value_negative = self._value < 0
+        steps_negative = steps < 0
+        sign_compensation = 0 if value_negative == steps_negative else 1
+
+        log = int(math.log10(abs_value - sign_compensation)) - 1
+        return int(math.pow(10, log))
