@@ -1,9 +1,10 @@
 """superqt is a collection of Qt components for python."""
+from importlib.metadata import PackageNotFoundError, version
 from typing import TYPE_CHECKING, Any
 
 try:
-    from ._version import version as __version__
-except ImportError:
+    __version__ = version("superqt")
+except PackageNotFoundError:
     __version__ = "unknown"
 
 if TYPE_CHECKING:

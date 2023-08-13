@@ -1,4 +1,3 @@
-import sys
 from typing import Any, Iterable
 from unittest.mock import Mock
 
@@ -26,8 +25,7 @@ def test_slider_connect_works(qtbot):
 
 def _assert_types(args: Iterable[Any], type_: type):
     # sourcery skip: comprehension-to-generator
-    if sys.version_info >= (3, 8):
-        assert all(isinstance(v, type_) for v in args), "invalid type"
+    assert all(isinstance(v, type_) for v in args), "invalid type"
 
 
 @pytest.mark.parametrize("cls", [QLabeledDoubleSlider, QLabeledSlider])
