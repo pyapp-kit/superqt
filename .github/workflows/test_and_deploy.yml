@@ -45,7 +45,7 @@ jobs:
 
           - python-version: "3.12-dev"
             platform: ubuntu-latest
-            backend: pyside6
+            backend: pyqt6
 
           # python 3.7
           - python-version: 3.7
