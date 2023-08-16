@@ -6,6 +6,9 @@ from typing import Callable
 
 def get_max_args(func: Callable) -> int | None:
     """Return the maximum number of positional arguments that func can accept."""
+    if not callable(func):
+        raise TypeError(f"{func!r} is not callable")
+
     try:
         sig = signature(func)
     except Exception:
