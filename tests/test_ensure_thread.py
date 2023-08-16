@@ -233,4 +233,9 @@ def test_ensure_thread_sig_inspection(deco):
     obj = Emitter()
     r = Receiver()
     obj.sig.connect(r.func)
+
+    # this is the crux of the test...
+    # we emit 3 args, but the function only takes 2
+    # this should normally work fine in Qt.
+    # testing here that the decorator doesn't break it.
     obj.sig.emit(1, 2, 3)
