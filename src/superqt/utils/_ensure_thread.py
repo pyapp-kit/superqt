@@ -1,9 +1,11 @@
 # https://gist.github.com/FlorianRhiem/41a1ad9b694c14fb9ac3
 from __future__ import annotations
 
+import inspect
 from concurrent.futures import Future
 from functools import wraps
-from typing import TYPE_CHECKING, Callable, ClassVar, overload
+from textwrap import dedent
+from typing import TYPE_CHECKING, Any, Callable, ClassVar, overload
 
 from qtpy.QtCore import (
     QCoreApplication,
@@ -28,12 +30,12 @@ class CallCallable(QObject):
     finished = Signal(object)
     instances: ClassVar[list[CallCallable]] = []
 
-    def __init__(self, callable, *args, **kwargs):
+    def __init__(_call_callable_self_, callable, *args, **kwargs):
         super().__init__()
-        self._callable = callable
-        self._args = args
-        self._kwargs = kwargs
-        CallCallable.instances.append(self)
+        _call_callable_self_._callable = callable
+        _call_callable_self_._args = args
+        _call_callable_self_._kwargs = kwargs
+        CallCallable.instances.append(_call_callable_self_)
 
     @Slot()
     def call(self):
@@ -88,18 +90,29 @@ def ensure_main_thread(
     """
 
     def _out_func(func_):
-        @wraps(func_)
-        def _func(*args, **kwargs):
+        src = f"""
+        def {func_.__name__}{inspect.signature(func_)}:
             return _run_in_thread(
                 func_,
                 QCoreApplication.instance().thread(),
                 await_return,
                 timeout,
-                *args,
-                **kwargs,
+                **locals(),
             )
-
-        return _func
+        """
+        localns: dict[str, Any] = {}
+        exec(  # noqa S102
+            compile(dedent(src), "<string>", "exec"),
+            {
+                "func_": func_,
+                "_run_in_thread": _run_in_thread,
+                "QCoreApplication": QCoreApplication,
+                "await_return": await_return,
+                "timeout": timeout,
+            },
+            localns,
+        )
+        return wraps(func_)(localns[func_.__name__])
 
     return _out_func if func is None else _out_func(func)
 
@@ -150,13 +163,35 @@ def ensure_object_thread(
     """
 
     def _out_func(func_):
-        @wraps(func_)
-        def _func(self, *args, **kwargs):
-            return _run_in_thread(
-                func_, self.thread(), await_return, timeout, self, *args, **kwargs
-            )
+        sig = inspect.signature(func_)
+        first_arg = next(iter(sig.parameters))
 
-        return _func
+        src = f"""
+        def {func_.__name__}{sig}:
+            kwargs = locals()
+            self = kwargs.pop("{first_arg}")
+            return _run_in_thread(
+                func_,
+                self.thread(),
+                await_return,
+                timeout,
+                self,
+                **kwargs,
+            )
+        """
+        localns: dict[str, Any] = {}
+        exec(  # noqa S102
+            compile(dedent(src), "<string>", "exec"),
+            {
+                "func_": func_,
+                "_run_in_thread": _run_in_thread,
+                "QCoreApplication": QCoreApplication,
+                "await_return": await_return,
+                "timeout": timeout,
+            },
+            localns,
+        )
+        return wraps(func_)(localns[func_.__name__])
 
     return _out_func if func is None else _out_func(func)
 

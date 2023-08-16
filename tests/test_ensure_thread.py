@@ -52,6 +52,7 @@ class SampleObject(QObject):
     def check_main_thread(self, a, *, b=1):
         if QThread.currentThread() is not QCoreApplication.instance().thread():
             raise RuntimeError("Wrong thread")
+
         self.main_thread_res = {"a": a, "b": b}
         self.assigment_done.emit()
 
@@ -217,3 +218,19 @@ def test_object_thread(qtbot):
     assert ob.thread() is thread
     with qtbot.waitSignal(thread.finished):
         thread.quit()
+
+
+@pytest.mark.parametrize("deco", [ensure_main_thread, ensure_object_thread])
+def test_ensure_thread_sig_inspection(deco):
+    class Emitter(QObject):
+        sig = Signal(int, int, int)
+
+    class Receiver(QObject):
+        @deco
+        def func(self, a: int, b: int):
+            pass
+
+    obj = Emitter()
+    r = Receiver()
+    obj.sig.connect(r.func)
+    obj.sig.emit(1, 2, 3)
