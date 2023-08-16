@@ -41,6 +41,7 @@ dependencies = [
     "packaging",
     "pygments>=2.4.0",
     "qtpy>=1.1.0",
+    "psygnal",
     "typing-extensions",
 ]
 
