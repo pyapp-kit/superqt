@@ -6,7 +6,11 @@ from typing import Callable
 
 def get_max_args(func: Callable) -> int | None:
     """Return the maximum number of positional arguments that func can accept."""
-    sig = signature(func)
+    try:
+        sig = signature(func)
+    except Exception:
+        return None
+
     max_args = 0
     for param in sig.parameters.values():
         if param.kind == param.VAR_POSITIONAL:
