@@ -3,6 +3,7 @@ import os
 import threading
 import time
 from concurrent.futures import Future, TimeoutError
+from functools import wraps
 from unittest.mock import Mock
 
 import pytest
@@ -221,25 +222,58 @@ def test_object_thread(qtbot):
         thread.quit()
 
 
+@pytest.mark.parametrize("mode", ["method", "func", "wrapped"])
 @pytest.mark.parametrize("deco", [ensure_main_thread, ensure_object_thread])
-def test_ensure_thread_sig_inspection(deco):
+def test_ensure_thread_sig_inspection(deco, mode):
     class Emitter(QObject):
         sig = Signal(int, int, int)
 
-    class Receiver(QObject):
-        @deco
-        def func(self, a: int, b: int):
-            pass
-
     obj = Emitter()
-    r = Receiver()
-    obj.sig.connect(r.func)
+    mock = Mock()
+
+    if mode == "method":
+
+        class Receiver(QObject):
+            @deco
+            def func(self, a: int, b: int):
+                mock(a, b)
+
+        r = Receiver()
+        obj.sig.connect(r.func)
+    elif deco == ensure_object_thread:
+        return  # not compatible with function types
+
+    elif mode == "wrapped":
+
+        def wr(fun):
+            @wraps(fun)
+            def wr2(*args):
+                mock(*args)
+                return fun(*args) * 2
+
+            return wr2
+
+        @deco
+        @wr
+        def wrapped_func(a, b):
+            return a + b
+
+        obj.sig.connect(wrapped_func)
+
+    elif mode == "func":
+
+        @deco
+        def func(a: int, b: int) -> None:
+            mock(a, b)
+
+        obj.sig.connect(func)
 
     # this is the crux of the test...
     # we emit 3 args, but the function only takes 2
     # this should normally work fine in Qt.
     # testing here that the decorator doesn't break it.
     obj.sig.emit(1, 2, 3)
+    mock.assert_called_once_with(1, 2)
 
 
 def test_main_thread_function(qtbot):

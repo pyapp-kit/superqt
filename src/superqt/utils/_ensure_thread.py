@@ -1,6 +1,7 @@
 # https://gist.github.com/FlorianRhiem/41a1ad9b694c14fb9ac3
 from __future__ import annotations
 
+import inspect
 from concurrent.futures import Future
 from functools import wraps
 from typing import TYPE_CHECKING, Any, Callable, ClassVar, overload
@@ -28,20 +29,17 @@ class CallCallable(QObject):
     finished = Signal(object)
     instances: ClassVar[list[CallCallable]] = []
 
-    def __init__(
-        self, callable: Callable, args: tuple, kwargs: dict, max_args: int | None
-    ):
+    def __init__(self, callable: Callable, args: tuple, kwargs: dict):
         super().__init__()
         self._callable = callable
         self._args = args
         self._kwargs = kwargs
-        self._max_args = max_args
         CallCallable.instances.append(self)
 
     @Slot()
     def call(self):
         CallCallable.instances.remove(self)
-        res = self._callable(*self._args[: self._max_args], **self._kwargs)
+        res = self._callable(*self._args, **self._kwargs)
         self.finished.emit(res)
 
 
@@ -91,14 +89,16 @@ def ensure_main_thread(
     """
 
     def _out_func(func_):
+        max_args = _get_max_args(func_)
+
         @wraps(func_)
-        def _func(*args, **kwargs):
+        def _func(*args, _max_args_=max_args, **kwargs):
             return _run_in_thread(
                 func_,
                 QCoreApplication.instance().thread(),
                 await_return,
                 timeout,
-                args,
+                args[:_max_args_],
                 kwargs,
             )
 
@@ -153,10 +153,14 @@ def ensure_object_thread(
     """
 
     def _out_func(func_):
+        max_args = _get_max_args(func_)
+
         @wraps(func_)
-        def _func(*args, **kwargs):
-            thread = args[0].thread()  # "self"
-            return _run_in_thread(func_, thread, await_return, timeout, args, kwargs)
+        def _func(*args, _max_args_=max_args, **kwargs):
+            thread = args[0].thread()  # self
+            return _run_in_thread(
+                func_, thread, await_return, timeout, args[:_max_args_], kwargs
+            )
 
         return _func
 
@@ -171,21 +175,23 @@ def _run_in_thread(
     args: tuple,
     kwargs: dict,
 ) -> Any:
-    try:
-        max_args: int | None = func.__code__.co_argcount
-    except AttributeError:
-        max_args = None
-
     future = Future()  # type: ignore
     if thread is QThread.currentThread():
-        result = func(*args[:max_args], **kwargs)
+        result = func(*args, **kwargs)
         if not await_return:
             future.set_result(result)
             return future
         return result
 
-    f = CallCallable(func, args, kwargs, max_args)
+    f = CallCallable(func, args, kwargs)
     f.moveToThread(thread)
     f.finished.connect(future.set_result, Qt.ConnectionType.DirectConnection)
     QMetaObject.invokeMethod(f, "call", Qt.ConnectionType.QueuedConnection)  # type: ignore  # noqa
     return future.result(timeout=timeout / 1000) if await_return else future
+
+
+def _get_max_args(func: Callable) -> int | None:
+    try:
+        return inspect.unwrap(func).__code__.co_argcount  # type: ignore
+    except Exception:
+        return None
