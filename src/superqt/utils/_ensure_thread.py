@@ -1,7 +1,6 @@
 # https://gist.github.com/FlorianRhiem/41a1ad9b694c14fb9ac3
 from __future__ import annotations
 
-import inspect
 from concurrent.futures import Future
 from functools import wraps
 from typing import TYPE_CHECKING, Any, Callable, ClassVar, overload
@@ -15,6 +14,8 @@ from qtpy.QtCore import (
     Signal,
     Slot,
 )
+
+from ._util import get_max_args
 
 if TYPE_CHECKING:
     from typing import TypeVar
@@ -89,7 +90,7 @@ def ensure_main_thread(
     """
 
     def _out_func(func_):
-        max_args = _get_max_args(func_)
+        max_args = get_max_args(func_)
 
         @wraps(func_)
         def _func(*args, _max_args_=max_args, **kwargs):
@@ -153,7 +154,7 @@ def ensure_object_thread(
     """
 
     def _out_func(func_):
-        max_args = _get_max_args(func_)
+        max_args = get_max_args(func_)
 
         @wraps(func_)
         def _func(*args, _max_args_=max_args, **kwargs):
@@ -188,10 +189,3 @@ def _run_in_thread(
     f.finished.connect(future.set_result, Qt.ConnectionType.DirectConnection)
     QMetaObject.invokeMethod(f, "call", Qt.ConnectionType.QueuedConnection)  # type: ignore  # noqa
     return future.result(timeout=timeout / 1000) if await_return else future
-
-
-def _get_max_args(func: Callable) -> int | None:
-    try:
-        return len(inspect.signature(func).parameters)
-    except Exception:
-        return None
