@@ -1,7 +1,9 @@
 import inspect
 import os
+import threading
 import time
 from concurrent.futures import Future, TimeoutError
+from unittest.mock import Mock
 
 import pytest
 from qtpy.QtCore import QCoreApplication, QObject, QThread, Signal
@@ -217,3 +219,47 @@ def test_object_thread(qtbot):
     assert ob.thread() is thread
     with qtbot.waitSignal(thread.finished):
         thread.quit()
+
+
+@pytest.mark.parametrize("deco", [ensure_main_thread, ensure_object_thread])
+def test_ensure_thread_sig_inspection(deco):
+    class Emitter(QObject):
+        sig = Signal(int, int, int)
+
+    class Receiver(QObject):
+        @deco
+        def func(self, a: int, b: int):
+            pass
+
+    obj = Emitter()
+    r = Receiver()
+    obj.sig.connect(r.func)
+
+    # this is the crux of the test...
+    # we emit 3 args, but the function only takes 2
+    # this should normally work fine in Qt.
+    # testing here that the decorator doesn't break it.
+    obj.sig.emit(1, 2, 3)
+
+
+def test_main_thread_function(qtbot):
+    """Testing decorator on a function rather than QObject method."""
+
+    mock = Mock()
+
+    class Emitter(QObject):
+        sig = Signal(int, int, int)
+
+    @ensure_main_thread
+    def func(x: int) -> None:
+        mock(x, QThread.currentThread())
+
+    e = Emitter()
+    e.sig.connect(func)
+
+    with qtbot.waitSignal(e.sig):
+        thread = threading.Thread(target=e.sig.emit, args=(1, 2, 3))
+        thread.start()
+        thread.join()
+
+    mock.assert_called_once_with(1, QCoreApplication.instance().thread())

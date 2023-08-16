@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from concurrent.futures import Future
 from functools import wraps
-from typing import TYPE_CHECKING, Callable, ClassVar, overload
+from typing import TYPE_CHECKING, Any, Callable, ClassVar, overload
 
 from qtpy.QtCore import (
     QCoreApplication,
@@ -28,17 +28,20 @@ class CallCallable(QObject):
     finished = Signal(object)
     instances: ClassVar[list[CallCallable]] = []
 
-    def __init__(self, callable, *args, **kwargs):
+    def __init__(
+        self, callable: Callable, args: tuple, kwargs: dict, max_args: int | None
+    ):
         super().__init__()
         self._callable = callable
         self._args = args
         self._kwargs = kwargs
+        self._max_args = max_args
         CallCallable.instances.append(self)
 
     @Slot()
     def call(self):
         CallCallable.instances.remove(self)
-        res = self._callable(*self._args, **self._kwargs)
+        res = self._callable(*self._args[: self._max_args], **self._kwargs)
         self.finished.emit(res)
 
 
@@ -95,8 +98,8 @@ def ensure_main_thread(
                 QCoreApplication.instance().thread(),
                 await_return,
                 timeout,
-                *args,
-                **kwargs,
+                args,
+                kwargs,
             )
 
         return _func
@@ -151,10 +154,9 @@ def ensure_object_thread(
 
     def _out_func(func_):
         @wraps(func_)
-        def _func(self, *args, **kwargs):
-            return _run_in_thread(
-                func_, self.thread(), await_return, timeout, self, *args, **kwargs
-            )
+        def _func(*args, **kwargs):
+            thread = args[0].thread()  # "self"
+            return _run_in_thread(func_, thread, await_return, timeout, args, kwargs)
 
         return _func
 
@@ -166,17 +168,23 @@ def _run_in_thread(
     thread: QThread,
     await_return: bool,
     timeout: int,
-    *args,
-    **kwargs,
-):
+    args: tuple,
+    kwargs: dict,
+) -> Any:
+    try:
+        max_args: int | None = func.__code__.co_argcount
+    except AttributeError:
+        max_args = None
+
     future = Future()  # type: ignore
     if thread is QThread.currentThread():
-        result = func(*args, **kwargs)
+        result = func(*args[:max_args], **kwargs)
         if not await_return:
             future.set_result(result)
             return future
         return result
-    f = CallCallable(func, *args, **kwargs)
+
+    f = CallCallable(func, args, kwargs, max_args)
     f.moveToThread(thread)
     f.finished.connect(future.set_result, Qt.ConnectionType.DirectConnection)
     QMetaObject.invokeMethod(f, "call", Qt.ConnectionType.QueuedConnection)  # type: ignore  # noqa
