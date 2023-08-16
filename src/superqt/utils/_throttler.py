@@ -28,6 +28,7 @@ SOFTWARE.
 """
 from __future__ import annotations
 
+import inspect
 from concurrent.futures import Future
 from enum import IntFlag, auto
 from functools import wraps
@@ -212,8 +213,8 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
         # so we do it ourselfs and limit the number of positional arguments
         # that we pass to func
         try:
-            self._max_args: int | None = func.__code__.co_argcount
-        except AttributeError:
+            self._max_args: int | None = len(inspect.signature(func).parameters)
+        except Exception:
             self._max_args = None
 
     def __call__(self, *args: P.args, **kwargs: P.kwargs) -> "Future[R]":  # noqa
