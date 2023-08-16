@@ -192,6 +192,6 @@ def _run_in_thread(
 
 def _get_max_args(func: Callable) -> int | None:
     try:
-        return inspect.unwrap(func).__code__.co_argcount  # type: ignore
+        return len(inspect.signature(func).parameters)
     except Exception:
         return None
