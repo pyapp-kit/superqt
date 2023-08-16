@@ -52,7 +52,6 @@ class SampleObject(QObject):
     def check_main_thread(self, a, *, b=1):
         if QThread.currentThread() is not QCoreApplication.instance().thread():
             raise RuntimeError("Wrong thread")
-
         self.main_thread_res = {"a": a, "b": b}
         self.assigment_done.emit()
 
