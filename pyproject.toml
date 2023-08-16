@@ -8,9 +8,9 @@ build-backend = "hatchling.build"
 name = "superqt"
 description = "Missing widgets and components for PyQt/PySide"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 license = { text = "BSD 3-Clause License" }
-authors = [{ email = "talley.lambert@gmail.com" }, { name = "Talley Lambert" }]
+authors = [{ email = "talley.lambert@gmail.com", name = "Talley Lambert" }]
 keywords = [
     "qt",
     "pyqt",
@@ -28,7 +28,6 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -93,19 +92,21 @@ src_paths = ["src/superqt", "tests"]
 # https://github.com/charliermarsh/ruff
 [tool.ruff]
 line-length = 88
-target-version = "py37"
+target-version = "py38"
 src = ["src", "tests"]
 select = [
     "E",    # style errors
     "F",    # flakes
+    "W",    # flakes
     "D",    # pydocstyle
     "I",    # isort
     "UP",   # pyupgrade
     "S",    # bandit
-    "C",    # flake8-comprehensions
+    "C4",   # flake8-comprehensions
     "B",    # flake8-bugbear
     "A001", # flake8-builtins
     "RUF",  # ruff-specific rules
+    "TID",  # tidy imports
 ]
 ignore = [
     "D100", # Missing docstring in public module
@@ -118,7 +119,6 @@ ignore = [
     "D401", # First line should be in imperative mood
     "D413", # Missing blank line after last section
     "D416", # Section name should end with a colon
-    "C901", # Function is too complex
 ]
 
 
@@ -180,5 +180,4 @@ ignore = [
     "CONTRIBUTING.md",
     "codecov.yml",
     ".ruff_cache/**/*",
-    "setup.py",
 ]
