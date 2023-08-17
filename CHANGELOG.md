@@ -1,5 +1,23 @@
 # Changelog
 
+## [Unreleased](https://github.com/pyapp-kit/superqt/tree/HEAD)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.5.0...HEAD)
+
+**Fixed bugs:**
+
+- fix: fix parameter inspection on ensure\_thread decorators \(alternate\) [\#185](https://github.com/pyapp-kit/superqt/pull/185) ([tlambert03](https://github.com/tlambert03))
+- fix: fix callback of throttled/debounced decorated functions with mismatched args [\#184](https://github.com/pyapp-kit/superqt/pull/184) ([tlambert03](https://github.com/tlambert03))
+
+**Documentation updates:**
+
+- docs: document signals blocked [\#186](https://github.com/pyapp-kit/superqt/pull/186) ([tlambert03](https://github.com/tlambert03))
+
+**Merged pull requests:**
+
+- test: change wait pattern [\#187](https://github.com/pyapp-kit/superqt/pull/187) ([tlambert03](https://github.com/tlambert03))
+- build: drop python3.7, misc updates to repo [\#180](https://github.com/pyapp-kit/superqt/pull/180) ([tlambert03](https://github.com/tlambert03))
+
 ## [v0.5.0](https://github.com/pyapp-kit/superqt/tree/v0.5.0) (2023-08-06)
 
 [Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.4.1...v0.5.0)
