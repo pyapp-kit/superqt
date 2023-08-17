@@ -72,3 +72,16 @@ def test_keyboard_tracking(qtbot):
         sb.lineEdit().setText("25")
     assert sb._pending_emit is False
     assert sgnl.args == [25]
+
+
+def test_large_spinbox_step_type(qtbot):
+    sb = QLargeIntSpinBox()
+    qtbot.addWidget(sb)
+    sb.setMaximum(1_000_000_000)
+    sb.setStepType(sb.StepType.AdaptiveDecimalStepType)
+    sb.setValue(1_000_000)
+    sb.stepBy(1)
+    assert sb.value() == 1_100_000
+    sb.setStepType(sb.StepType.DefaultStepType)
+    sb.stepBy(1)
+    assert sb.value() == 1_100_001
