@@ -32,7 +32,6 @@ from concurrent.futures import Future
 from enum import IntFlag, auto
 from functools import wraps
 from typing import TYPE_CHECKING, Callable, Generic, TypeVar, overload
-from inspect import ismethod
 
 from qtpy.QtCore import QObject, Qt, QTimer, Signal
 
@@ -199,7 +198,7 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
         kind: Kind,
         emissionPolicy: EmissionPolicy,
         parent: QObject | None = None,
-        instance: object | None = None
+        instance: object | None = None,
     ) -> None:
         super().__init__(kind, emissionPolicy, parent)
 
@@ -232,7 +231,9 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
 
     def _set_future_result(self):
         if self._instance is not None:
-            result = self.__wrapped__(self._instance, *self._args[: self._max_args], **self._kwargs)
+            result = self.__wrapped__(
+                self._instance, *self._args[: self._max_args], **self._kwargs
+            )
         else:
             result = self.__wrapped__(*self._args[: self._max_args], **self._kwargs)
         self._future.set_result(result)
@@ -247,16 +248,19 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
         if parent is None and isinstance(instance, QObject):
             parent = instance
 
-        setattr(instance, self._name, ThrottledCallable(
-            func=self.__wrapped__,
-            kind=self._kind,
-            emissionPolicy=self._emissionPolicy,
-            parent=parent,
-            instance=instance
-        ))
+        setattr(
+            instance,
+            self._name,
+            ThrottledCallable(
+                func=self.__wrapped__,
+                kind=self._kind,
+                emissionPolicy=self._emissionPolicy,
+                parent=parent,
+                instance=instance,
+            ),
+        )
 
         return getattr(instance, self._name)
-
 
 
 @overload
@@ -265,7 +269,7 @@ def qthrottled(
     timeout: int = 100,
     leading: bool = True,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
-    parent: QObject | None = None
+    parent: QObject | None = None,
 ) -> ThrottledCallable[P, R]:
     ...
 
@@ -276,7 +280,7 @@ def qthrottled(
     timeout: int = 100,
     leading: bool = True,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
-    parent: QObject | None = None
+    parent: QObject | None = None,
 ) -> Callable[[Callable[P, R]], ThrottledCallable[P, R]]:
     ...
 
@@ -286,7 +290,7 @@ def qthrottled(
     timeout: int = 100,
     leading: bool = True,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
-    parent: QObject | None = None
+    parent: QObject | None = None,
 ) -> ThrottledCallable[P, R] | Callable[[Callable[P, R]], ThrottledCallable[P, R]]:
     """Creates a throttled function that invokes func at most once per timeout.
 
@@ -327,7 +331,7 @@ def qdebounced(
     timeout: int = 100,
     leading: bool = False,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
-    parent: QObject | None = None
+    parent: QObject | None = None,
 ) -> ThrottledCallable[P, R]:
     ...
 
@@ -338,7 +342,7 @@ def qdebounced(
     timeout: int = 100,
     leading: bool = False,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
-    parent: QObject | None = None
+    parent: QObject | None = None,
 ) -> Callable[[Callable[P, R]], ThrottledCallable[P, R]]:
     ...
 
@@ -348,7 +352,7 @@ def qdebounced(
     timeout: int = 100,
     leading: bool = False,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
-    parent: QObject | None = None
+    parent: QObject | None = None,
 ) -> ThrottledCallable[P, R] | Callable[[Callable[P, R]], ThrottledCallable[P, R]]:
     """Creates a debounced function that delays invoking `func`.
 
@@ -392,9 +396,8 @@ def _make_decorator(
     leading: bool,
     timer_type: Qt.TimerType,
     kind: Kind,
-    parent: QObject | None = None
+    parent: QObject | None = None,
 ) -> ThrottledCallable[P, R] | Callable[[Callable[P, R]], ThrottledCallable[P, R]]:
-
     def deco(func: Callable[P, R]) -> ThrottledCallable[P, R]:
         nonlocal parent
 

@@ -4,7 +4,6 @@ import pytest
 from qtpy.QtCore import QObject, Signal
 
 from superqt.utils import qdebounced, qthrottled
-
 from superqt.utils._throttler import ThrottledCallable
 
 
@@ -29,7 +28,6 @@ def test_debounced(qtbot):
 
 
 def test_debouncer_method(qtbot):
-
     class A(QObject):
         def __init__(self):
             super().__init__()
@@ -51,7 +49,6 @@ def test_debouncer_method(qtbot):
 
 
 def test_debouncer_method_definition(qtbot):
-
     class A(QObject):
         def __init__(self):
             super().__init__()
@@ -69,6 +66,7 @@ def test_debouncer_method_definition(qtbot):
     qtbot.wait(5)
 
     assert a.count == 1
+
 
 def test_throttled(qtbot):
     mock1 = Mock()
