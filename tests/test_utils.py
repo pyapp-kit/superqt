@@ -55,7 +55,7 @@ def test_get_max_args_simple():
         pass
 
     assert get_max_args(fun5) is None
-    
+
     assert get_max_args(print) is None
 
 
