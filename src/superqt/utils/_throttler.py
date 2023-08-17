@@ -38,7 +38,7 @@ from qtpy.QtCore import QObject, Qt, QTimer, Signal
 from ._util import get_max_args
 
 if TYPE_CHECKING:
-    from typing_extensions import Literal, ParamSpec
+    from typing_extensions import ParamSpec
 
     P = ParamSpec("P")
 # maintain runtime compatibility with older typing_extensions
@@ -243,7 +243,7 @@ def qthrottled(
 
 @overload
 def qthrottled(
-    func: Literal[None] | None = None,
+    func: None = ...,
     timeout: int = 100,
     leading: bool = True,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
@@ -300,7 +300,7 @@ def qdebounced(
 
 @overload
 def qdebounced(
-    func: Literal[None] | None = None,
+    func: None = ...,
     timeout: int = 100,
     leading: bool = False,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
