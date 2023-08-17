@@ -2,7 +2,6 @@ import inspect
 import threading
 import time
 import warnings
-
 from functools import partial
 from operator import eq
 from unittest.mock import Mock
