@@ -28,13 +28,14 @@ SOFTWARE.
 """
 from __future__ import annotations
 
-import inspect
 from concurrent.futures import Future
 from enum import IntFlag, auto
 from functools import wraps
 from typing import TYPE_CHECKING, Callable, Generic, TypeVar, overload
 
 from qtpy.QtCore import QObject, Qt, QTimer, Signal
+
+from ._util import get_max_args
 
 if TYPE_CHECKING:
     from typing_extensions import Literal, ParamSpec
@@ -212,10 +213,7 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
         # instance: https://bugreports.qt.io/browse/PYSIDE-2423
         # so we do it ourselfs and limit the number of positional arguments
         # that we pass to func
-        try:
-            self._max_args: int | None = len(inspect.signature(func).parameters)
-        except Exception:
-            self._max_args = None
+        self._max_args: int | None = get_max_args(func)
 
     def __call__(self, *args: P.args, **kwargs: P.kwargs) -> "Future[R]":  # noqa
         if not self._future.done():
