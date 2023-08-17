@@ -403,8 +403,8 @@ def _make_decorator(
     def deco(func: Callable[P, R]) -> ThrottledCallable[P, R]:
         nonlocal parent
 
-        instance: QObject | None = getattr(func, "__self__", None)
-        if instance is not None and parent is None:
+        instance: object | None = getattr(func, "__self__", None)
+        if isinstance(instance, QObject) and parent is None:
             parent = instance
         policy = EmissionPolicy.Leading if leading else EmissionPolicy.Trailing
         obj = ThrottledCallable(func, kind, policy, parent=parent)
