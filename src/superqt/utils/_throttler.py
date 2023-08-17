@@ -320,7 +320,8 @@ def qthrottled(
               desired interval
             - `Qt.VeryCoarseTimer`: Very coarse timers only keep full second accuracy
     parent: QObject or None
-        Parent object for timer. If using qthrottled as function it may be usefull for cleaning data
+        Parent object for timer. If using qthrottled as function it may be usefull
+        for cleaning data
     """
     return _make_decorator(func, timeout, leading, timer_type, Kind.Throttler, parent)
 
@@ -385,7 +386,8 @@ def qdebounced(
               desired interval
             - `Qt.VeryCoarseTimer`: Very coarse timers only keep full second accuracy
     parent: QObject or None
-        Parent object for timer. If using qthrottled as function it may be usefull for cleaning data
+        Parent object for timer. If using qthrottled as function it may be usefull
+        for cleaning data
     """
     return _make_decorator(func, timeout, leading, timer_type, Kind.Debouncer, parent)
 
