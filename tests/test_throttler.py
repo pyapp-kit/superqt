@@ -4,6 +4,7 @@ import pytest
 from qtpy.QtCore import QObject, Signal
 
 from superqt.utils import qdebounced, qthrottled
+from superqt.utils._throttler import ThrottledCallable
 
 
 def test_debounced(qtbot):
@@ -24,6 +25,66 @@ def test_debounced(qtbot):
     qtbot.wait(5)
     mock1.assert_called_once()
     assert mock2.call_count == 10
+
+
+def test_debouncer_method(qtbot):
+    class A(QObject):
+        def __init__(self):
+            super().__init__()
+            self.count = 0
+
+        def callback(self):
+            self.count += 1
+
+    a = A()
+    assert all(not isinstance(x, ThrottledCallable) for x in a.children())
+    b = qdebounced(a.callback, timeout=4)
+    assert any(isinstance(x, ThrottledCallable) for x in a.children())
+    for _ in range(10):
+        b()
+
+    qtbot.wait(5)
+
+    assert a.count == 1
+
+
+def test_debouncer_method_definition(qtbot):
+    mock1 = Mock()
+    mock2 = Mock()
+
+    class A(QObject):
+        def __init__(self):
+            super().__init__()
+            self.count = 0
+
+        @qdebounced(timeout=4)
+        def callback(self):
+            self.count += 1
+
+        @qdebounced(timeout=4)
+        @staticmethod
+        def call1():
+            mock1()
+
+        @staticmethod
+        @qdebounced(timeout=4)
+        def call2():
+            mock2()
+
+    a = A()
+    assert all(not isinstance(x, ThrottledCallable) for x in a.children())
+    for _ in range(10):
+        a.callback(1)
+        A.call1(34)
+        a.call1(22)
+        a.call2(22)
+        A.call2(32)
+
+    qtbot.wait(5)
+
+    assert a.count == 1
+    mock1.assert_called_once()
+    mock2.assert_called_once()
 
 
 def test_throttled(qtbot):
