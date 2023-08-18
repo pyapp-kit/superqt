@@ -32,6 +32,7 @@ from concurrent.futures import Future
 from enum import IntFlag, auto
 from functools import wraps
 from typing import TYPE_CHECKING, Callable, Generic, TypeVar, overload
+from weakref import WeakKeyDictionary
 
 from qtpy.QtCore import QObject, Qt, QTimer, Signal
 
@@ -214,6 +215,8 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
         self.triggered.connect(self._set_future_result)
         self._name = None
 
+        self._obj_dkt = WeakKeyDictionary()
+
         # even if we were to compile __call__ with a signature matching that of func,
         # PySide wouldn't correctly inspect the signature of the ThrottledCallable
         # instance: https://bugreports.qt.io/browse/PYSIDE-2423
@@ -249,16 +252,22 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
         )
         throttler.setTimerType(self.timerType())
         throttler.setTimeout(self.timeout())
-        setattr(
-            obj,
-            self._name,
-            throttler,
-        )
+        try:
+            setattr(
+                obj,
+                self._name,
+                throttler,
+            )
+        except AttributeError:
+            self._obj_dkt[obj] = throttler
         return throttler
 
     def __get__(self, instance, owner):
         if instance is None or not self._name:
             return self
+
+        if instance in self._obj_dkt:
+            return self._obj_dkt[instance]
 
         parent = self.parent()
         if parent is None and isinstance(instance, QObject):
