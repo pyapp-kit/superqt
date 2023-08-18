@@ -1,8 +1,20 @@
 # Changelog
 
-## [Unreleased](https://github.com/pyapp-kit/superqt/tree/HEAD)
+## [v0.5.2](https://github.com/pyapp-kit/superqt/tree/v0.5.2) (2023-08-18)
 
-[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.5.0...HEAD)
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.5.1...v0.5.2)
+
+**Implemented enhancements:**
+
+- feat: allow throttler/debouncer as method decorator [\#188](https://github.com/pyapp-kit/superqt/pull/188) ([Czaki](https://github.com/Czaki))
+
+**Fixed bugs:**
+
+- fix: Add descriptive exception when fail to add instance to weakref dictionary  [\#189](https://github.com/pyapp-kit/superqt/pull/189) ([Czaki](https://github.com/Czaki))
+
+## [v0.5.1](https://github.com/pyapp-kit/superqt/tree/v0.5.1) (2023-08-17)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.5.0...v0.5.1)
 
 **Fixed bugs:**
 
