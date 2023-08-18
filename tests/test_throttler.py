@@ -49,6 +49,8 @@ def test_debouncer_method(qtbot):
 
 
 def test_debouncer_method_definition(qtbot):
+    mock1 = Mock()
+
     class A(QObject):
         def __init__(self):
             super().__init__()
@@ -58,14 +60,21 @@ def test_debouncer_method_definition(qtbot):
         def callback(self):
             self.count += 1
 
+        @qdebounced(timeout=4)
+        @staticmethod
+        def call():
+            mock1()
+
     a = A()
     assert all(not isinstance(x, ThrottledCallable) for x in a.children())
     for _ in range(10):
         a.callback(1)
+        a.call(22)
 
     qtbot.wait(5)
 
     assert a.count == 1
+    mock1.assert_called_once()
 
 
 def test_throttled(qtbot):
