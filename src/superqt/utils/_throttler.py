@@ -214,7 +214,10 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
         # instance: https://bugreports.qt.io/browse/PYSIDE-2423
         # so we do it ourselfs and limit the number of positional arguments
         # that we pass to func
-        self._max_args: int | None = get_max_args(func)
+        if isinstance(func, staticmethod):
+            self._max_args = None
+        else:
+            self._max_args: int | None = get_max_args(func)
 
     def __call__(self, *args: P.args, **kwargs: P.kwargs) -> "Future[R]":  # noqa
         if not self._future.done():
@@ -235,6 +238,8 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
         self._name = name
 
     def __get__(self, instance, owner):
+        if isinstance(self.__wrapped__, staticmethod):
+            self._max_args = get_max_args(self.__wrapped__.__get__(instance, owner))
         if instance is None or not self._name:
             return self
         parent = self.parent()
