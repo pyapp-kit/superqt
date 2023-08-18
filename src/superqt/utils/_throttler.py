@@ -242,7 +242,7 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
         self._name = name
 
     def __get__(self, instance, owner):
-        if instance is None:
+        if instance is None or not self._name:
             return self
         parent = self.parent()
         if parent is None and isinstance(instance, QObject):
