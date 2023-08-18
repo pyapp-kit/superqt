@@ -248,20 +248,26 @@ class ThrottledCallableDescriptor(ThrottledCallable):
     def __set_name__(self, owner, name):
         self._name = name
 
+    def _get_throttler(self, instance, owner, parent, obj):
+        throttler = ThrottledCallable(
+            self.__wrapped__.__get__(instance, owner),
+            self._kind,
+            self._emissionPolicy,
+            parent=parent,
+        )
+        throttler.setTimerType(self.timerType())
+        throttler.setTimeout(self.timeout())
+        setattr(
+            obj,
+            self._name,
+            throttler,
+        )
+        return throttler
+
     def __get__(self, instance, owner):
         parent = self.parent()
         if isinstance(self.__wrapped__, staticmethod):
-            setattr(
-                owner,
-                self._name,
-                ThrottledCallable(
-                    self.__wrapped__.__get__(instance, owner),
-                    self._kind,
-                    self._emissionPolicy,
-                    parent=parent,
-                ),
-            )
-            return getattr(owner, self._name)
+            return self._get_throttler(instance, owner, parent, owner)
 
         if instance is None or not self._name:
             return self
@@ -269,18 +275,7 @@ class ThrottledCallableDescriptor(ThrottledCallable):
         if parent is None and isinstance(instance, QObject):
             parent = instance
 
-        setattr(
-            instance,
-            self._name,
-            ThrottledCallable(
-                func=self.__wrapped__.__get__(instance, owner),
-                kind=self._kind,
-                emissionPolicy=self._emissionPolicy,
-                parent=parent,
-            ),
-        )
-
-        return getattr(instance, self._name)
+        return self._get_throttler(instance, owner, parent, instance)
 
 
 @overload
