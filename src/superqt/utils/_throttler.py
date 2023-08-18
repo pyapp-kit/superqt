@@ -198,7 +198,6 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
         kind: Kind,
         emissionPolicy: EmissionPolicy,
         parent: QObject | None = None,
-        instance: object | None = None,
     ) -> None:
         super().__init__(kind, emissionPolicy, parent)
 
@@ -209,7 +208,6 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
         self._kwargs: dict = {}
         self.triggered.connect(self._set_future_result)
         self._name = None
-        self._instance = instance
 
         # even if we were to compile __call__ with a signature matching that of func,
         # PySide wouldn't correctly inspect the signature of the ThrottledCallable
@@ -230,23 +228,14 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
         return self._future
 
     def _set_future_result(self):
-        if self._instance is not None:
-            result = self.__wrapped__(
-                self._instance, *self._args[: self._max_args - 1], **self._kwargs
-            )
-        else:
-            result = self.__wrapped__(*self._args[: self._max_args], **self._kwargs)
+        result = self.__wrapped__(*self._args[: self._max_args], **self._kwargs)
         self._future.set_result(result)
 
     def __set_name__(self, owner, name):
         self._name = name
 
     def __get__(self, instance, owner):
-        if (
-            instance is None
-            or not self._name
-            or isinstance(self.__wrapped__, staticmethod)
-        ):
+        if instance is None or not self._name:
             return self
         parent = self.parent()
         if parent is None and isinstance(instance, QObject):
@@ -256,11 +245,10 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
             instance,
             self._name,
             ThrottledCallable(
-                func=self.__wrapped__,
+                func=self.__wrapped__.__get__(instance, owner),
                 kind=self._kind,
                 emissionPolicy=self._emissionPolicy,
                 parent=parent,
-                instance=instance,
             ),
         )
 
