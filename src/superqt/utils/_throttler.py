@@ -266,7 +266,8 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
                     "To use qthrottled or qdebounced as a class decorator, "
                     "there is a need to have __dict__ or allow weak references"
                     " to the class instance, that requires __weakref__ to "
-                    "be added to __slots__"
+                    "be added to __slots__. If you don't want to add then "
+                    "qthrottled or qdebounced can be used as a function."
                 ) from e
         return throttler
 
