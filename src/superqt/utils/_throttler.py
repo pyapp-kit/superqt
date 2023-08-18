@@ -213,7 +213,6 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
         self._kwargs: dict = {}
         self.triggered.connect(self._set_future_result)
         self._name = None
-        self._is_static = isinstance(func, staticmethod)
 
         # even if we were to compile __call__ with a signature matching that of func,
         # PySide wouldn't correctly inspect the signature of the ThrottledCallable
@@ -238,10 +237,8 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
         self._future.set_result(result)
 
     def __set_name__(self, owner, name):
-        if not self._is_static:
+        if not isinstance(self.__wrapped__, staticmethod):
             self._name = name
-        if isinstance(self.__wrapped__, staticmethod):
-            self.__wrapped__ = self.__wrapped__.__func__
 
     def _get_throttler(self, instance, owner, parent, obj):
         throttler = ThrottledCallable(
