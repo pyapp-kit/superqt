@@ -237,12 +237,26 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
     def __set_name__(self, owner, name):
         self._name = name
 
+
+class ThrottledCallableDescriptor(ThrottledCallable):
     def __get__(self, instance, owner):
+        parent = self.parent()
         if isinstance(self.__wrapped__, staticmethod):
-            self._max_args = get_max_args(self.__wrapped__.__get__(instance, owner))
+            setattr(
+                owner,
+                self._name,
+                ThrottledCallable(
+                    self.__wrapped__.__get__(instance, owner),
+                    self._kind,
+                    self._emissionPolicy,
+                    parent=parent,
+                ),
+            )
+            return getattr(owner, self._name)
+
         if instance is None or not self._name:
             return self
-        parent = self.parent()
+
         if parent is None and isinstance(instance, QObject):
             parent = instance
 
@@ -404,7 +418,7 @@ def _make_decorator(
         if isinstance(instance, QObject) and parent is None:
             parent = instance
         policy = EmissionPolicy.Leading if leading else EmissionPolicy.Trailing
-        obj = ThrottledCallable(func, kind, policy, parent=parent)
+        obj = ThrottledCallableDescriptor(func, kind, policy, parent=parent)
         obj.setTimerType(timer_type)
         obj.setTimeout(timeout)
         return wraps(func)(obj)

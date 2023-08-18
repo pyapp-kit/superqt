@@ -83,7 +83,7 @@ def test_debouncer_method_definition(qtbot):
     qtbot.wait(5)
 
     assert a.count == 1
-    assert mock1.call_count == 2
+    mock1.assert_called_once()
     mock2.assert_called_once()
 
 
