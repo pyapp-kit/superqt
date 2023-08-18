@@ -61,7 +61,7 @@ def test_debouncer_method_definition(qtbot):
     a = A()
     assert all(not isinstance(x, ThrottledCallable) for x in a.children())
     for _ in range(10):
-        a.callback()
+        a.callback(1)
 
     qtbot.wait(5)
 

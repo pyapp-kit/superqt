@@ -232,7 +232,7 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
     def _set_future_result(self):
         if self._instance is not None:
             result = self.__wrapped__(
-                self._instance, *self._args[: self._max_args], **self._kwargs
+                self._instance, *self._args[: self._max_args - 1], **self._kwargs
             )
         else:
             result = self.__wrapped__(*self._args[: self._max_args], **self._kwargs)
