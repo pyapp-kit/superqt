@@ -263,11 +263,10 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
                 self._obj_dkt[obj] = throttler
             except TypeError as e:
                 raise TypeError(
-                    "To use qthrottled or qdebounced as a class decorator, "
-                    "there is a need to have __dict__ or allow weak references"
-                    " to the class instance, that requires __weakref__ to "
-                    "be added to __slots__. If you don't want to add then "
-                    "qthrottled or qdebounced can be used as a function."
+                    "To use qthrottled or qdebounced as a method decorator, "
+                    "objects must have  `__dict__` or be weak referenceable. "
+                    "Please either add `__weakref__` to `__slots__` or use"
+                    "qthrottled/qdebounced as a function (not a decorator)."
                 ) from e
         return throttler
 
