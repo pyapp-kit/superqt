@@ -202,21 +202,25 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
         super().__init__(kind, emissionPolicy, parent)
 
         self._future: Future[R] = Future()
+        if isinstance(func, staticmethod):
+            self._func = func.__func__
+        else:
+            self._func = func
+
         self.__wrapped__ = func
 
         self._args: tuple = ()
         self._kwargs: dict = {}
         self.triggered.connect(self._set_future_result)
+        self._name = None
+        self._is_static = isinstance(func, staticmethod)
 
         # even if we were to compile __call__ with a signature matching that of func,
         # PySide wouldn't correctly inspect the signature of the ThrottledCallable
         # instance: https://bugreports.qt.io/browse/PYSIDE-2423
         # so we do it ourselfs and limit the number of positional arguments
         # that we pass to func
-        if isinstance(func, staticmethod):
-            self._max_args = None
-        else:
-            self._max_args: int | None = get_max_args(func)
+        self._max_args: int | None = get_max_args(self._func)
 
     def __call__(self, *args: P.args, **kwargs: P.kwargs) -> "Future[R]":  # noqa
         if not self._future.done():
@@ -230,23 +234,14 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
         return self._future
 
     def _set_future_result(self):
-        result = self.__wrapped__(*self._args[: self._max_args], **self._kwargs)
+        result = self._func(*self._args[: self._max_args], **self._kwargs)
         self._future.set_result(result)
 
-
-class ThrottledCallableDescriptor(ThrottledCallable):
-    def __init__(
-        self,
-        func: Callable[P, R],
-        kind: Kind,
-        emissionPolicy: EmissionPolicy,
-        parent: QObject | None = None,
-    ) -> None:
-        super().__init__(func, kind, emissionPolicy, parent)
-        self._name = None
-
     def __set_name__(self, owner, name):
-        self._name = name
+        if not self._is_static:
+            self._name = name
+        if isinstance(self.__wrapped__, staticmethod):
+            self.__wrapped__ = self.__wrapped__.__func__
 
     def _get_throttler(self, instance, owner, parent, obj):
         throttler = ThrottledCallable(
@@ -265,13 +260,10 @@ class ThrottledCallableDescriptor(ThrottledCallable):
         return throttler
 
     def __get__(self, instance, owner):
-        parent = self.parent()
-        if isinstance(self.__wrapped__, staticmethod):
-            return self._get_throttler(instance, owner, parent, owner)
-
         if instance is None or not self._name:
             return self
 
+        parent = self.parent()
         if parent is None and isinstance(instance, QObject):
             parent = instance
 
@@ -422,7 +414,7 @@ def _make_decorator(
         if isinstance(instance, QObject) and parent is None:
             parent = instance
         policy = EmissionPolicy.Leading if leading else EmissionPolicy.Trailing
-        obj = ThrottledCallableDescriptor(func, kind, policy, parent=parent)
+        obj = ThrottledCallable(func, kind, policy, parent=parent)
         obj.setTimerType(timer_type)
         obj.setTimeout(timeout)
         return wraps(func)(obj)
