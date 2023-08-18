@@ -87,6 +87,41 @@ def test_debouncer_method_definition(qtbot):
     mock2.assert_called_once()
 
 
+def test_class_with_slots(qtbot):
+    class A:
+        __slots__ = ("count", "__weakref__")
+
+        def __init__(self):
+            self.count = 0
+
+        @qdebounced(timeout=4)
+        def callback(self):
+            self.count += 1
+
+    a = A()
+    for _ in range(10):
+        a.callback()
+
+    qtbot.wait(5)
+    assert a.count == 1
+
+
+@pytest.mark.usefixtures("qapp")
+def test_class_with_slots_except():
+    class A:
+        __slots__ = ("count",)
+
+        def __init__(self):
+            self.count = 0
+
+        @qdebounced(timeout=4)
+        def callback(self):
+            self.count += 1
+
+    with pytest.raises(TypeError, match="To use qthrottled or qdebounced"):
+        A().callback()
+
+
 def test_throttled(qtbot):
     mock1 = Mock()
     mock2 = Mock()

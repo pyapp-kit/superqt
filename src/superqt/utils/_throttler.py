@@ -259,7 +259,15 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
                 throttler,
             )
         except AttributeError:
-            self._obj_dkt[obj] = throttler
+            try:
+                self._obj_dkt[obj] = throttler
+            except TypeError as e:
+                raise TypeError(
+                    "To use qthrottled or qdebounced as a method decorator, "
+                    "objects must have  `__dict__` or be weak referenceable. "
+                    "Please either add `__weakref__` to `__slots__` or use"
+                    "qthrottled/qdebounced as a function (not a decorator)."
+                ) from e
         return throttler
 
     def __get__(self, instance, owner):
