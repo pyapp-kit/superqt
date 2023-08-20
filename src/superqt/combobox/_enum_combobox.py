@@ -49,7 +49,9 @@ class QEnumComboBox(QComboBox):
         self._allow_none = allow_none and enum is not None
         if allow_none:
             super().addItem(NONE_STRING)
-        super().addItems(list(map(_get_name, self._enum_class.__members__.values())))
+        names = map(_get_name, self._enum_class.__members__.values())
+        _names = dict.fromkeys(names)  # remove duplicates/aliases, keep order
+        super().addItems(list(_names))
 
     def enumClass(self) -> Optional[EnumMeta]:
         """Return current Enum class."""

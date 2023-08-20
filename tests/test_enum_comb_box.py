@@ -11,6 +11,8 @@ class Enum1(Enum):
     b = 2
     c = 3
 
+    ALIAS = a
+
 
 class Enum2(Enum):
     d = 1
