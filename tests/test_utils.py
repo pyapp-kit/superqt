@@ -1,6 +1,9 @@
+import os
+import sys
 from unittest.mock import Mock
 
 import pytest
+import qtpy
 from qtpy.QtCore import QObject, QTimer, Signal
 from qtpy.QtWidgets import QApplication, QErrorMessage, QMessageBox
 
@@ -95,6 +98,12 @@ def test_get_max_args_methods():
     assert get_max_args(A()) == 2
 
 
+MAC_CI_PYSIDE6 = bool(
+    sys.platform == "darwin" and os.getenv("CI") and qtpy.API_NAME == "PySide6"
+)
+
+
+@pytest.mark.skipif(MAC_CI_PYSIDE6, reason="still hangs on mac ci with pyside6")
 def test_exception_context(qtbot, qapp: QApplication) -> None:
     def accept():
         for wdg in qapp.topLevelWidgets():
