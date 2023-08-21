@@ -1,5 +1,17 @@
 # Changelog
 
+## [v0.5.3](https://github.com/pyapp-kit/superqt/tree/v0.5.3) (2023-08-21)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.5.2...v0.5.3)
+
+**Implemented enhancements:**
+
+- feat: add error `exceptions_as_dialog` context manager to catch and show Exceptions [\#191](https://github.com/pyapp-kit/superqt/pull/191) ([tlambert03](https://github.com/tlambert03))
+
+**Fixed bugs:**
+
+- fix: remove dupes/aliases in QEnumCombo [\#190](https://github.com/pyapp-kit/superqt/pull/190) ([tlambert03](https://github.com/tlambert03))
+
 ## [v0.5.2](https://github.com/pyapp-kit/superqt/tree/v0.5.2) (2023-08-18)
 
 [Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.5.1...v0.5.2)
