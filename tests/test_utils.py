@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 from qtpy.QtCore import QObject, QTimer, Signal
-from qtpy.QtWidgets import QApplication, QDialog, QErrorMessage
+from qtpy.QtWidgets import QApplication, QErrorMessage, QMessageBox
 
 from superqt.utils import exceptions_as_dialog, signals_blocked
 from superqt.utils._util import get_max_args
@@ -98,8 +98,8 @@ def test_get_max_args_methods():
 def test_exception_context(qtbot, qapp: QApplication) -> None:
     def accept():
         for wdg in qapp.topLevelWidgets():
-            if isinstance(wdg, QDialog):
-                wdg.accept()
+            if isinstance(wdg, QMessageBox):
+                wdg.button(QMessageBox.StandardButton.Ok).click()
 
     with exceptions_as_dialog():
         QTimer.singleShot(0, accept)
@@ -119,9 +119,14 @@ def test_exception_context(qtbot, qapp: QApplication) -> None:
 
     # tb formatting smoke test, and return value checking
     exc = ValueError("Bad Val")
-    with exceptions_as_dialog(msg_template="{tb}") as ctx:
-        qtbot.addWidget(ctx.widget)
+    with exceptions_as_dialog(
+        msg_template="{tb}",
+        buttons=QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel,
+    ) as ctx:
+        qtbot.addWidget(ctx.dialog)
         QTimer.singleShot(100, accept)
         raise exc
 
+    assert isinstance(ctx.dialog, QMessageBox)
+    assert ctx.dialog.result() == QMessageBox.StandardButton.Ok
     assert ctx.exception is exc

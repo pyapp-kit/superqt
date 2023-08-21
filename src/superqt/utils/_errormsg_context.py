@@ -15,7 +15,7 @@ class exceptions_as_dialog(AbstractContextManager):
 
     To determine whether an exception was raised or not, check the `exception`
     attribute after the context manager has exited.  If `use_error_message` is `False`
-    (the default), you can also access the `widget` attribute to get/manipulate the
+    (the default), you can also access the `dialog` attribute to get/manipulate the
     `QMessageBox` instance.
 
     Parameters
@@ -49,7 +49,7 @@ class exceptions_as_dialog(AbstractContextManager):
 
     Attributes
     ----------
-    widget : QMessageBox | None
+    dialog : QMessageBox | None
         The `QMessageBox` instance that was created. If `use_error_message` is
         True, this will be `None`.
     exception : BaseException | None
@@ -84,8 +84,9 @@ class exceptions_as_dialog(AbstractContextManager):
     ```
     """
 
-    widget: QMessageBox | None
+    dialog: QMessageBox | None
     exception: BaseException | None
+    exec_result: int | None = None
 
     def __init__(
         self,
@@ -100,13 +101,13 @@ class exceptions_as_dialog(AbstractContextManager):
         self.exceptions = exceptions
         self.msg_template = msg_template
         self.exception = None
-        self.widget = None
+        self.dialog = None
 
         self._err_msg = use_error_message
 
         if not use_error_message:
             # the message will be overwritten in __exit__
-            self.widget = QMessageBox(icon, title, "An error occurred", buttons, parent)
+            self.dialog = QMessageBox(icon, title, "An error occurred", buttons, parent)
 
     def __enter__(self) -> exceptions_as_dialog:
         return self
@@ -138,8 +139,8 @@ class exceptions_as_dialog(AbstractContextManager):
                 else QErrorMessage.qtHandler()
             )
             cast("QErrorMessage", msg).showMessage(text)
-        elif self.widget is not None:  # it won't be if use_error_message=False
-            self.widget.setText(text)
-            self.widget.exec()  # the result here could be stored in a variable
+        elif self.dialog is not None:  # it won't be if use_error_message=False
+            self.dialog.setText(text)
+            self.dialog.exec()
 
         return True  # swallow the exception
