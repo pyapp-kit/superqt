@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import traceback
 from contextlib import AbstractContextManager
 from types import TracebackType
@@ -30,7 +32,7 @@ class exceptions_as_dialog(AbstractContextManager):
         raise Exception("This message will be used as 'exc_value'")
 
     for _i in range(3):
-        with exceptions_as_dialog(AssertionError, global_err_message=True):
+        with exceptions_as_dialog(AssertionError, use_global_err_message=True):
             assert False, "Uncheck the checkbox to ignore this in the future"
     ```
     """
@@ -57,7 +59,7 @@ class exceptions_as_dialog(AbstractContextManager):
         else:
             self.widget = None
 
-    def __enter__(self) -> "exceptions_as_dialog":
+    def __enter__(self) -> exceptions_as_dialog:
         return self
 
     def __exit__(
