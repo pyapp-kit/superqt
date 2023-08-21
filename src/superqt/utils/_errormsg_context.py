@@ -49,7 +49,8 @@ class exceptions_as_dialog(AbstractContextManager):
         `msg_template`.) If `True`, the global `QMessageError.qtHandler()`
         instance is used to maintain a history of dismissed messages. You may also pass
         a `QErrorMessage` instance to use a specific instance. If `use_error_message` is
-        True, `parent` is ignored.
+        True, or if you pass your own `QErrorMessage` instance, the `parent` argument
+        is ignored.
 
     Attributes
     ----------
