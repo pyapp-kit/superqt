@@ -86,6 +86,12 @@ class exceptions_as_dialog(AbstractContextManager):
         with exceptions_as_dialog(AssertionError, use_error_message=True):
             assert False, "Uncheck the checkbox to ignore this in the future"
 
+    # use ctx.dialog to get the result of the dialog
+    btns = QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel
+    with exceptions_as_dialog(buttons=btns) as ctx:
+        raise Exception("This will be caught and shown in a QMessageBox")
+    print(ctx.dialog.result())  # prints which button was clicked
+
     app.exec()  # needed only for the use_error_message example to show
     ```
     """
