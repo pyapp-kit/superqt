@@ -72,7 +72,7 @@ class exceptions_as_dialog(AbstractContextManager):
             return False  # let it propagate
 
         self.raised = True
-        if "tb" in self.msg_template:
+        if "{tb}" in self.msg_template:
             _tb = "\n".join(traceback.format_exception(exc_type, exc_value, tb))
         else:
             _tb = ""
