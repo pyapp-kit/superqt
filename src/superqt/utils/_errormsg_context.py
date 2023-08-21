@@ -9,6 +9,7 @@ from qtpy.QtWidgets import QErrorMessage, QMessageBox, QWidget
 if TYPE_CHECKING:
     from types import TracebackType
 
+
 class exceptions_as_dialog(AbstractContextManager):
     """Context manager that shows a dialog when an exception is raised.
 
