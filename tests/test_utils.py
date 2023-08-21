@@ -1,8 +1,6 @@
-from contextlib import suppress
-from typing import cast
 from unittest.mock import Mock
-import pytest
 
+import pytest
 from qtpy.QtCore import QObject, QTimer, Signal
 from qtpy.QtWidgets import QApplication, QDialog, QErrorMessage
 
