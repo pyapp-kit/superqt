@@ -4,10 +4,14 @@ import traceback
 from contextlib import AbstractContextManager
 from typing import TYPE_CHECKING, cast
 
+from qtpy.QtCore import Qt
 from qtpy.QtWidgets import QErrorMessage, QMessageBox, QWidget
 
 if TYPE_CHECKING:
     from types import TracebackType
+
+
+_DEFAULT_FLAGS = Qt.WindowType.Dialog | Qt.WindowType.MSWindowsFixedSizeDialogHint
 
 
 class exceptions_as_dialog(AbstractContextManager):
@@ -108,6 +112,7 @@ class exceptions_as_dialog(AbstractContextManager):
         msg_template: str = "{exc_value}",
         buttons: QMessageBox.StandardButton = QMessageBox.StandardButton.Ok,
         parent: QWidget | None = None,
+        flags: Qt.WindowType = _DEFAULT_FLAGS,
         use_error_message: bool | QErrorMessage = False,
     ):
         self.exceptions = exceptions
@@ -119,7 +124,9 @@ class exceptions_as_dialog(AbstractContextManager):
 
         if not use_error_message:
             # the message will be overwritten in __exit__
-            self.dialog = QMessageBox(icon, title, "An error occurred", buttons, parent)
+            self.dialog = QMessageBox(
+                icon, title, "An error occurred", buttons, parent, flags
+            )
 
     def __enter__(self) -> exceptions_as_dialog:
         return self
