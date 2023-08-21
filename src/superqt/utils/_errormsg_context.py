@@ -29,9 +29,11 @@ class exceptions_as_dialog(AbstractContextManager):
     msg_template : str, optional
         The message to show in the `QMessageBox`. The message will be formatted
         using three variables:
+
         - `exc_value`: the exception instance
         - `exc_type`: the exception type
         - `tb`: the traceback as a string
+
         The default template is the content of the exception: `"{exc_value}"`
     buttons : QMessageBox.StandardButton, optional
         The buttons to show in the `QMessageBox`, by default
