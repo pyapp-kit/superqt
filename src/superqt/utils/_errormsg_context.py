@@ -13,6 +13,8 @@ if TYPE_CHECKING:
 class exceptions_as_dialog(AbstractContextManager):
     """Context manager that shows a dialog when an exception is raised.
 
+    See examples below for common usage patterns.
+
     To determine whether an exception was raised or not, check the `exception`
     attribute after the context manager has exited.  If `use_error_message` is `False`
     (the default), you can also access the `dialog` attribute to get/manipulate the
@@ -25,7 +27,7 @@ class exceptions_as_dialog(AbstractContextManager):
     icon : QMessageBox.Icon, optional
         The icon to show in the QMessageBox, by default `QMessageBox.Icon.Critical`
     title : str, optional
-        The title of the `QMessageBox`, by default "An error occurred"
+        The title of the `QMessageBox`, by default `"An error occurred"`.
     msg_template : str, optional
         The message to show in the `QMessageBox`. The message will be formatted
         using three variables:
@@ -52,13 +54,14 @@ class exceptions_as_dialog(AbstractContextManager):
     Attributes
     ----------
     dialog : QMessageBox | None
-        The `QMessageBox` instance that was created. If `use_error_message` is
-        True, this will be `None`.
+        The `QMessageBox` instance that was created (if `use_error_message` was
+        `False`).  This can be used, among other things, to determine the result of
+        the dialog (e.g. `dialog.result()`) or to manipulate the dialog (e.g.
+        `dialog.setDetailedText("some text")`).
     exception : BaseException | None
-        Will hold the exception instance if an exception was raised and caught. This
-        can be used to determine whether an exception was raised or not.
+        Will hold the exception instance if an exception was raised and caught.
 
-    Example
+    Examplez
     -------
     ```python
     from qtpy.QtWidgets import QApplication
