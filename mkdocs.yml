@@ -25,6 +25,7 @@ theme:
     # - navigation.tabs
     - search.highlight
     - search.suggest
+    - content.code.copy
 
 markdown_extensions:
   - admonition

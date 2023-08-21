@@ -9,6 +9,7 @@ from qtpy.QtWidgets import QErrorMessage, QMessageBox, QWidget
 if TYPE_CHECKING:
     from types import TracebackType
 
+
 class exceptions_as_dialog(AbstractContextManager):
     """Context manager that shows a dialog when an exception is raised.
 
@@ -58,18 +59,28 @@ class exceptions_as_dialog(AbstractContextManager):
     Example
     -------
     ```python
-    with exceptions_as_dialog():
+    from qtpy.QtWidgets import QApplication
+    from superqt.utils import exceptions_as_dialog
+
+    app = QApplication([])
+
+    with exceptions_as_dialog() as ctx:
         raise Exception("This will be caught and shown in a QMessageBox")
 
-    with exceptions_as_dialog(ValueError):
-        1 / 0  # ZeroDivisionError is not caught, so this will raise
+    # you can access the exception instance here
+    assert ctx.exception is not None
+
+    # with exceptions_as_dialog(ValueError):
+    #     1 / 0  # ZeroDivisionError is not caught, so this will raise
 
     with exceptions_as_dialog(msg_template="Error: {exc_value}"):
-        raise Exception("This message will be used as 'exc_value'")
+        raise Exception("This message will be inserted at 'exc_value'")
 
     for _i in range(3):
         with exceptions_as_dialog(AssertionError, use_error_message=True):
             assert False, "Uncheck the checkbox to ignore this in the future"
+
+    app.exec()  # needed only for the use_error_message example to show
     ```
     """
 
