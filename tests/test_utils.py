@@ -1,8 +1,12 @@
+from contextlib import suppress
+from typing import cast
 from unittest.mock import Mock
+import pytest
 
-from qtpy.QtCore import QObject, Signal
+from qtpy.QtCore import QObject, QTimer, Signal
+from qtpy.QtWidgets import QApplication, QDialog, QErrorMessage
 
-from superqt.utils import signals_blocked
+from superqt.utils import exceptions_as_dialog, signals_blocked
 from superqt.utils._util import get_max_args
 
 
@@ -91,3 +95,35 @@ def test_get_max_args_methods():
     assert get_max_args(A().fun1) == 0
     assert get_max_args(A().fun2) == 1
     assert get_max_args(A()) == 2
+
+
+def test_exception_context(qtbot, qapp: QApplication) -> None:
+    def accept():
+        for wdg in qapp.topLevelWidgets():
+            if isinstance(wdg, QDialog):
+                wdg.accept()
+
+    with exceptions_as_dialog():
+        QTimer.singleShot(0, accept)
+        raise Exception("This will be caught and shown in a QMessageBox")
+
+    with pytest.raises(ZeroDivisionError), exceptions_as_dialog(ValueError):
+        1 / 0  # noqa
+
+    with exceptions_as_dialog(msg_template="Error: {exc_value}"):
+        QTimer.singleShot(0, accept)
+        raise Exception("This message will be used as 'exc_value'")
+
+    err = QErrorMessage()
+    with exceptions_as_dialog(use_error_message=err):
+        QTimer.singleShot(0, err.accept)
+        raise AssertionError("Uncheck the checkbox to ignore this in the future")
+
+    # tb formatting smoke test, and return value checking
+    exc = ValueError("Bad Val")
+    with exceptions_as_dialog(msg_template="{tb}") as ctx:
+        qtbot.addWidget(ctx.widget)
+        QTimer.singleShot(100, accept)
+        raise exc
+
+    assert ctx.exception is exc
