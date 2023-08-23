@@ -12,8 +12,13 @@
       
         <link rel="canonical" href="https://github.com/pyapp-kit/superqt/widgets/qsearchablelistwidget/">
       
+      
+        <link rel="prev" href="../qsearchablecombobox/">
+      
+      
+      
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-8.5.9">
+      <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.2.3">
     
     
       
@@ -21,15 +26,14 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.20d9efc8.min.css">
-      
-        
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.08040f6c.min.css">
-        
+      <link rel="stylesheet" href="../../assets/stylesheets/main.0e669242.min.css">
       
       
 
+
     
+    
+      
     
     
       
@@ -40,6 +44,8 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
     
       <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
     
@@ -55,14 +61,11 @@
   </head>
   
   
-    
-    
-    
-    
-    
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+    <body dir="ltr">
   
     
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -82,7 +85,9 @@
     
       
 
-<header class="md-header" data-md-component="header">
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="../.." title="superqt" class="md-header__button md-logo" aria-label="superqt" data-md-component="logo">
       
@@ -91,6 +96,7 @@
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
+      
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
     </label>
     <div class="md-header__title" data-md-component="header-title">
@@ -113,6 +119,7 @@
     
     
       <label class="md-header__button md-icon" for="__search">
+        
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
       </label>
       <div class="md-search" data-md-component="search" role="dialog">
@@ -121,12 +128,15 @@
     <form class="md-search__form" name="search">
       <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
       <label class="md-search__icon md-icon" for="__search">
+        
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
       </label>
       <nav class="md-search__options" aria-label="Search">
         
         <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
         </button>
       </nav>
@@ -140,7 +150,7 @@
           <div class="md-search-result__meta">
             Initializing search
           </div>
-          <ol class="md-search-result__list"></ol>
+          <ol class="md-search-result__list" role="presentation"></ol>
         </div>
       </div>
     </div>
@@ -152,7 +162,7 @@
         <a href="https://github.com/pyapp-kit/superqt" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
     pyapp-kit/superqt
@@ -182,6 +192,7 @@
                     
 
 
+
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href="../.." title="superqt" class="md-nav__button md-logo" aria-label="superqt" data-md-component="logo">
@@ -197,7 +208,7 @@
       <a href="https://github.com/pyapp-kit/superqt" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
     pyapp-kit/superqt
@@ -209,14 +220,18 @@
     
       
       
-      
-
   
   
   
     <li class="md-nav__item">
       <a href="../.." class="md-nav__link">
-        superqt
+        
+  
+  <span class="md-ellipsis">
+    superqt
+  </span>
+  
+
       </a>
     </li>
   
@@ -224,14 +239,18 @@
     
       
       
-      
-
   
   
   
     <li class="md-nav__item">
       <a href="../../faq/" class="md-nav__link">
-        FAQ
+        
+  
+  <span class="md-ellipsis">
+    FAQ
+  </span>
+  
+
       </a>
     </li>
   
@@ -239,404 +258,581 @@
     
       
       
-      
-
   
   
   
     
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
-      
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
-      
-      
-      
+        
+        
+        
         
           
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../utilities/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    Utilities
+  </span>
+  
+
+            </a>
             
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-      
-      
-        
-        
-        <div class="md-nav__link md-nav__link--index ">
-          <a href="../../utilities/">Utilities</a>
-          
-            <label for="__nav_3">
-              <span class="md-nav__icon md-icon"></span>
-            </label>
-          
-        </div>
-      
-      <nav class="md-nav" aria-label="Utilities" data-md-level="1">
-        <label class="md-nav__title" for="__nav_3">
-          <span class="md-nav__icon md-icon"></span>
-          Utilities
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
+              <label class="md-nav__link " for="__nav_3">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
             
-          
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Utilities
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
+            
+              
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../utilities/code_syntax_highlight/" class="md-nav__link">
-        CodeSyntaxHighlight
+        
+  
+  <span class="md-ellipsis">
+    CodeSyntaxHighlight
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../utilities/error_dialog_contexts/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Error message context manager
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../utilities/fonticon/" class="md-nav__link">
-        Font icons
+        
+  
+  <span class="md-ellipsis">
+    Font icons
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../utilities/qmessagehandler/" class="md-nav__link">
-        QMessageHandler
+        
+  
+  <span class="md-ellipsis">
+    QMessageHandler
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../utilities/signal_utils/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Signal Utilities
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../utilities/thread_decorators/" class="md-nav__link">
-        Threading decorators
+        
+  
+  <span class="md-ellipsis">
+    Threading decorators
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../utilities/threading/" class="md-nav__link">
-        Thread workers
+        
+  
+  <span class="md-ellipsis">
+    Thread workers
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../utilities/throttling/" class="md-nav__link">
-        Throttling & Debouncing
+        
+  
+  <span class="md-ellipsis">
+    Throttling & Debouncing
+  </span>
+  
+
       </a>
     </li>
   
 
+              
             
-          
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      
     </li>
   
 
     
       
       
-      
-
   
   
     
   
   
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
     
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" checked>
-      
-      
-      
+        
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
         
           
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    Widgets
+  </span>
+  
+
+            </a>
             
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-      
-      
-        
-        
-        <div class="md-nav__link md-nav__link--index ">
-          <a href="../">Widgets</a>
-          
-            <label for="__nav_4">
-              <span class="md-nav__icon md-icon"></span>
-            </label>
-          
-        </div>
-      
-      <nav class="md-nav" aria-label="Widgets" data-md-level="1">
-        <label class="md-nav__title" for="__nav_4">
-          <span class="md-nav__icon md-icon"></span>
-          Widgets
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
+              <label class="md-nav__link " for="__nav_4">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
             
-          
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Widgets
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
+            
+              
+                
   
   
   
     <li class="md-nav__item">
       <a href="../qcollapsible/" class="md-nav__link">
-        QCollapsible
+        
+  
+  <span class="md-ellipsis">
+    QCollapsible
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../qdoublerangeslider/" class="md-nav__link">
-        QDoubleRangeSlider
+        
+  
+  <span class="md-ellipsis">
+    QDoubleRangeSlider
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../qdoubleslider/" class="md-nav__link">
-        QDoubleSlider
+        
+  
+  <span class="md-ellipsis">
+    QDoubleSlider
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../qelidinglabel/" class="md-nav__link">
-        QElidingLabel
+        
+  
+  <span class="md-ellipsis">
+    QElidingLabel
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../qenumcombobox/" class="md-nav__link">
-        QEnumComboBox
+        
+  
+  <span class="md-ellipsis">
+    QEnumComboBox
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../qlabeleddoublerangeslider/" class="md-nav__link">
-        QLabeledDoubleRangeSlider
+        
+  
+  <span class="md-ellipsis">
+    QLabeledDoubleRangeSlider
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../qlabeleddoubleslider/" class="md-nav__link">
-        QLabeledDoubleSlider
+        
+  
+  <span class="md-ellipsis">
+    QLabeledDoubleSlider
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../qlabeledrangeslider/" class="md-nav__link">
-        QLabeledRangeSlider
+        
+  
+  <span class="md-ellipsis">
+    QLabeledRangeSlider
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../qlabeledslider/" class="md-nav__link">
-        QLabeledSlider
+        
+  
+  <span class="md-ellipsis">
+    QLabeledSlider
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../qlargeintspinbox/" class="md-nav__link">
-        QLargeIntSpinBox
+        
+  
+  <span class="md-ellipsis">
+    QLargeIntSpinBox
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../qquantity/" class="md-nav__link">
-        QQuantity
+        
+  
+  <span class="md-ellipsis">
+    QQuantity
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../qrangeslider/" class="md-nav__link">
-        QRangeSlider
+        
+  
+  <span class="md-ellipsis">
+    QRangeSlider
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../qsearchablecombobox/" class="md-nav__link">
-        QSearchableComboBox
+        
+  
+  <span class="md-ellipsis">
+    QSearchableComboBox
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
     
@@ -644,19 +840,31 @@
   
     <li class="md-nav__item md-nav__item--active">
       
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
         
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          QSearchableListWidget
+          
+  
+  <span class="md-ellipsis">
+    QSearchableListWidget
+  </span>
+  
+
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        QSearchableListWidget
+        
+  
+  <span class="md-ellipsis">
+    QSearchableListWidget
+  </span>
+  
+
       </a>
       
         
@@ -736,10 +944,11 @@
     </li>
   
 
+              
             
-          
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -839,13 +1048,11 @@
                 
                   
 
-  <a href="https://github.com/pyapp-kit/superqt/edit/master/docs/widgets/qsearchablelistwidget.md" title="Edit this page" class="md-content__button md-icon">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
-  </a>
+  
+  
 
 
-<h1 id="qsearchablelistwidget">QSearchableListWidget</h1>
+<h1 id="qsearchablelistwidget">QSearchableListWidget<a class="headerlink" href="#qsearchablelistwidget" title="Permanent link">#</a></h1>
 <p><code>QSearchableListWidget</code> is a variant of
 <a href="https://doc.qt.io/qt-5/qlistwidget.html"><code>QListWidget</code></a> that add text entry
 above list widget that allow to filter list of available options.</p>
@@ -866,9 +1073,9 @@ satisfy its api. The only limitation is that it cannot be used as argument of
 <span class="n">app</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span>
 </code></pre></div>
 <p><img alt="QSearchableListWidget" loading="lazy;" src="../../_auto_images/QSearchableListWidget.png" width="500" /></p>
-<h2 id="qt-class">Qt Class</h2>
+<h2 id="qt-class">Qt Class<a class="headerlink" href="#qt-class" title="Permanent link">#</a></h2>
 <p><a href='https://doc.qt.io/qt-6/qwidget.html'><code>QWidget</code></a></p>
-<h2 id="methods">Methods</h2>
+<h2 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">#</a></h2>
 
 
 <div class="doc doc-object doc-class">
@@ -879,10 +1086,10 @@ satisfy its api. The only limitation is that it cannot be used as argument of
 
 
 
-
   
 
   <div class="doc doc-children">
+
 
 
 
@@ -899,7 +1106,7 @@ satisfy its api. The only limitation is that it cannot be used as argument of
 <h3 id="superqt.selection._searchable_list_widget.QSearchableListWidget.addItem" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">addItem</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span></code>
 
-</h3>
+<a href="#superqt.selection._searchable_list_widget.QSearchableListWidget.addItem" class="headerlink" title="Permanent link">#</a></h3>
 
 
   <div class="doc doc-contents ">
@@ -907,6 +1114,7 @@ satisfy its api. The only limitation is that it cannot be used as argument of
   </div>
 
 </div>
+
 
 <div class="doc doc-object doc-function">
 
@@ -915,7 +1123,7 @@ satisfy its api. The only limitation is that it cannot be used as argument of
 <h3 id="superqt.selection._searchable_list_widget.QSearchableListWidget.addItems" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">addItems</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span></code>
 
-</h3>
+<a href="#superqt.selection._searchable_list_widget.QSearchableListWidget.addItems" class="headerlink" title="Permanent link">#</a></h3>
 
 
   <div class="doc doc-contents ">
@@ -923,6 +1131,7 @@ satisfy its api. The only limitation is that it cannot be used as argument of
   </div>
 
 </div>
+
 
 <div class="doc doc-object doc-function">
 
@@ -931,7 +1140,7 @@ satisfy its api. The only limitation is that it cannot be used as argument of
 <h3 id="superqt.selection._searchable_list_widget.QSearchableListWidget.insertItem" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">insertItem</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span></code>
 
-</h3>
+<a href="#superqt.selection._searchable_list_widget.QSearchableListWidget.insertItem" class="headerlink" title="Permanent link">#</a></h3>
 
 
   <div class="doc doc-contents ">
@@ -939,6 +1148,7 @@ satisfy its api. The only limitation is that it cannot be used as argument of
   </div>
 
 </div>
+
 
 <div class="doc doc-object doc-function">
 
@@ -947,7 +1157,7 @@ satisfy its api. The only limitation is that it cannot be used as argument of
 <h3 id="superqt.selection._searchable_list_widget.QSearchableListWidget.insertItems" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">insertItems</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span></code>
 
-</h3>
+<a href="#superqt.selection._searchable_list_widget.QSearchableListWidget.insertItems" class="headerlink" title="Permanent link">#</a></h3>
 
 
   <div class="doc doc-contents ">
@@ -956,6 +1166,7 @@ satisfy its api. The only limitation is that it cannot be used as argument of
 
 </div>
 
+
 <div class="doc doc-object doc-function">
 
 
@@ -963,7 +1174,7 @@ satisfy its api. The only limitation is that it cannot be used as argument of
 <h3 id="superqt.selection._searchable_list_widget.QSearchableListWidget.update_visible" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">update_visible</span><span class="p">(</span><span class="n">text</span><span class="p">)</span></code>
 
-</h3>
+<a href="#superqt.selection._searchable_list_widget.QSearchableListWidget.update_visible" class="headerlink" title="Permanent link">#</a></h3>
 
 
   <div class="doc doc-contents ">
@@ -995,27 +1206,6 @@ satisfy its api. The only limitation is that it cannot be used as argument of
       
         <footer class="md-footer">
   
-    
-    <nav class="md-footer__inner md-grid" aria-label="Footer" >
-      
-        
-        <a href="../qsearchablecombobox/" class="md-footer__link md-footer__link--prev" aria-label="Previous: QSearchableComboBox" rel="prev">
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
-          </div>
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Previous
-              </span>
-              QSearchableComboBox
-            </div>
-          </div>
-        </a>
-      
-      
-    </nav>
-  
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
       <div class="md-copyright">
@@ -1041,10 +1231,10 @@ satisfy its api. The only limitation is that it cannot be used as argument of
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.indexes", "navigation.expand", "search.highlight", "search.suggest"], "search": "../../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.indexes", "navigation.expand", "search.highlight", "search.suggest", "content.code.copy"], "search": "../../assets/javascripts/workers/search.dfff1995.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.d6c3db9e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.78eede0e.min.js"></script>
       
     
   </body>

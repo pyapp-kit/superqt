@@ -37,7 +37,7 @@ def define_env(env: "MacrosPlugin"):
             )
             src = src.replace("app.exec_()", "")
 
-            exec(src)
+            exec(src)  # noqa: S102
             _grab(dest, width)
         return (
             f"![{page.title}](../{dest.parent.name}/{dest.name})"
@@ -104,7 +104,6 @@ def define_env(env: "MacrosPlugin"):
                     out += f"- `{m.name}`\n\n"
 
         if self_members:
-
             out += dedent(
                 f"""
             ## Methods

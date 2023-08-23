@@ -12,8 +12,15 @@
       
         <link rel="canonical" href="https://github.com/pyapp-kit/superqt/utilities/threading/">
       
+      
+        <link rel="prev" href="../thread_decorators/">
+      
+      
+        <link rel="next" href="../throttling/">
+      
+      
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-8.5.9">
+      <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.2.3">
     
     
       
@@ -21,15 +28,14 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.20d9efc8.min.css">
-      
-        
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.08040f6c.min.css">
-        
+      <link rel="stylesheet" href="../../assets/stylesheets/main.0e669242.min.css">
       
       
 
+
     
+    
+      
     
     
       
@@ -40,6 +46,8 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
     
       <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
     
@@ -55,14 +63,11 @@
   </head>
   
   
-    
-    
-    
-    
-    
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+    <body dir="ltr">
   
     
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -82,7 +87,9 @@
     
       
 
-<header class="md-header" data-md-component="header">
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="../.." title="superqt" class="md-header__button md-logo" aria-label="superqt" data-md-component="logo">
       
@@ -91,6 +98,7 @@
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
+      
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
     </label>
     <div class="md-header__title" data-md-component="header-title">
@@ -113,6 +121,7 @@
     
     
       <label class="md-header__button md-icon" for="__search">
+        
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
       </label>
       <div class="md-search" data-md-component="search" role="dialog">
@@ -121,12 +130,15 @@
     <form class="md-search__form" name="search">
       <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
       <label class="md-search__icon md-icon" for="__search">
+        
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
       </label>
       <nav class="md-search__options" aria-label="Search">
         
         <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
         </button>
       </nav>
@@ -140,7 +152,7 @@
           <div class="md-search-result__meta">
             Initializing search
           </div>
-          <ol class="md-search-result__list"></ol>
+          <ol class="md-search-result__list" role="presentation"></ol>
         </div>
       </div>
     </div>
@@ -152,7 +164,7 @@
         <a href="https://github.com/pyapp-kit/superqt" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
     pyapp-kit/superqt
@@ -182,6 +194,7 @@
                     
 
 
+
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href="../.." title="superqt" class="md-nav__button md-logo" aria-label="superqt" data-md-component="logo">
@@ -197,7 +210,7 @@
       <a href="https://github.com/pyapp-kit/superqt" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
     pyapp-kit/superqt
@@ -209,14 +222,18 @@
     
       
       
-      
-
   
   
   
     <li class="md-nav__item">
       <a href="../.." class="md-nav__link">
-        superqt
+        
+  
+  <span class="md-ellipsis">
+    superqt
+  </span>
+  
+
       </a>
     </li>
   
@@ -224,14 +241,18 @@
     
       
       
-      
-
   
   
   
     <li class="md-nav__item">
       <a href="../../faq/" class="md-nav__link">
-        FAQ
+        
+  
+  <span class="md-ellipsis">
+    FAQ
+  </span>
+  
+
       </a>
     </li>
   
@@ -239,118 +260,194 @@
     
       
       
-      
-
   
   
     
   
   
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
     
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
-      
-      
-      
+        
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    Utilities
+  </span>
+  
+
+            </a>
             
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-      
-      
-        
-        
-        <div class="md-nav__link md-nav__link--index ">
-          <a href="../">Utilities</a>
-          
-            <label for="__nav_3">
-              <span class="md-nav__icon md-icon"></span>
-            </label>
-          
-        </div>
-      
-      <nav class="md-nav" aria-label="Utilities" data-md-level="1">
-        <label class="md-nav__title" for="__nav_3">
-          <span class="md-nav__icon md-icon"></span>
-          Utilities
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
+              <label class="md-nav__link " for="__nav_3">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
             
-          
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Utilities
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
+            
+              
+                
   
   
   
     <li class="md-nav__item">
       <a href="../code_syntax_highlight/" class="md-nav__link">
-        CodeSyntaxHighlight
+        
+  
+  <span class="md-ellipsis">
+    CodeSyntaxHighlight
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../error_dialog_contexts/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Error message context manager
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
   
   
   
     <li class="md-nav__item">
       <a href="../fonticon/" class="md-nav__link">
-        Font icons
+        
+  
+  <span class="md-ellipsis">
+    Font icons
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../qmessagehandler/" class="md-nav__link">
-        QMessageHandler
+        
+  
+  <span class="md-ellipsis">
+    QMessageHandler
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../signal_utils/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Signal Utilities
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
   
   
   
     <li class="md-nav__item">
       <a href="../thread_decorators/" class="md-nav__link">
-        Threading decorators
+        
+  
+  <span class="md-ellipsis">
+    Threading decorators
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
     
@@ -358,19 +455,31 @@
   
     <li class="md-nav__item md-nav__item--active">
       
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
         
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          Thread workers
+          
+  
+  <span class="md-ellipsis">
+    Thread workers
+  </span>
+  
+
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        Thread workers
+        
+  
+  <span class="md-ellipsis">
+    Thread workers
+  </span>
+  
+
       </a>
       
         
@@ -397,6 +506,20 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#superqt.utils._qthreading.WorkerBase.abort_requested" class="md-nav__link">
+    abort_requested
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#superqt.utils._qthreading.WorkerBase.is_running" class="md-nav__link">
+    is_running
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#superqt.utils._qthreading.WorkerBase.__getattr__" class="md-nav__link">
     __getattr__()
   </a>
@@ -404,22 +527,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#superqt.utils._qthreading.WorkerBase.abort_requested" class="md-nav__link">
-    abort_requested()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#superqt.utils._qthreading.WorkerBase.await_workers" class="md-nav__link">
     await_workers()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#superqt.utils._qthreading.WorkerBase.is_running" class="md-nav__link">
-    is_running()
   </a>
   
 </li>
@@ -474,7 +583,7 @@
         
           <li class="md-nav__item">
   <a href="#superqt.utils._qthreading.GeneratorWorker.is_paused" class="md-nav__link">
-    is_paused()
+    is_paused
   </a>
   
 </li>
@@ -560,296 +669,398 @@
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../throttling/" class="md-nav__link">
-        Throttling & Debouncing
+        
+  
+  <span class="md-ellipsis">
+    Throttling & Debouncing
+  </span>
+  
+
       </a>
     </li>
   
 
+              
             
-          
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      
     </li>
   
 
     
       
       
-      
-
   
   
   
     
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
-      
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" checked>
-      
-      
-      
+        
+        
+        
         
           
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../widgets/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    Widgets
+  </span>
+  
+
+            </a>
             
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-      
-      
-        
-        
-        <div class="md-nav__link md-nav__link--index ">
-          <a href="../../widgets/">Widgets</a>
-          
-            <label for="__nav_4">
-              <span class="md-nav__icon md-icon"></span>
-            </label>
-          
-        </div>
-      
-      <nav class="md-nav" aria-label="Widgets" data-md-level="1">
-        <label class="md-nav__title" for="__nav_4">
-          <span class="md-nav__icon md-icon"></span>
-          Widgets
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
+              <label class="md-nav__link " for="__nav_4">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
             
-          
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Widgets
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
+            
+              
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../widgets/qcollapsible/" class="md-nav__link">
-        QCollapsible
+        
+  
+  <span class="md-ellipsis">
+    QCollapsible
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../widgets/qdoublerangeslider/" class="md-nav__link">
-        QDoubleRangeSlider
+        
+  
+  <span class="md-ellipsis">
+    QDoubleRangeSlider
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../widgets/qdoubleslider/" class="md-nav__link">
-        QDoubleSlider
+        
+  
+  <span class="md-ellipsis">
+    QDoubleSlider
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../widgets/qelidinglabel/" class="md-nav__link">
-        QElidingLabel
+        
+  
+  <span class="md-ellipsis">
+    QElidingLabel
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../widgets/qenumcombobox/" class="md-nav__link">
-        QEnumComboBox
+        
+  
+  <span class="md-ellipsis">
+    QEnumComboBox
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../widgets/qlabeleddoublerangeslider/" class="md-nav__link">
-        QLabeledDoubleRangeSlider
+        
+  
+  <span class="md-ellipsis">
+    QLabeledDoubleRangeSlider
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../widgets/qlabeleddoubleslider/" class="md-nav__link">
-        QLabeledDoubleSlider
+        
+  
+  <span class="md-ellipsis">
+    QLabeledDoubleSlider
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../widgets/qlabeledrangeslider/" class="md-nav__link">
-        QLabeledRangeSlider
+        
+  
+  <span class="md-ellipsis">
+    QLabeledRangeSlider
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../widgets/qlabeledslider/" class="md-nav__link">
-        QLabeledSlider
+        
+  
+  <span class="md-ellipsis">
+    QLabeledSlider
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../widgets/qlargeintspinbox/" class="md-nav__link">
-        QLargeIntSpinBox
+        
+  
+  <span class="md-ellipsis">
+    QLargeIntSpinBox
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../widgets/qquantity/" class="md-nav__link">
-        QQuantity
+        
+  
+  <span class="md-ellipsis">
+    QQuantity
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../widgets/qrangeslider/" class="md-nav__link">
-        QRangeSlider
+        
+  
+  <span class="md-ellipsis">
+    QRangeSlider
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../widgets/qsearchablecombobox/" class="md-nav__link">
-        QSearchableComboBox
+        
+  
+  <span class="md-ellipsis">
+    QSearchableComboBox
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../widgets/qsearchablelistwidget/" class="md-nav__link">
-        QSearchableListWidget
+        
+  
+  <span class="md-ellipsis">
+    QSearchableListWidget
+  </span>
+  
+
       </a>
     </li>
   
 
+              
             
-          
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -889,6 +1100,20 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#superqt.utils._qthreading.WorkerBase.abort_requested" class="md-nav__link">
+    abort_requested
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#superqt.utils._qthreading.WorkerBase.is_running" class="md-nav__link">
+    is_running
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#superqt.utils._qthreading.WorkerBase.__getattr__" class="md-nav__link">
     __getattr__()
   </a>
@@ -896,22 +1121,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#superqt.utils._qthreading.WorkerBase.abort_requested" class="md-nav__link">
-    abort_requested()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#superqt.utils._qthreading.WorkerBase.await_workers" class="md-nav__link">
     await_workers()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#superqt.utils._qthreading.WorkerBase.is_running" class="md-nav__link">
-    is_running()
   </a>
   
 </li>
@@ -966,7 +1177,7 @@
         
           <li class="md-nav__item">
   <a href="#superqt.utils._qthreading.GeneratorWorker.is_paused" class="md-nav__link">
-    is_paused()
+    is_paused
   </a>
   
 </li>
@@ -1059,13 +1270,11 @@
                 
                   
 
-  <a href="https://github.com/pyapp-kit/superqt/edit/master/docs/utilities/threading.md" title="Edit this page" class="md-content__button md-icon">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
-  </a>
+  
+  
 
 
-<h1 id="thread-workers">Thread workers</h1>
+<h1 id="thread-workers">Thread workers<a class="headerlink" href="#thread-workers" title="Permanent link">#</a></h1>
 <p>The objects in this module provide utilities for running tasks in a separate
 thread. In general (with the exception of <code>new_worker_qthread</code>), everything
 here wraps Qt's <a href="https://doc.qt.io/qt-6/qrunnable.html">QRunnable API</a>.</p>
@@ -1085,18 +1294,20 @@ which provides a more in-depth/introductory usage guide.</p>
 
 
 <h2 id="superqt.utils.WorkerBase" class="doc doc-heading">
-        <code>superqt.utils.WorkerBase</code>
+          <code>superqt.utils.WorkerBase</code>
 
 
-</h2>
+<a href="#superqt.utils.WorkerBase" class="headerlink" title="Permanent link">#</a></h2>
 
 
   <div class="doc doc-contents first">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="qtpy.QtCore.QRunnable">QRunnable</span></code>, <code><a class="autorefs autorefs-external" title="typing.Generic" href="https://docs.python.org/3/library/typing.html#typing.Generic">Generic</a>[<span title="superqt.utils._qthreading._R">_R</span>]</code></p>
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="qtpy.QtCore.QRunnable">QRunnable</span></code>, <code><a class="autorefs autorefs-external" title="typing.Generic" href="https://docs.python.org/3/library/typing.html#typing.Generic">Generic</a>[<span title="superqt.utils._qthreading._R">_R</span>]</code></p>
 
   
       <p>Base class for creating a Worker that can run in another thread.</p>
+
+
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -1112,15 +1323,21 @@ which provides a more in-depth/introductory usage guide.</p>
         <tr>
           <td><code>SignalsClass</code></td>
           <td>
-                <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#type">type</a>, optional</code>
+                <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#type">type</a></code>
           </td>
-          <td><p>A QObject subclass that contains signals, by default WorkerBaseSignals</p></td>
           <td>
-                <code>WorkerBaseSignals</code>
+            <div class="doc-md-description">
+              <p>A QObject subclass that contains signals, by default WorkerBaseSignals</p>
+            </div>
+          </td>
+          <td>
+                <code><span title="superqt.utils._qthreading.WorkerBaseSignals">WorkerBaseSignals</span></code>
           </td>
         </tr>
     </tbody>
   </table>
+
+
 
   <p><strong>Attributes:</strong></p>
   <table>
@@ -1137,11 +1354,14 @@ which provides a more in-depth/introductory usage guide.</p>
           <td>
                 <code><span title="superqt.utils._qthreading.WorkerBaseSignals">WorkerBaseSignals</span></code>
           </td>
-          <td><p>signal emitter object. To allow identify which worker thread emitted signal.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>signal emitter object. To allow identify which worker thread emitted signal.</p>
+            </div>
+          </td>
         </tr>
     </tbody>
   </table>
-
 
 
   
@@ -1154,6 +1374,49 @@ which provides a more in-depth/introductory usage guide.</p>
 
 
 
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="superqt.utils._qthreading.WorkerBase.abort_requested" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">abort_requested</span><span class="p">:</span> <span class="nb">bool</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#superqt.utils._qthreading.WorkerBase.abort_requested" class="headerlink" title="Permanent link">#</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Whether the worker has been requested to stop.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="superqt.utils._qthreading.WorkerBase.is_running" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">is_running</span><span class="p">:</span> <span class="nb">bool</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#superqt.utils._qthreading.WorkerBase.is_running" class="headerlink" title="Permanent link">#</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Whether the worker has been started.</p>
+  </div>
+
+</div>
+
+
 
 
 <div class="doc doc-object doc-function">
@@ -1163,7 +1426,7 @@ which provides a more in-depth/introductory usage guide.</p>
 <h3 id="superqt.utils._qthreading.WorkerBase.__getattr__" class="doc doc-heading">
 <code class="highlight language-python"><span class="fm">__getattr__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></code>
 
-</h3>
+<a href="#superqt.utils._qthreading.WorkerBase.__getattr__" class="headerlink" title="Permanent link">#</a></h3>
 
 
   <div class="doc doc-contents ">
@@ -1180,27 +1443,6 @@ object.</p>
 
 </div>
 
-<div class="doc doc-object doc-function">
-
-
-
-<h3 id="superqt.utils._qthreading.WorkerBase.abort_requested" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">abort_requested</span><span class="p">()</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h3>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Whether the worker has been requested to stop.</p>
-
-  </div>
-
-</div>
 
 <div class="doc doc-object doc-function">
 
@@ -1213,7 +1455,7 @@ object.</p>
       <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
   </span>
 
-</h3>
+<a href="#superqt.utils._qthreading.WorkerBase.await_workers" class="headerlink" title="Permanent link">#</a></h3>
 
 
   <div class="doc doc-contents ">
@@ -1243,6 +1485,8 @@ post</a>
 for a good discussion on the difficulty of killing a rogue python thread:</p>
 </div>
 
+
+
   <p><strong>Parameters:</strong></p>
   <table>
     <thead>
@@ -1257,17 +1501,23 @@ for a good discussion on the difficulty of killing a rogue python thread:</p>
         <tr>
           <td><code>msecs</code></td>
           <td>
-                <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>, optional</code>
+                <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
           </td>
-          <td><p>Waits up to msecs milliseconds for all threads to exit and removes all
+          <td>
+            <div class="doc-md-description">
+              <p>Waits up to msecs milliseconds for all threads to exit and removes all
 threads from the thread pool. If msecs is <code>None</code> (the default), the
-timeout is ignored (waits for the last thread to exit).</p></td>
+timeout is ignored (waits for the last thread to exit).</p>
+            </div>
+          </td>
           <td>
                 <code>None</code>
           </td>
         </tr>
     </tbody>
   </table>
+
+
 
   <p><strong>Raises:</strong></p>
   <table>
@@ -1282,8 +1532,12 @@ timeout is ignored (waits for the last thread to exit).</p></td>
           <td>
                 <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError">RuntimeError</a></code>
           </td>
-          <td><p>If a timeout is provided and workers do not quit successfully within
-the time allotted.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>If a timeout is provided and workers do not quit successfully within
+the time allotted.</p>
+            </div>
+          </td>
         </tr>
     </tbody>
   </table>
@@ -1292,27 +1546,6 @@ the time allotted.</p></td>
 
 </div>
 
-<div class="doc doc-object doc-function">
-
-
-
-<h3 id="superqt.utils._qthreading.WorkerBase.is_running" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">is_running</span><span class="p">()</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h3>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Whether the worker has been started</p>
-
-  </div>
-
-</div>
 
 <div class="doc doc-object doc-function">
 
@@ -1321,7 +1554,7 @@ the time allotted.</p></td>
 <h3 id="superqt.utils._qthreading.WorkerBase.quit" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">quit</span><span class="p">()</span></code>
 
-</h3>
+<a href="#superqt.utils._qthreading.WorkerBase.quit" class="headerlink" title="Permanent link">#</a></h3>
 
 
   <div class="doc doc-contents ">
@@ -1338,6 +1571,7 @@ method, and exiting if <code>True</code>.</p>
 
 </div>
 
+
 <div class="doc doc-object doc-function">
 
 
@@ -1345,7 +1579,7 @@ method, and exiting if <code>True</code>.</p>
 <h3 id="superqt.utils._qthreading.WorkerBase.run" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">run</span><span class="p">()</span></code>
 
-</h3>
+<a href="#superqt.utils._qthreading.WorkerBase.run" class="headerlink" title="Permanent link">#</a></h3>
 
 
   <div class="doc doc-contents ">
@@ -1371,6 +1605,7 @@ method (except with good reason), and instead should implement
 
 </div>
 
+
 <div class="doc doc-object doc-function">
 
 
@@ -1378,7 +1613,7 @@ method (except with good reason), and instead should implement
 <h3 id="superqt.utils._qthreading.WorkerBase.start" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">start</span><span class="p">()</span></code>
 
-</h3>
+<a href="#superqt.utils._qthreading.WorkerBase.start" class="headerlink" title="Permanent link">#</a></h3>
 
 
   <div class="doc doc-contents ">
@@ -1397,6 +1632,7 @@ method (except with good reason), and instead should implement
 
 </div>
 
+
 <div class="doc doc-object doc-function">
 
 
@@ -1404,7 +1640,7 @@ method (except with good reason), and instead should implement
 <h3 id="superqt.utils._qthreading.WorkerBase.work" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">work</span><span class="p">()</span></code>
 
-</h3>
+<a href="#superqt.utils._qthreading.WorkerBase.work" class="headerlink" title="Permanent link">#</a></h3>
 
 
   <div class="doc doc-contents ">
@@ -1415,6 +1651,8 @@ But subclasses must implement this method (See
 <a class="autorefs autorefs-internal" href="#superqt.utils._qthreading.GeneratorWorker.work"><code>GeneratorFunction.work</code></a> for
 an example implementation). Minimally, it should check <code>self.abort_requested</code>
 periodically and exit if True.</p>
+
+
 
 <p><strong>Examples:</strong></p>
     <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">MyWorker</span><span class="p">(</span><span class="n">WorkerBase</span><span class="p">):</span>
@@ -1448,15 +1686,15 @@ periodically and exit if True.</p>
 
 
 <h2 id="superqt.utils.FunctionWorker" class="doc doc-heading">
-        <code>superqt.utils.FunctionWorker</code>
+          <code>superqt.utils.FunctionWorker</code>
 
 
-</h2>
+<a href="#superqt.utils.FunctionWorker" class="headerlink" title="Permanent link">#</a></h2>
 
 
   <div class="doc doc-contents first">
-      <p class="doc doc-class-bases">
-        Bases: <code><a class="autorefs autorefs-internal" title="superqt.utils._qthreading.WorkerBase" href="#superqt.utils.WorkerBase">WorkerBase</a>[<span title="superqt.utils._qthreading._R">_R</span>]</code></p>
+          <p class="doc doc-class-bases">
+            Bases: <code><a class="autorefs autorefs-internal" title="superqt.utils._qthreading.WorkerBase" href="#superqt.utils.WorkerBase">WorkerBase</a>[<span title="superqt.utils._qthreading._R">_R</span>]</code></p>
 
   
       <p>QRunnable with signals that wraps a simple long-running function.</p>
@@ -1467,6 +1705,8 @@ function (e.g. <code>time.sleep(10000)</code>).  So whenever possible, it is bet
 implement your long running function as a generator that yields periodically,
 and use the <a class="autorefs autorefs-internal" href="#superqt.utils.GeneratorWorker"><code>GeneratorWorker</code></a> instead.</p>
 </div>
+
+
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -1484,7 +1724,11 @@ and use the <a class="autorefs autorefs-internal" href="#superqt.utils.Generator
           <td>
                 <code><a class="autorefs autorefs-external" title="typing.Callable" href="https://docs.python.org/3/library/typing.html#typing.Callable">Callable</a></code>
           </td>
-          <td><p>A function to call in another thread</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>A function to call in another thread</p>
+            </div>
+          </td>
           <td>
               <em>required</em>
           </td>
@@ -1493,7 +1737,11 @@ and use the <a class="autorefs autorefs-internal" href="#superqt.utils.Generator
           <td><code>*args</code></td>
           <td>
           </td>
-          <td><p>will be passed to the function</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>will be passed to the function</p>
+            </div>
+          </td>
           <td>
                 <code>()</code>
           </td>
@@ -1502,13 +1750,19 @@ and use the <a class="autorefs autorefs-internal" href="#superqt.utils.Generator
           <td><code>**kwargs</code></td>
           <td>
           </td>
-          <td><p>will be passed to the function</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>will be passed to the function</p>
+            </div>
+          </td>
           <td>
                 <code>{}</code>
           </td>
         </tr>
     </tbody>
   </table>
+
+
 
   <p><strong>Raises:</strong></p>
   <table>
@@ -1523,11 +1777,14 @@ and use the <a class="autorefs autorefs-internal" href="#superqt.utils.Generator
           <td>
                 <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#TypeError">TypeError</a></code>
           </td>
-          <td><p>If <code>func</code> is a generator function and not a regular function.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>If <code>func</code> is a generator function and not a regular function.</p>
+            </div>
+          </td>
         </tr>
     </tbody>
   </table>
-
 
 
   
@@ -1555,21 +1812,23 @@ and use the <a class="autorefs autorefs-internal" href="#superqt.utils.Generator
 
 
 <h2 id="superqt.utils.GeneratorWorker" class="doc doc-heading">
-        <code>superqt.utils.GeneratorWorker</code>
+          <code>superqt.utils.GeneratorWorker</code>
 
 
-</h2>
+<a href="#superqt.utils.GeneratorWorker" class="headerlink" title="Permanent link">#</a></h2>
 
 
   <div class="doc doc-contents first">
-      <p class="doc doc-class-bases">
-        Bases: <code><a class="autorefs autorefs-internal" title="superqt.utils._qthreading.WorkerBase" href="#superqt.utils.WorkerBase">WorkerBase</a></code>, <code><a class="autorefs autorefs-external" title="typing.Generic" href="https://docs.python.org/3/library/typing.html#typing.Generic">Generic</a>[<span title="superqt.utils._qthreading._Y">_Y</span>, <span title="superqt.utils._qthreading._S">_S</span>, <span title="superqt.utils._qthreading._R">_R</span>]</code></p>
+          <p class="doc doc-class-bases">
+            Bases: <code><a class="autorefs autorefs-internal" title="superqt.utils._qthreading.WorkerBase" href="#superqt.utils.WorkerBase">WorkerBase</a></code>, <code><a class="autorefs autorefs-external" title="typing.Generic" href="https://docs.python.org/3/library/typing.html#typing.Generic">Generic</a>[<span title="superqt.utils._qthreading._Y">_Y</span>, <span title="superqt.utils._qthreading._S">_S</span>, <span title="superqt.utils._qthreading._R">_R</span>]</code></p>
 
   
       <p>QRunnable with signals that wraps a long-running generator.</p>
 <p>Provides a convenient way to run a generator function in another thread,
 while allowing 2-way communication between threads, using plain-python
 generator syntax in the original function.</p>
+
+
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -1587,7 +1846,11 @@ generator syntax in the original function.</p>
           <td>
                 <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#callable">callable</a></code>
           </td>
-          <td><p>The function being run in another thread.  May be a generator function.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>The function being run in another thread.  May be a generator function.</p>
+            </div>
+          </td>
           <td>
               <em>required</em>
           </td>
@@ -1595,19 +1858,27 @@ generator syntax in the original function.</p>
         <tr>
           <td><code>SignalsClass</code></td>
           <td>
-                <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#type">type</a>, optional</code>
+                <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#type">type</a></code>
           </td>
-          <td><p>A QObject subclass that contains signals, by default
-GeneratorWorkerSignals</p></td>
           <td>
-                <code>GeneratorWorkerSignals</code>
+            <div class="doc-md-description">
+              <p>A QObject subclass that contains signals, by default
+GeneratorWorkerSignals</p>
+            </div>
+          </td>
+          <td>
+                <code><span title="superqt.utils._qthreading.GeneratorWorkerSignals">GeneratorWorkerSignals</span></code>
           </td>
         </tr>
         <tr>
           <td><code>*args</code></td>
           <td>
           </td>
-          <td><p>Will be passed to func on instantiation</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>Will be passed to func on instantiation</p>
+            </div>
+          </td>
           <td>
                 <code>()</code>
           </td>
@@ -1616,14 +1887,17 @@ GeneratorWorkerSignals</p></td>
           <td><code>**kwargs</code></td>
           <td>
           </td>
-          <td><p>Will be passed to func on instantiation</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>Will be passed to func on instantiation</p>
+            </div>
+          </td>
           <td>
                 <code>{}</code>
           </td>
         </tr>
     </tbody>
   </table>
-
 
 
   
@@ -1636,29 +1910,29 @@ GeneratorWorkerSignals</p></td>
 
 
 
-
-
-<div class="doc doc-object doc-function">
+<div class="doc doc-object doc-attribute">
 
 
 
 <h3 id="superqt.utils._qthreading.GeneratorWorker.is_paused" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">is_paused</span><span class="p">()</span></code>
+<code class="highlight language-python"><span class="n">is_paused</span><span class="p">:</span> <span class="nb">bool</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
-</h3>
+<a href="#superqt.utils._qthreading.GeneratorWorker.is_paused" class="headerlink" title="Permanent link">#</a></h3>
 
 
   <div class="doc doc-contents ">
   
       <p>Whether the worker is currently paused.</p>
-
   </div>
 
 </div>
+
+
+
 
 <div class="doc doc-object doc-function">
 
@@ -1667,7 +1941,7 @@ GeneratorWorkerSignals</p></td>
 <h3 id="superqt.utils._qthreading.GeneratorWorker.pause" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">pause</span><span class="p">()</span></code>
 
-</h3>
+<a href="#superqt.utils._qthreading.GeneratorWorker.pause" class="headerlink" title="Permanent link">#</a></h3>
 
 
   <div class="doc doc-contents ">
@@ -1678,6 +1952,7 @@ GeneratorWorkerSignals</p></td>
 
 </div>
 
+
 <div class="doc doc-object doc-function">
 
 
@@ -1685,7 +1960,7 @@ GeneratorWorkerSignals</p></td>
 <h3 id="superqt.utils._qthreading.GeneratorWorker.resume" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">resume</span><span class="p">()</span></code>
 
-</h3>
+<a href="#superqt.utils._qthreading.GeneratorWorker.resume" class="headerlink" title="Permanent link">#</a></h3>
 
 
   <div class="doc doc-contents ">
@@ -1696,6 +1971,7 @@ GeneratorWorkerSignals</p></td>
 
 </div>
 
+
 <div class="doc doc-object doc-function">
 
 
@@ -1703,7 +1979,7 @@ GeneratorWorkerSignals</p></td>
 <h3 id="superqt.utils._qthreading.GeneratorWorker.send" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">send</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></code>
 
-</h3>
+<a href="#superqt.utils._qthreading.GeneratorWorker.send" class="headerlink" title="Permanent link">#</a></h3>
 
 
   <div class="doc doc-contents ">
@@ -1714,6 +1990,7 @@ GeneratorWorkerSignals</p></td>
 
 </div>
 
+
 <div class="doc doc-object doc-function">
 
 
@@ -1721,7 +1998,7 @@ GeneratorWorkerSignals</p></td>
 <h3 id="superqt.utils._qthreading.GeneratorWorker.toggle_pause" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">toggle_pause</span><span class="p">()</span></code>
 
-</h3>
+<a href="#superqt.utils._qthreading.GeneratorWorker.toggle_pause" class="headerlink" title="Permanent link">#</a></h3>
 
 
   <div class="doc doc-contents ">
@@ -1732,6 +2009,7 @@ GeneratorWorkerSignals</p></td>
 
 </div>
 
+
 <div class="doc doc-object doc-function">
 
 
@@ -1739,7 +2017,7 @@ GeneratorWorkerSignals</p></td>
 <h3 id="superqt.utils._qthreading.GeneratorWorker.work" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">work</span><span class="p">()</span></code>
 
-</h3>
+<a href="#superqt.utils._qthreading.GeneratorWorker.work" class="headerlink" title="Permanent link">#</a></h3>
 
 
   <div class="doc doc-contents ">
@@ -1760,7 +2038,8 @@ there IS NO Qt event loop running in the other thread to hook into)</p>
 
   </div>
 
-</div><h2 id="convenience-functions">Convenience functions</h2>
+</div><h2 id="convenience-functions">Convenience functions<a class="headerlink" href="#convenience-functions" title="Permanent link">#</a></h2>
+
 
 
 <div class="doc doc-object doc-function">
@@ -1770,7 +2049,7 @@ there IS NO Qt event loop running in the other thread to hook into)</p>
 <h3 id="superqt.utils.thread_worker" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">superqt</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">thread_worker</span><span class="p">(</span><span class="n">function</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start_thread</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">connect</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">worker_class</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
-</h3>
+<a href="#superqt.utils.thread_worker" class="headerlink" title="Permanent link">#</a></h3>
 
 
   <div class="doc doc-contents first">
@@ -1807,6 +2086,8 @@ provide these signals:</p>
   decorator function uses the <code>value = yield</code> syntax)</li>
 </ul>
 
+
+
   <p><strong>Parameters:</strong></p>
   <table>
     <thead>
@@ -1823,8 +2104,12 @@ provide these signals:</p>
           <td>
                 <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#callable">callable</a></code>
           </td>
-          <td><p>Function to call in another thread.  For communication between threads
-may be a generator function.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>Function to call in another thread.  For communication between threads
+may be a generator function.</p>
+            </div>
+          </td>
           <td>
                 <code>None</code>
           </td>
@@ -1834,9 +2119,13 @@ may be a generator function.</p></td>
           <td>
                 <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
           </td>
-          <td><p>Whether to immediaetly start the thread.  If False, the returned worker
+          <td>
+            <div class="doc-md-description">
+              <p>Whether to immediaetly start the thread.  If False, the returned worker
 must be manually started with <code>worker.start()</code>. by default it will be
-<code>False</code> if the <code>_connect</code> argument is <code>None</code>, otherwise <code>True</code>.</p></td>
+<code>False</code> if the <code>_connect</code> argument is <code>None</code>, otherwise <code>True</code>.</p>
+            </div>
+          </td>
           <td>
                 <code>None</code>
           </td>
@@ -1844,11 +2133,15 @@ must be manually started with <code>worker.start()</code>. by default it will be
         <tr>
           <td><code>connect</code></td>
           <td>
-                <code><a class="autorefs autorefs-external" title="typing.Dict" href="https://docs.python.org/3/library/typing.html#typing.Dict">Dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Union" href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a class="autorefs autorefs-external" title="typing.Callable" href="https://docs.python.org/3/library/typing.html#typing.Callable">Callable</a>, <a class="autorefs autorefs-external" title="typing.Sequence" href="https://docs.python.org/3/library/typing.html#typing.Sequence">Sequence</a>]]</code>
+                <code>Dict[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, Union[<a class="autorefs autorefs-external" title="typing.Callable" href="https://docs.python.org/3/library/typing.html#typing.Callable">Callable</a>, <a class="autorefs autorefs-external" title="typing.Sequence" href="https://docs.python.org/3/library/typing.html#typing.Sequence">Sequence</a>]]</code>
           </td>
-          <td><p>A mapping of <code>"signal_name"</code> -&gt; <code>callable</code> or list of <code>callable</code>:
+          <td>
+            <div class="doc-md-description">
+              <p>A mapping of <code>"signal_name"</code> -&gt; <code>callable</code> or list of <code>callable</code>:
 callback functions to connect to the various signals offered by the
-worker class. by default None</p></td>
+worker class. by default None</p>
+            </div>
+          </td>
           <td>
                 <code>None</code>
           </td>
@@ -1856,12 +2149,16 @@ worker class. by default None</p></td>
         <tr>
           <td><code>worker_class</code></td>
           <td>
-                <code><a class="autorefs autorefs-external" title="typing.Type" href="https://docs.python.org/3/library/typing.html#typing.Type">Type</a>[<a class="autorefs autorefs-internal" title="superqt.utils._qthreading.WorkerBase" href="#superqt.utils.WorkerBase">WorkerBase</a>]</code>
+                <code>Type[<a class="autorefs autorefs-internal" title="superqt.utils._qthreading.WorkerBase" href="#superqt.utils.WorkerBase">WorkerBase</a>]</code>
           </td>
-          <td><p>The <a class="autorefs autorefs-internal" href="#superqt.utils.WorkerBase"><code>WorkerBase</code></a> to instantiate, by default
+          <td>
+            <div class="doc-md-description">
+              <p>The <a class="autorefs autorefs-internal" href="#superqt.utils.WorkerBase"><code>WorkerBase</code></a> to instantiate, by default
 <a class="autorefs autorefs-internal" href="#superqt.utils.FunctionWorker"><code>FunctionWorker</code></a> will be used if <code>func</code> is a
 regular function, and <a class="autorefs autorefs-internal" href="#superqt.utils.GeneratorWorker"><code>GeneratorWorker</code></a> will be
-used if it is a generator.</p></td>
+used if it is a generator.</p>
+            </div>
+          </td>
           <td>
                 <code>None</code>
           </td>
@@ -1871,14 +2168,20 @@ used if it is a generator.</p></td>
           <td>
                 <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
           </td>
-          <td><p>If <code>False</code> (the default), errors raised in the other thread will be
-reraised in the main thread (makes debugging significantly easier).</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>If <code>False</code> (the default), errors raised in the other thread will be
+reraised in the main thread (makes debugging significantly easier).</p>
+            </div>
+          </td>
           <td>
                 <code>False</code>
           </td>
         </tr>
     </tbody>
   </table>
+
+
 
   <p><strong>Returns:</strong></p>
   <table>
@@ -1893,11 +2196,17 @@ reraised in the main thread (makes debugging significantly easier).</p></td>
           <td>
                 <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#callable">callable</a></code>
           </td>
-          <td><p>function that creates a worker, puts it in a new thread and returns
-the worker instance.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>function that creates a worker, puts it in a new thread and returns
+the worker instance.</p>
+            </div>
+          </td>
         </tr>
     </tbody>
   </table>
+
+
 
 <p><strong>Examples:</strong></p>
     <div class="highlight"><pre><span></span><code><span class="nd">@thread_worker</span>
@@ -1924,6 +2233,7 @@ the worker instance.</p></td>
 
 </div>
 
+
 <div class="doc doc-object doc-function">
 
 
@@ -1931,7 +2241,7 @@ the worker instance.</p></td>
 <h3 id="superqt.utils.create_worker" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">superqt</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">create_worker</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">_start_thread</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">_connect</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">_worker_class</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">_ignore_errors</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
-</h3>
+<a href="#superqt.utils.create_worker" class="headerlink" title="Permanent link">#</a></h3>
 
 
   <div class="doc doc-contents first">
@@ -1940,6 +2250,8 @@ the worker instance.</p></td>
 <p>By default, uses <code>FunctionWorker</code> for functions and <code>GeneratorWorker</code> for
 generators, but a custom <code>WorkerBase</code> subclass may be provided.  If so, it must be a
 subclass of <code>WorkerBase</code>, which defines a standard set of signals and a run method.</p>
+
+
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -1957,7 +2269,11 @@ subclass of <code>WorkerBase</code>, which defines a standard set of signals and
           <td>
                 <code><a class="autorefs autorefs-external" title="typing.Callable" href="https://docs.python.org/3/library/typing.html#typing.Callable">Callable</a></code>
           </td>
-          <td><p>The function to call in another thread.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>The function to call in another thread.</p>
+            </div>
+          </td>
           <td>
               <em>required</em>
           </td>
@@ -1967,9 +2283,13 @@ subclass of <code>WorkerBase</code>, which defines a standard set of signals and
           <td>
                 <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
           </td>
-          <td><p>Whether to immediaetly start the thread.  If False, the returned worker
+          <td>
+            <div class="doc-md-description">
+              <p>Whether to immediaetly start the thread.  If False, the returned worker
 must be manually started with <code>worker.start()</code>. by default it will be
-<code>False</code> if the <code>_connect</code> argument is <code>None</code>, otherwise <code>True</code>.</p></td>
+<code>False</code> if the <code>_connect</code> argument is <code>None</code>, otherwise <code>True</code>.</p>
+            </div>
+          </td>
           <td>
                 <code>None</code>
           </td>
@@ -1977,11 +2297,15 @@ must be manually started with <code>worker.start()</code>. by default it will be
         <tr>
           <td><code>_connect</code></td>
           <td>
-                <code><a class="autorefs autorefs-external" title="typing.Dict" href="https://docs.python.org/3/library/typing.html#typing.Dict">Dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Union" href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a class="autorefs autorefs-external" title="typing.Callable" href="https://docs.python.org/3/library/typing.html#typing.Callable">Callable</a>, <a class="autorefs autorefs-external" title="typing.Sequence" href="https://docs.python.org/3/library/typing.html#typing.Sequence">Sequence</a>]], optional</code>
+                <code>Dict[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, Union[<a class="autorefs autorefs-external" title="typing.Callable" href="https://docs.python.org/3/library/typing.html#typing.Callable">Callable</a>, <a class="autorefs autorefs-external" title="typing.Sequence" href="https://docs.python.org/3/library/typing.html#typing.Sequence">Sequence</a>]]</code>
           </td>
-          <td><p>A mapping of <code>"signal_name"</code> -&gt; <code>callable</code> or list of <code>callable</code>:
+          <td>
+            <div class="doc-md-description">
+              <p>A mapping of <code>"signal_name"</code> -&gt; <code>callable</code> or list of <code>callable</code>:
 callback functions to connect to the various signals offered by the
-worker class. by default <code>None</code></p></td>
+worker class. by default <code>None</code></p>
+            </div>
+          </td>
           <td>
                 <code>None</code>
           </td>
@@ -1989,12 +2313,16 @@ worker class. by default <code>None</code></p></td>
         <tr>
           <td><code>_worker_class</code></td>
           <td>
-                <code>type of </code>
+                <code>type of `GeneratorWorker` or `FunctionWorker`</code>
           </td>
-          <td><p>The <a class="autorefs autorefs-internal" href="#superqt.utils.WorkerBase"><code>WorkerBase</code></a> to instantiate, by default
+          <td>
+            <div class="doc-md-description">
+              <p>The <a class="autorefs autorefs-internal" href="#superqt.utils.WorkerBase"><code>WorkerBase</code></a> to instantiate, by default
 <a class="autorefs autorefs-internal" href="#superqt.utils.FunctionWorker"><code>FunctionWorker</code></a> will be used if <code>func</code> is a
 regular function, and <a class="autorefs autorefs-internal" href="#superqt.utils.GeneratorWorker"><code>GeneratorWorker</code></a> will be
-used if it is a generator.</p></td>
+used if it is a generator.</p>
+            </div>
+          </td>
           <td>
                 <code>None</code>
           </td>
@@ -2004,8 +2332,12 @@ used if it is a generator.</p></td>
           <td>
                 <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
           </td>
-          <td><p>If <code>False</code> (the default), errors raised in the other thread will be
-reraised in the main thread (makes debugging significantly easier).</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>If <code>False</code> (the default), errors raised in the other thread will be
+reraised in the main thread (makes debugging significantly easier).</p>
+            </div>
+          </td>
           <td>
                 <code>False</code>
           </td>
@@ -2014,7 +2346,11 @@ reraised in the main thread (makes debugging significantly easier).</p></td>
           <td><code>*args</code></td>
           <td>
           </td>
-          <td><p>will be passed to <code>func</code></p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>will be passed to <code>func</code></p>
+            </div>
+          </td>
           <td>
                 <code>()</code>
           </td>
@@ -2023,13 +2359,19 @@ reraised in the main thread (makes debugging significantly easier).</p></td>
           <td><code>**kwargs</code></td>
           <td>
           </td>
-          <td><p>will be passed to <code>func</code></p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>will be passed to <code>func</code></p>
+            </div>
+          </td>
           <td>
                 <code>{}</code>
           </td>
         </tr>
     </tbody>
   </table>
+
+
 
   <p><strong>Returns:</strong></p>
   <table>
@@ -2044,11 +2386,17 @@ reraised in the main thread (makes debugging significantly easier).</p></td>
 <td><code>worker</code></td>          <td>
                 <code><a class="autorefs autorefs-internal" title="superqt.utils._qthreading.WorkerBase" href="#superqt.utils.WorkerBase">WorkerBase</a></code>
           </td>
-          <td><p>An instantiated worker.  If <code>_start_thread</code> was <code>False</code>, the worker
-will have a <code>.start()</code> method that can be used to start the thread.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>An instantiated worker.  If <code>_start_thread</code> was <code>False</code>, the worker
+will have a <code>.start()</code> method that can be used to start the thread.</p>
+            </div>
+          </td>
         </tr>
     </tbody>
   </table>
+
+
 
   <p><strong>Raises:</strong></p>
   <table>
@@ -2063,16 +2411,26 @@ will have a <code>.start()</code> method that can be used to start the thread.</
           <td>
                 <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#TypeError">TypeError</a></code>
           </td>
-          <td><p>If a worker_class is provided that is not a subclass of WorkerBase.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>If a worker_class is provided that is not a subclass of WorkerBase.</p>
+            </div>
+          </td>
         </tr>
         <tr>
           <td>
                 <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#TypeError">TypeError</a></code>
           </td>
-          <td><p>If _connect is provided and is not a dict of <code>{str: callable}</code></p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>If _connect is provided and is not a dict of <code>{str: callable}</code></p>
+            </div>
+          </td>
         </tr>
     </tbody>
   </table>
+
+
 
 <p><strong>Examples:</strong></p>
     <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">long_function</span><span class="p">(</span><span class="n">duration</span><span class="p">):</span>
@@ -2086,6 +2444,7 @@ will have a <code>.start()</code> method that can be used to start the thread.</
 
 </div>
 
+
 <div class="doc doc-object doc-function">
 
 
@@ -2093,23 +2452,13 @@ will have a <code>.start()</code> method that can be used to start the thread.</
 <h3 id="superqt.utils.new_worker_qthread" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">superqt</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">new_worker_qthread</span><span class="p">(</span><span class="n">Worker</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">_start_thread</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">_connect</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
-</h3>
+<a href="#superqt.utils.new_worker_qthread" class="headerlink" title="Permanent link">#</a></h3>
 
 
   <div class="doc doc-contents first">
   
-      <p>This is a convenience function to start a worker in a <code>QThread</code>.</p>
-<p>In most cases, the <a class="autorefs autorefs-internal" href="#superqt.utils.thread_worker">thread_worker</a> decorator is
-sufficient and preferable. But this allows the user to completely customize the
-Worker object. However, they must then maintain control over the thread and clean up
-appropriately.</p>
-<p>It follows the pattern described
-<a href="https://www.qt.io/blog/2010/06/17/youre-doing-it-wrong">here</a> and in the <a href="https://doc.qt.io/qt-5/qthread.html#details">qt thread
-docs</a></p>
-<p>see also:</p>
-<p>https://mayaposch.wordpress.com/2011/11/01/how-to-really-truly-use-qthreads-the-full-explanation/</p>
-<p>A QThread object is not a thread! It should be thought of as a class to <em>manage</em> a
-thread, not as the actual code or object that runs in that
+      <p>Convenience function to start a worker in a <code>QThread</code>.</p>
+<p>thread, not as the actual code or object that runs in that
 thread.  The QThread object is created on the main thread and lives there.</p>
 <p>Worker objects which derive from QObject are the things that actually do
 the work. They can be moved to a QThread as is done here.</p>
@@ -2121,6 +2470,8 @@ signals and slots (automatically) use an event-based QueuedConnection, while
 intra-thread signals use a DirectConnection. See <a href="https://doc.qt.io/qt-5/threads-qobject.html#signals-and-slots-across-threads&gt;">Signals and Slots Across
 Threads</a></p>
 </details>
+
+
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -2138,8 +2489,12 @@ Threads</a></p>
           <td>
                 <code><span title="qtpy.QtCore.QObject">QObject</span></code>
           </td>
-          <td><p>QObject type that implements a <code>work()</code> method.  The Worker should also
-emit a finished signal when the work is done.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>QObject type that implements a <code>work()</code> method.  The Worker should also
+emit a finished signal when the work is done.</p>
+            </div>
+          </td>
           <td>
               <em>required</em>
           </td>
@@ -2149,8 +2504,12 @@ emit a finished signal when the work is done.</p></td>
           <td>
                 <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
           </td>
-          <td><p>If True, thread will be started immediately, otherwise, thread must
-be manually started with thread.start().</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>If True, thread will be started immediately, otherwise, thread must
+be manually started with thread.start().</p>
+            </div>
+          </td>
           <td>
                 <code>False</code>
           </td>
@@ -2160,9 +2519,13 @@ be manually started with thread.start().</p></td>
           <td>
                 <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></code>
           </td>
-          <td><p>Optional dictionary of {signal: function} to connect to the new worker.
+          <td>
+            <div class="doc-md-description">
+              <p>Optional dictionary of {signal: function} to connect to the new worker.
 for instance:  _connect = {'incremented': myfunc} will result in:
-worker.incremented.connect(myfunc)</p></td>
+worker.incremented.connect(myfunc)</p>
+            </div>
+          </td>
           <td>
                 <code>None</code>
           </td>
@@ -2171,7 +2534,11 @@ worker.incremented.connect(myfunc)</p></td>
           <td><code>*args</code></td>
           <td>
           </td>
-          <td><p>will be passed to the Worker class on instantiation.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>will be passed to the Worker class on instantiation.</p>
+            </div>
+          </td>
           <td>
                 <code>()</code>
           </td>
@@ -2180,13 +2547,19 @@ worker.incremented.connect(myfunc)</p></td>
           <td><code>**kwargs</code></td>
           <td>
           </td>
-          <td><p>will be passed to the Worker class on instantiation.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>will be passed to the Worker class on instantiation.</p>
+            </div>
+          </td>
           <td>
                 <code>{}</code>
           </td>
         </tr>
     </tbody>
   </table>
+
+
 
   <p><strong>Returns:</strong></p>
   <table>
@@ -2201,16 +2574,26 @@ worker.incremented.connect(myfunc)</p></td>
 <td><code>worker</code></td>          <td>
                 <code><a class="autorefs autorefs-internal" title="superqt.utils._qthreading.WorkerBase" href="#superqt.utils.WorkerBase">WorkerBase</a></code>
           </td>
-          <td><p>The created worker.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>The created worker.</p>
+            </div>
+          </td>
         </tr>
         <tr>
 <td><code>thread</code></td>          <td>
                 <code><span title="qtpy.QtCore.QThread">QThread</span></code>
           </td>
-          <td><p>The thread on which the worker is running.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>The thread on which the worker is running.</p>
+            </div>
+          </td>
         </tr>
     </tbody>
   </table>
+
+
 
 <p><strong>Examples:</strong></p>
     <p>Create some QObject that has a long-running work method:</p>
@@ -2259,42 +2642,6 @@ worker.incremented.connect(myfunc)</p></td>
       
         <footer class="md-footer">
   
-    
-    <nav class="md-footer__inner md-grid" aria-label="Footer" >
-      
-        
-        <a href="../thread_decorators/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Threading decorators" rel="prev">
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
-          </div>
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Previous
-              </span>
-              Threading decorators
-            </div>
-          </div>
-        </a>
-      
-      
-        
-        <a href="../throttling/" class="md-footer__link md-footer__link--next" aria-label="Next: Throttling &amp; Debouncing" rel="next">
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              Throttling & Debouncing
-            </div>
-          </div>
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
-          </div>
-        </a>
-      
-    </nav>
-  
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
       <div class="md-copyright">
@@ -2320,10 +2667,10 @@ worker.incremented.connect(myfunc)</p></td>
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.indexes", "navigation.expand", "search.highlight", "search.suggest"], "search": "../../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.indexes", "navigation.expand", "search.highlight", "search.suggest", "content.code.copy"], "search": "../../assets/javascripts/workers/search.dfff1995.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.d6c3db9e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.78eede0e.min.js"></script>
       
     
   </body>
