@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.5.4](https://github.com/pyapp-kit/superqt/tree/v0.5.4) (2023-08-31)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.5.3...v0.5.4)
+
+**Fixed bugs:**
+
+- fix: fix mysterious segfault [\#192](https://github.com/pyapp-kit/superqt/pull/192) ([tlambert03](https://github.com/tlambert03))
+
 ## [v0.5.3](https://github.com/pyapp-kit/superqt/tree/v0.5.3) (2023-08-21)
 
 [Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.5.2...v0.5.3)
