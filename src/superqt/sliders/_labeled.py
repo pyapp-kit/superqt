@@ -135,8 +135,8 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         fp = self.style().styleHint(QStyle.StyleHint.SH_Button_FocusPolicy)
         self.setFocusPolicy(Qt.FocusPolicy(fp))
 
-        self._slider = self._slider_class()
-        self._label = SliderLabel(self._slider, connect=self._setValue)
+        self._slider = self._slider_class(parent=self)
+        self._label = SliderLabel(self._slider, connect=self._setValue, parent=self)
         self._edge_label_mode: EdgeLabelMode = EdgeLabelMode.LabelIsValue
 
         self._rename_signals()
@@ -145,11 +145,14 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         self._slider.sliderMoved.connect(self.sliderMoved.emit)
         self._slider.sliderPressed.connect(self.sliderPressed.emit)
         self._slider.sliderReleased.connect(self.sliderReleased.emit)
-        self._slider.valueChanged.connect(self._label.setValue)
-        self._slider.valueChanged.connect(self.valueChanged.emit)
+        self._slider.valueChanged.connect(self._on_slider_value_changed)
         self._label.editingFinished.connect(self.editingFinished)
 
         self.setOrientation(orientation)
+
+    def _on_slider_value_changed(self, v):
+        self._label.setValue(v)
+        self.valueChanged.emit(v)
 
     def _setValue(self, value: float):
         """Convert the value from float to int before setting the slider value."""
