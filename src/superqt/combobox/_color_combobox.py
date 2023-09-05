@@ -86,20 +86,22 @@ class QColorComboBox(QComboBox):
     currentColorChanged = Signal(QColor)
 
     def __init__(
-        self, parent: QWidget | None = None, enableUserDefColors: bool = False
+        self, parent: QWidget | None = None, allow_user_colors: bool = False
     ) -> None:
         # init QComboBox
         super().__init__(parent)
         self._invalid_policy: InvalidPolicy = InvalidPolicy.Ignore
         self._add_color_text: str = "Add Color"
+        self._allow_user_colors: bool = allow_user_colors
 
         self.setLineEdit(_ComboLine(self))
         self.setItemDelegate(_ComboDelegate())
         self.setMinimumHeight(20)
 
-        self.activated.connect(self._index_changed)
+        self.currentIndexChanged.connect(self._index_changed)
+        self.activated.connect(self._activated)
 
-        if True:
+        if allow_user_colors:
             self.addItem(self._add_color_text)
             self.lineEdit().setStyleSheet("color: transparent")
 
@@ -119,6 +121,14 @@ class QColorComboBox(QComboBox):
     def invalidPolicy(self) -> InvalidPolicy:
         """Returns the policy for handling invalid colors."""
         return self._invalid_policy
+
+    def userColorsAllowed(self) -> bool:
+        """Returns whether the user can add custom colors."""
+        return self._allow_user_colors
+
+    def setUserColorsAllowed(self, allow: bool) -> None:
+        """Sets whether the user can add custom colors."""
+        self._allow_user_colors = bool(allow)
 
     def addColor(self, color: Any) -> None:
         """Adds the color to the QComboBox."""
@@ -158,16 +168,29 @@ class QColorComboBox(QComboBox):
         """Returns the currently selected QColor or None if not yet selected."""
         return self.currentData(Qt.ItemDataRole.BackgroundRole)
 
+    def setCurrentColor(self, color: Any) -> None:
+        """Adds the color to the QComboBox and selects it."""
+        idx = self.findData(_cast_color(color), Qt.ItemDataRole.BackgroundRole)
+        print(idx)
+        if idx >= 0:
+            self.setCurrentIndex(idx)
+
     def currentColorName(self) -> str | None:
         """Returns the name of the currently selected QColor or black if None."""
         color = self.currentColor()
         return color.name() if color else "#000000"
 
-    def setCurrentColor(self, color: QColor) -> None:
-        """Adds the color to the QComboBox and selects it."""
-        idx = self.findData(color)
-        if idx >= 0:
-            self.setCurrentIndex(idx)
+    def _activated(self, index: int) -> None:
+        # if the user wants to define a custom color
+        if self.itemText(index) == self._add_color_text:
+            # get the user defined color
+            new_color = QColorDialog.getColor()
+            if new_color.isValid():
+                # add the color to the QComboBox and emit the signal
+                with signals_blocked(self):
+                    self.addColor(new_color)
+                idx = self.findData(new_color, Qt.ItemDataRole.BackgroundRole)
+                self.setCurrentIndex(idx)
 
     def _index_changed(self, index: int) -> None:
         # make sure that current color is displayed
@@ -175,16 +198,7 @@ class QColorComboBox(QComboBox):
             self.lineEdit().setStyleSheet(
                 f"background-color: {color.name()}; color: transparent"
             )
-        # if the user wants to define a custom color
-        elif self.itemText(index) == self._add_color_text:
-            # get the user defined color
-            new_color = QColorDialog.getColor()
-            if new_color.isValid():
-                # add the color to the QComboBox and emit the signal
-                self.addColor(new_color)
-                return
-
-        if not self.itemText(index) and (color := self.currentColor()):
+        if color := self.currentColor():
             self.currentColorChanged.emit(color)
 
 
@@ -214,6 +228,7 @@ if __name__ == "__main__":
     app = QApplication([])
     w = QColorComboBox()
     w.addColors(["red", "blue", "green", "lime", "magenta"])
+    w.setCurrentColor(QColor("magenta"))
     w.show()
     w.currentColorChanged.connect(lambda x: print(w.currentColorName()))
     app.exec_()
