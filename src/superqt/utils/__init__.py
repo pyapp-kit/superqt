@@ -1,8 +1,15 @@
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from ._draw_cmap import draw_colormap
+
 __all__ = (
     "CodeSyntaxHighlight",
     "create_worker",
+    "draw_colormap",
     "ensure_main_thread",
     "ensure_object_thread",
+    "exceptions_as_dialog",
     "FunctionWorker",
     "GeneratorWorker",
     "new_worker_qthread",
@@ -14,8 +21,8 @@ __all__ = (
     "signals_blocked",
     "thread_worker",
     "WorkerBase",
-    "exceptions_as_dialog",
 )
+
 
 from ._code_syntax_highlight import CodeSyntaxHighlight
 from ._ensure_thread import ensure_main_thread, ensure_object_thread
@@ -31,3 +38,11 @@ from ._qthreading import (
     thread_worker,
 )
 from ._throttler import QSignalDebouncer, QSignalThrottler, qdebounced, qthrottled
+
+
+def __getattr__(name: str) -> Any:
+    if name == "draw_colormap":
+        from ._draw_cmap import draw_colormap
+
+        return draw_colormap
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
