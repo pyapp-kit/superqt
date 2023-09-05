@@ -17,6 +17,7 @@ except ImportError as e:
 
 
 from qtpy.QtCore import (
+    QMargins,
     QModelIndex,
     QObject,
     QPersistentModelIndex,
@@ -31,12 +32,12 @@ from qtpy.QtGui import (
     QPaintEvent,
 )
 from qtpy.QtWidgets import (
-    QAbstractItemDelegate,
     QComboBox,
     QDialog,
     QDialogButtonBox,
     QLineEdit,
     QStyle,
+    QStyledItemDelegate,
     QStyleOptionViewItem,
     QVBoxLayout,
     QWidget,
@@ -91,16 +92,21 @@ class _CmapComboLineEdit(QLineEdit):
         draw_colormap(self, self._cmap)
 
 
-class _CmapComboItemDelegate(QAbstractItemDelegate):
+class ColormapItemDelegate(QStyledItemDelegate):
     """Delegate that draws colormaps in the ComboBox dropdown."""
 
-    def __init__(self, parent: QObject | None = ...) -> None:
+    def __init__(self, parent: QObject | None = None) -> None:
         super().__init__(parent)
+        self._item_size: QSize = QSize(80, 24)
+        self._item_height: int = 20
+        self._colormap_fraction: float = 1
+        self._colormap_left: bool = True
+        self._padding: int = 2
 
     def sizeHint(
         self, option: QStyleOptionViewItem, index: QModelIndex | QPersistentModelIndex
     ) -> QSize:
-        return QSize(20, 20)
+        return super().sizeHint(option, index).expandedTo(self._item_size)
 
     def paint(
         self,
@@ -125,13 +131,29 @@ class _CmapComboItemDelegate(QAbstractItemDelegate):
             painter.drawText(rect, text_align, text)
             return
 
-        border = QColor("gray") if is_hovering else QColor("lightgray")
-        draw_colormap(painter, colormap, rect, border_color=border, border_width=2)
+        rect = rect.marginsAdded(QMargins(-self._padding, -self._padding, 0, 0))
+        cmap_rect = QRect(rect)
+        if self._colormap_fraction < 1:
+            cmap_rect.setWidth(int(rect.width() * self._colormap_fraction))
+            if not self._colormap_left:
+                cmap_rect.moveLeft(rect.right() - cmap_rect.width())
 
-        # use user friendly color name if available
-        painter.setPen(_pick_font_color(colormap))
-        short_name = colormap.name.rsplit(":", 1)[-1]
-        painter.drawText(rect, text_align, short_name)
+        draw_colormap(painter, colormap, cmap_rect)
+
+        # make new rect with the remaining space
+        text_rect = QRect(rect)
+        if self._colormap_left:
+            text_rect.setLeft(cmap_rect.right())
+            text_rect.setWidth(rect.width() - cmap_rect.width())
+        else:
+            text_rect.setRight(cmap_rect.left())
+            option.displayAlignment = Qt.AlignmentFlag.AlignRight
+        text_rect.adjust(2, 0, -2, 0)
+        option.rect = text_rect
+        if self._colormap_fraction < 1:
+            super().paint(painter, option, index)
+        else:
+            painter.drawText(text_rect, option.displayAlignment, text)
 
 
 class QColormapComboBox(QComboBox):
@@ -166,7 +188,7 @@ class QColormapComboBox(QComboBox):
         self._last_cmap: Colormap | None = None
 
         self.setLineEdit(_CmapComboLineEdit(self))
-        self.setItemDelegate(_CmapComboItemDelegate())
+        self.setItemDelegate(ColormapItemDelegate())
 
         self.currentIndexChanged.connect(self._on_index_changed)
         self.activated.connect(self._on_activated)
@@ -220,7 +242,7 @@ class QColormapComboBox(QComboBox):
 
         c = self.currentColormap()
         # add the new color and set the background color of that item
-        self.addItem("", _cmap)
+        self.addItem(_cmap.name.rsplit(":", 1)[-1], _cmap)
         self.setItemData(self.count() - 1, _cmap, CMAP_ROLE)
         if not c:
             self._on_index_changed(self.count() - 1)
@@ -300,7 +322,7 @@ class _CmapNameDialog(QDialog):
         from cmap._catalog import catalog
 
         self.combo = QSearchableComboBox()
-        self.combo.completer().popup().setItemDelegate(_CmapComboItemDelegate())
+        self.combo.completer().popup().setItemDelegate(ColormapItemDelegate())
 
         self.combo.addItems(sorted(catalog))
         btns = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
