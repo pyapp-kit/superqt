@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from .spinbox._quantity import QQuantity
 
 from .collapsible import QCollapsible
-from .combobox import QEnumComboBox, QSearchableComboBox
+from .combobox import QColorComboBox, QEnumComboBox, QSearchableComboBox
 from .elidable import QElidingLabel, QElidingLineEdit
 from .selection import QSearchableListWidget, QSearchableTreeWidget
 from .sliders import (
@@ -31,6 +31,7 @@ __all__ = [
     "ensure_object_thread",
     "QDoubleRangeSlider",
     "QCollapsible",
+    "QColorComboBox",
     "QDoubleSlider",
     "QElidingLabel",
     "QElidingLineEdit",
