@@ -160,6 +160,7 @@ class ColormapItemDelegate(QStyledItemDelegate):
         # short_name = colormap.name.rsplit(":", 1)[-1]
         # painter.drawText(rect, text_align, short_name)
 
+
 class QColormapComboBox(QComboBox):
     """A drop down menu for selecting colors.
 
