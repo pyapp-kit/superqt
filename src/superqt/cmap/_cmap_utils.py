@@ -105,7 +105,9 @@ def draw_colormap(
             painter.setBrush(QColor(stop.color.hex).lighter(lighter))
             painter.drawRect(rect.adjusted(int(stop.position * width), 0, 0, 0))
     else:
-        gradient = QLinearGradient(rect.topLeft(), rect.topRight())
+        gradient = QLinearGradient(
+            rect.topLeft().toPointF(), rect.topRight().toPointF()
+        )
         for stop in cmap_.color_stops:
             gradient.setColorAt(stop.position, QColor(stop.color.hex).lighter(lighter))
         painter.setBrush(gradient)
