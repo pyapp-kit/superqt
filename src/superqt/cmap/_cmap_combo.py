@@ -19,7 +19,7 @@ from superqt.utils import signals_blocked
 
 from ._catalog_combo import CmapCatalogComboBox
 from ._cmap_item_delegate import QColormapItemDelegate
-from ._cmap_line_edit import _PopupColormapLineEdit
+from ._cmap_line_edit import QColormapLineEdit
 from ._cmap_utils import try_cast_colormap
 
 if TYPE_CHECKING:
@@ -203,3 +203,15 @@ class _CmapNameDialog(QDialog):
         )
         self.combo.clear()
         self.combo.addItems(sorted(word_list))
+
+
+class _PopupColormapLineEdit(QColormapLineEdit):
+    def mouseReleaseEvent(self, _: Any) -> None:
+        """Show parent popup when clicked.
+
+        Without this, only the down arrow will show the popup.  And if mousePressEvent
+        is used instead, the popup will show and then immediately hide.
+        """
+        parent = self.parent()
+        if parent and hasattr(parent, "showPopup"):
+            parent.showPopup()

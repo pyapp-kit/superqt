@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
-
 from cmap import Colormap
 from qtpy.QtCore import Qt
 from qtpy.QtGui import QIcon, QPainter, QPaintEvent, QPalette
@@ -40,7 +38,7 @@ class QColormapLineEdit(QLineEdit):
             self._missing_icon: QIcon = self.style().standardIcon(missing_icon)
         elif isinstance(missing_icon, QIcon):
             self._missing_icon = missing_icon
-        else:
+        else:  # pragma: no cover
             raise TypeError("missing_icon must be a QIcon or QStyle.StandardPixmap")
 
         self._cmap: Colormap | None = None  # current colormap
@@ -106,15 +104,3 @@ class QColormapLineEdit(QLineEdit):
             self._missing_icon.paint(QPainter(self), cmap_rect.adjusted(4, 4, 0, -4))
 
         super().paintEvent(e)  # draw text (must come after draw_colormap)
-
-
-class _PopupColormapLineEdit(QColormapLineEdit):
-    def mouseReleaseEvent(self, _: Any) -> None:
-        """Show parent popup when clicked.
-
-        Without this, only the down arrow will show the popup.  And if mousePressEvent
-        is used instead, the popup will show and then immediately hide.
-        """
-        parent = self.parent()
-        if parent and hasattr(parent, "showPopup"):
-            parent.showPopup()

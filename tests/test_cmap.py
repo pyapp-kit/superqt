@@ -92,13 +92,19 @@ def test_cmap_combo(qtbot):
     assert wdg.count() == 4  # make sure we didn't duplicate
     assert wdg.currentIndex() == 1
 
+    # click the Add Colormap... item
     with qtbot.waitSignal(wdg.currentColormapChanged):
         with patch.object(_CmapNameDialog, "exec", return_value=True):
             wdg._on_activated(wdg.count() - 1)
+
     assert wdg.count() == 5
     # this could potentially fail in the future if cmap catalog changes
     # but mocking the return value of the dialog is also annoying
     assert wdg.itemColormap(3).name.split(":")[-1] == "accent"
+
+    # click the Add Colormap... item, but cancel the dialog
+    with patch.object(_CmapNameDialog, "exec", return_value=False):
+        wdg._on_activated(wdg.count() - 1)
 
 
 def test_cmap_item_delegate(qtbot):
@@ -133,6 +139,7 @@ def test_cmap_line_edit(qtbot, qapp):
     qtbot.wait(10)  # force the paintEvent
 
     wdg.setFractionalColormapWidth(1)
+    assert wdg.fractionalColormapWidth() == 1
     wdg.update()
     qapp.processEvents()
     qtbot.wait(10)  # force the paintEvent
@@ -140,6 +147,8 @@ def test_cmap_line_edit(qtbot, qapp):
     wdg.setText("not-a-cmap")
     assert wdg.colormap() is None
     # or
+
+    wdg.setFractionalColormapWidth(0.3)
     wdg.setColormap(None)
     assert wdg.colormap() is None
     qapp.processEvents()
