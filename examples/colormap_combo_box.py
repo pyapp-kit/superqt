@@ -10,7 +10,7 @@ app = QApplication([])
 
 wdg = QWidget()
 layout = QVBoxLayout(wdg)
-w2 = CmapCatalogComboBox()
+w2 = CmapCatalogComboBox(interpolation="linear")
 layout.addWidget(w2)
 wdg.show()
 app.exec()

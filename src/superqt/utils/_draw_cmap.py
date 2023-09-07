@@ -21,7 +21,7 @@ def draw_colormap(
     painter_or_device: QPainter | QPaintDevice,
     cmap: Colormap | str | ColorStopsLike,
     rect: QRect | QRectF | None = None,
-    border_color: QColor | None = None,
+    border_color: QColor | str | None = None,
     border_width: int = 1,
     lighter: int = 100,
 ) -> None:
@@ -39,7 +39,7 @@ def draw_colormap(
     rect : QRect | QRectF | None, optional
         A rect onto which to draw. If `None`, the `painter.viewport()` will be
         used.  by default `None`
-    border_color : QColor | None, optional
+    border_color : QColor | str | None
         If not `None`, a border of color `border_color` and width `border_width` is
         included around the edge, by default None.
     border_width : int, optional
