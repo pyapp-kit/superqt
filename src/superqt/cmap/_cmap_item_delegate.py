@@ -67,5 +67,7 @@ class QColormapItemDelegate(QStyledItemDelegate):
             )
 
         painter.setPen(text_color)
-        painter.drawText(text_rect, text_align, text)
+        # cast to int works all the way back to Qt 5.12...
+        # but the enum only works since Qt 5.14
+        painter.drawText(text_rect, int(text_align), text)
         painter.restore()
