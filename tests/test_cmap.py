@@ -1,6 +1,11 @@
 import numpy as np
 import pytest
-from cmap import Colormap
+
+try:
+    from cmap import Colormap
+except ImportError:
+    pytest.skip("cmap not installed", allow_module_level=True)
+
 from qtpy.QtCore import QRect
 from qtpy.QtGui import QPainter, QPixmap
 from qtpy.QtWidgets import QStyleOptionViewItem, QWidget
