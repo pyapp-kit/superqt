@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from ._draw_cmap import draw_colormap
+    from superqt.cmap import draw_colormap
 
 __all__ = (
     "CodeSyntaxHighlight",
@@ -42,7 +42,7 @@ from ._throttler import QSignalDebouncer, QSignalThrottler, qdebounced, qthrottl
 
 def __getattr__(name: str) -> Any:
     if name == "draw_colormap":
-        from ._draw_cmap import draw_colormap
+        from superqt.cmap import draw_colormap
 
         return draw_colormap
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

@@ -1,20 +1,16 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from contextlib import suppress
+from typing import TYPE_CHECKING, Any
 
-try:
-    from cmap import Colormap
-except ImportError as e:
-    raise ImportError(
-        "cmap is required to use `draw_colormap`.  Install it with `pip install cmap` "
-        "or `pip install superqt[cmap]`."
-    ) from e
-
+from cmap import Colormap
 from qtpy.QtCore import QRect, QRectF, Qt
 from qtpy.QtGui import QColor, QLinearGradient, QPaintDevice, QPainter
 
 if TYPE_CHECKING:
     from cmap._colormap import ColorStopsLike
+
+CMAP_ROLE = Qt.ItemDataRole.UserRole + 1
 
 
 def draw_colormap(
@@ -117,3 +113,27 @@ def draw_colormap(
             gradient.setColorAt(stop.position, QColor(stop.color.hex).lighter(lighter))
         painter.setBrush(gradient)
         painter.drawRect(rect)
+
+
+def try_cast_colormap(val: Any) -> Colormap | None:
+    """Try to cast `val` to a Colormap instance, return None if it fails."""
+    if isinstance(val, Colormap):
+        return val
+    with suppress(Exception):
+        return Colormap(val)
+    return None
+
+
+def pick_font_color(cmap: Colormap, at_stop: float = 0.49, alpha: int = 255) -> QColor:
+    """Pick a font shade that contrasts with the given colormap at `at_stop`."""
+    if _is_dark(cmap, at_stop):
+        return QColor(0, 0, 0, alpha)
+    else:
+        return QColor(255, 255, 255, alpha)
+
+
+def _is_dark(cmap: Colormap, at_stop: float, threshold: float = 110) -> bool:
+    """Return True if the color at `at_stop` is dark according to `threshold`."""
+    color = cmap(at_stop)
+    r, g, b, a = color.rgba8
+    return (r * 0.299 + g * 0.587 + b * 0.114) > threshold

@@ -3,8 +3,7 @@ import sys
 from cmap import Colormap
 from qtpy.QtWidgets import QApplication, QVBoxLayout, QWidget
 
-from superqt import QColormapComboBox
-from superqt.combobox._colormap_combobox import CmapCatalogComboBox
+from superqt.cmap import CmapCatalogComboBox, QColormapComboBox
 
 app = QApplication([])
 
