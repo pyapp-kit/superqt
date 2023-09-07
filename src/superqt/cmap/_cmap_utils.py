@@ -4,7 +4,7 @@ from contextlib import suppress
 from typing import TYPE_CHECKING, Any
 
 from cmap import Colormap
-from qtpy.QtCore import QRect, QRectF, Qt
+from qtpy.QtCore import QPointF, QRect, QRectF, Qt
 from qtpy.QtGui import QColor, QLinearGradient, QPaintDevice, QPainter
 
 if TYPE_CHECKING:
@@ -105,9 +105,7 @@ def draw_colormap(
             painter.setBrush(QColor(stop.color.hex).lighter(lighter))
             painter.drawRect(rect.adjusted(int(stop.position * width), 0, 0, 0))
     else:
-        gradient = QLinearGradient(
-            rect.topLeft().toPointF(), rect.topRight().toPointF()
-        )
+        gradient = QLinearGradient(QPointF(rect.topLeft()), QPointF(rect.topRight()))
         for stop in cmap_.color_stops:
             gradient.setColorAt(stop.position, QColor(stop.color.hex).lighter(lighter))
         painter.setBrush(gradient)
