@@ -94,12 +94,12 @@ def test_cmap_line_edit(qtbot, qapp):
     wdg.setText("magma")  # also works if the name is recognized
     assert wdg.colormap() == Colormap("magma")
     qapp.processEvents()
-    qtbot.wait(20)  # force the paintEvent
+    qtbot.wait(10)  # force the paintEvent
 
-    wdg._colormap_fraction = 0.3
+    wdg.setFractionalColormapWidth(1)
     wdg.update()
     qapp.processEvents()
-    qtbot.wait(20)  # force the paintEvent
+    qtbot.wait(10)  # force the paintEvent
 
     wdg.setText("not-a-cmap")
     assert wdg.colormap() is None
@@ -107,4 +107,4 @@ def test_cmap_line_edit(qtbot, qapp):
     wdg.setColormap(None)
     assert wdg.colormap() is None
     qapp.processEvents()
-    qtbot.wait(20)  # force the paintEvent
+    qtbot.wait(10)  # force the paintEvent

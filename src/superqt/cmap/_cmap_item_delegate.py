@@ -16,9 +16,9 @@ class QColormapItemDelegate(QStyledItemDelegate):
     def __init__(self, parent: QObject | None = None) -> None:
         super().__init__(parent)
         self._item_size: QSize = QSize(80, 22)
-        self._colormap_fraction: float = 0.35
-        self._padding: int = 2
-        self._border_color: QColor | None = QColor(Qt.GlobalColor.lightGray)
+        self._colormap_fraction: float = 1
+        self._padding: int = 1
+        self._border_color: QColor | None = QColor(Qt.GlobalColor.transparent)
 
     def sizeHint(
         self, option: QStyleOptionViewItem, index: QModelIndex | QPersistentModelIndex
@@ -31,6 +31,9 @@ class QColormapItemDelegate(QStyledItemDelegate):
         option: QStyleOptionViewItem,
         index: QModelIndex | QPersistentModelIndex,
     ) -> None:
+        painter.save()
+
+        self.initStyleOption(option, index)
         rect = cast("QRect", option.rect)  # type: ignore
         selected = option.state & QStyle.StateFlag.State_Selected  # type: ignore
         text = index.data(Qt.ItemDataRole.DisplayRole)
@@ -66,3 +69,4 @@ class QColormapItemDelegate(QStyledItemDelegate):
 
         painter.setPen(text_color)
         painter.drawText(text_rect, text_align, text)
+        painter.restore()

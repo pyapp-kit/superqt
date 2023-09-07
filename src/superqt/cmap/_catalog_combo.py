@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Container
 
 from cmap import Colormap
 from qtpy.QtCore import Qt
+from qtpy.QtGui import QKeyEvent
 from qtpy.QtWidgets import QComboBox, QCompleter, QWidget
 
 from ._cmap_item_delegate import QColormapItemDelegate
@@ -69,9 +70,17 @@ class CmapCatalogComboBox(QComboBox):
 
         # set the delegate for both the popup and the combobox
         delegate = QColormapItemDelegate()
-        completer.popup().setItemDelegate(delegate)
+        if popup := completer.popup():
+            popup.setItemDelegate(delegate)
         self.setItemDelegate(delegate)
 
     def currentColormap(self) -> Colormap | None:
         """Returns the currently selected Colormap or None if not yet selected."""
         return try_cast_colormap(self.currentText())
+
+    def keyPressEvent(self, e: QKeyEvent | None) -> None:
+        if e and e.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):
+            # select the first completion when pressing enter if the popup is visible
+            if (completer := self.completer()) and completer.completionCount():
+                self.lineEdit().setText(completer.currentCompletion())  # type: ignore
+        return super().keyPressEvent(e)
