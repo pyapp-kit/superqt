@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from cmap import Colormap
 from qtpy.QtCore import Qt
 from qtpy.QtGui import QIcon, QPainter, QPaintEvent, QPalette
@@ -41,12 +43,6 @@ class QColormapLineEdit(QLineEdit):
         else:
             raise TypeError("missing_icon must be a QIcon or QStyle.StandardPixmap")
 
-        # don't draw the background
-        # otherwise it will cover the colormap during super().paintEvent
-        palette = self.palette()
-        palette.setColor(palette.ColorRole.Base, Qt.GlobalColor.transparent)
-        self.setPalette(palette)
-
         self._cmap: Colormap | None = None  # current colormap
         self.textChanged.connect(self.setColormap)
 
@@ -85,6 +81,14 @@ class QColormapLineEdit(QLineEdit):
         return self._colormap_fraction >= 0.75
 
     def paintEvent(self, e: QPaintEvent) -> None:
+        # don't draw the background
+        # otherwise it will cover the colormap during super().paintEvent
+        # FIXME: this appears to need to be reset during every paint event...
+        # otherwise something is resetting it
+        palette = self.palette()
+        palette.setColor(palette.ColorRole.Base, Qt.GlobalColor.transparent)
+        self.setPalette(palette)
+
         cmap_rect = self.rect()
         cmap_rect.setWidth(int(cmap_rect.width() * self._colormap_fraction))
 
@@ -103,12 +107,14 @@ class QColormapLineEdit(QLineEdit):
 
         super().paintEvent(e)  # draw text (must come after draw_colormap)
 
-    # def mouseReleaseEvent(self, _: Any) -> None:
-    #     """Show parent popup when clicked.
 
-    #     Without this, only the down arrow will show the popup.  And if mousePressEvent
-    #     is used instead, the popup will show and then immediately hide.
-    #     """
-    #     parent = self.parent()
-    #     if hasattr(parent, "showPopup") and self.show_combo_on_click:
-    #         parent.showPopup()
+class _PopupColormapLineEdit(QColormapLineEdit):
+    def mouseReleaseEvent(self, _: Any) -> None:
+        """Show parent popup when clicked.
+
+        Without this, only the down arrow will show the popup.  And if mousePressEvent
+        is used instead, the popup will show and then immediately hide.
+        """
+        parent = self.parent()
+        if parent and hasattr(parent, "showPopup"):
+            parent.showPopup()

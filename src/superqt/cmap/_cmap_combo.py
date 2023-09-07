@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import warnings
 from enum import IntEnum, auto
-from typing import TYPE_CHECKING, Any, Sequence, cast
+from typing import TYPE_CHECKING, Any, Sequence
 
 from cmap import Colormap
 from qtpy.QtCore import Qt, Signal
-from qtpy.QtGui import QColor
 from qtpy.QtWidgets import (
+    QButtonGroup,
+    QCheckBox,
     QComboBox,
     QDialog,
     QDialogButtonBox,
@@ -20,7 +21,7 @@ from superqt.utils import signals_blocked
 
 from ._catalog_combo import CmapCatalogComboBox
 from ._cmap_item_delegate import QColormapItemDelegate
-from ._cmap_line_edit import QColormapLineEdit
+from ._cmap_line_edit import _PopupColormapLineEdit
 from ._cmap_utils import try_cast_colormap
 
 if TYPE_CHECKING:
@@ -45,51 +46,38 @@ class QColormapComboBox(QComboBox):
     ----------
     parent : QWidget, optional
         The parent widget.
-    allow_user_colors : bool, optional
-        Whether to show an "Add Color" item that opens a QColorDialog when clicked.
+    allow_user_colormaps : bool, optional
+        Whether to show an "Add Color" item that opens a Colormap dialog when clicked.
         Whether the user can add custom colors by clicking the "Add Color" item.
         Default is False. Can also be set with `setUserColorsAllowed`.
     add_color_text: str, optional
         The text to display for the "Add Color" item. Default is "Add Color".
     """
 
-    currentColorChanged = Signal(QColor)
+    currentColormapChanged = Signal(Colormap)
 
     def __init__(
         self,
         parent: QWidget | None = None,
         *,
-        allow_user_colors: bool = False,
-        add_color_text: str = "Add Color",
+        allow_user_colormaps: bool = False,
+        add_color_text: str = "Add Colormap...",
     ) -> None:
         # init QComboBox
         super().__init__(parent)
         self._invalid_policy: InvalidPolicy = InvalidPolicy.Warn
         self._add_color_text: str = add_color_text
-        self._allow_user_colors: bool = allow_user_colors
+        self._allow_user_colors: bool = allow_user_colormaps
         self._last_cmap: Colormap | None = None
 
-        self.setLineEdit(QColormapLineEdit(self))
-        self.setItemDelegate(QColormapItemDelegate())
+        self.setLineEdit(_PopupColormapLineEdit(self))
+        self.lineEdit().setReadOnly(True)
+        self.setItemDelegate(QColormapItemDelegate(self))
 
         self.currentIndexChanged.connect(self._on_index_changed)
         self.activated.connect(self._on_activated)
 
-        self.setUserColorsAllowed(allow_user_colors)
-
-    def setInvalidPolicy(self, policy: InvalidPolicy) -> None:
-        """Sets the policy for handling invalid colors."""
-        if isinstance(policy, str):
-            policy = InvalidPolicy[policy]
-        elif isinstance(policy, int):
-            policy = InvalidPolicy(policy)
-        elif not isinstance(policy, InvalidPolicy):
-            raise TypeError(f"Invalid policy type: {type(policy)!r}")
-        self._invalid_policy = policy
-
-    def invalidPolicy(self) -> InvalidPolicy:
-        """Returns the policy for handling invalid colors."""
-        return self._invalid_policy
+        self.setUserColorsAllowed(allow_user_colormaps)
 
     def userColorsAllowed(self) -> bool:
         """Returns whether the user can add custom colors."""
@@ -110,6 +98,10 @@ class QColormapComboBox(QComboBox):
         super().clear()
         self.setUserColorsAllowed(self._allow_user_colors)
 
+    def itemColormap(self, index: int) -> Colormap | None:
+        """Returns the color of the item at the given index."""
+        return self.itemData(index, CMAP_ROLE)
+
     def addColormap(self, cmap: ColorStopsLike) -> None:
         """Adds the colormap to the QComboBox."""
         if (_cmap := try_cast_colormap(cmap)) is None:
@@ -119,14 +111,16 @@ class QColormapComboBox(QComboBox):
                 warnings.warn(f"Ignoring invalid colormap: {cmap!r}", stacklevel=2)
             return
 
-        if self.findData(_cmap) > -1:  # avoid duplicates
-            return
+        for i in range(self.count()):
+            if item := self.itemColormap(i):
+                if item.name == _cmap.name:
+                    return  # no duplicates
 
-        c = self.currentColormap()
+        had_items = self.count() > int(self._allow_user_colors)
         # add the new color and set the background color of that item
-        self.addItem(_cmap.name.rsplit(":", 1)[-1], _cmap)
+        self.addItem(_cmap.name.rsplit(":", 1)[-1])
         self.setItemData(self.count() - 1, _cmap, CMAP_ROLE)
-        if not c:
+        if not had_items:  # first item added
             self._on_index_changed(self.count() - 1)
 
         # make sure the "Add Color" item is last
@@ -136,17 +130,13 @@ class QColormapComboBox(QComboBox):
                 self.removeItem(idx)
                 self.addItem(self._add_color_text)
 
-    def itemColormap(self, index: int) -> QColor | None:
-        """Returns the color of the item at the given index."""
-        return self.itemData(index, CMAP_ROLE)
-
     def addColormaps(self, colors: Sequence[Any]) -> None:
         """Adds colors to the QComboBox."""
         for color in colors:
             self.addColormap(color)
 
-    def currentColormap(self) -> QColor | None:
-        """Returns the currently selected QColor or None if not yet selected."""
+    def currentColormap(self) -> Colormap | None:
+        """Returns the currently selected Colormap or None if not yet selected."""
         return self.currentData(CMAP_ROLE)
 
     def setCurrentColormap(self, color: Any) -> None:
@@ -155,27 +145,17 @@ class QColormapComboBox(QComboBox):
         if idx >= 0:
             self.setCurrentIndex(idx)
 
-    def currentColormapName(self) -> str | None:
-        """Returns the name of the currently selected QColor or black if None."""
-        color = self.currentColormap()
-        return color.name() if color else "#000000"
-
     def _on_activated(self, index: int) -> None:
         if self.itemText(index) != self._add_color_text:
             return
 
-        # show temporary text while dialog is open
-        # self.lineEdit().setStyleSheet("background-color: white; color: gray;")
-        # self.lineEdit().setText("Pick a Color ...")
-        try:
-            dlg = _CmapNameDialog()
-            dlg.exec()
-        finally:
-            pass
-            # self.lineEdit().setText("")
-
-        if cmap := dlg.colormap():
-            # add the color and select it
+        dlg = _CmapNameDialog(self, Qt.WindowType.Sheet)
+        if dlg.exec() and (cmap := dlg.combo.currentColormap()):
+            # add the color and select it, without adding duplicates
+            for i in range(self.count()):
+                if (item := self.itemColormap(i)) and cmap.name == item.name:
+                    self.setCurrentIndex(i)
+                    return
             self.addColormap(cmap)
         elif self._last_cmap is not None:
             # user canceled, restore previous color without emitting signal
@@ -183,28 +163,23 @@ class QColormapComboBox(QComboBox):
             if idx >= 0:
                 with signals_blocked(self):
                     self.setCurrentIndex(idx)
-                # hex_ = self._last_cmap.
-                # self.lineEdit().setStyleSheet(f"background-color: {hex_};")
-            return
 
     def _on_index_changed(self, index: int) -> None:
         colormap = self.itemData(index, CMAP_ROLE)
         if isinstance(colormap, Colormap):
-            self.lineEdit().setColormap(colormap)
-            self.currentColorChanged.emit(colormap)
+            self.currentColormapChanged.emit(colormap)
             self._last_cmap = colormap
 
-    def lineEdit(self) -> QColormapLineEdit:
-        return cast(QColormapLineEdit, super().lineEdit())
+
+CATEGORIES = ("sequential", "diverging", "cyclic", "qualitative", "miscellaneous")
 
 
 class _CmapNameDialog(QDialog):
-    def __init__(self, parent: QWidget | None = None) -> None:
-        super().__init__(parent)
+    def __init__(self, *args: Any) -> None:
+        super().__init__(*args)
 
         self.combo = CmapCatalogComboBox()
 
-        # self.combo.addItems(sorted(catalog))
         B = QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
         btns = QDialogButtonBox(B)
         btns.accepted.connect(self.accept)
@@ -212,8 +187,25 @@ class _CmapNameDialog(QDialog):
 
         layout = QVBoxLayout(self)
         layout.addWidget(self.combo)
+
+        self._btn_group = QButtonGroup(self)
+        self._btn_group.setExclusive(False)
+        for cat in CATEGORIES:
+            box = QCheckBox(cat)
+            self._btn_group.addButton(box)
+            box.setChecked(True)
+            box.toggled.connect(self._on_check_toggled)
+            layout.addWidget(box)
+
         layout.addWidget(btns)
         self.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Maximum)
+        self.resize(self.sizeHint())
 
-    def colormap(self) -> Colormap | None:
-        return self.combo.currentColormap()
+    def _on_check_toggled(self) -> None:
+        # get valid names according to preferences
+        word_list = Colormap.catalog().unique_keys(
+            prefer_short_names=True,
+            categories={b.text() for b in self._btn_group.buttons() if b.isChecked()},
+        )
+        self.combo.clear()
+        self.combo.addItems(sorted(word_list))

@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Container
 
 from cmap import Colormap
-from qtpy.QtCore import Qt
+from qtpy.QtCore import Qt, Signal
 from qtpy.QtGui import QKeyEvent
 from qtpy.QtWidgets import QComboBox, QCompleter, QWidget
 
@@ -32,6 +32,8 @@ class CmapCatalogComboBox(QComboBox):
     interpolation : Interpolation, optional
         If provided, only return names that have the given interpolation method.
     """
+
+    currentColormapChanged = Signal(Colormap)
 
     def __init__(
         self,
@@ -74,6 +76,8 @@ class CmapCatalogComboBox(QComboBox):
             popup.setItemDelegate(delegate)
         self.setItemDelegate(delegate)
 
+        self.currentTextChanged.connect(self._on_text_changed)
+
     def currentColormap(self) -> Colormap | None:
         """Returns the currently selected Colormap or None if not yet selected."""
         return try_cast_colormap(self.currentText())
@@ -84,3 +88,7 @@ class CmapCatalogComboBox(QComboBox):
             if (completer := self.completer()) and completer.completionCount():
                 self.lineEdit().setText(completer.currentCompletion())  # type: ignore
         return super().keyPressEvent(e)
+
+    def _on_text_changed(self, text: str) -> None:
+        if (cmap := try_cast_colormap(text)) is not None:
+            self.currentColormapChanged.emit(cmap)

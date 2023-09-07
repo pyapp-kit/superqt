@@ -31,8 +31,6 @@ class QColormapItemDelegate(QStyledItemDelegate):
         option: QStyleOptionViewItem,
         index: QModelIndex | QPersistentModelIndex,
     ) -> None:
-        painter.save()
-
         self.initStyleOption(option, index)
         rect = cast("QRect", option.rect)  # type: ignore
         selected = option.state & QStyle.StateFlag.State_Selected  # type: ignore
@@ -42,6 +40,7 @@ class QColormapItemDelegate(QStyledItemDelegate):
         if not colormap:  # pragma: no cover
             return super().paint(painter, option, index)
 
+        painter.save()
         rect.adjust(self._padding, self._padding, -self._padding, -self._padding)
         cmap_rect = QRect(rect)
         if self._colormap_fraction < 1:
