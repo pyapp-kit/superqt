@@ -1,13 +1,13 @@
 from typing import TYPE_CHECKING
 
 from qtpy import API_NAME
-from qtpy.QtGui import QImage
 
 if TYPE_CHECKING:
     import numpy as np
+    from qtpy.QtGui import QImage
 
 
-def qimage_to_array(img: QImage) -> np.ndarray:
+def qimage_to_array(img: "QImage") -> "np.ndarray":
     """Convert QImage to an array.
 
     Parameters
