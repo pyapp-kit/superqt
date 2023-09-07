@@ -10,14 +10,14 @@ else:
 
 from ._catalog_combo import CmapCatalogComboBox
 from ._cmap_combo import QColormapComboBox
-from ._cmap_item_delegate import ColormapItemDelegate
-from ._cmap_line_edit import ColormapLineEdit
+from ._cmap_item_delegate import QColormapItemDelegate
+from ._cmap_line_edit import QColormapLineEdit
 from ._cmap_utils import draw_colormap
 
 __all__ = [
-    "ColormapItemDelegate",
+    "QColormapItemDelegate",
     "draw_colormap",
-    "ColormapLineEdit",
+    "QColormapLineEdit",
     "CmapCatalogComboBox",
     "QColormapComboBox",
 ]

@@ -15,7 +15,7 @@ CMAP_ROLE = Qt.ItemDataRole.UserRole + 1
 
 def draw_colormap(
     painter_or_device: QPainter | QPaintDevice,
-    cmap: Colormap | str | ColorStopsLike,
+    cmap: Colormap | ColorStopsLike,
     rect: QRect | QRectF | None = None,
     border_color: QColor | str | None = None,
     border_width: int = 1,
@@ -28,7 +28,7 @@ def draw_colormap(
     painter_or_device : QPainter | QPaintDevice
         A `QPainter` instance or a `QPaintDevice` (e.g. a QWidget or QPixmap) onto
         which to paint the colormap.
-    cmap : Colormap
+    cmap : Colormap | Any
         `cmap.Colormap` instance, or anything that can be converted to one (such as a
         string name of a colormap in the `cmap` catalog).
         https://cmap-docs.readthedocs.io/en/latest/colormaps/#colormaplike-objects
@@ -73,14 +73,11 @@ def draw_colormap(
             f"got {type(painter_or_device)!r} instead."
         )
 
-    if not isinstance(cmap, Colormap):
-        try:
-            cmap = Colormap(cmap)
-        except Exception as e:
-            raise TypeError(
-                f"Expected a Colormap instance or something that can be "
-                f"converted to one, got {type(cmap)!r} instead."
-            ) from e
+    if (cmap_ := try_cast_colormap(cmap)) is None:
+        raise TypeError(
+            f"Expected a Colormap instance or something that can be "
+            f"converted to one, got {cmap!r} instead."
+        )
 
     if rect is None:
         rect = painter.viewport()
@@ -94,8 +91,8 @@ def draw_colormap(
         rect = rect.adjusted(border_width, border_width, -border_width, -border_width)
 
     if (
-        cmap.interpolation == "nearest"
-        or getattr(cmap.color_stops, "_interpolation", "") == "nearest"
+        cmap_.interpolation == "nearest"
+        or getattr(cmap_.color_stops, "_interpolation", "") == "nearest"
     ):
         # XXX: this is a little bit of a hack.
         # when the interpolation is nearest, the last stop is often at 1.0
@@ -103,13 +100,13 @@ def draw_colormap(
         # to fix this, we shrink the drawing area slightly
         # it might not work well with unenvenly-spaced stops
         # (but those are uncommon for categorical colormaps)
-        width = rect.width() - rect.width() / len(cmap.color_stops)
-        for stop in cmap.color_stops:
+        width = rect.width() - rect.width() / len(cmap_.color_stops)
+        for stop in cmap_.color_stops:
             painter.setBrush(QColor(stop.color.hex).lighter(lighter))
             painter.drawRect(rect.adjusted(int(stop.position * width), 0, 0, 0))
     else:
         gradient = QLinearGradient(rect.topLeft(), rect.topRight())
-        for stop in cmap.color_stops:
+        for stop in cmap_.color_stops:
             gradient.setColorAt(stop.position, QColor(stop.color.hex).lighter(lighter))
         painter.setBrush(gradient)
         painter.drawRect(rect)

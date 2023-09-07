@@ -10,8 +10,8 @@ from qtpy.QtWidgets import QStyle, QStyledItemDelegate, QStyleOptionViewItem
 from ._cmap_utils import CMAP_ROLE, draw_colormap, pick_font_color, try_cast_colormap
 
 
-class ColormapItemDelegate(QStyledItemDelegate):
-    """Delegate that draws colormaps in the ComboBox dropdown."""
+class QColormapItemDelegate(QStyledItemDelegate):
+    """Delegate that draws colormaps into a QAbstractItemView item."""
 
     def __init__(self, parent: QObject | None = None) -> None:
         super().__init__(parent)
@@ -34,15 +34,10 @@ class ColormapItemDelegate(QStyledItemDelegate):
         rect = cast("QRect", option.rect)  # type: ignore
         selected = option.state & QStyle.StateFlag.State_Selected  # type: ignore
         text = index.data(Qt.ItemDataRole.DisplayRole)
+        colormap: Colormap | None = index.data(CMAP_ROLE) or try_cast_colormap(text)
 
-        colormap: Colormap | None = index.data(CMAP_ROLE)
-        if not colormap:
-            colormap = try_cast_colormap(text)
-        if not colormap:
-            super().paint(painter, option, index)
-            return
-
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        if not colormap:  # pragma: no cover
+            return super().paint(painter, option, index)
 
         rect.adjust(self._padding, self._padding, -self._padding, -self._padding)
         cmap_rect = QRect(rect)
@@ -65,7 +60,6 @@ class ColormapItemDelegate(QStyledItemDelegate):
         else:
             text_align = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
             text_color = QColor(Qt.GlobalColor.black)
-
             text_rect.adjust(
                 cmap_rect.width() + self._padding + 4, 0, -self._padding - 2, 0
             )

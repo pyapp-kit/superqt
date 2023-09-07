@@ -6,6 +6,7 @@ if TYPE_CHECKING:
 __all__ = (
     "CodeSyntaxHighlight",
     "create_worker",
+    "qimage_to_array",
     "draw_colormap",
     "ensure_main_thread",
     "ensure_object_thread",
@@ -23,10 +24,10 @@ __all__ = (
     "WorkerBase",
 )
 
-
 from ._code_syntax_highlight import CodeSyntaxHighlight
 from ._ensure_thread import ensure_main_thread, ensure_object_thread
 from ._errormsg_context import exceptions_as_dialog
+from ._img_utils import qimage_to_array
 from ._message_handler import QMessageHandler
 from ._misc import signals_blocked
 from ._qthreading import (

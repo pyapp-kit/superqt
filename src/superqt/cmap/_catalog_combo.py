@@ -6,8 +6,8 @@ from cmap import Colormap
 from qtpy.QtCore import Qt
 from qtpy.QtWidgets import QComboBox, QCompleter, QWidget
 
-from ._cmap_item_delegate import ColormapItemDelegate
-from ._cmap_line_edit import ColormapLineEdit
+from ._cmap_item_delegate import QColormapItemDelegate
+from ._cmap_line_edit import QColormapLineEdit
 from ._cmap_utils import try_cast_colormap
 
 if TYPE_CHECKING:
@@ -57,7 +57,7 @@ class CmapCatalogComboBox(QComboBox):
         self.setEditable(True)
         self.setDuplicatesEnabled(False)
         # (must come before setCompleter)
-        self.setLineEdit(ColormapLineEdit(self))
+        self.setLineEdit(QColormapLineEdit(self))
 
         # setup the completer
         completer = QCompleter(word_list)
@@ -68,7 +68,7 @@ class CmapCatalogComboBox(QComboBox):
         self.setCompleter(completer)
 
         # set the delegate for both the popup and the combobox
-        delegate = ColormapItemDelegate()
+        delegate = QColormapItemDelegate()
         completer.popup().setItemDelegate(delegate)
         self.setItemDelegate(delegate)
 

@@ -19,8 +19,8 @@ from qtpy.QtWidgets import (
 from superqt.utils import signals_blocked
 
 from ._catalog_combo import CmapCatalogComboBox
-from ._cmap_item_delegate import ColormapItemDelegate
-from ._cmap_line_edit import ColormapLineEdit
+from ._cmap_item_delegate import QColormapItemDelegate
+from ._cmap_line_edit import QColormapLineEdit
 from ._cmap_utils import try_cast_colormap
 
 if TYPE_CHECKING:
@@ -69,8 +69,8 @@ class QColormapComboBox(QComboBox):
         self._allow_user_colors: bool = allow_user_colors
         self._last_cmap: Colormap | None = None
 
-        self.setLineEdit(ColormapLineEdit(self))
-        self.setItemDelegate(ColormapItemDelegate())
+        self.setLineEdit(QColormapLineEdit(self))
+        self.setItemDelegate(QColormapItemDelegate())
 
         self.currentIndexChanged.connect(self._on_index_changed)
         self.activated.connect(self._on_activated)
@@ -194,8 +194,8 @@ class QColormapComboBox(QComboBox):
             self.currentColorChanged.emit(colormap)
             self._last_cmap = colormap
 
-    def lineEdit(self) -> ColormapLineEdit:
-        return cast(ColormapLineEdit, super().lineEdit())
+    def lineEdit(self) -> QColormapLineEdit:
+        return cast(QColormapLineEdit, super().lineEdit())
 
 
 class _CmapNameDialog(QDialog):

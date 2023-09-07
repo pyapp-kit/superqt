@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from cmap import Colormap
 
 
-class ColormapLineEdit(QLineEdit):
+class QColormapLineEdit(QLineEdit):
     """A line edit that shows the parent ComboBox popup when clicked."""
 
     def __init__(
@@ -37,7 +37,10 @@ class ColormapLineEdit(QLineEdit):
         if hasattr(parent, "showPopup") and self.show_combo_on_click:
             parent.showPopup()
 
-    def setColormap(self, cmap: Colormap | str) -> None:
+    def colormap(self) -> Colormap | None:
+        return self._cmap
+
+    def setColormap(self, cmap: Colormap | str | None) -> None:
         self._cmap = try_cast_colormap(cmap)
         palette = self.palette()
         if self._cmap:
