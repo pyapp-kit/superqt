@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import warnings
-from enum import IntEnum, auto
 from typing import TYPE_CHECKING, Any, Sequence
 
 from cmap import Colormap
@@ -31,14 +29,6 @@ if TYPE_CHECKING:
 CMAP_ROLE = Qt.ItemDataRole.UserRole + 1
 
 
-class InvalidPolicy(IntEnum):
-    """Policy for handling invalid colors."""
-
-    Ignore = auto()
-    Warn = auto()
-    Raise = auto()
-
-
 class QColormapComboBox(QComboBox):
     """A drop down menu for selecting colors.
 
@@ -47,11 +37,12 @@ class QColormapComboBox(QComboBox):
     parent : QWidget, optional
         The parent widget.
     allow_user_colormaps : bool, optional
-        Whether to show an "Add Color" item that opens a Colormap dialog when clicked.
-        Whether the user can add custom colors by clicking the "Add Color" item.
-        Default is False. Can also be set with `setUserColorsAllowed`.
-    add_color_text: str, optional
-        The text to display for the "Add Color" item. Default is "Add Color".
+        Whether the user can add custom colormaps by clicking the "Add
+        Colormap..." item. Default is False. Can also be set with
+        `setUserAdditionsAllowed`.
+    add_colormap_text: str, optional
+        The text to display for the "Add Colormap..." item.
+        Default is "Add Colormap...".
     """
 
     currentColormapChanged = Signal(Colormap)
@@ -61,12 +52,11 @@ class QColormapComboBox(QComboBox):
         parent: QWidget | None = None,
         *,
         allow_user_colormaps: bool = False,
-        add_color_text: str = "Add Colormap...",
+        add_colormap_text: str = "Add Colormap...",
     ) -> None:
         # init QComboBox
         super().__init__(parent)
-        self._invalid_policy: InvalidPolicy = InvalidPolicy.Warn
-        self._add_color_text: str = add_color_text
+        self._add_color_text: str = add_colormap_text
         self._allow_user_colors: bool = allow_user_colormaps
         self._last_cmap: Colormap | None = None
 
@@ -75,15 +65,19 @@ class QColormapComboBox(QComboBox):
         self.setItemDelegate(QColormapItemDelegate(self))
 
         self.currentIndexChanged.connect(self._on_index_changed)
+        # there's a little bit of a potential bug here:
+        # if the user clicks on the "Add Colormap..." item
+        # then an indexChanged signal will be emitted, but it may not
+        # actually represent a "true" change in the index if they dismiss the dialog
         self.activated.connect(self._on_activated)
 
-        self.setUserColorsAllowed(allow_user_colormaps)
+        self.setUserAdditionsAllowed(allow_user_colormaps)
 
-    def userColorsAllowed(self) -> bool:
+    def userAdditionsAllowed(self) -> bool:
         """Returns whether the user can add custom colors."""
         return self._allow_user_colors
 
-    def setUserColorsAllowed(self, allow: bool) -> None:
+    def setUserAdditionsAllowed(self, allow: bool) -> None:
         """Sets whether the user can add custom colors."""
         self._allow_user_colors = bool(allow)
 
@@ -96,7 +90,7 @@ class QColormapComboBox(QComboBox):
 
     def clear(self) -> None:
         super().clear()
-        self.setUserColorsAllowed(self._allow_user_colors)
+        self.setUserAdditionsAllowed(self._allow_user_colors)
 
     def itemColormap(self, index: int) -> Colormap | None:
         """Returns the color of the item at the given index."""
@@ -105,16 +99,12 @@ class QColormapComboBox(QComboBox):
     def addColormap(self, cmap: ColorStopsLike) -> None:
         """Adds the colormap to the QComboBox."""
         if (_cmap := try_cast_colormap(cmap)) is None:
-            if self._invalid_policy == InvalidPolicy.Raise:
-                raise ValueError(f"Invalid colormap: {cmap!r}")
-            elif self._invalid_policy == InvalidPolicy.Warn:
-                warnings.warn(f"Ignoring invalid colormap: {cmap!r}", stacklevel=2)
-            return
+            raise ValueError(f"Invalid colormap value: {cmap!r}")
 
         for i in range(self.count()):
             if item := self.itemColormap(i):
                 if item.name == _cmap.name:
-                    return  # no duplicates
+                    return  # no duplicates  # pragma: no cover
 
         had_items = self.count() > int(self._allow_user_colors)
         # add the new color and set the background color of that item
@@ -123,7 +113,7 @@ class QColormapComboBox(QComboBox):
         if not had_items:  # first item added
             self._on_index_changed(self.count() - 1)
 
-        # make sure the "Add Color" item is last
+        # make sure the "Add Colormap..." item is last
         idx = self.findData(self._add_color_text, Qt.ItemDataRole.DisplayRole)
         if idx >= 0:
             with signals_blocked(self):
@@ -141,9 +131,12 @@ class QColormapComboBox(QComboBox):
 
     def setCurrentColormap(self, color: Any) -> None:
         """Adds the color to the QComboBox and selects it."""
-        idx = self.findData(try_cast_colormap(color), CMAP_ROLE)
-        if idx >= 0:
-            self.setCurrentIndex(idx)
+        if not (cmap := try_cast_colormap(color)):
+            raise ValueError(f"Invalid colormap value: {color!r}")
+
+        for idx in range(self.count()):
+            if (item := self.itemColormap(idx)) and item.name == cmap.name:
+                self.setCurrentIndex(idx)
 
     def _on_activated(self, index: int) -> None:
         if self.itemText(index) != self._add_color_text:
@@ -157,6 +150,7 @@ class QColormapComboBox(QComboBox):
                     self.setCurrentIndex(i)
                     return
             self.addColormap(cmap)
+            self.currentIndexChanged.emit(self.currentIndex())
         elif self._last_cmap is not None:
             # user canceled, restore previous color without emitting signal
             idx = self.findData(self._last_cmap, CMAP_ROLE)

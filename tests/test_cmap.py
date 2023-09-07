@@ -1,4 +1,5 @@
 import platform
+from unittest.mock import patch
 
 import numpy as np
 import pytest
@@ -14,10 +15,12 @@ from qtpy.QtWidgets import QStyleOptionViewItem, QWidget
 
 from superqt.cmap import (
     CmapCatalogComboBox,
+    QColormapComboBox,
     QColormapItemDelegate,
     QColormapLineEdit,
     draw_colormap,
 )
+from superqt.cmap._cmap_combo import _CmapNameDialog
 from superqt.utils import qimage_to_array
 
 
@@ -67,6 +70,35 @@ def test_catalog_combo(qtbot):
 
     wdg.setCurrentText("viridis")
     assert wdg.currentColormap() == Colormap("viridis")
+
+
+def test_cmap_combo(qtbot):
+    wdg = QColormapComboBox(allow_user_colormaps=True)
+    qtbot.addWidget(wdg)
+    wdg.show()
+    assert wdg.userAdditionsAllowed()
+
+    with qtbot.waitSignal(wdg.currentColormapChanged):
+        wdg.addColormaps([Colormap("viridis"), "magma", ("red", "blue", "green")])
+    assert wdg.currentColormap().name.split(":")[-1] == "viridis"
+
+    with pytest.raises(ValueError, match="Invalid colormap"):
+        wdg.addColormap("not a recognized string or cmap")
+
+    assert wdg.currentColormap().name.split(":")[-1] == "viridis"
+    assert wdg.currentIndex() == 0
+    assert wdg.count() == 4  # includes "Add Colormap..."
+    wdg.setCurrentColormap("magma")
+    assert wdg.count() == 4  # make sure we didn't duplicate
+    assert wdg.currentIndex() == 1
+
+    with qtbot.waitSignal(wdg.currentColormapChanged):
+        with patch.object(_CmapNameDialog, "exec", return_value=True):
+            wdg._on_activated(wdg.count() - 1)
+    assert wdg.count() == 5
+    # this could potentially fail in the future if cmap catalog changes
+    # but mocking the return value of the dialog is also annoying
+    assert wdg.itemColormap(3).name.split(":")[-1] == "accent"
 
 
 def test_cmap_item_delegate(qtbot):
