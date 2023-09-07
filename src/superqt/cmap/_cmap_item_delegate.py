@@ -16,8 +16,8 @@ class QColormapItemDelegate(QStyledItemDelegate):
     def __init__(self, parent: QObject | None = None) -> None:
         super().__init__(parent)
         self._item_size: QSize = QSize(80, 22)
-        self._colormap_fraction: float = 1
-        self._padding: int = 0
+        self._colormap_fraction: float = 0.35
+        self._padding: int = 2
         self._border_color: QColor | None = QColor(Qt.GlobalColor.lightGray)
 
     def sizeHint(

@@ -21,7 +21,7 @@ class QColormapLineEdit(QLineEdit):
         super().__init__(parent)
         self.show_combo_on_click = show_combo_on_click
 
-        self._colormap_fraction: float = 1
+        self._colormap_fraction: float = 0.35
         self._cmap: Colormap | None = None
 
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)

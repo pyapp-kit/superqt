@@ -1,6 +1,10 @@
-import numpy as np
+from typing import TYPE_CHECKING
+
 from qtpy import API_NAME
 from qtpy.QtGui import QImage
+
+if TYPE_CHECKING:
+    import numpy as np
 
 
 def qimage_to_array(img: QImage) -> np.ndarray:
@@ -17,6 +21,8 @@ def qimage_to_array(img: QImage) -> np.ndarray:
         Numpy array of type uint8 and shape (h, w, 4). Index [0, 0] is the
         upper-left corner of the rendered region.
     """
+    import numpy as np
+
     # cast to ARGB32 if necessary
     if img.format() != QImage.Format.Format_ARGB32:
         img = img.convertToFormat(QImage.Format.Format_ARGB32)
