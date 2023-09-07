@@ -177,6 +177,7 @@ class ColormapItemDelegate(QStyledItemDelegate):
         painter.drawText(rect, text_align, text)
 
 
+
 class QColormapComboBox(QComboBox):
     """A drop down menu for selecting colors.
 
