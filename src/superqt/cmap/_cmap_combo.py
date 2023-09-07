@@ -143,7 +143,7 @@ class QColormapComboBox(QComboBox):
             return
 
         dlg = _CmapNameDialog(self, Qt.WindowType.Sheet)
-        if dlg.exec_() and (cmap := dlg.combo.currentColormap()):
+        if dlg.exec() and (cmap := dlg.combo.currentColormap()):
             # add the color and select it, without adding duplicates
             for i in range(self.count()):
                 if (item := self.itemColormap(i)) and cmap.name == item.name:
