@@ -1,9 +1,21 @@
+import sys
+
 from cmap import Colormap
-from qtpy.QtWidgets import QApplication
+from qtpy.QtWidgets import QApplication, QVBoxLayout, QWidget
 
 from superqt import QColormapComboBox
+from superqt.combobox._colormap_combobox import CmapCatalogComboBox
 
 app = QApplication([])
+
+wdg = QWidget()
+layout = QVBoxLayout(wdg)
+w2 = CmapCatalogComboBox()
+layout.addWidget(w2)
+wdg.show()
+app.exec()
+sys.exit()
+
 w = QColormapComboBox()
 # adds an item "Add Color" that opens a QColorDialog when clicked
 w.setUserColorsAllowed(True)

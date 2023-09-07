@@ -22,7 +22,8 @@ def draw_colormap(
     cmap: Colormap | str | ColorStopsLike,
     rect: QRect | QRectF | None = None,
     border_color: QColor | None = None,
-    border_width: int = 2,
+    border_width: int = 1,
+    lighter: int = 100,
 ) -> None:
     """Draw a colormap onto a QPainter or QPaintDevice.
 
@@ -44,6 +45,9 @@ def draw_colormap(
     border_width : int, optional
         The width of the border to draw (provided `border_color` is not `None`),
         by default 2
+    lighter : int, optional
+        Percentage by which to lighten (or darken) the colors. Greater than 100
+        lightens, less than 100 darkens, by default 100 (i.e. no change).
 
     Examples
     --------
@@ -85,14 +89,13 @@ def draw_colormap(
     if rect is None:
         rect = painter.viewport()
 
+    painter.setPen(Qt.PenStyle.NoPen)
+
     if border_width and border_color is not None:
         # draw rect, and then contract it by border_width
-        painter.setBrush(border_color)
+        painter.setBrush(QColor(border_color))
         painter.drawRect(rect)
         rect = rect.adjusted(border_width, border_width, -border_width, -border_width)
-
-    # no border
-    painter.setPen(Qt.PenStyle.NoPen)
 
     if (
         cmap.interpolation == "nearest"
@@ -106,11 +109,11 @@ def draw_colormap(
         # (but those are uncommon for categorical colormaps)
         width = rect.width() - rect.width() / len(cmap.color_stops)
         for stop in cmap.color_stops:
-            painter.setBrush(QColor(stop.color.hex))
+            painter.setBrush(QColor(stop.color.hex).lighter(lighter))
             painter.drawRect(rect.adjusted(int(stop.position * width), 0, 0, 0))
     else:
         gradient = QLinearGradient(rect.topLeft(), rect.topRight())
         for stop in cmap.color_stops:
-            gradient.setColorAt(stop.position, QColor(stop.color.hex))
+            gradient.setColorAt(stop.position, QColor(stop.color.hex).lighter(lighter))
         painter.setBrush(gradient)
         painter.drawRect(rect)

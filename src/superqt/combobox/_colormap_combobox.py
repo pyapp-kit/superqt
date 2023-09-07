@@ -3,7 +3,7 @@ from __future__ import annotations
 import warnings
 from contextlib import suppress
 from enum import IntEnum, auto
-from typing import TYPE_CHECKING, Any, Sequence, cast
+from typing import TYPE_CHECKING, Any, Container, Sequence, cast
 
 try:
     from cmap import Colormap
@@ -17,7 +17,6 @@ except ImportError as e:
 
 
 from qtpy.QtCore import (
-    QMargins,
     QModelIndex,
     QObject,
     QPersistentModelIndex,
@@ -30,9 +29,11 @@ from qtpy.QtGui import (
     QColor,
     QPainter,
     QPaintEvent,
+    QPalette,
 )
 from qtpy.QtWidgets import (
     QComboBox,
+    QCompleter,
     QDialog,
     QDialogButtonBox,
     QLineEdit,
@@ -48,7 +49,9 @@ from superqt.utils import signals_blocked
 from ._searchable_combo_box import QSearchableComboBox
 
 if TYPE_CHECKING:
-    from cmap._colormap import ColorStopsLike
+    from cmap._catalog import Category
+    from cmap._colormap import ColorStopsLike, Interpolation
+
 
 CMAP_ROLE = Qt.ItemDataRole.UserRole + 1
 
@@ -66,9 +69,15 @@ class _CmapComboLineEdit(QLineEdit):
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
-        self.setReadOnly(True)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._cmap: Colormap | None = None
+        self.textChanged.connect(self.setColormap)
+
+        # allows the paintEvent to paint the background, but still call super()
+        # to draw the text
+        palette = self.palette()
+        palette.setColor(palette.ColorRole.Base, Qt.GlobalColor.transparent)
+        self.setPalette(palette)
 
     def mouseReleaseEvent(self, _: Any) -> None:
         """Show parent popup when clicked.
@@ -80,16 +89,19 @@ class _CmapComboLineEdit(QLineEdit):
         if hasattr(parent, "showPopup"):
             parent.showPopup()
 
-    def setColormap(self, cmap: Colormap) -> None:
-        self._cmap = cmap
-        self.setText(cmap.name)
-        self.setStyleSheet(f"color: {_pick_font_color(cmap).name()}")
-        self.update()
+    def setColormap(self, cmap: Colormap | str) -> None:
+        self._cmap = _try_cast_colormap(cmap)
+        if self._cmap:
+            # set self font color to contrast with the colormap
+            font_color = _pick_font_color(self._cmap, alpha=255)
+            palette = self.palette()
+            palette.setColor(QPalette.ColorRole.Text, font_color)
+            self.setPalette(palette)
 
-    def paintEvent(self, arg__1: QPaintEvent) -> None:
-        if not self._cmap:
-            return super().paintEvent(arg__1)
-        draw_colormap(self, self._cmap)
+    def paintEvent(self, e: QPaintEvent) -> None:
+        if self._cmap:
+            draw_colormap(self, self._cmap)
+        super().paintEvent(e)
 
 
 class ColormapItemDelegate(QStyledItemDelegate):
@@ -97,8 +109,7 @@ class ColormapItemDelegate(QStyledItemDelegate):
 
     def __init__(self, parent: QObject | None = None) -> None:
         super().__init__(parent)
-        self._item_size: QSize = QSize(80, 24)
-        self._item_height: int = 20
+        self._item_size: QSize = QSize(80, 22)
         self._colormap_fraction: float = 1
         self._colormap_left: bool = True
         self._padding: int = 2
@@ -116,7 +127,7 @@ class ColormapItemDelegate(QStyledItemDelegate):
     ) -> None:
         rect = cast("QRect", option.rect)  # type: ignore
         state = cast("QStyle.StateFlag", option.state)  # type: ignore
-        is_hovering = state & QStyle.StateFlag.State_MouseOver
+        is_hovering = state & QStyle.StateFlag.State_Selected
         text = index.data(Qt.ItemDataRole.DisplayRole)
         text_align = Qt.AlignmentFlag.AlignCenter
 
@@ -131,34 +142,40 @@ class ColormapItemDelegate(QStyledItemDelegate):
             painter.drawText(rect, text_align, text)
             return
 
-        rect = rect.marginsAdded(QMargins(-self._padding, -self._padding, 0, 0))
+        # rect = rect.marginsAdded(
+        # QMargins(-self._padding, -self._padding, -self._padding, -self._padding)
+        # )
         cmap_rect = QRect(rect)
         if self._colormap_fraction < 1:
             cmap_rect.setWidth(int(rect.width() * self._colormap_fraction))
             if not self._colormap_left:
                 cmap_rect.moveLeft(rect.right() - cmap_rect.width())
 
-        draw_colormap(painter, colormap, cmap_rect)
+        lighter = 110 if is_hovering else 100
+        border = "lightgray" if is_hovering else None
+        draw_colormap(
+            painter, colormap, cmap_rect, lighter=lighter, border_color=border
+        )
 
-        # make new rect with the remaining space
-        text_rect = QRect(rect)
-        if self._colormap_left:
-            text_rect.setLeft(cmap_rect.right())
-            text_rect.setWidth(rect.width() - cmap_rect.width())
-        else:
-            text_rect.setRight(cmap_rect.left())
-            option.displayAlignment = Qt.AlignmentFlag.AlignRight
-        text_rect.adjust(2, 0, -2, 0)
-        option.rect = text_rect
-        if self._colormap_fraction < 1:
-            super().paint(painter, option, index)
-        else:
-            painter.drawText(text_rect, option.displayAlignment, text)
+        # # make new rect with the remaining space
+        # text_rect = QRect(rect)
+        # if self._colormap_left:
+        #     text_rect.setLeft(cmap_rect.right())
+        #     text_rect.setWidth(rect.width() - cmap_rect.width())
+        # else:
+        #     text_rect.setRight(cmap_rect.left())
+        #     option.displayAlignment = Qt.AlignmentFlag.AlignRight
+        # text_rect.adjust(2, 0, -2, 0)
+        # option.rect = text_rect
+        # if self._colormap_fraction < 1:
+        #     super().paint(painter, option, index)
+        # else:
+        #     painter.drawText(text_rect, option.displayAlignment, text)
 
-        # # use user friendly color name if available
-        # painter.setPen(_pick_font_color(colormap))
-        # short_name = colormap.name.rsplit(":", 1)[-1]
-        # painter.drawText(rect, text_align, short_name)
+        # use user friendly color name if available
+        painter.setPen(_pick_font_color(colormap))
+        painter.drawText(rect, text_align, text)
+
 
 class QColormapComboBox(QComboBox):
     """A drop down menu for selecting colors.
@@ -320,15 +337,73 @@ class QColormapComboBox(QComboBox):
         return cast(_CmapComboLineEdit, super().lineEdit())
 
 
+class CmapCatalogComboBox(QComboBox):
+    """A combo box for selecting a colormap from the entire cmap catalog.
+
+    Parameters
+    ----------
+    parent : QWidget, optional
+        The parent widget.
+    prefer_short_names : bool, optional
+        If True (default), short names (without the namespace prefix) will be
+        preferred over fully qualified names. In cases where the same short name is
+        used in multiple namespaces, they will *all* be referred to by their fully
+        qualified (namespaced) name.
+    categories : Container[Category], optional
+        If provided, only return names from the given categories.
+    interpolation : Interpolation, optional
+        If provided, only return names that have the given interpolation method.
+    """
+
+    def __init__(
+        self,
+        parent: QWidget | None = None,
+        *,
+        categories: Container[Category] = (),
+        prefer_short_names: bool = True,
+        interpolation: Interpolation | None = "linear",
+    ) -> None:
+        super().__init__(parent)
+
+        # get valid names according to preferences
+        word_list = sorted(
+            Colormap.catalog().unique_keys(
+                prefer_short_names=prefer_short_names,
+                categories=categories,
+                interpolation=interpolation,
+            )
+        )
+
+        # initialize the combobox
+        self.addItems(word_list)
+        self.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+        self.setEditable(True)
+        self.setDuplicatesEnabled(False)
+        # (must come before setCompleter)
+        self.setLineEdit(_CmapComboLineEdit(self))
+
+        # setup the completer
+        completer = QCompleter(word_list)
+        completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+        completer.setCompletionMode(QCompleter.CompletionMode.PopupCompletion)
+        completer.setFilterMode(Qt.MatchFlag.MatchContains)
+        completer.setModel(self.model())
+        self.setCompleter(completer)
+
+        # set the delegate for both the popup and the combobox
+        delegate = ColormapItemDelegate()
+        completer.popup().setItemDelegate(delegate)
+        self.setItemDelegate(delegate)
+
+
 class _CmapNameDialog(QDialog):
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
-        from cmap._catalog import catalog
 
         self.combo = QSearchableComboBox()
         self.combo.completer().popup().setItemDelegate(ColormapItemDelegate())
 
-        self.combo.addItems(sorted(catalog))
+        # self.combo.addItems(sorted(catalog))
         btns = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         btns.accepted.connect(self.accept)
         btns.rejected.connect(self.reject)
@@ -349,11 +424,15 @@ def _try_cast_colormap(val: Any) -> Colormap | None:
     return None
 
 
-def _pick_font_color(cmap: Colormap, at_stop: float = 0.45) -> QColor:
+def _pick_font_color(cmap: Colormap, at_stop: float = 0.45, alpha: int = 128) -> QColor:
     """Pick a font shade that contrasts with the given color."""
+    if _is_dark(cmap, at_stop):
+        return QColor(0, 0, 0, alpha)
+    else:
+        return QColor(255, 255, 255, alpha)
+
+
+def _is_dark(cmap: Colormap, at_stop: float, threshold: float = 110) -> bool:
     color = cmap(at_stop)
     r, g, b, a = color.rgba8
-    if (r * 0.299 + g * 0.587 + b * 0.114) > 110:
-        return QColor(0, 0, 0, 128)
-    else:
-        return QColor(255, 255, 255, 128)
+    return (r * 0.299 + g * 0.587 + b * 0.114) > threshold
