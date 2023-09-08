@@ -20,19 +20,40 @@ class QColormapLineEdit(QLineEdit):
     If the current text is not a valid colormap name, a swatch of the fallback colormap
     will be shown instead (by default, a gray colormap) if `fractionalColormapWidth` is
     less than .75.
+
+    Parameters
+    ----------
+    parent : QWidget, optional
+        The parent widget.
+    fractional_colormap_width : float, optional
+        The fraction of the widget width to use for the colormap swatch. If the
+        colormap is full width (greater than 0.75), the swatch will be drawn behind
+        the text. Otherwise, the swatch will be drawn to the left of the text.
+        Default is 0.33.
+    fallback_cmap : Colormap | str | None, optional
+        The colormap to use when the current text is not a recognized colormap.
+        by default "gray".
+    missing_icon : QIcon | QStyle.StandardPixmap, optional
+        The icon to show when the current text is not a recognized colormap and
+        `fractionalColormapWidth` is less than .75. Default is a question mark.
+    checkerboard_size : int, optional
+        Size (in pixels) of the checkerboard pattern to draw behind colormaps with
+        transparency, by default 4. If 0, no checkerboard is drawn.
     """
 
     def __init__(
         self,
         parent: QWidget | None = None,
         *,
-        fractional_colormap_width: float = 0.35,
+        fractional_colormap_width: float = 0.33,
         fallback_cmap: Colormap | str | None = "gray",
         missing_icon: QIcon | QStyle.StandardPixmap = MISSING,
+        checkerboard_size: int = 4,
     ) -> None:
         super().__init__(parent)
         self.setFractionalColormapWidth(fractional_colormap_width)
         self.setMissingColormap(fallback_cmap)
+        self._checkerboard_size = checkerboard_size
 
         if isinstance(missing_icon, QStyle.StandardPixmap):
             self._missing_icon: QIcon = self.style().standardIcon(missing_icon)
@@ -87,7 +108,7 @@ class QColormapLineEdit(QLineEdit):
         palette.setColor(palette.ColorRole.Base, Qt.GlobalColor.transparent)
         self.setPalette(palette)
 
-        cmap_rect = self.rect()
+        cmap_rect = self.rect().adjusted(2, 0, 0, 0)
         cmap_rect.setWidth(int(cmap_rect.width() * self._colormap_fraction))
 
         left_margin = 6
@@ -97,7 +118,9 @@ class QColormapLineEdit(QLineEdit):
         self.setTextMargins(left_margin, 2, 0, 0)
 
         if self._cmap:
-            draw_colormap(self, self._cmap, cmap_rect)
+            draw_colormap(
+                self, self._cmap, cmap_rect, checkerboard_size=self._checkerboard_size
+            )
         elif not self._cmap_is_full_width():
             if self._missing_cmap:
                 draw_colormap(self, self._missing_cmap, cmap_rect)

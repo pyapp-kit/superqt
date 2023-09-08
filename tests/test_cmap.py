@@ -63,6 +63,9 @@ def test_cmap_draw_result():
     atol = 8 if platform.system() == "Linux" else 4
     np.testing.assert_allclose(ary1, ary2, atol=atol)
 
+    cmap2 = Colormap(("#230777",), name="MyMap")
+    draw_colormap(pix, cmap2)  # include transparency
+
 
 def test_catalog_combo(qtbot):
     wdg = CmapCatalogComboBox()

@@ -20,6 +20,7 @@ def draw_colormap(
     border_color: QColor | str | None = None,
     border_width: int = 1,
     lighter: int = 100,
+    checkerboard_size: int = 4,
 ) -> None:
     """Draw a colormap onto a QPainter or QPaintDevice.
 
@@ -44,6 +45,9 @@ def draw_colormap(
     lighter : int, optional
         Percentage by which to lighten (or darken) the colors. Greater than 100
         lightens, less than 100 darkens, by default 100 (i.e. no change).
+    checkerboard_size : bool, optional
+        Size (in pixels) of the checkerboard pattern to draw, by default 5.
+        If 0, no checkerboard is drawn.
 
     Examples
     --------
@@ -86,9 +90,13 @@ def draw_colormap(
 
     if border_width and border_color is not None:
         # draw rect, and then contract it by border_width
-        painter.setBrush(QColor(border_color))
+        painter.setPen(QColor(border_color))
+        painter.setBrush(Qt.BrushStyle.NoBrush)
         painter.drawRect(rect)
         rect = rect.adjusted(border_width, border_width, -border_width, -border_width)
+
+    if checkerboard_size:
+        _draw_checkerboard(painter, rect, checkerboard_size)
 
     if (
         cmap_.interpolation == "nearest"
@@ -110,6 +118,24 @@ def draw_colormap(
             gradient.setColorAt(stop.position, QColor(stop.color.hex).lighter(lighter))
         painter.setBrush(gradient)
         painter.drawRect(rect)
+
+
+def _draw_checkerboard(
+    painter: QPainter, rect: QRect | QRectF, checker_size: int
+) -> None:
+    darkgray = QColor("#969696")
+    lightgray = QColor("#C8C8C8")
+    sz = checker_size
+    h, w = rect.height(), rect.width()
+    left, top = rect.left(), rect.top()
+    full_rows = h // sz
+    full_cols = w // sz
+    for row in range(int(full_rows) + 1):
+        szh = sz if row < full_rows else int(h % sz)
+        for col in range(int(full_cols) + 1):
+            szw = sz if col < full_cols else int(w % sz)
+            color = lightgray if (row + col) % 2 == 0 else darkgray
+            painter.fillRect(int(col * sz + left), int(row * sz + top), szw, szh, color)
 
 
 def try_cast_colormap(val: Any) -> Colormap | None:

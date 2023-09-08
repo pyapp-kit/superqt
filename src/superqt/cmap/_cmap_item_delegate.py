@@ -9,16 +9,46 @@ from qtpy.QtWidgets import QStyle, QStyledItemDelegate, QStyleOptionViewItem
 
 from ._cmap_utils import CMAP_ROLE, draw_colormap, pick_font_color, try_cast_colormap
 
+DEFAULT_SIZE = QSize(80, 22)
+DEFAULT_BORDER_COLOR = QColor(Qt.GlobalColor.transparent)
+
 
 class QColormapItemDelegate(QStyledItemDelegate):
-    """Delegate that draws colormaps into a QAbstractItemView item."""
+    """Delegate that draws colormaps into a QAbstractItemView item.
 
-    def __init__(self, parent: QObject | None = None) -> None:
+    Parameters
+    ----------
+    parent : QObject, optional
+        The parent object.
+    item_size : QSize, optional
+        The size hint for each item, by default QSize(80, 22).
+    fractional_colormap_width : float, optional
+        The fraction of the widget width to use for the colormap swatch. If the
+        colormap is full width (greater than 0.75), the swatch will be drawn behind
+        the text. Otherwise, the swatch will be drawn to the left of the text.
+        Default is 0.33.
+    padding : int, optional
+        The padding (in pixels) around the edge of the item, by default 1.
+    checkerboard_size : int, optional
+        Size (in pixels) of the checkerboard pattern to draw behind colormaps with
+        transparency, by default 4. If 0, no checkerboard is drawn.
+    """
+
+    def __init__(
+        self,
+        parent: QObject | None = None,
+        *,
+        item_size: QSize = DEFAULT_SIZE,
+        fractional_colormap_width: float = 1,
+        padding: int = 1,
+        checkerboard_size: int = 4,
+    ) -> None:
         super().__init__(parent)
-        self._item_size: QSize = QSize(80, 22)
-        self._colormap_fraction: float = 1
-        self._padding: int = 1
-        self._border_color: QColor | None = QColor(Qt.GlobalColor.transparent)
+        self._item_size = item_size
+        self._colormap_fraction = fractional_colormap_width
+        self._padding = padding
+        self._border_color: QColor | None = DEFAULT_BORDER_COLOR
+        self._checkerboard_size = checkerboard_size
 
     def sizeHint(
         self, option: QStyleOptionViewItem, index: QModelIndex | QPersistentModelIndex
@@ -43,19 +73,23 @@ class QColormapItemDelegate(QStyledItemDelegate):
         painter.save()
         rect.adjust(self._padding, self._padding, -self._padding, -self._padding)
         cmap_rect = QRect(rect)
-        if self._colormap_fraction < 1:
-            cmap_rect.setWidth(int(rect.width() * self._colormap_fraction))
+        cmap_rect.setWidth(int(rect.width() * self._colormap_fraction))
 
         lighter = 110 if selected else 100
         border = self._border_color if selected else None
         draw_colormap(
-            painter, colormap, cmap_rect, lighter=lighter, border_color=border
+            painter,
+            colormap,
+            cmap_rect,
+            lighter=lighter,
+            border_color=border,
+            checkerboard_size=self._checkerboard_size,
         )
 
         # # make new rect with the remaining space
         text_rect = QRect(rect)
 
-        if self._colormap_fraction > 0.9:
+        if self._colormap_fraction > 0.75:
             text_align = Qt.AlignmentFlag.AlignCenter
             alpha = 230 if selected else 140
             text_color = pick_font_color(colormap, alpha=alpha)
