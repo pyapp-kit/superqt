@@ -162,6 +162,7 @@ class QColormapComboBox(QComboBox):
         colormap = self.itemData(index, CMAP_ROLE)
         if isinstance(colormap, Colormap):
             self.currentColormapChanged.emit(colormap)
+            self.lineEdit().setColormap(colormap)
             self._last_cmap = colormap
 
 
