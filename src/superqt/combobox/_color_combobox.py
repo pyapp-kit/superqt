@@ -3,7 +3,7 @@ from __future__ import annotations
 import warnings
 from contextlib import suppress
 from enum import IntEnum, auto
-from typing import Any, Sequence, cast
+from typing import Any, Literal, Sequence, cast
 
 from qtpy.QtCore import QModelIndex, QPersistentModelIndex, QRect, QSize, Qt, Signal
 from qtpy.QtGui import QColor, QPainter
@@ -21,8 +21,10 @@ from superqt.utils import signals_blocked
 
 _NAME_MAP = {QColor(x).name(): x for x in QColor.colorNames()}
 
+COLOR_ROLE = Qt.ItemDataRole.BackgroundRole
 
-class InvalidPolicy(IntEnum):
+
+class InvalidColorPolicy(IntEnum):
     """Policy for handling invalid colors."""
 
     Ignore = auto()
@@ -51,9 +53,6 @@ class _ColorComboLineEdit(QLineEdit):
             parent.showPopup()
 
 
-COLOR_ROLE = Qt.ItemDataRole.BackgroundRole
-
-
 class _ColorComboItemDelegate(QAbstractItemDelegate):
     """Delegate that draws color squares in the ComboBox.
 
@@ -76,12 +75,12 @@ class _ColorComboItemDelegate(QAbstractItemDelegate):
         color: QColor | None = index.data(COLOR_ROLE)
         rect = cast("QRect", option.rect)  # type: ignore
         state = cast("QStyle.StateFlag", option.state)  # type: ignore
-        is_hovering = state & QStyle.StateFlag.State_MouseOver
+        selected = state & QStyle.StateFlag.State_Selected
         border = QColor("lightgray")
 
         if not color:
             # not a color square, just draw the text
-            text_color = Qt.GlobalColor.black if is_hovering else Qt.GlobalColor.gray
+            text_color = Qt.GlobalColor.black if selected else Qt.GlobalColor.gray
             painter.setPen(text_color)
             text = index.data(Qt.ItemDataRole.DisplayRole)
             painter.drawText(rect, Qt.AlignmentFlag.AlignCenter, text)
@@ -93,7 +92,7 @@ class _ColorComboItemDelegate(QAbstractItemDelegate):
         pen.setColor(border)
         painter.setPen(pen)
 
-        if is_hovering:
+        if selected:
             # if hovering, give a slight highlight and draw the color name
             painter.setBrush(color.lighter(110))
             painter.drawRect(rect)
@@ -118,7 +117,7 @@ class QColorComboBox(QComboBox):
         Whether the user can add custom colors by clicking the "Add Color" item.
         Default is False. Can also be set with `setUserColorsAllowed`.
     add_color_text: str, optional
-        The text to display for the "Add Color" item. Default is "Add Color".
+        The text to display for the "Add Color" item. Default is "Add Color...".
     """
 
     currentColorChanged = Signal(QColor)
@@ -128,11 +127,11 @@ class QColorComboBox(QComboBox):
         parent: QWidget | None = None,
         *,
         allow_user_colors: bool = False,
-        add_color_text: str = "Add Color",
+        add_color_text: str = "Add Color...",
     ) -> None:
         # init QComboBox
         super().__init__(parent)
-        self._invalid_policy: InvalidPolicy = InvalidPolicy.Ignore
+        self._invalid_policy: InvalidColorPolicy = InvalidColorPolicy.Ignore
         self._add_color_text: str = add_color_text
         self._allow_user_colors: bool = allow_user_colors
         self._last_color: QColor = QColor()
@@ -145,19 +144,23 @@ class QColorComboBox(QComboBox):
 
         self.setUserColorsAllowed(allow_user_colors)
 
-    def setInvalidPolicy(self, policy: InvalidPolicy) -> None:
+    def setInvalidColorPolicy(
+        self, policy: InvalidColorPolicy | int | Literal["Raise", "Ignore", "Warn"]
+    ) -> None:
         """Sets the policy for handling invalid colors."""
         if isinstance(policy, str):
-            policy = InvalidPolicy[policy]
+            policy = InvalidColorPolicy[policy]
         elif isinstance(policy, int):
-            policy = InvalidPolicy(policy)
-        elif not isinstance(policy, InvalidPolicy):
+            policy = InvalidColorPolicy(policy)
+        elif not isinstance(policy, InvalidColorPolicy):
             raise TypeError(f"Invalid policy type: {type(policy)!r}")
         self._invalid_policy = policy
 
-    def invalidPolicy(self) -> InvalidPolicy:
+    def invalidColorPolicy(self) -> InvalidColorPolicy:
         """Returns the policy for handling invalid colors."""
         return self._invalid_policy
+
+    InvalidColorPolicy = InvalidColorPolicy
 
     def userColorsAllowed(self) -> bool:
         """Returns whether the user can add custom colors."""
@@ -175,6 +178,7 @@ class QColorComboBox(QComboBox):
             self.removeItem(idx)
 
     def clear(self) -> None:
+        """Clears the QComboBox of all entries (leaves "Add colors" if enabled)."""
         super().clear()
         self.setUserColorsAllowed(self._allow_user_colors)
 
@@ -182,9 +186,9 @@ class QColorComboBox(QComboBox):
         """Adds the color to the QComboBox."""
         _color = _cast_color(color)
         if not _color.isValid():
-            if self._invalid_policy == InvalidPolicy.Raise:
+            if self._invalid_policy == InvalidColorPolicy.Raise:
                 raise ValueError(f"Invalid color: {color!r}")
-            elif self._invalid_policy == InvalidPolicy.Warn:
+            elif self._invalid_policy == InvalidColorPolicy.Warn:
                 warnings.warn(f"Ignoring invalid color: {color!r}", stacklevel=2)
             return
 
