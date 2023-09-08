@@ -8,7 +8,7 @@ except PackageNotFoundError:
     __version__ = "unknown"
 
 if TYPE_CHECKING:
-    from .combobox._colormap_combobox import QColormapComboBox
+    from .combobox import QColormapComboBox
     from .spinbox._quantity import QQuantity
 
 from .collapsible import QCollapsible
@@ -57,7 +57,7 @@ def __getattr__(name: str) -> Any:
 
         return QQuantity
     if name == "QColormapComboBox":
-        from .combobox._colormap_combobox import QColormapComboBox
+        from .cmap import QColormapComboBox
 
         return QColormapComboBox
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

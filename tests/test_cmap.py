@@ -14,9 +14,9 @@ from qtpy.QtCore import QRect
 from qtpy.QtGui import QPainter, QPixmap
 from qtpy.QtWidgets import QStyleOptionViewItem, QWidget
 
+from superqt import QColormapComboBox
 from superqt.cmap import (
     CmapCatalogComboBox,
-    QColormapComboBox,
     QColormapItemDelegate,
     QColormapLineEdit,
     _cmap_combo,

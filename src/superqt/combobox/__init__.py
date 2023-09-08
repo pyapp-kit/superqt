@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 __all__ = ("QEnumComboBox", "QSearchableComboBox", "QColormapComboBox")
 
 
-def __getattr__(name: str) -> Any:
+def __getattr__(name: str) -> Any:  # pragma: no cover
     if name == "QColormapComboBox":
         from superqt.cmap import QColormapComboBox
 

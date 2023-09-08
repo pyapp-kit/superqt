@@ -41,7 +41,7 @@ from ._qthreading import (
 from ._throttler import QSignalDebouncer, QSignalThrottler, qdebounced, qthrottled
 
 
-def __getattr__(name: str) -> Any:
+def __getattr__(name: str) -> Any:  # pragma: no cover
     if name == "draw_colormap":
         from superqt.cmap import draw_colormap
 
