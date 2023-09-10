@@ -8,6 +8,7 @@ except PackageNotFoundError:
     __version__ = "unknown"
 
 if TYPE_CHECKING:
+    from .combobox import QColormapComboBox
     from .spinbox._quantity import QQuantity
 
 from .collapsible import QCollapsible
@@ -31,6 +32,7 @@ __all__ = [
     "ensure_object_thread",
     "QDoubleRangeSlider",
     "QCollapsible",
+    "QColormapComboBox",
     "QDoubleSlider",
     "QElidingLabel",
     "QElidingLineEdit",
@@ -54,4 +56,8 @@ def __getattr__(name: str) -> Any:
         from .spinbox._quantity import QQuantity
 
         return QQuantity
+    if name == "QColormapComboBox":
+        from .cmap import QColormapComboBox
+
+        return QColormapComboBox
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
