@@ -156,7 +156,12 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
 
     def _setValue(self, value: float):
         """Convert the value from float to int before setting the slider value."""
-        self._slider.setValue(int(value))
+        value = int(value)
+        if self._slider.maximum() < value:
+            self._slider.setMaximum(value)
+        elif self._slider.minimum() > value:
+            self._slider.setMinimum(value)
+        self._slider.setValue(value)
 
     def _rename_signals(self):
         # for subclasses
@@ -215,6 +220,10 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
 
         QApplication.processEvents()
 
+    def setLabelSpinBoxRange(self, min: int, max: int):
+        """Change valid label values independently of slider range."""
+        self._label.setRange(int(min), int(max))
+
 
 class QLabeledDoubleSlider(QLabeledSlider):
     _slider_class = QDoubleSlider
@@ -228,8 +237,16 @@ class QLabeledDoubleSlider(QLabeledSlider):
         self.setDecimals(2)
 
     def _setValue(self, value: float):
-        """Convert the value from float to int before setting the slider value."""
+        """Override method in the subclass which converts float to int."""
+        if self._slider.maximum() < value:
+            self._slider.setMaximum(value)
+        elif self._slider.minimum() > value:
+            self._slider.setMinimum(value)
         self._slider.setValue(value)
+
+    def setLabelSpinBoxRange(self, min: float, max: float):
+        """Change valid label values independently of slider range."""
+        self._label.setRange(min, max)
 
     def _rename_signals(self):
         self.valueChanged = self._fvalueChanged
@@ -580,8 +597,8 @@ class SliderLabel(QDoubleSpinBox):
             with contextlib.suppress(Exception):
                 self._slider.rangeChanged.disconnect(self.setRange)
         else:
-            self.setMinimum(self._slider.minimum())
-            self.setMaximum(self._slider.maximum())
+            self.setMinimum(min(self._slider.minimum(), self.minimum()))
+            self.setMaximum(max(self._slider.maximum(), self.maximum()))
             self._slider.rangeChanged.connect(self.setRange)
         self._update_size()
 
