@@ -51,6 +51,7 @@ if TYPE_CHECKING:
     from .combobox import QColormapComboBox
     from .spinbox._quantity import QQuantity
 
+
 def __getattr__(name: str) -> Any:
     if name == "QQuantity":
         from .spinbox._quantity import QQuantity
