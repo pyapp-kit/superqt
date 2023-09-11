@@ -7,12 +7,8 @@ try:
 except PackageNotFoundError:
     __version__ = "unknown"
 
-if TYPE_CHECKING:
-    from .combobox import QColormapComboBox
-    from .spinbox._quantity import QQuantity
-
 from .collapsible import QCollapsible
-from .combobox import QEnumComboBox, QSearchableComboBox
+from .combobox import QColorComboBox, QEnumComboBox, QSearchableComboBox
 from .elidable import QElidingLabel, QElidingLineEdit
 from .selection import QSearchableListWidget, QSearchableTreeWidget
 from .sliders import (
@@ -30,9 +26,10 @@ from .utils import QMessageHandler, ensure_main_thread, ensure_object_thread
 __all__ = [
     "ensure_main_thread",
     "ensure_object_thread",
-    "QDoubleRangeSlider",
     "QCollapsible",
+    "QColorComboBox",
     "QColormapComboBox",
+    "QDoubleRangeSlider",
     "QDoubleSlider",
     "QElidingLabel",
     "QElidingLineEdit",
@@ -49,6 +46,10 @@ __all__ = [
     "QSearchableListWidget",
     "QSearchableTreeWidget",
 ]
+
+if TYPE_CHECKING:
+    from .combobox import QColormapComboBox
+    from .spinbox._quantity import QQuantity
 
 
 def __getattr__(name: str) -> Any:
