@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import contextlib
 from enum import IntEnum, IntFlag, auto
 from functools import partial
