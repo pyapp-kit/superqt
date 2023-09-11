@@ -59,7 +59,7 @@ jobs:
             backend: "pyqt5==5.14.*"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
@@ -90,7 +90,7 @@ jobs:
     name: qtpy minreq
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: tlambert03/setup-qt-libs@v1.4
       - uses: actions/setup-python@v4
         with:
@@ -111,12 +111,12 @@ jobs:
     name: napari tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           path: superqt
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           repository: napari/napari
           path: napari-repo
@@ -143,7 +143,7 @@ jobs:
     name: Check Manifest
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
         with:
           python-version: "3.x"
@@ -157,7 +157,7 @@ jobs:
     if: ${{ github.repository == 'pyapp-kit/superqt' && contains(github.ref, 'tags') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Set up Python
