@@ -223,10 +223,11 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
 
     # --------------------- private api --------------------
 
-    def _on_slider_range_changed(self) -> None:
+    def _on_slider_range_changed(self, min_: int, max_: int) -> None:
         slash = " / " if self._edge_label_mode & EdgeLabelMode.LabelIsValue else ""
         if self._edge_label_mode & EdgeLabelMode.LabelIsRange:
-            self._label.setSuffix(f"{slash}{self._slider.maximum()}")
+            self._label.setSuffix(f"{slash}{max_}")
+        self.rangeChanged.emit(min_, max_)
 
     def _on_slider_value_changed(self, v: Any) -> None:
         self._label.setValue(v)
