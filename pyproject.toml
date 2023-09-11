@@ -85,6 +85,30 @@ source = "vcs"
 [tool.hatch.build.targets.sdist]
 include = ["src", "tests", "CHANGELOG.md"]
 
+# these let you run tests across all backends easily with:
+# hatch run test:test
+[tool.hatch.envs.test]
+
+[tool.hatch.envs.test.scripts]
+test = "pytest"
+
+[[tool.hatch.envs.test.matrix]]
+qt = ["pyside6", "pyqt6"]
+python = ["3.11"]
+
+[[tool.hatch.envs.test.matrix]]
+qt = ["pyside2", "pyqt5", "pyqt5.12"]
+python = ["3.8"]
+
+[tool.hatch.envs.test.overrides]
+matrix.qt.extra-dependencies = [
+  {value = "pyside2", if = ["pyside2"]},
+  {value = "pyside6", if = ["pyside6"]},
+  {value = "pyqt5", if = ["pyqt5"]},
+  {value = "pyqt6", if = ["pyqt6"]},
+  {value = "pyqt5==5.12", if = ["pyqt5.12"]},
+]
+
 # https://pycqa.github.io/isort/docs/configuration/options.html
 [tool.isort]
 profile = "black"
@@ -159,12 +183,16 @@ warn_unused_ignores = false
 allow_redefinition = true
 
 # https://coverage.readthedocs.io/en/6.4/config.html
+[tool.coverage.run]
+source = ["src/superqt"]
+
 [tool.coverage.report]
 exclude_lines = [
     "pragma: no cover",
     "if TYPE_CHECKING:",
     "@overload",
     "except ImportError",
+    "\\.\\.\\."
 ]
 
 # https://github.com/mgedmin/check-manifest#configuration
