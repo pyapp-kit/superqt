@@ -41,25 +41,25 @@ class EdgeLabelMode(IntFlag):
 class _SliderProxy:
     _slider: QSlider
 
-    def value(self):
+    def value(self) -> int:
         return self._slider.value()
 
     def setValue(self, value: int) -> None:
         self._slider.setValue(value)
 
-    def sliderPosition(self):
+    def sliderPosition(self) -> int:
         return self._slider.sliderPosition()
 
     def setSliderPosition(self, pos: int) -> None:
         self._slider.setSliderPosition(pos)
 
-    def minimum(self):
+    def minimum(self) -> int:
         return self._slider.minimum()
 
     def setMinimum(self, minimum: int) -> None:
         self._slider.setMinimum(minimum)
 
-    def maximum(self):
+    def maximum(self) -> int:
         return self._slider.maximum()
 
     def setMaximum(self, maximum: int) -> None:
@@ -99,6 +99,7 @@ class _SliderProxy:
 def _handle_overloaded_slider_sig(
     args: tuple, kwargs: dict
 ) -> tuple[QWidget | None, Qt.Orientation]:
+    """Maintaining signature of QSlider.__init__."""
     parent = None
     orientation = Qt.Orientation.Horizontal
     errmsg = (
@@ -196,7 +197,16 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         return self._edge_label_mode
 
     def setEdgeLabelMode(self, opt: EdgeLabelMode) -> None:
-        """Set the `EdgeLabelMode`."""
+        """Set the `EdgeLabelMode`.
+
+        Parameters
+        ----------
+        opt : EdgeLabelMode
+            To show no label, use `EdgeLabelMode.NoLabel`. To show the value
+            of the slider, use `EdgeLabelMode.LabelIsValue`. To show
+            `value / maximum`, use
+            `EdgeLabelMode.LabelIsValue | EdgeLabelMode.LabelIsRange`.
+        """
         if opt is EdgeLabelMode.LabelIsRange:
             raise ValueError(
                 "mode must be one of 'EdgeLabelMode.NoLabel' or "
@@ -214,7 +224,7 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
             self._label.setMode(opt)
             self._label.setValue(self._slider.value())
             self.layout().setContentsMargins(0, 0, 0, 0)
-        self._on_slider_range_changed()
+        self._on_slider_range_changed(self.minimum(), self.maximum())
 
         QApplication.processEvents()
 
@@ -605,7 +615,7 @@ class SliderLabel(QDoubleSpinBox):
             if self.specialValueText():
                 w = max(w, _fm_width(fm, self.specialValueText()))
             if self._mode & EdgeLabelMode.LabelIsRange:
-                w += _fm_width(fm, maxtext)
+                w += 8  # it seems as thought suffix() is not enough
         else:
             w = max(0, _fm_width(fm, self.textFromValue(self.value()))) + 3
 
