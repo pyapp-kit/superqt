@@ -210,7 +210,8 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         if opt is EdgeLabelMode.LabelIsRange:
             raise ValueError(
                 "mode must be one of 'EdgeLabelMode.NoLabel' or "
-                "'EdgeLabelMode.LabelIsValue'."
+                "'EdgeLabelMode.LabelIsValue' or"
+                "'EdgeLabelMode.LabelIsValue | EdgeLabelMode.LabelIsRange'."
             )
 
         self._edge_label_mode = opt
@@ -481,7 +482,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
             label.show()
         self.update()
 
-    def _min_label_edited(self, val: float):
+    def _min_label_edited(self, val: float) -> None:
         if self._edge_label_mode == EdgeLabelMode.LabelIsRange:
             self.setMinimum(val)
         else:
@@ -490,7 +491,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
             self.setValue(v)
         self._reposition_labels()
 
-    def _max_label_edited(self, val: float):
+    def _max_label_edited(self, val: float) -> None:
         if self._edge_label_mode == EdgeLabelMode.LabelIsRange:
             self.setMaximum(val)
         else:
@@ -499,7 +500,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
             self.setValue(v)
         self._reposition_labels()
 
-    def _on_value_changed(self, v: tuple[int, ...]):
+    def _on_value_changed(self, v: tuple[int, ...]) -> None:
         if self._edge_label_mode == EdgeLabelMode.LabelIsValue:
             self._min_label.setValue(v[0])
             self._max_label.setValue(v[-1])
@@ -592,41 +593,9 @@ class SliderLabel(QDoubleSpinBox):
         self.editingFinished.connect(self._silent_clear_focus)
         self._update_size()
 
-    def _silent_clear_focus(self) -> None:
-        with signals_blocked(self):
-            self.clearFocus()
-
     def setDecimals(self, prec: int) -> None:
         super().setDecimals(prec)
         self._update_size()
-
-    def _update_size(self, *_: Any) -> None:
-        # fontmetrics to measure the width of text
-        fm = QFontMetrics(self.font())
-        h = self.sizeHint().height()
-        fixed_content = self.prefix() + self.suffix() + " "
-
-        if self._mode & EdgeLabelMode.LabelIsValue:
-            # determine width based on min/max/specialValue
-            mintext = self.textFromValue(self.minimum())[:18]
-            maxtext = self.textFromValue(self.maximum())[:18]
-            w = max(0, _fm_width(fm, mintext + fixed_content))
-            w = max(w, _fm_width(fm, maxtext + fixed_content))
-            if self.specialValueText():
-                w = max(w, _fm_width(fm, self.specialValueText()))
-            if self._mode & EdgeLabelMode.LabelIsRange:
-                w += 8  # it seems as thought suffix() is not enough
-        else:
-            w = max(0, _fm_width(fm, self.textFromValue(self.value()))) + 3
-
-        w += 3  # cursor blinking space
-        # get the final size hint
-        opt = QStyleOptionSpinBox()
-        self.initStyleOption(opt)
-        size = self.style().sizeFromContents(
-            QStyle.ContentsType.CT_SpinBox, opt, QSize(w, h), self
-        )
-        self.setFixedSize(size)
 
     def setValue(self, val: Any) -> None:
         super().setValue(val)
@@ -657,6 +626,40 @@ class SliderLabel(QDoubleSpinBox):
             self.setMaximum(self._slider.maximum())
             self._slider.rangeChanged.connect(self.setRange)
         self._update_size()
+
+    # --------------- private ----------------
+
+    def _silent_clear_focus(self) -> None:
+        with signals_blocked(self):
+            self.clearFocus()
+
+    def _update_size(self, *_: Any) -> None:
+        # fontmetrics to measure the width of text
+        fm = QFontMetrics(self.font())
+        h = self.sizeHint().height()
+        fixed_content = self.prefix() + self.suffix() + " "
+
+        if self._mode & EdgeLabelMode.LabelIsValue:
+            # determine width based on min/max/specialValue
+            mintext = self.textFromValue(self.minimum())[:18]
+            maxtext = self.textFromValue(self.maximum())[:18]
+            w = max(0, _fm_width(fm, mintext + fixed_content))
+            w = max(w, _fm_width(fm, maxtext + fixed_content))
+            if self.specialValueText():
+                w = max(w, _fm_width(fm, self.specialValueText()))
+            if self._mode & EdgeLabelMode.LabelIsRange:
+                w += 8  # it seems as thought suffix() is not enough
+        else:
+            w = max(0, _fm_width(fm, self.textFromValue(self.value()))) + 3
+
+        w += 3  # cursor blinking space
+        # get the final size hint
+        opt = QStyleOptionSpinBox()
+        self.initStyleOption(opt)
+        size = self.style().sizeFromContents(
+            QStyle.ContentsType.CT_SpinBox, opt, QSize(w, h), self
+        )
+        self.setFixedSize(size)
 
     def validate(
         self, input_: str | None, pos: int
