@@ -47,7 +47,7 @@ dependencies = [
 # extras
 # https://peps.python.org/pep-0621/#dependencies-optional-dependencies
 [project.optional-dependencies]
-test = ["pint", "pytest", "pytest-cov", "pytest-qt"]
+test = ["pint", "pytest", "pytest-cov", "pytest-qt", "numpy", "cmap"]
 dev = [
     "black",
     "ipython",
@@ -61,6 +61,7 @@ dev = [
 ]
 docs = ["mkdocs-macros-plugin", "mkdocs-material", "mkdocstrings[python]"]
 quantity = ["pint"]
+cmap = ["cmap >=0.1.1"]
 pyside2 = ["pyside2"]
 # see issues surrounding usage of Generics in pyside6.5.x
 # https://github.com/pyapp-kit/superqt/pull/177
