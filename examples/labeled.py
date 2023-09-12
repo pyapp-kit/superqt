@@ -14,6 +14,7 @@ ORIENTATION = Qt.Orientation.Horizontal
 
 w = QWidget()
 qls = QLabeledSlider(ORIENTATION)
+qls.setEdgeLabelMode(qls.EdgeLabelMode.LabelIsRange | qls.EdgeLabelMode.LabelIsValue)
 qls.valueChanged.connect(lambda e: print("qls valueChanged", e))
 qls.setRange(0, 500)
 qls.setValue(300)
