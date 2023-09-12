@@ -325,6 +325,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
         self._slider = self._slider_class()
         self._slider.valueChanged.connect(self.valueChanged.emit)
         self._slider.rangeChanged.connect(self.rangeChanged.emit)
+        self.sliderMoved = self._slider._slidersMoved
 
         self._min_label = SliderLabel(
             self._slider,

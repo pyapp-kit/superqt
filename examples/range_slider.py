@@ -6,7 +6,6 @@ from superqt import QRangeSlider
 app = QApplication([])
 
 slider = QRangeSlider(Qt.Orientation.Horizontal)
-slider = QRangeSlider(Qt.Orientation.Horizontal)
 
 slider.setValue((20, 80))
 slider.show()
