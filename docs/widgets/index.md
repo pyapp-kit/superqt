@@ -24,6 +24,9 @@ The following are QWidget subclasses:
 | [`QEnumComboBox`](./qenumcombobox.md)             | `QComboBox` that populates the combobox from a python `Enum` |
 | [`QSearchableComboBox`](./qsearchablecombobox.md)       | `QComboBox` variant that filters available options based on text input |
 | [`QSearchableListWidget`](./qsearchablelistwidget.md)     | `QListWidget` variant with search field that filters available options |
+| [`QSearchableTreeWidget`](./qsearchabletreewidget.md)     | `QTreeWidget` variant with search field that filters available options |
+| [`QColorComboBox`](./qcolorcombobox.md)            | `QComboBox` to select from a specified set of colors |
+| [`QColormapComboBox`](./qcolormap.md)            | `QComboBox` to select from a specified set of colormaps. |
 
 ## Frames and containers
 

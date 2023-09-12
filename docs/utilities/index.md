@@ -29,3 +29,4 @@
 | -----------                     | --------------------- |
 | [`QMessageHandler`](./qmessagehandler.md)           | A context manager to intercept messages from Qt. |
 | [`CodeSyntaxHighlight`](./code_syntax_highlight.md) | A `QSyntaxHighlighter` for code syntax highlighting. |
+| [`draw_colormap`](./cmap.md) | Function that draws a colormap into any QPaintDevice. |
