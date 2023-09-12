@@ -59,7 +59,7 @@ dev = [
     "rich",
     "types-Pygments",
 ]
-docs = ["mkdocs-macros-plugin", "mkdocs-material", "mkdocstrings[python]"]
+docs = ["mkdocs-macros-plugin", "mkdocs-material", "mkdocstrings[python]", "pint", "cmap"]
 quantity = ["pint"]
 cmap = ["cmap >=0.1.1"]
 pyside2 = ["pyside2"]

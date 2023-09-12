@@ -7,10 +7,7 @@ repo_name: pyapp-kit/superqt
 repo_url: https://github.com/pyapp-kit/superqt
 
 # Copyright
-copyright: Copyright &copy; 2021 - 2022 Talley Lambert
-
-extra_css:
-  - stylesheets/extra.css
+copyright: Copyright &copy; 2021 - 2022
 
 watch:
   - src
@@ -44,7 +41,6 @@ markdown_extensions:
 plugins:
   - search
   - autorefs
-  - mkdocstrings
   - macros:
       module_name: docs/_macros
   - mkdocstrings:
@@ -52,6 +48,7 @@ plugins:
         python:
           import:
             - https://docs.python.org/3/objects.inv
+            - https://cmap-docs.readthedocs.io/en/latest/objects.inv
           options:
               show_source: false
               docstring_style: numpy

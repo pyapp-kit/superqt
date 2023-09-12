@@ -78,7 +78,13 @@ class QColormapComboBox(QComboBox):
         return self._allow_user_colors
 
     def setUserAdditionsAllowed(self, allow: bool) -> None:
-        """Sets whether the user can add custom colors."""
+        """Sets whether the user can add custom colors.
+
+        If enabled, an "Add Colormap..." item will be added to the end of the
+        list. When clicked, a dialog will be shown to allow the user to select
+        a colormap from the
+        [cmap catalog](https://cmap-docs.readthedocs.io/en/latest/catalog/).
+        """
         self._allow_user_colors = bool(allow)
 
         idx = self.findData(self._add_color_text, Qt.ItemDataRole.DisplayRole)

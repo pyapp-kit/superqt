@@ -26,4 +26,4 @@ conda install -c conda-forge superqt
 
 ## Usage
 
-See the [Widgets](./widgets/) and [Utilities](./utilities/) pages for features offered by superqt.
+See the [Widgets](./widgets/index.md) and [Utilities](./utilities/index.md) pages for features offered by superqt.
