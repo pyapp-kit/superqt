@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://github.com/pyapp-kit/superqt/widgets/qlargeintspinbox/">
+        <link rel="canonical" href="https://github.com/pyapp-kit/superqt/utilities/cmap/">
       
       
-        <link rel="prev" href="../qlabeledslider/">
+        <link rel="prev" href="../">
       
       
-        <link rel="next" href="../qquantity/">
+        <link rel="next" href="../code_syntax_highlight/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -24,7 +24,7 @@
     
     
       
-        <title>QLargeIntSpinBox - superqt</title>
+        <title>Colormap utilities - superqt</title>
       
     
     
@@ -71,7 +71,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#qlargeintspinbox" class="md-skip">
+        <a href="#colormap-utilities" class="md-skip">
           Skip to content
         </a>
       
@@ -107,7 +107,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              QLargeIntSpinBox
+              Colormap utilities
             
           </span>
         </div>
@@ -258,12 +258,348 @@
       
   
   
+    
+  
   
     
     
       
         
           
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    Utilities
+  </span>
+  
+
+            </a>
+            
+              <label class="md-nav__link " for="__nav_3">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Utilities
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Colormap utilities
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Colormap utilities
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#superqt.cmap.draw_colormap" class="md-nav__link">
+    draw_colormap()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#superqt.cmap.QColormapLineEdit" class="md-nav__link">
+    QColormapLineEdit
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#superqt.cmap.QColormapItemDelegate" class="md-nav__link">
+    QColormapItemDelegate
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_syntax_highlight/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    CodeSyntaxHighlight
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../error_dialog_contexts/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Error message context manager
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fonticon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Font icons
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../qmessagehandler/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    QMessageHandler
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../signal_utils/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Signal Utilities
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../thread_decorators/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Threading decorators
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../threading/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Thread workers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../throttling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Throttling & Debouncing
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
         
       
         
@@ -294,287 +630,12 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
         
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../utilities/" class="md-nav__link ">
-              
-  
-  <span class="md-ellipsis">
-    Utilities
-  </span>
-  
-
-            </a>
-            
-              <label class="md-nav__link " for="__nav_3">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3">
-            <span class="md-nav__icon md-icon"></span>
-            Utilities
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-            
-              
-                
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../utilities/cmap/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Colormap utilities
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../utilities/code_syntax_highlight/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    CodeSyntaxHighlight
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../utilities/error_dialog_contexts/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Error message context manager
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../utilities/fonticon/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Font icons
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../utilities/qmessagehandler/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    QMessageHandler
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../utilities/signal_utils/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Signal Utilities
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../utilities/thread_decorators/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Threading decorators
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../utilities/threading/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Thread workers
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../utilities/throttling/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Throttling & Debouncing
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-    
-  
-  
-    
-    
-      
-        
-          
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-        
-        
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
-        
-          
-          
-          <div class="md-nav__link md-nav__container">
-            <a href="../" class="md-nav__link ">
+            <a href="../../widgets/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -590,7 +651,7 @@
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             Widgets
@@ -605,7 +666,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../colormap_catalog/" class="md-nav__link">
+      <a href="../../widgets/colormap_catalog/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -625,7 +686,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../qcollapsible/" class="md-nav__link">
+      <a href="../../widgets/qcollapsible/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -645,7 +706,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../qcolorcombobox/" class="md-nav__link">
+      <a href="../../widgets/qcolorcombobox/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -665,7 +726,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../qcolormap/" class="md-nav__link">
+      <a href="../../widgets/qcolormap/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -685,7 +746,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../qdoublerangeslider/" class="md-nav__link">
+      <a href="../../widgets/qdoublerangeslider/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -705,7 +766,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../qdoubleslider/" class="md-nav__link">
+      <a href="../../widgets/qdoubleslider/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -725,7 +786,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../qelidinglabel/" class="md-nav__link">
+      <a href="../../widgets/qelidinglabel/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -745,7 +806,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../qenumcombobox/" class="md-nav__link">
+      <a href="../../widgets/qenumcombobox/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -765,7 +826,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../qlabeleddoublerangeslider/" class="md-nav__link">
+      <a href="../../widgets/qlabeleddoublerangeslider/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -785,7 +846,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../qlabeleddoubleslider/" class="md-nav__link">
+      <a href="../../widgets/qlabeleddoubleslider/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -805,7 +866,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../qlabeledrangeslider/" class="md-nav__link">
+      <a href="../../widgets/qlabeledrangeslider/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -825,7 +886,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../qlabeledslider/" class="md-nav__link">
+      <a href="../../widgets/qlabeledslider/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -843,29 +904,9 @@
                 
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    QLargeIntSpinBox
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../widgets/qlargeintspinbox/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -874,150 +915,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#qt-class" class="md-nav__link">
-    Qt Class
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#signals" class="md-nav__link">
-    Signals
-  </a>
-  
-    <nav class="md-nav" aria-label="Signals">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#textchanged" class="md-nav__link">
-    textChanged
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#valuechanged" class="md-nav__link">
-    valueChanged
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#methods" class="md-nav__link">
-    Methods
-  </a>
-  
-    <nav class="md-nav" aria-label="Methods">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#superqt.QLargeIntSpinBox.maximum" class="md-nav__link">
-    maximum()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#superqt.QLargeIntSpinBox.minimum" class="md-nav__link">
-    minimum()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#superqt.QLargeIntSpinBox.setMaximum" class="md-nav__link">
-    setMaximum()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#superqt.QLargeIntSpinBox.setMinimum" class="md-nav__link">
-    setMinimum()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#superqt.QLargeIntSpinBox.setRange" class="md-nav__link">
-    setRange()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#superqt.QLargeIntSpinBox.setSingleStep" class="md-nav__link">
-    setSingleStep()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#superqt.QLargeIntSpinBox.setStepType" class="md-nav__link">
-    setStepType()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#superqt.QLargeIntSpinBox.setValue" class="md-nav__link">
-    setValue()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#superqt.QLargeIntSpinBox.singleStep" class="md-nav__link">
-    singleStep()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#superqt.QLargeIntSpinBox.stepType" class="md-nav__link">
-    stepType()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#superqt.QLargeIntSpinBox.value" class="md-nav__link">
-    value()
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1029,7 +926,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../qquantity/" class="md-nav__link">
+      <a href="../../widgets/qquantity/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1049,7 +946,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../qrangeslider/" class="md-nav__link">
+      <a href="../../widgets/qrangeslider/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1069,7 +966,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../qsearchablecombobox/" class="md-nav__link">
+      <a href="../../widgets/qsearchablecombobox/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1089,7 +986,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../qsearchablelistwidget/" class="md-nav__link">
+      <a href="../../widgets/qsearchablelistwidget/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1109,7 +1006,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../qsearchabletreewidget/" class="md-nav__link">
+      <a href="../../widgets/qsearchabletreewidget/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1157,126 +1054,23 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#qt-class" class="md-nav__link">
-    Qt Class
+  <a href="#superqt.cmap.draw_colormap" class="md-nav__link">
+    draw_colormap()
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#signals" class="md-nav__link">
-    Signals
+  <a href="#superqt.cmap.QColormapLineEdit" class="md-nav__link">
+    QColormapLineEdit
   </a>
-  
-    <nav class="md-nav" aria-label="Signals">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#textchanged" class="md-nav__link">
-    textChanged
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#valuechanged" class="md-nav__link">
-    valueChanged
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#methods" class="md-nav__link">
-    Methods
+  <a href="#superqt.cmap.QColormapItemDelegate" class="md-nav__link">
+    QColormapItemDelegate
   </a>
-  
-    <nav class="md-nav" aria-label="Methods">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#superqt.QLargeIntSpinBox.maximum" class="md-nav__link">
-    maximum()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#superqt.QLargeIntSpinBox.minimum" class="md-nav__link">
-    minimum()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#superqt.QLargeIntSpinBox.setMaximum" class="md-nav__link">
-    setMaximum()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#superqt.QLargeIntSpinBox.setMinimum" class="md-nav__link">
-    setMinimum()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#superqt.QLargeIntSpinBox.setRange" class="md-nav__link">
-    setRange()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#superqt.QLargeIntSpinBox.setSingleStep" class="md-nav__link">
-    setSingleStep()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#superqt.QLargeIntSpinBox.setStepType" class="md-nav__link">
-    setStepType()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#superqt.QLargeIntSpinBox.setValue" class="md-nav__link">
-    setValue()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#superqt.QLargeIntSpinBox.singleStep" class="md-nav__link">
-    singleStep()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#superqt.QLargeIntSpinBox.stepType" class="md-nav__link">
-    stepType()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#superqt.QLargeIntSpinBox.value" class="md-nav__link">
-    value()
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1298,44 +1092,290 @@
   
 
 
-<h1 id="qlargeintspinbox">QLargeIntSpinBox<a class="headerlink" href="#qlargeintspinbox" title="Permanent link">#</a></h1>
-<p><code>QSpinBox</code> variant that allows to enter large integers, without overflow.</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">qtpy.QtCore</span> <span class="kn">import</span> <span class="n">Qt</span>
-<span class="kn">from</span> <span class="nn">qtpy.QtWidgets</span> <span class="kn">import</span> <span class="n">QApplication</span>
+<h1 id="colormap-utilities">Colormap utilities<a class="headerlink" href="#colormap-utilities" title="Permanent link">#</a></h1>
+<p>See also:</p>
+<ul>
+<li><a href="../../widgets/qcolormap/"><code>superqt.QColormapComboBox</code></a></li>
+<li><a href="../../widgets/colormap_catalog/"><code>superqt.cmap.CmapCatalogComboBox</code></a></li>
+</ul>
 
-<span class="kn">from</span> <span class="nn">superqt</span> <span class="kn">import</span> <span class="n">QLargeIntSpinBox</span>
 
-<span class="n">app</span> <span class="o">=</span> <span class="n">QApplication</span><span class="p">([])</span>
 
-<span class="n">slider</span> <span class="o">=</span> <span class="n">QLargeIntSpinBox</span><span class="p">()</span>
-<span class="n">slider</span><span class="o">.</span><span class="n">setRange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">4.53e8</span><span class="p">)</span>
-<span class="n">slider</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="mf">4.53e8</span><span class="p">)</span>
-<span class="n">slider</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<div class="doc doc-object doc-function">
 
-<span class="n">app</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span>
+
+
+
+<h2 id="superqt.cmap.draw_colormap" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">superqt</span><span class="o">.</span><span class="n">cmap</span><span class="o">.</span><span class="n">draw_colormap</span><span class="p">(</span><span class="n">painter_or_device</span><span class="p">,</span> <span class="n">cmap</span><span class="p">,</span> <span class="n">rect</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">border_color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">border_width</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">lighter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">checkerboard_size</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span></code>
+
+<a href="#superqt.cmap.draw_colormap" class="headerlink" title="Permanent link">#</a></h2>
+
+
+  <div class="doc doc-contents first">
+  
+      <p>Draw a colormap onto a QPainter or QPaintDevice.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>painter_or_device</code></td>
+          <td>
+                <code><span title="qtpy.QtGui.QPainter">QPainter</span> | <span title="qtpy.QtGui.QPaintDevice">QPaintDevice</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>A <code>QPainter</code> instance or a <code>QPaintDevice</code> (e.g. a QWidget or QPixmap) onto
+which to paint the colormap.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>cmap</code></td>
+          <td>
+                <code><a class="autorefs autorefs-external" title="cmap.Colormap" href="https://cmap-docs.readthedocs.io/en/latest/api/colormap/#cmap.Colormap">Colormap</a> | <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p><code>cmap.Colormap</code> instance, or anything that can be converted to one (such as a
+string name of a colormap in the <code>cmap</code> catalog).
+https://cmap-docs.readthedocs.io/en/latest/colormaps/#colormaplike-objects</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>rect</code></td>
+          <td>
+                <code><span title="qtpy.QtCore.QRect">QRect</span> | <span title="qtpy.QtCore.QRectF">QRectF</span> | None</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>A rect onto which to draw. If <code>None</code>, the <code>painter.viewport()</code> will be
+used.  by default <code>None</code></p>
+            </div>
+          </td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>border_color</code></td>
+          <td>
+                <code><span title="qtpy.QtGui.QColor">QColor</span> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>If not <code>None</code>, a border of color <code>border_color</code> and width <code>border_width</code> is
+included around the edge, by default None.</p>
+            </div>
+          </td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>border_width</code></td>
+          <td>
+                <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The width of the border to draw (provided <code>border_color</code> is not <code>None</code>),
+by default 2</p>
+            </div>
+          </td>
+          <td>
+                <code>1</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>lighter</code></td>
+          <td>
+                <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Percentage by which to lighten (or darken) the colors. Greater than 100
+lightens, less than 100 darkens, by default 100 (i.e. no change).</p>
+            </div>
+          </td>
+          <td>
+                <code>100</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>checkerboard_size</code></td>
+          <td>
+                <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Size (in pixels) of the checkerboard pattern to draw, by default 5.
+If 0, no checkerboard is drawn.</p>
+            </div>
+          </td>
+          <td>
+                <code>4</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+<p><strong>Examples:</strong></p>
+    <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">qtpy.QtGui</span> <span class="kn">import</span> <span class="n">QPixmap</span>
+<span class="kn">from</span> <span class="nn">qtpy.QtWidgets</span> <span class="kn">import</span> <span class="n">QWidget</span>
+<span class="kn">from</span> <span class="nn">superqt.utils</span> <span class="kn">import</span> <span class="n">draw_colormap</span>
+
+<span class="n">viridis</span> <span class="o">=</span> <span class="s1">&#39;viridis&#39;</span>  <span class="c1"># or cmap.Colormap(&#39;viridis&#39;)</span>
+
+<span class="k">class</span> <span class="nc">W</span><span class="p">(</span><span class="n">QWidget</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">paintEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">draw_colormap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">viridis</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">rect</span><span class="p">())</span>
+
+<span class="c1"># or draw onto a QPixmap</span>
+<span class="n">pm</span> <span class="o">=</span> <span class="n">QPixmap</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+<span class="n">draw_colormap</span><span class="p">(</span><span class="n">pm</span><span class="p">,</span> <span class="n">viridis</span><span class="p">)</span>
 </code></pre></div>
-<p><img alt="QLargeIntSpinBox" loading="lazy;" src="../../_auto_images/QLargeIntSpinBox.png" width="150" /></p>
-<h2 id="qt-class">Qt Class<a class="headerlink" href="#qt-class" title="Permanent link">#</a></h2>
-<p><a href='https://doc.qt.io/qt-6/qabstractspinbox.html'><code>QAbstractSpinBox</code></a></p>
-<h2 id="signals">Signals<a class="headerlink" href="#signals" title="Permanent link">#</a></h2>
-<h3 id="textchanged"><code>textChanged</code><a class="headerlink" href="#textchanged" title="Permanent link">#</a></h3>
-<h3 id="valuechanged"><code>valueChanged</code><a class="headerlink" href="#valuechanged" title="Permanent link">#</a></h3>
-<h2 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">#</a></h2>
 
+  </div>
+
+</div>
 
 <div class="doc doc-object doc-class">
 
 
 
 
+<h2 id="superqt.cmap.QColormapLineEdit" class="doc doc-heading">
+          <code>superqt.cmap.QColormapLineEdit</code>
+
+
+<a href="#superqt.cmap.QColormapLineEdit" class="headerlink" title="Permanent link">#</a></h2>
+
+
   <div class="doc doc-contents first">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="qtpy.QtWidgets.QLineEdit">QLineEdit</span></code></p>
 
   
-      <p>An integer spinboxes backed by unbound python integer.</p>
-<p>Qt's built-in <code>QSpinBox</code> is backed by a signed 32-bit integer.
-This could become limiting, particularly in large dense segmentations.
-This class behaves like a <code>QSpinBox</code> backed by an unbound python int.</p>
-<p>Does not yet support "prefix", "suffix" or "specialValue" like QSpinBox.</p>
+      <p>A QLineEdit that shows a colormap swatch.</p>
+<p>When the current text is a valid colormap name from the <code>cmap</code> package, a swatch
+of the colormap will be shown to the left of the text (if <code>fractionalColormapWidth</code>
+is less than .75) or behind the text (for when the colormap fills the full width).</p>
+<p>If the current text is not a valid colormap name, a swatch of the fallback colormap
+will be shown instead (by default, a gray colormap) if <code>fractionalColormapWidth</code> is
+less than .75.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>parent</code></td>
+          <td>
+                <code><span title="qtpy.QtWidgets.QWidget">QWidget</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The parent widget.</p>
+            </div>
+          </td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>fractional_colormap_width</code></td>
+          <td>
+                <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The fraction of the widget width to use for the colormap swatch. If the
+colormap is full width (greater than 0.75), the swatch will be drawn behind
+the text. Otherwise, the swatch will be drawn to the left of the text.
+Default is 0.33.</p>
+            </div>
+          </td>
+          <td>
+                <code>0.33</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>fallback_cmap</code></td>
+          <td>
+                <code><a class="autorefs autorefs-external" title="cmap.Colormap" href="https://cmap-docs.readthedocs.io/en/latest/api/colormap/#cmap.Colormap">Colormap</a> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The colormap to use when the current text is not a recognized colormap.
+by default "gray".</p>
+            </div>
+          </td>
+          <td>
+                <code>&#39;gray&#39;</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>missing_icon</code></td>
+          <td>
+                <code><span title="qtpy.QtGui.QIcon">QIcon</span> | <span title="qtpy.QtWidgets.QStyle.StandardPixmap">StandardPixmap</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The icon to show when the current text is not a recognized colormap and
+<code>fractionalColormapWidth</code> is less than .75. Default is a question mark.</p>
+            </div>
+          </td>
+          <td>
+                <code><span title="superqt.cmap._cmap_line_edit.MISSING">MISSING</span></code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>checkerboard_size</code></td>
+          <td>
+                <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Size (in pixels) of the checkerboard pattern to draw behind colormaps with
+transparency, by default 4. If 0, no checkerboard is drawn.</p>
+            </div>
+          </td>
+          <td>
+                <code>4</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
 
 
   
@@ -1351,202 +1391,134 @@ This class behaves like a <code>QSpinBox</code> backed by an unbound python int.
 
 
 
-<div class="doc doc-object doc-function">
 
-
-
-
-<h3 id="superqt.QLargeIntSpinBox.maximum" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">maximum</span><span class="p">()</span></code>
-
-<a href="#superqt.QLargeIntSpinBox.maximum" class="headerlink" title="Permanent link">#</a></h3>
-
-
-  <div class="doc doc-contents ">
+  </div>
 
   </div>
 
 </div>
 
+<div class="doc doc-object doc-class">
+
+
+
+
+<h2 id="superqt.cmap.QColormapItemDelegate" class="doc doc-heading">
+          <code>superqt.cmap.QColormapItemDelegate</code>
+
+
+<a href="#superqt.cmap.QColormapItemDelegate" class="headerlink" title="Permanent link">#</a></h2>
+
+
+  <div class="doc doc-contents first">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="qtpy.QtWidgets.QStyledItemDelegate">QStyledItemDelegate</span></code></p>
+
+  
+      <p>Delegate that draws colormaps into a QAbstractItemView item.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>parent</code></td>
+          <td>
+                <code><span title="qtpy.QtCore.QObject">QObject</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The parent object.</p>
+            </div>
+          </td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>item_size</code></td>
+          <td>
+                <code><span title="qtpy.QtCore.QSize">QSize</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The size hint for each item, by default QSize(80, 22).</p>
+            </div>
+          </td>
+          <td>
+                <code><span title="superqt.cmap._cmap_item_delegate.DEFAULT_SIZE">DEFAULT_SIZE</span></code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>fractional_colormap_width</code></td>
+          <td>
+                <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The fraction of the widget width to use for the colormap swatch. If the
+colormap is full width (greater than 0.75), the swatch will be drawn behind
+the text. Otherwise, the swatch will be drawn to the left of the text.
+Default is 0.33.</p>
+            </div>
+          </td>
+          <td>
+                <code>1</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>padding</code></td>
+          <td>
+                <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The padding (in pixels) around the edge of the item, by default 1.</p>
+            </div>
+          </td>
+          <td>
+                <code>1</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>checkerboard_size</code></td>
+          <td>
+                <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Size (in pixels) of the checkerboard pattern to draw behind colormaps with
+transparency, by default 4. If 0, no checkerboard is drawn.</p>
+            </div>
+          </td>
+          <td>
+                <code>4</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
 
-<div class="doc doc-object doc-function">
 
+  
 
+  <div class="doc doc-children">
 
 
-<h3 id="superqt.QLargeIntSpinBox.minimum" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">minimum</span><span class="p">()</span></code>
 
-<a href="#superqt.QLargeIntSpinBox.minimum" class="headerlink" title="Permanent link">#</a></h3>
 
 
-  <div class="doc doc-contents ">
 
-  </div>
 
-</div>
 
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h3 id="superqt.QLargeIntSpinBox.setMaximum" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">setMaximum</span><span class="p">(</span><span class="nb">max</span><span class="p">)</span></code>
-
-<a href="#superqt.QLargeIntSpinBox.setMaximum" class="headerlink" title="Permanent link">#</a></h3>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h3 id="superqt.QLargeIntSpinBox.setMinimum" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">setMinimum</span><span class="p">(</span><span class="nb">min</span><span class="p">)</span></code>
-
-<a href="#superqt.QLargeIntSpinBox.setMinimum" class="headerlink" title="Permanent link">#</a></h3>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h3 id="superqt.QLargeIntSpinBox.setRange" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">setRange</span><span class="p">(</span><span class="n">minimum</span><span class="p">,</span> <span class="n">maximum</span><span class="p">)</span></code>
-
-<a href="#superqt.QLargeIntSpinBox.setRange" class="headerlink" title="Permanent link">#</a></h3>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h3 id="superqt.QLargeIntSpinBox.setSingleStep" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">setSingleStep</span><span class="p">(</span><span class="n">step</span><span class="p">)</span></code>
-
-<a href="#superqt.QLargeIntSpinBox.setSingleStep" class="headerlink" title="Permanent link">#</a></h3>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h3 id="superqt.QLargeIntSpinBox.setStepType" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">setStepType</span><span class="p">(</span><span class="n">stepType</span><span class="p">:</span> <span class="n">QAbstractSpinBox</span><span class="o">.</span><span class="n">StepType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
-
-<a href="#superqt.QLargeIntSpinBox.setStepType" class="headerlink" title="Permanent link">#</a></h3>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h3 id="superqt.QLargeIntSpinBox.setValue" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">setValue</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></code>
-
-<a href="#superqt.QLargeIntSpinBox.setValue" class="headerlink" title="Permanent link">#</a></h3>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h3 id="superqt.QLargeIntSpinBox.singleStep" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">singleStep</span><span class="p">()</span></code>
-
-<a href="#superqt.QLargeIntSpinBox.singleStep" class="headerlink" title="Permanent link">#</a></h3>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h3 id="superqt.QLargeIntSpinBox.stepType" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">stepType</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">QAbstractSpinBox</span><span class="o">.</span><span class="n">StepType</span></code>
-
-<a href="#superqt.QLargeIntSpinBox.stepType" class="headerlink" title="Permanent link">#</a></h3>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h3 id="superqt.QLargeIntSpinBox.value" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">value</span><span class="p">()</span></code>
-
-<a href="#superqt.QLargeIntSpinBox.value" class="headerlink" title="Permanent link">#</a></h3>
-
-
-  <div class="doc doc-contents ">
-
-  </div>
-
-</div>
 
 
 

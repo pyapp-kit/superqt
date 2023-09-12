@@ -10,13 +10,11 @@
       
       
       
-        <link rel="canonical" href="https://github.com/pyapp-kit/superqt/widgets/qsearchablecombobox/">
+        <link rel="canonical" href="https://github.com/pyapp-kit/superqt/widgets/qsearchabletreewidget/">
       
       
-        <link rel="prev" href="../qrangeslider/">
+        <link rel="prev" href="../qsearchablelistwidget/">
       
-      
-        <link rel="next" href="../qsearchablelistwidget/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -24,7 +22,7 @@
     
     
       
-        <title>QSearchableComboBox - superqt</title>
+        <title>QSearchableTreeWidget - superqt</title>
       
     
     
@@ -71,7 +69,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#qsearchablecombobox" class="md-skip">
+        <a href="#qsearchabletreewidget" class="md-skip">
           Skip to content
         </a>
       
@@ -107,7 +105,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              QSearchableComboBox
+              QSearchableTreeWidget
             
           </span>
         </div>
@@ -903,29 +901,9 @@
                 
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    QSearchableComboBox
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../qsearchablecombobox/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -934,33 +912,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#qt-class" class="md-nav__link">
-    Qt Class
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -990,9 +941,29 @@
                 
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../qsearchabletreewidget/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    QSearchableTreeWidget
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -1001,6 +972,60 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#qt-class" class="md-nav__link">
+    Qt Class
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#methods" class="md-nav__link">
+    Methods
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#superqt.QSearchableTreeWidget.fromData" class="md-nav__link">
+    fromData()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#superqt.QSearchableTreeWidget.setData" class="md-nav__link">
+    setData()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1046,6 +1071,33 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#methods" class="md-nav__link">
+    Methods
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#superqt.QSearchableTreeWidget.fromData" class="md-nav__link">
+    fromData()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#superqt.QSearchableTreeWidget.setData" class="md-nav__link">
+    setData()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1064,26 +1116,160 @@
   
 
 
-<h1 id="qsearchablecombobox">QSearchableComboBox<a class="headerlink" href="#qsearchablecombobox" title="Permanent link">#</a></h1>
-<p><code>QSearchableComboBox</code> is a variant of
-<a href="https://doc.qt.io/qt-5/qcombobox.html"><code>QComboBox</code></a> that allow to filter list
-of options by enter part of text. It could be drop in replacement for
-<code>QComboBox</code>.</p>
+<h1 id="qsearchabletreewidget">QSearchableTreeWidget<a class="headerlink" href="#qsearchabletreewidget" title="Permanent link">#</a></h1>
+<p><code>QSearchableTreeWidget</code> combines a
+<a href="https://doc.qt.io/qt-6/qtreewidget.html"><code>QTreeWidget</code></a> and a <code>QLineEdit</code> for showing a mapping that can be searched by key.</p>
+<p>This is intended to be used with a read-only mapping and be conveniently created
+using <code>QSearchableTreeWidget.fromData(data)</code>. If the mapping changes, the
+easiest way to update this is by calling <code>setData</code>.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">qtpy.QtWidgets</span> <span class="kn">import</span> <span class="n">QApplication</span>
 
-<span class="kn">from</span> <span class="nn">superqt</span> <span class="kn">import</span> <span class="n">QSearchableComboBox</span>
+<span class="kn">from</span> <span class="nn">superqt</span> <span class="kn">import</span> <span class="n">QSearchableTreeWidget</span>
 
 <span class="n">app</span> <span class="o">=</span> <span class="n">QApplication</span><span class="p">([])</span>
 
-<span class="n">combo</span> <span class="o">=</span> <span class="n">QSearchableComboBox</span><span class="p">()</span>
-<span class="n">combo</span><span class="o">.</span><span class="n">addItems</span><span class="p">([</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="s2">&quot;baz&quot;</span><span class="p">,</span> <span class="s2">&quot;foobar&quot;</span><span class="p">,</span> <span class="s2">&quot;foobaz&quot;</span><span class="p">,</span> <span class="s2">&quot;barbaz&quot;</span><span class="p">])</span>
-<span class="n">combo</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;none&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;str&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;int&quot;</span><span class="p">:</span> <span class="mi">42</span><span class="p">,</span>
+    <span class="s2">&quot;list&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+    <span class="s2">&quot;dict&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;float&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+        <span class="s2">&quot;tuple&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">22</span><span class="p">,</span> <span class="mi">99</span><span class="p">),</span>
+        <span class="s2">&quot;bool&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+<span class="n">tree</span> <span class="o">=</span> <span class="n">QSearchableTreeWidget</span><span class="o">.</span><span class="n">fromData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">tree</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
 <span class="n">app</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span>
 </code></pre></div>
-<p><img alt="QSearchableComboBox" loading="lazy;" src="../../_auto_images/QSearchableComboBox.png" width="500" /></p>
+<p><img alt="QSearchableTreeWidget" loading="lazy;" src="../../_auto_images/QSearchableTreeWidget.png" width="500" /></p>
 <h2 id="qt-class">Qt Class<a class="headerlink" href="#qt-class" title="Permanent link">#</a></h2>
-<p><a href='https://doc.qt.io/qt-6/qcombobox.html'><code>QComboBox</code></a></p>
+<p><a href='https://doc.qt.io/qt-6/qwidget.html'><code>QWidget</code></a></p>
+<h2 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">#</a></h2>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+
+  <div class="doc doc-contents first">
+
+  
+      <p>A tree widget for showing a mapping that can be searched by key.</p>
+<p>This is intended to be used with a read-only mapping and be conveniently
+created using <code>QSearchableTreeWidget.fromData(data)</code>.
+If the mapping changes, the easiest way to update this is by calling <code>setData</code>.</p>
+<p>The tree can be searched by entering a regular expression pattern
+into the <code>filter</code> line edit. An item is only shown if its, any of its ancestors',
+or any of its descendants' keys or values match this pattern.
+The regular expression follows the conventions described by the Qt docs:
+https://doc.qt.io/qt-5/qregularexpression.html#details</p>
+
+
+
+  <p><strong>Attributes:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>tree</code></td>
+          <td>
+                <code><span title="qtpy.QtWidgets.QTreeWidget">QTreeWidget</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Shows the mapping as a tree of items.</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>filter</code></td>
+          <td>
+                <code><span title="qtpy.QtWidgets.QLineEdit">QLineEdit</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Used to filter items in the tree by matching their key against a
+regular expression.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h3 id="superqt.QSearchableTreeWidget.fromData" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">fromData</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">QWidget</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QSearchableTreeWidget</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#superqt.QSearchableTreeWidget.fromData" class="headerlink" title="Permanent link">#</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Make a searchable tree widget from a mapping.</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h3 id="superqt.QSearchableTreeWidget.setData" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">setData</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+<a href="#superqt.QSearchableTreeWidget.setData" class="headerlink" title="Permanent link">#</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Update the mapping data shown by the tree.</p>
+
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
 
 
 
