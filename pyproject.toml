@@ -75,6 +75,7 @@ font-mi6 = ["fonticon-materialdesignicons6"]
 font-mi7 = ["fonticon-materialdesignicons7"]
 
 [project.urls]
+Documentation = "https://pyapp-kit.github.io/superqt/"
 Source = "https://github.com/pyapp-kit/superqt"
 Tracker = "https://github.com/pyapp-kit/superqt/issues"
 Changelog = "https://github.com/pyapp-kit/superqt/blob/main/CHANGELOG.md"

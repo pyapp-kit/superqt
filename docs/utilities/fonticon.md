@@ -28,21 +28,44 @@ app.exec()
 
 ## Font Icon plugins
 
-Ready-made fonticon packs are available as plugins:
+Ready-made fonticon packs are available as plugins.
 
-### [Font Awesome 5](https://fontawesome.com/v5/search)
+A great way to search across most available icons libraries from a single
+search interface is to use glyphsearch: <https://glyphsearch.com/>
 
-```bash
-pip install fonticon-fontawesome5
-```
+If a font library you'd like to use is unavailable as a superqt plugin,
+please [open a feature request](https://github.com/pyapp-kit/superqt/issues/new/choose)
 
-### [Font Awesome 6](https://fontawesome.com/v6/search)
+
+### Font Awesome 6
+
+Browse available icons at <https://fontawesome.com/v6/search>
 
 ```bash
 pip install fonticon-fontawesome6
 ```
 
-### [Material Design Icons](https://materialdesignicons.com/)
+### Font Awesome 5
+
+Browse available icons at <https://fontawesome.com/v5/search>
+
+```bash
+pip install fonticon-fontawesome5
+```
+
+### Material Design Icons 7
+
+Browse available icons at <https://materialdesignicons.com/>
+
+```bash
+pip install fonticon-materialdesignicons7
+```
+
+### Material Design Icons 6
+
+Browse available icons at <https://materialdesignicons.com/>
+(note that the search defaults to v7, see changes from v6 in [the
+changelog](https://pictogrammers.com/docs/library/mdi/releases/changelog/))
 
 ```bash
 pip install fonticon-materialdesignicons6
@@ -55,7 +78,7 @@ pip install fonticon-materialdesignicons6
 - <https://github.com/tlambert03/fonticon-feather>
 
 `superqt.fonticon` is a pluggable system, and font icon packs may use the `"superqt.fonticon"`
-entry point to register themselves with superqt.  See [`fonticon-cookiecutter`](https://github.com/tlambert03/fonticon-cookiecutter) for a template, or look through the following repos for examples:
+entry point to register themselves with superqt. See [`fonticon-cookiecutter`](https://github.com/tlambert03/fonticon-cookiecutter) for a template, or look through the following repos for examples:
 
 - <https://github.com/tlambert03/fonticon-fontawesome6>
 - <https://github.com/tlambert03/fonticon-fontawesome5>
@@ -64,24 +87,24 @@ entry point to register themselves with superqt.  See [`fonticon-cookiecutter`](
 ## API
 
 ::: superqt.fonticon.icon
-    options:
-        heading_level: 3
+options:
+heading_level: 3
 
 ::: superqt.fonticon.setTextIcon
-    options:
-        heading_level: 3
+options:
+heading_level: 3
 
 ::: superqt.fonticon.font
-    options:
-        heading_level: 3
+options:
+heading_level: 3
 
 ::: superqt.fonticon.IconOpts
-    options:
-        heading_level: 3
+options:
+heading_level: 3
 
 ::: superqt.fonticon.addFont
-    options:
-        heading_level: 3
+options:
+heading_level: 3
 
 ## Animations
 
@@ -89,13 +112,13 @@ the `animation` parameter to `icon()` accepts a subclass of
 `Animation` that will be
 
 ::: superqt.fonticon.Animation
-    options:
-        heading_level: 3
+options:
+heading_level: 3
 
 ::: superqt.fonticon.pulse
-    options:
-        heading_level: 3
+options:
+heading_level: 3
 
 ::: superqt.fonticon.spin
-    options:
-        heading_level: 3
+options:
+heading_level: 3
