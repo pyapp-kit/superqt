@@ -10,7 +10,7 @@ QtWidgets module.
 Components are tested on:
 
 - macOS, Windows, & Linux
-- Python 3.7 and above
+- Python 3.8 and above
 - PyQt5 (5.11 and above) & PyQt6
 - PySide2 (5.11 and above) & PySide6
 
@@ -26,4 +26,4 @@ conda install -c conda-forge superqt
 
 ## Usage
 
-See the [Widgets](./widgets/) and [Utilities](./utilities/) pages for features offered by superqt.
+See the [Widgets](./widgets/index.md) and [Utilities](./utilities/index.md) pages for features offered by superqt.

@@ -26,17 +26,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 """
-import sys
+from __future__ import annotations
+
 from concurrent.futures import Future
 from enum import IntFlag, auto
 from functools import wraps
-from typing import TYPE_CHECKING, Callable, Generic, Optional, TypeVar, Union, overload
+from typing import TYPE_CHECKING, Callable, Generic, TypeVar, overload
+from weakref import WeakKeyDictionary
 
 from qtpy.QtCore import QObject, Qt, QTimer, Signal
 
+from ._util import get_max_args
+
 if TYPE_CHECKING:
-    from qtpy.QtCore import SignalInstance
-    from typing_extensions import Literal, ParamSpec
+    from typing_extensions import ParamSpec
 
     P = ParamSpec("P")
 # maintain runtime compatibility with older typing_extensions
@@ -70,7 +73,7 @@ class GenericSignalThrottler(QObject):
         self,
         kind: Kind,
         emissionPolicy: EmissionPolicy,
-        parent: Optional[QObject] = None,
+        parent: QObject | None = None,
     ) -> None:
         super().__init__(parent)
 
@@ -166,7 +169,7 @@ class QSignalThrottler(GenericSignalThrottler):
     def __init__(
         self,
         policy: EmissionPolicy = EmissionPolicy.Leading,
-        parent: Optional[QObject] = None,
+        parent: QObject | None = None,
     ) -> None:
         super().__init__(Kind.Throttler, policy, parent)
 
@@ -181,7 +184,7 @@ class QSignalDebouncer(GenericSignalThrottler):
     def __init__(
         self,
         policy: EmissionPolicy = EmissionPolicy.Trailing,
-        parent: Optional[QObject] = None,
+        parent: QObject | None = None,
     ) -> None:
         super().__init__(Kind.Debouncer, policy, parent)
 
@@ -189,30 +192,96 @@ class QSignalDebouncer(GenericSignalThrottler):
 # below here part is unique to superqt (not from KD)
 
 
-if TYPE_CHECKING:
-    from typing_extensions import Protocol
+class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
+    def __init__(
+        self,
+        func: Callable[P, R],
+        kind: Kind,
+        emissionPolicy: EmissionPolicy,
+        parent: QObject | None = None,
+    ) -> None:
+        super().__init__(kind, emissionPolicy, parent)
 
-    class ThrottledCallable(Generic[P, R], Protocol):
-        triggered: "SignalInstance"
-
-        def cancel(self) -> None:
-            ...
-
-        def flush(self) -> None:
-            ...
-
-        def set_timeout(self, timeout: int) -> None:
-            ...
-
-        if sys.version_info < (3, 9):
-
-            def __call__(self, *args: "P.args", **kwargs: "P.kwargs") -> Future:
-                ...
-
+        self._future: Future[R] = Future()
+        if isinstance(func, staticmethod):
+            self._func = func.__func__
         else:
+            self._func = func
 
-            def __call__(self, *args: "P.args", **kwargs: "P.kwargs") -> Future[R]:
-                ...
+        self.__wrapped__ = func
+
+        self._args: tuple = ()
+        self._kwargs: dict = {}
+        self.triggered.connect(self._set_future_result)
+        self._name = None
+
+        self._obj_dkt = WeakKeyDictionary()
+
+        # even if we were to compile __call__ with a signature matching that of func,
+        # PySide wouldn't correctly inspect the signature of the ThrottledCallable
+        # instance: https://bugreports.qt.io/browse/PYSIDE-2423
+        # so we do it ourselfs and limit the number of positional arguments
+        # that we pass to func
+        self._max_args: int | None = get_max_args(self._func)
+
+    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> "Future[R]":  # noqa
+        if not self._future.done():
+            self._future.cancel()
+
+        self._future = Future()
+        self._args = args
+        self._kwargs = kwargs
+
+        self.throttle()
+        return self._future
+
+    def _set_future_result(self):
+        result = self._func(*self._args[: self._max_args], **self._kwargs)
+        self._future.set_result(result)
+
+    def __set_name__(self, owner, name):
+        if not isinstance(self.__wrapped__, staticmethod):
+            self._name = name
+
+    def _get_throttler(self, instance, owner, parent, obj):
+        throttler = ThrottledCallable(
+            self.__wrapped__.__get__(instance, owner),
+            self._kind,
+            self._emissionPolicy,
+            parent=parent,
+        )
+        throttler.setTimerType(self.timerType())
+        throttler.setTimeout(self.timeout())
+        try:
+            setattr(
+                obj,
+                self._name,
+                throttler,
+            )
+        except AttributeError:
+            try:
+                self._obj_dkt[obj] = throttler
+            except TypeError as e:
+                raise TypeError(
+                    "To use qthrottled or qdebounced as a method decorator, "
+                    "objects must have  `__dict__` or be weak referenceable. "
+                    "Please either add `__weakref__` to `__slots__` or use"
+                    "qthrottled/qdebounced as a function (not a decorator)."
+                ) from e
+        return throttler
+
+    def __get__(self, instance, owner):
+        if instance is None or not self._name:
+            return self
+
+        if instance in self._obj_dkt:
+            return self._obj_dkt[instance]
+
+        parent = self.parent()
+        if parent is None and isinstance(instance, QObject):
+            parent = instance
+
+        return self._get_throttler(instance, owner, parent, instance)
 
 
 @overload
@@ -221,28 +290,29 @@ def qthrottled(
     timeout: int = 100,
     leading: bool = True,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
-) -> "ThrottledCallable[P, R]":
+    parent: QObject | None = None,
+) -> ThrottledCallable[P, R]:
     ...
 
 
 @overload
 def qthrottled(
-    func: Optional["Literal[None]"] = None,
+    func: None = ...,
     timeout: int = 100,
     leading: bool = True,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
-) -> Callable[[Callable[P, R]], "ThrottledCallable[P, R]"]:
+    parent: QObject | None = None,
+) -> Callable[[Callable[P, R]], ThrottledCallable[P, R]]:
     ...
 
 
 def qthrottled(
-    func: Optional[Callable[P, R]] = None,
+    func: Callable[P, R] | None = None,
     timeout: int = 100,
     leading: bool = True,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
-) -> Union[
-    "ThrottledCallable[P, R]", Callable[[Callable[P, R]], "ThrottledCallable[P, R]"]
-]:
+    parent: QObject | None = None,
+) -> ThrottledCallable[P, R] | Callable[[Callable[P, R]], ThrottledCallable[P, R]]:
     """Creates a throttled function that invokes func at most once per timeout.
 
     The throttled function comes with a `cancel` method to cancel delayed func
@@ -270,8 +340,11 @@ def qthrottled(
             - `Qt.CoarseTimer`: Coarse timers try to keep accuracy within 5% of the
               desired interval
             - `Qt.VeryCoarseTimer`: Very coarse timers only keep full second accuracy
+    parent: QObject or None
+        Parent object for timer. If using qthrottled as function it may be usefull
+        for cleaning data
     """
-    return _make_decorator(func, timeout, leading, timer_type, Kind.Throttler)
+    return _make_decorator(func, timeout, leading, timer_type, Kind.Throttler, parent)
 
 
 @overload
@@ -280,28 +353,29 @@ def qdebounced(
     timeout: int = 100,
     leading: bool = False,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
-) -> "ThrottledCallable[P, R]":
+    parent: QObject | None = None,
+) -> ThrottledCallable[P, R]:
     ...
 
 
 @overload
 def qdebounced(
-    func: Optional["Literal[None]"] = None,
+    func: None = ...,
     timeout: int = 100,
     leading: bool = False,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
-) -> Callable[[Callable[P, R]], "ThrottledCallable[P, R]"]:
+    parent: QObject | None = None,
+) -> Callable[[Callable[P, R]], ThrottledCallable[P, R]]:
     ...
 
 
 def qdebounced(
-    func: Optional[Callable[P, R]] = None,
+    func: Callable[P, R] | None = None,
     timeout: int = 100,
     leading: bool = False,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
-) -> Union[
-    "ThrottledCallable[P, R]", Callable[[Callable[P, R]], "ThrottledCallable[P, R]"]
-]:
+    parent: QObject | None = None,
+) -> ThrottledCallable[P, R] | Callable[[Callable[P, R]], ThrottledCallable[P, R]]:
     """Creates a debounced function that delays invoking `func`.
 
     `func` will not be invoked until `timeout` ms have elapsed since the last time
@@ -332,46 +406,31 @@ def qdebounced(
             - `Qt.CoarseTimer`: Coarse timers try to keep accuracy within 5% of the
               desired interval
             - `Qt.VeryCoarseTimer`: Very coarse timers only keep full second accuracy
+    parent: QObject or None
+        Parent object for timer. If using qthrottled as function it may be usefull
+        for cleaning data
     """
-    return _make_decorator(func, timeout, leading, timer_type, Kind.Debouncer)
+    return _make_decorator(func, timeout, leading, timer_type, Kind.Debouncer, parent)
 
 
 def _make_decorator(
-    func: Optional[Callable[P, R]],
+    func: Callable[P, R] | None,
     timeout: int,
     leading: bool,
     timer_type: Qt.TimerType,
     kind: Kind,
-) -> Union[
-    "ThrottledCallable[P, R]", Callable[[Callable[P, R]], "ThrottledCallable[P, R]"]
-]:
-    def deco(func: Callable[P, R]) -> "ThrottledCallable[P, R]":
+    parent: QObject | None = None,
+) -> ThrottledCallable[P, R] | Callable[[Callable[P, R]], ThrottledCallable[P, R]]:
+    def deco(func: Callable[P, R]) -> ThrottledCallable[P, R]:
+        nonlocal parent
+
+        instance: object | None = getattr(func, "__self__", None)
+        if isinstance(instance, QObject) and parent is None:
+            parent = instance
         policy = EmissionPolicy.Leading if leading else EmissionPolicy.Trailing
-        throttle = GenericSignalThrottler(kind, policy)
-        throttle.setTimerType(timer_type)
-        throttle.setTimeout(timeout)
-        last_f = None
-        future: Optional[Future] = None
-
-        @wraps(func)
-        def inner(*args: "P.args", **kwargs: "P.kwargs") -> Future:
-            nonlocal last_f
-            nonlocal future
-            if last_f is not None:
-                throttle.triggered.disconnect(last_f)
-            if future is not None and not future.done():
-                future.cancel()
-
-            future = Future()
-            last_f = lambda: future.set_result(func(*args, **kwargs))  # noqa
-            throttle.triggered.connect(last_f)
-            throttle.throttle()
-            return future
-
-        inner.cancel = throttle.cancel
-        inner.flush = throttle.flush
-        inner.set_timeout = throttle.setTimeout
-        inner.triggered = throttle.triggered
-        return inner  # type: ignore
+        obj = ThrottledCallable(func, kind, policy, parent=parent)
+        obj.setTimerType(timer_type)
+        obj.setTimeout(timeout)
+        return wraps(func)(obj)
 
     return deco(func) if func is not None else deco

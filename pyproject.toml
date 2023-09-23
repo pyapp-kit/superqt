@@ -8,9 +8,9 @@ build-backend = "hatchling.build"
 name = "superqt"
 description = "Missing widgets and components for PyQt/PySide"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 license = { text = "BSD 3-Clause License" }
-authors = [{ email = "talley.lambert@gmail.com" }, { name = "Talley Lambert" }]
+authors = [{ email = "talley.lambert@gmail.com", name = "Talley Lambert" }]
 keywords = [
     "qt",
     "pyqt",
@@ -28,7 +28,6 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -42,13 +41,13 @@ dependencies = [
     "packaging",
     "pygments>=2.4.0",
     "qtpy>=1.1.0",
-    "typing-extensions",
+    "typing-extensions >=3.7.4.3,!=3.10.0.0",
 ]
 
 # extras
 # https://peps.python.org/pep-0621/#dependencies-optional-dependencies
 [project.optional-dependencies]
-test = ["pint", "pytest", "pytest-cov", "pytest-qt"]
+test = ["pint", "pytest", "pytest-cov", "pytest-qt", "numpy", "cmap"]
 dev = [
     "black",
     "ipython",
@@ -60,8 +59,9 @@ dev = [
     "rich",
     "types-Pygments",
 ]
-docs = ["mkdocs-macros-plugin", "mkdocs-material", "mkdocstrings[python]"]
+docs = ["mkdocs-macros-plugin", "mkdocs-material", "mkdocstrings[python]", "pint", "cmap"]
 quantity = ["pint"]
+cmap = ["cmap >=0.1.1"]
 pyside2 = ["pyside2"]
 # see issues surrounding usage of Generics in pyside6.5.x
 # https://github.com/pyapp-kit/superqt/pull/177
@@ -75,6 +75,7 @@ font-mi6 = ["fonticon-materialdesignicons6"]
 font-mi7 = ["fonticon-materialdesignicons7"]
 
 [project.urls]
+Documentation = "https://pyapp-kit.github.io/superqt/"
 Source = "https://github.com/pyapp-kit/superqt"
 Tracker = "https://github.com/pyapp-kit/superqt/issues"
 Changelog = "https://github.com/pyapp-kit/superqt/blob/main/CHANGELOG.md"
@@ -85,6 +86,30 @@ source = "vcs"
 [tool.hatch.build.targets.sdist]
 include = ["src", "tests", "CHANGELOG.md"]
 
+# these let you run tests across all backends easily with:
+# hatch run test:test
+[tool.hatch.envs.test]
+
+[tool.hatch.envs.test.scripts]
+test = "pytest"
+
+[[tool.hatch.envs.test.matrix]]
+qt = ["pyside6", "pyqt6"]
+python = ["3.11"]
+
+[[tool.hatch.envs.test.matrix]]
+qt = ["pyside2", "pyqt5", "pyqt5.12"]
+python = ["3.8"]
+
+[tool.hatch.envs.test.overrides]
+matrix.qt.extra-dependencies = [
+  {value = "pyside2", if = ["pyside2"]},
+  {value = "pyside6", if = ["pyside6"]},
+  {value = "pyqt5", if = ["pyqt5"]},
+  {value = "pyqt6", if = ["pyqt6"]},
+  {value = "pyqt5==5.12", if = ["pyqt5.12"]},
+]
+
 # https://pycqa.github.io/isort/docs/configuration/options.html
 [tool.isort]
 profile = "black"
@@ -93,19 +118,21 @@ src_paths = ["src/superqt", "tests"]
 # https://github.com/charliermarsh/ruff
 [tool.ruff]
 line-length = 88
-target-version = "py37"
+target-version = "py38"
 src = ["src", "tests"]
 select = [
     "E",    # style errors
     "F",    # flakes
+    "W",    # flakes
     "D",    # pydocstyle
     "I",    # isort
     "UP",   # pyupgrade
     "S",    # bandit
-    "C",    # flake8-comprehensions
+    "C4",   # flake8-comprehensions
     "B",    # flake8-bugbear
     "A001", # flake8-builtins
     "RUF",  # ruff-specific rules
+    "TID",  # tidy imports
 ]
 ignore = [
     "D100", # Missing docstring in public module
@@ -118,7 +145,6 @@ ignore = [
     "D401", # First line should be in imperative mood
     "D413", # Missing blank line after last section
     "D416", # Section name should end with a colon
-    "C901", # Function is too complex
 ]
 
 
@@ -158,12 +184,16 @@ warn_unused_ignores = false
 allow_redefinition = true
 
 # https://coverage.readthedocs.io/en/6.4/config.html
+[tool.coverage.run]
+source = ["src/superqt"]
+
 [tool.coverage.report]
 exclude_lines = [
     "pragma: no cover",
     "if TYPE_CHECKING:",
     "@overload",
     "except ImportError",
+    "\\.\\.\\."
 ]
 
 # https://github.com/mgedmin/check-manifest#configuration
@@ -180,5 +210,4 @@ ignore = [
     "CONTRIBUTING.md",
     "codecov.yml",
     ".ruff_cache/**/*",
-    "setup.py",
 ]

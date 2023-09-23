@@ -1,5 +1,55 @@
 # Changelog
 
+## [v0.5.4](https://github.com/pyapp-kit/superqt/tree/v0.5.4) (2023-08-31)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.5.3...v0.5.4)
+
+**Fixed bugs:**
+
+- fix: fix mysterious segfault [\#192](https://github.com/pyapp-kit/superqt/pull/192) ([tlambert03](https://github.com/tlambert03))
+
+## [v0.5.3](https://github.com/pyapp-kit/superqt/tree/v0.5.3) (2023-08-21)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.5.2...v0.5.3)
+
+**Implemented enhancements:**
+
+- feat: add error `exceptions_as_dialog` context manager to catch and show Exceptions [\#191](https://github.com/pyapp-kit/superqt/pull/191) ([tlambert03](https://github.com/tlambert03))
+
+**Fixed bugs:**
+
+- fix: remove dupes/aliases in QEnumCombo [\#190](https://github.com/pyapp-kit/superqt/pull/190) ([tlambert03](https://github.com/tlambert03))
+
+## [v0.5.2](https://github.com/pyapp-kit/superqt/tree/v0.5.2) (2023-08-18)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.5.1...v0.5.2)
+
+**Implemented enhancements:**
+
+- feat: allow throttler/debouncer as method decorator [\#188](https://github.com/pyapp-kit/superqt/pull/188) ([Czaki](https://github.com/Czaki))
+
+**Fixed bugs:**
+
+- fix: Add descriptive exception when fail to add instance to weakref dictionary  [\#189](https://github.com/pyapp-kit/superqt/pull/189) ([Czaki](https://github.com/Czaki))
+
+## [v0.5.1](https://github.com/pyapp-kit/superqt/tree/v0.5.1) (2023-08-17)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.5.0...v0.5.1)
+
+**Fixed bugs:**
+
+- fix: fix parameter inspection on ensure\_thread decorators \(alternate\) [\#185](https://github.com/pyapp-kit/superqt/pull/185) ([tlambert03](https://github.com/tlambert03))
+- fix: fix callback of throttled/debounced decorated functions with mismatched args [\#184](https://github.com/pyapp-kit/superqt/pull/184) ([tlambert03](https://github.com/tlambert03))
+
+**Documentation updates:**
+
+- docs: document signals blocked [\#186](https://github.com/pyapp-kit/superqt/pull/186) ([tlambert03](https://github.com/tlambert03))
+
+**Merged pull requests:**
+
+- test: change wait pattern [\#187](https://github.com/pyapp-kit/superqt/pull/187) ([tlambert03](https://github.com/tlambert03))
+- build: drop python3.7, misc updates to repo [\#180](https://github.com/pyapp-kit/superqt/pull/180) ([tlambert03](https://github.com/tlambert03))
+
 ## [v0.5.0](https://github.com/pyapp-kit/superqt/tree/v0.5.0) (2023-08-06)
 
 [Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.4.1...v0.5.0)

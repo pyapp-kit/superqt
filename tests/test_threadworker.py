@@ -1,4 +1,5 @@
 import inspect
+import threading
 import time
 import warnings
 from functools import partial
@@ -280,15 +281,20 @@ def test_abort_does_not_return(qtbot):
 def test_nested_threads_start(qtbot):
     mock1 = Mock()
     mock2 = Mock()
+    event = threading.Event()
 
-    def call_mock():
+    def call_mock(_e=event):
+        def nested_func():
+            mock2()
+            _e.set()
+
         mock1()
-        worker2 = qthreading.create_worker(mock2)
+        worker2 = qthreading.create_worker(nested_func)
         worker2.start()
 
     worker = qthreading.create_worker(call_mock)
     worker.start()
 
-    qtbot.wait(20)
+    event.wait(timeout=2)
     mock1.assert_called_once()
     mock2.assert_called_once()

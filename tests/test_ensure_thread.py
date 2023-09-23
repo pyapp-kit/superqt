@@ -1,7 +1,10 @@
 import inspect
 import os
+import threading
 import time
 from concurrent.futures import Future, TimeoutError
+from functools import wraps
+from unittest.mock import Mock
 
 import pytest
 from qtpy.QtCore import QCoreApplication, QObject, QThread, Signal
@@ -217,3 +220,80 @@ def test_object_thread(qtbot):
     assert ob.thread() is thread
     with qtbot.waitSignal(thread.finished):
         thread.quit()
+
+
+@pytest.mark.parametrize("mode", ["method", "func", "wrapped"])
+@pytest.mark.parametrize("deco", [ensure_main_thread, ensure_object_thread])
+def test_ensure_thread_sig_inspection(deco, mode):
+    class Emitter(QObject):
+        sig = Signal(int, int, int)
+
+    obj = Emitter()
+    mock = Mock()
+
+    if mode == "method":
+
+        class Receiver(QObject):
+            @deco
+            def func(self, a: int, b: int):
+                mock(a, b)
+
+        r = Receiver()
+        obj.sig.connect(r.func)
+    elif deco == ensure_object_thread:
+        return  # not compatible with function types
+
+    elif mode == "wrapped":
+
+        def wr(fun):
+            @wraps(fun)
+            def wr2(*args):
+                mock(*args)
+                return fun(*args) * 2
+
+            return wr2
+
+        @deco
+        @wr
+        def wrapped_func(a, b):
+            return a + b
+
+        obj.sig.connect(wrapped_func)
+
+    elif mode == "func":
+
+        @deco
+        def func(a: int, b: int) -> None:
+            mock(a, b)
+
+        obj.sig.connect(func)
+
+    # this is the crux of the test...
+    # we emit 3 args, but the function only takes 2
+    # this should normally work fine in Qt.
+    # testing here that the decorator doesn't break it.
+    obj.sig.emit(1, 2, 3)
+    mock.assert_called_once_with(1, 2)
+
+
+def test_main_thread_function(qtbot):
+    """Testing decorator on a function rather than QObject method."""
+
+    mock = Mock()
+
+    class Emitter(QObject):
+        sig = Signal(int, int, int)
+
+    @ensure_main_thread
+    def func(x: int) -> None:
+        mock(x, QThread.currentThread())
+
+    e = Emitter()
+    e.sig.connect(func)
+
+    with qtbot.waitSignal(e.sig):
+        thread = threading.Thread(target=e.sig.emit, args=(1, 2, 3))
+        thread.start()
+        thread.join()
+
+    mock.assert_called_once_with(1, QCoreApplication.instance().thread())
