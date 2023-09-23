@@ -139,18 +139,28 @@ class GenericSignalThrottler(QObject):
         """Cancel any pending emissions."""
         self._hasPendingEmission = False
 
-    def flush(self) -> None:
-        """Force emission of any pending emissions."""
-        self._maybeEmitTriggered()
+    def flush(self, restart_timer: bool = True) -> None:
+        """
+        Force emission of any pending emissions.
+
+        Parameters
+        ----------
+        restart_timer : bool
+            Whether to restart the timer after flushing.
+            Defaults to True.
+        """
+        self._maybeEmitTriggered(restart_timer=restart_timer)
 
     def _emitTriggered(self) -> None:
         self._hasPendingEmission = False
         self.triggered.emit()
         self._timer.start()
 
-    def _maybeEmitTriggered(self) -> None:
+    def _maybeEmitTriggered(self, restart_timer=True) -> None:
         if self._hasPendingEmission:
             self._emitTriggered()
+        if not restart_timer:
+            self._timer.stop()
 
     Kind = Kind
     EmissionPolicy = EmissionPolicy
