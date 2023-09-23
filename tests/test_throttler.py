@@ -27,6 +27,41 @@ def test_debounced(qtbot):
     assert mock2.call_count == 10
 
 
+@pytest.mark.usefixtures("qapp")
+def test_stop_timer_simple():
+    mock = Mock()
+
+    @qdebounced(timeout=5)
+    def f1() -> str:
+        mock()
+
+    f1()
+    assert f1._timer.isActive()
+    mock.assert_not_called()
+    f1.flush(restart_timer=False)
+    assert not f1._timer.isActive()
+    mock.assert_called_once()
+
+
+@pytest.mark.usefixtures("qapp")
+def test_stop_timer_no_event_pending():
+    mock = Mock()
+
+    @qdebounced(timeout=5)
+    def f1() -> str:
+        mock()
+
+    f1()
+    assert f1._timer.isActive()
+    mock.assert_not_called()
+    f1.flush()
+    assert f1._timer.isActive()
+    mock.assert_called_once()
+    f1.flush(restart_timer=False)
+    assert not f1._timer.isActive()
+    mock.assert_called_once()
+
+
 def test_debouncer_method(qtbot):
     class A(QObject):
         def __init__(self):
