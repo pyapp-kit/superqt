@@ -12,10 +12,8 @@ NONE_STRING = "----"
 
 def _get_name(enum_value: Enum):
     """Create human readable name if user does not implement `__str__`."""
-    if (
-        enum_value.__str__.__module__ != "enum"
-        and not enum_value.__str__.__module__.startswith("shibokensupport")
-    ):
+    str_module = getattr(enum_value.__str__, "__module__", "enum")
+    if str_module != "enum" and not str_module.startswith("shibokensupport"):
         # check if function was overloaded
         name = str(enum_value)
     else:

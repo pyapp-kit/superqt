@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import Enum, IntEnum
 
 import pytest
 
@@ -34,6 +34,12 @@ class Enum4(Enum):
     a_1 = 1
     b_2 = 2
     c_3 = 3
+
+
+class IntEnum1(IntEnum):
+    a = 1
+    b = 2
+    c = 5
 
 
 def test_simple_create(qtbot):
@@ -129,3 +135,10 @@ def test_optional(qtbot):
     enum.setCurrentEnum(None)
     assert enum.currentText() == NONE_STRING
     assert enum.currentEnum() is None
+
+
+def test_simple_create_int_enum(qtbot):
+    enum = QEnumComboBox(enum_class=IntEnum1)
+    qtbot.addWidget(enum)
+    assert enum.count() == 3
+    assert [enum.itemText(i) for i in range(enum.count())] == ["a", "b", "c"]
