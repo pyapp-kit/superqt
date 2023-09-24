@@ -66,8 +66,7 @@ class QCollapsible(QFrame):
 
     def setText(self, text: str) -> None:
         """Set the text of the toggle button."""
-        current = self._toggle_btn.text()
-        self._toggle_btn.setText(current + text)
+        self._toggle_btn.setText(text)
 
     def text(self) -> str:
         """Return the text of the toggle button."""
