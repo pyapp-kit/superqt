@@ -1,5 +1,39 @@
 # Changelog
 
+## [v0.6.0](https://github.com/pyapp-kit/superqt/tree/v0.6.0) (2023-09-25)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.5.4...v0.6.0)
+
+**Implemented enhancements:**
+
+- feat: add support for flag enum [\#207](https://github.com/pyapp-kit/superqt/pull/207) ([Czaki](https://github.com/Czaki))
+- Add restart\_timer argument to GenericSignalThrottler.flush [\#206](https://github.com/pyapp-kit/superqt/pull/206) ([Czaki](https://github.com/Czaki))
+- Add colormap combobox and utils [\#195](https://github.com/pyapp-kit/superqt/pull/195) ([tlambert03](https://github.com/tlambert03))
+- feat: add QColorComboBox for picking single colors [\#194](https://github.com/pyapp-kit/superqt/pull/194) ([tlambert03](https://github.com/tlambert03))
+
+**Fixed bugs:**
+
+- Fix IntEnum for python 3.11 [\#205](https://github.com/pyapp-kit/superqt/pull/205) ([Czaki](https://github.com/Czaki))
+- fix: don't reuse text in qcollapsible [\#204](https://github.com/pyapp-kit/superqt/pull/204) ([tlambert03](https://github.com/tlambert03))
+- fix: sliderMoved event on RangeSliders [\#200](https://github.com/pyapp-kit/superqt/pull/200) ([tlambert03](https://github.com/tlambert03))
+
+**Documentation updates:**
+
+- docs: add colormap utils and QSearchableTreeWidget to docs [\#199](https://github.com/pyapp-kit/superqt/pull/199) ([tlambert03](https://github.com/tlambert03))
+- docs: update fonticon docs [\#198](https://github.com/pyapp-kit/superqt/pull/198) ([tlambert03](https://github.com/tlambert03))
+
+**Tests & CI:**
+
+- ci: \[pre-commit.ci\] autoupdate [\#193](https://github.com/pyapp-kit/superqt/pull/193) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
+
+**Refactors:**
+
+- refactor: Labeled slider updates [\#197](https://github.com/pyapp-kit/superqt/pull/197) ([tlambert03](https://github.com/tlambert03))
+
+**Merged pull requests:**
+
+- ci\(dependabot\): bump actions/checkout from 3 to 4 [\#196](https://github.com/pyapp-kit/superqt/pull/196) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v0.5.4](https://github.com/pyapp-kit/superqt/tree/v0.5.4) (2023-08-31)
 
 [Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.5.3...v0.5.4)
