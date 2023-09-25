@@ -1,5 +1,9 @@
-from enum import Enum, EnumMeta
-from typing import Optional, TypeVar
+import sys
+from enum import Enum, EnumMeta, Flag
+from functools import reduce
+from itertools import combinations
+from operator import or_
+from typing import Optional, Tuple, TypeVar
 
 from qtpy.QtCore import Signal
 from qtpy.QtWidgets import QComboBox
@@ -17,8 +21,34 @@ def _get_name(enum_value: Enum):
         # check if function was overloaded
         name = str(enum_value)
     else:
-        name = enum_value.name.replace("_", " ")
+        if enum_value.name is None:
+            # This is hack for python bellow 3.11
+            if not isinstance(enum_value, Flag):
+                raise TypeError(
+                    f"Expected Flag instance, got {enum_value}"
+                )  # pragma: no cover
+            if sys.version_info >= (3, 11):
+                # There is a bug in some releases of Python 3.11 (for example 3.11.3)
+                # that leads to wrong evaluation of or operation on Flag members
+                # and produces numeric value without proper set name property.
+                return f"{enum_value.value}"
+
+            # Before python 3.11 there is no smart name set during
+            # the creation of Flag members.
+            # We needs to decompose the value to get the name.
+            # It is under if condition because it uses private API.
+
+            from enum import _decompose
+
+            members, not_covered = _decompose(enum_value.__class__, enum_value.value)
+            name = "|".join(m.name.replace("_", " ") for m in members[::-1])
+        else:
+            name = enum_value.name.replace("_", " ")
     return name
+
+
+def _get_name_with_value(enum_value: Enum) -> Tuple[str, Enum]:
+    return _get_name(enum_value), enum_value
 
 
 class QEnumComboBox(QComboBox):
@@ -47,9 +77,20 @@ class QEnumComboBox(QComboBox):
         self._allow_none = allow_none and enum is not None
         if allow_none:
             super().addItem(NONE_STRING)
-        names = map(_get_name, self._enum_class.__members__.values())
-        _names = dict.fromkeys(names)  # remove duplicates/aliases, keep order
-        super().addItems(list(_names))
+        names_ = self._get_enum_member_list(enum)
+        super().addItems(list(names_))
+
+    @staticmethod
+    def _get_enum_member_list(enum: Optional[EnumMeta]):
+        if issubclass(enum, Flag):
+            members = list(enum.__members__.values())
+            comb_list = []
+            for i in range(len(members)):
+                comb_list.extend(reduce(or_, x) for x in combinations(members, i + 1))
+
+        else:
+            comb_list = list(enum.__members__.values())
+        return dict(map(_get_name_with_value, comb_list))
 
     def enumClass(self) -> Optional[EnumMeta]:
         """Return current Enum class."""
@@ -70,11 +111,7 @@ class QEnumComboBox(QComboBox):
             if self._allow_none:
                 if self.currentText() == NONE_STRING:
                     return None
-                else:
-                    return list(self._enum_class.__members__.values())[
-                        self.currentIndex() - 1
-                    ]
-            return list(self._enum_class.__members__.values())[self.currentIndex()]
+            return self._get_enum_member_list(self._enum_class)[self.currentText()]
         return None
 
     def setCurrentEnum(self, value: Optional[EnumType]) -> None:

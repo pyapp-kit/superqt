@@ -1,4 +1,5 @@
-from enum import Enum, IntEnum
+import sys
+from enum import Enum, Flag, IntEnum, IntFlag
 
 import pytest
 
@@ -40,6 +41,36 @@ class IntEnum1(IntEnum):
     a = 1
     b = 2
     c = 5
+
+
+class IntFlag1(IntFlag):
+    a = 1
+    b = 2
+    c = 4
+
+
+class Flag1(Flag):
+    a = 1
+    b = 2
+    c = 4
+
+
+class IntFlag2(IntFlag):
+    a = 1
+    b = 2
+    c = 3
+
+
+class Flag2(IntFlag):
+    a = 1
+    b = 2
+    c = 5
+
+
+class FlagOrNum(IntFlag):
+    a = 3
+    b = 5
+    c = 8
 
 
 def test_simple_create(qtbot):
@@ -140,5 +171,60 @@ def test_optional(qtbot):
 def test_simple_create_int_enum(qtbot):
     enum = QEnumComboBox(enum_class=IntEnum1)
     qtbot.addWidget(enum)
-    assert enum.count() == 3
+    assert [enum.itemText(i) for i in range(enum.count())] == ["a", "b", "c"]
+
+
+@pytest.mark.parametrize("enum_class", [IntFlag1, Flag1])
+def test_enum_flag_create(qtbot, enum_class):
+    enum = QEnumComboBox(enum_class=enum_class)
+    qtbot.addWidget(enum)
+    assert [enum.itemText(i) for i in range(enum.count())] == [
+        "a",
+        "b",
+        "c",
+        "a|b",
+        "a|c",
+        "b|c",
+        "a|b|c",
+    ]
+    enum.setCurrentText("a|b")
+    assert enum.currentEnum() == enum_class.a | enum_class.b
+
+
+def test_enum_flag_create_collision(qtbot):
+    enum = QEnumComboBox(enum_class=IntFlag2)
+    qtbot.addWidget(enum)
+    assert [enum.itemText(i) for i in range(enum.count())] == ["a", "b", "c"]
+
+
+@pytest.mark.skipif(
+    sys.version_info >= (3, 11), reason="different representation in 3.11"
+)
+def test_enum_flag_create_collision_evaluated_to_seven(qtbot):
+    enum = QEnumComboBox(enum_class=FlagOrNum)
+    qtbot.addWidget(enum)
+    assert [enum.itemText(i) for i in range(enum.count())] == [
+        "a",
+        "b",
+        "c",
+        "a|b",
+        "a|c",
+        "b|c",
+        "a|b|c",
+    ]
+
+
+@pytest.mark.skipif(
+    sys.version_info < (3, 11), reason="StrEnum is introduced in python 3.11"
+)
+def test_create_str_enum(qtbot):
+    from enum import StrEnum
+
+    class StrEnum1(StrEnum):
+        a = "a"
+        b = "b"
+        c = "c"
+
+    enum = QEnumComboBox(enum_class=StrEnum1)
+    qtbot.addWidget(enum)
     assert [enum.itemText(i) for i in range(enum.count())] == ["a", "b", "c"]
