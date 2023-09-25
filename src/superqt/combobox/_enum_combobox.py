@@ -1,3 +1,4 @@
+import sys
 from enum import Enum, EnumMeta, Flag
 from functools import reduce
 from itertools import combinations
@@ -20,7 +21,20 @@ def _get_name(enum_value: Enum):
         # check if function was overloaded
         name = str(enum_value)
     else:
-        name = enum_value.name.replace("_", " ")
+        if enum_value.name is None:
+            # This is hack for python bellow 3.11
+            if not isinstance(enum_value, Flag):
+                raise TypeError(
+                    f"Expected Flag instance, got {enum_value}"
+                )  # pragma: no cover
+            if sys.version_info >= (3, 11):
+                return f"{enum_value.value}"
+            from enum import _decompose
+
+            members, not_covered = _decompose(enum_value.__class__, enum_value.value)
+            name = "|".join(m.name.replace("_", " ") for m in members[::-1])
+        else:
+            name = enum_value.name.replace("_", " ")
     return name
 
 
