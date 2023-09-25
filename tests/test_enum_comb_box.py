@@ -177,6 +177,8 @@ def test_enum_flag_create(qtbot, enum_class):
         "b|c",
         "a|b|c",
     ]
+    enum.setCurrentText("a|b")
+    assert enum.currentEnum() == enum_class.a | enum_class.b
 
 
 def test_enum_flag_create_collision(qtbot):

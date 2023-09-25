@@ -2,7 +2,7 @@ from enum import Enum, EnumMeta, Flag
 from functools import reduce
 from itertools import combinations
 from operator import or_
-from typing import Optional, TypeVar
+from typing import Optional, Tuple, TypeVar
 
 from qtpy.QtCore import Signal
 from qtpy.QtWidgets import QComboBox
@@ -22,6 +22,10 @@ def _get_name(enum_value: Enum):
     else:
         name = enum_value.name.replace("_", " ")
     return name
+
+
+def _get_name_with_value(enum_value: Enum) -> Tuple[str, Enum]:
+    return _get_name(enum_value), enum_value
 
 
 class QEnumComboBox(QComboBox):
@@ -50,16 +54,20 @@ class QEnumComboBox(QComboBox):
         self._allow_none = allow_none and enum is not None
         if allow_none:
             super().addItem(NONE_STRING)
+        names_ = self._get_enum_member_list(enum)
+        super().addItems(list(names_))
+
+    @staticmethod
+    def _get_enum_member_list(enum: Optional[EnumMeta]):
         if issubclass(enum, Flag):
-            members = list(self._enum_class.__members__.values())
+            members = list(enum.__members__.values())
             comb_list = []
             for i in range(len(members)):
                 comb_list.extend(reduce(or_, x) for x in combinations(members, i + 1))
-            names = map(_get_name, comb_list)
+
         else:
-            names = map(_get_name, self._enum_class.__members__.values())
-        _names = dict.fromkeys(names)  # remove duplicates/aliases, keep order
-        super().addItems(list(_names))
+            comb_list = list(enum.__members__.values())
+        return dict(map(_get_name_with_value, comb_list))
 
     def enumClass(self) -> Optional[EnumMeta]:
         """Return current Enum class."""
@@ -80,11 +88,7 @@ class QEnumComboBox(QComboBox):
             if self._allow_none:
                 if self.currentText() == NONE_STRING:
                     return None
-                else:
-                    return list(self._enum_class.__members__.values())[
-                        self.currentIndex() - 1
-                    ]
-            return list(self._enum_class.__members__.values())[self.currentIndex()]
+            return self._get_enum_member_list(self._enum_class)[self.currentText()]
         return None
 
     def setCurrentEnum(self, value: Optional[EnumType]) -> None:
