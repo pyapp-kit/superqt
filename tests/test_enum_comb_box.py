@@ -198,53 +198,6 @@ def test_enum_flag_create_collision(qtbot):
 
 
 @pytest.mark.skipif(
-    sys.version_info < (3, 11), reason="different representation in 3.11"
-)
-def test_enum_flag_create_collision_not_covered_py311(qtbot):
-    enum = QEnumComboBox(enum_class=Flag2)
-    qtbot.addWidget(enum)
-    assert [enum.itemText(i) for i in range(enum.count())] == [
-        "a",
-        "b",
-        "c",
-        "a|b",
-        "a|b|4",
-    ]
-
-
-@pytest.mark.skipif(
-    sys.version_info >= (3, 11), reason="different representation in 3.11"
-)
-def test_enum_flag_create_collision_not_covered(qtbot):
-    enum = QEnumComboBox(enum_class=Flag2)
-    qtbot.addWidget(enum)
-    assert [enum.itemText(i) for i in range(enum.count())] == [
-        "a",
-        "b",
-        "c",
-        "a|b",
-        "a|b|c",
-    ]
-
-
-@pytest.mark.skipif(
-    sys.version_info < (3, 11), reason="different representation in 3.11"
-)
-def test_enum_flag_create_collision_evaluated_to_seven_py311(qtbot):
-    enum = QEnumComboBox(enum_class=FlagOrNum)
-    qtbot.addWidget(enum)
-    assert [enum.itemText(i) for i in range(enum.count())] == [
-        "a",
-        "b",
-        "c",
-        "7",
-        "c|3",
-        "c|5",
-        "c|7",
-    ]
-
-
-@pytest.mark.skipif(
     sys.version_info >= (3, 11), reason="different representation in 3.11"
 )
 def test_enum_flag_create_collision_evaluated_to_seven(qtbot):
