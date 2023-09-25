@@ -1,4 +1,7 @@
-from enum import Enum, EnumMeta
+from enum import Enum, EnumMeta, Flag
+from functools import reduce
+from itertools import combinations
+from operator import or_
 from typing import Optional, TypeVar
 
 from qtpy.QtCore import Signal
@@ -47,7 +50,14 @@ class QEnumComboBox(QComboBox):
         self._allow_none = allow_none and enum is not None
         if allow_none:
             super().addItem(NONE_STRING)
-        names = map(_get_name, self._enum_class.__members__.values())
+        if issubclass(enum, Flag):
+            members = list(self._enum_class.__members__.values())
+            comb_list = []
+            for i in range(len(members)):
+                comb_list.extend(reduce(or_, x) for x in combinations(members, i + 1))
+            names = map(_get_name, comb_list)
+        else:
+            names = map(_get_name, self._enum_class.__members__.values())
         _names = dict.fromkeys(names)  # remove duplicates/aliases, keep order
         super().addItems(list(_names))
 
