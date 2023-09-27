@@ -74,7 +74,7 @@ class connection_token:
             # perform the connection
             connection = CONNECT(*args, **kwargs)
             # store the connection for later disconnection
-            self._connections.append(connection)
+            self.append(connection)
             return connection
 
         # create a patcher for SignalInstance.connect
@@ -91,6 +91,10 @@ class connection_token:
 
     def __len__(self) -> int:
         return len(self._connections)
+
+    def append(self, connection: QMetaObject.Connection) -> None:
+        """Manually store a connection."""
+        self._connections.append(connection)
 
     def disconnect(self) -> None:
         """Disconnect all connections stored in this token."""
