@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, Iterator
 from unittest.mock import patch
@@ -9,7 +11,7 @@ if TYPE_CHECKING:
 
 
 @contextmanager
-def signals_blocked(obj: "QObject") -> Iterator[None]:
+def signals_blocked(obj: QObject) -> Iterator[None]:
     """Context manager to temporarily block signals emitted by QObject: `obj`.
 
     Parameters
@@ -80,7 +82,7 @@ class connection_token:
         # create a patcher for SignalInstance.connect
         self._patch_connect = patch.object(SignalInstance, "connect", _store_connection)
 
-    def __enter__(self) -> "connection_token":
+    def __enter__(self) -> connection_token:
         """Start the patcher."""
         self._patch_connect.start()
         return self
