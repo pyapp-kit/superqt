@@ -5,8 +5,8 @@ if TYPE_CHECKING:
 
 __all__ = (
     "CodeSyntaxHighlight",
+    "connection_token",
     "create_worker",
-    "qimage_to_array",
     "draw_colormap",
     "ensure_main_thread",
     "ensure_object_thread",
@@ -15,11 +15,13 @@ __all__ = (
     "GeneratorWorker",
     "new_worker_qthread",
     "qdebounced",
+    "qimage_to_array",
     "QMessageHandler",
     "QSignalDebouncer",
     "QSignalThrottler",
     "qthrottled",
     "signals_blocked",
+    "temporary_connections",
     "thread_worker",
     "WorkerBase",
 )
@@ -29,7 +31,7 @@ from ._ensure_thread import ensure_main_thread, ensure_object_thread
 from ._errormsg_context import exceptions_as_dialog
 from ._img_utils import qimage_to_array
 from ._message_handler import QMessageHandler
-from ._misc import signals_blocked
+from ._misc import connection_token, signals_blocked, temporary_connections
 from ._qthreading import (
     FunctionWorker,
     GeneratorWorker,

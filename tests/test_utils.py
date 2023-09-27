@@ -7,7 +7,7 @@ import qtpy
 from qtpy.QtCore import QObject, QTimer, Signal
 from qtpy.QtWidgets import QApplication, QErrorMessage, QMessageBox
 
-from superqt.utils import exceptions_as_dialog, signals_blocked
+from superqt.utils import exceptions_as_dialog, signals_blocked, temporary_connections
 from superqt.utils._util import get_max_args
 
 
@@ -139,3 +139,22 @@ def test_exception_context(qtbot, qapp: QApplication) -> None:
     assert isinstance(ctx.dialog, QMessageBox)
     assert ctx.dialog.result() == QMessageBox.StandardButton.Ok
     assert ctx.exception is exc
+
+
+def test_connection_token():
+    # this tests both the temporary_connections and connection_token
+    class Emitter(QObject):
+        sig = Signal()
+
+    emitter = Emitter()
+    cb = Mock()
+
+    with temporary_connections() as token:
+        emitter.sig.connect(cb)
+        emitter.sig.emit()
+        cb.assert_called_once()
+        cb.reset_mock()
+
+    emitter.sig.emit()
+    cb.assert_not_called()
+    assert not token
