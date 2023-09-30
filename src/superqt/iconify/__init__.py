@@ -34,15 +34,13 @@ class QIconifyIcon(QIcon):
         Icon set prefix and name. May be passed as a single string in the format
         `"prefix:name"` or as two separate strings: `'prefix', 'name'`.
     color : str, optional
-        Icon color. Replaces currentColor with specific color, resulting in icon with
-        hardcoded palette.
+        Icon color. If not provided, the icon will appear black (the icon fill color
+        will be set to the string "currentColor").
     flip : str, optional
-        Flip icon.
+        Flip icon.  Must be one of "horizontal", "vertical", "horizontal,vertical"
     rotate : str | int, optional
-        Rotate icon. If an integer is provided, it is assumed to be in degrees.
-    prefix : str, optional
-        If not None, the temp file name will begin with that prefix, otherwise a default
-        prefix is used.
+        Rotate icon. Must be one of 90, 180, 270,
+        or 1, 2, 3 (equivalent to 90, 180, 270, respectively)
     dir : str, optional
         If 'dir' is not None, the file will be created in that directory, otherwise a
         default directory is used.
@@ -62,7 +60,6 @@ class QIconifyIcon(QIcon):
         color: str | None = None,
         flip: Flip | None = None,
         rotate: Rotation | None = None,
-        prefix: str | None = None,
         dir: str | None = None,
     ):
         try:
@@ -72,7 +69,5 @@ class QIconifyIcon(QIcon):
                 "pyconify is required to use QIconifyIcon. "
                 "Please install it with `pip install pyconify`"
             ) from None
-        self.path = temp_svg(
-            *key, color=color, flip=flip, rotate=rotate, prefix=prefix, dir=dir
-        )
+        self.path = temp_svg(*key, color=color, flip=flip, rotate=rotate, dir=dir)
         super().__init__(self.path)
