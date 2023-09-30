@@ -10,6 +10,7 @@ except PackageNotFoundError:
 from .collapsible import QCollapsible
 from .combobox import QColorComboBox, QEnumComboBox, QSearchableComboBox
 from .elidable import QElidingLabel, QElidingLineEdit
+from .iconify import QIconifyIcon
 from .selection import QSearchableListWidget, QSearchableTreeWidget
 from .sliders import (
     QDoubleRangeSlider,
@@ -35,6 +36,7 @@ __all__ = [
     "QElidingLineEdit",
     "QEnumComboBox",
     "QLabeledDoubleRangeSlider",
+    "QIconifyIcon",
     "QLabeledDoubleSlider",
     "QLabeledRangeSlider",
     "QLabeledSlider",
