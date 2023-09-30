@@ -72,4 +72,4 @@ class QIconifyIcon(QIcon):
                 "`pip install superqt[iconify]` extra."
             ) from e
         self.path = svg_path(*key, color=color, flip=flip, rotate=rotate, dir=dir)
-        super().__init__(self.path)
+        super().__init__(str(self.path))
