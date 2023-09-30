@@ -7,7 +7,7 @@ app = QApplication([])
 
 btn = QPushButton()
 # search https://icon-sets.iconify.design for available icon keys
-btn.setIcon(QIconifyIcon("fa:smile-o", color="blue"))
+btn.setIcon(QIconifyIcon("fluent-emoji-flat:alarm-clock"))
 btn.setIconSize(QSize(60, 60))
 btn.show()
 
