@@ -14,19 +14,18 @@ if TYPE_CHECKING:
 class QIconifyIcon(QIcon):
     """QIcon backed by an iconify icon.
 
+    Iconify includes 150,000+ icons from most major icon sets including Bootstrap,
+    FontAwesome, Material Design, and many more.
+
+    Search availble icons at https://icon-sets.iconify.design
+    Once you find one you like, use the key in the format `"prefix:name"` to create an
+    icon:  `QIconifyIcon("bi:bell")`.
+
     This class is a thin wrapper around the
     [pyconify](https://github.com/pyapp-kit/pyconify) `temp_svg` function. It pulls SVGs
     from iconify, creates a temporary SVG file and uses it as the source for a QIcon.
     SVGs are cached to disk, and persist across sessions (until `pyconify.clear_cache()`
     is called).
-
-    Iconify includes 150,000+ icons from most major icon sets including Bootstrap,
-    FontAwesome, Material Design, and many more.
-
-    Search availble icons at https://icon-sets.iconify.design
-
-    Once you find one you like, use the key in the format `"prefix:name"` to create an
-    icon:  `QIconifyIcon("bi:bell")`.
 
     Parameters
     ----------
