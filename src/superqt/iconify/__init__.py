@@ -42,7 +42,7 @@ class QIconifyIcon(QIcon):
         or 1, 2, 3 (equivalent to 90, 180, 270, respectively)
     dir : str, optional
         If 'dir' is not None, the file will be created in that directory, otherwise a
-        default directory is used.
+        default [directory](https://docs.python.org/3/library/tempfile.html#tempfile.mkstemp) is used.
 
     Examples
     --------
