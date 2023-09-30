@@ -63,10 +63,10 @@ class QIconifyIcon(QIcon):
     ):
         try:
             from pyconify import temp_svg
-        except ImportError:
+        except ModuleNotFoundError as e:
             raise ImportError(
                 "pyconify is required to use QIconifyIcon. "
                 "Please install it with `pip install pyconify`"
-            ) from None
+            ) from e
         self.path = temp_svg(*key, color=color, flip=flip, rotate=rotate, dir=dir)
         super().__init__(self.path)
