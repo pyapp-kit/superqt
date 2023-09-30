@@ -38,11 +38,13 @@ class QIconifyIcon(QIcon):
     flip : str, optional
         Flip icon.  Must be one of "horizontal", "vertical", "horizontal,vertical"
     rotate : str | int, optional
-        Rotate icon. Must be one of 90, 180, 270,
-        or 1, 2, 3 (equivalent to 90, 180, 270, respectively)
+        Rotate icon. Must be one of 0, 90, 180, 270,
+        or 0, 1, 2, 3 (equivalent to 0, 90, 180, 270, respectively)
     dir : str, optional
         If 'dir' is not None, the file will be created in that directory, otherwise a
-        default [directory](https://docs.python.org/3/library/tempfile.html#tempfile.mkstemp) is used.
+        default
+        [directory](https://docs.python.org/3/library/tempfile.html#tempfile.mkstemp) is
+        used.
 
     Examples
     --------
@@ -62,11 +64,12 @@ class QIconifyIcon(QIcon):
         dir: str | None = None,
     ):
         try:
-            from pyconify import temp_svg
+            from pyconify import svg_path
         except ModuleNotFoundError as e:
             raise ImportError(
                 "pyconify is required to use QIconifyIcon. "
-                "Please install it with `pip install pyconify`"
+                "Please install it with `pip install iconify` or use the "
+                "`pip install superqt[iconify]` extra."
             ) from e
-        self.path = temp_svg(*key, color=color, flip=flip, rotate=rotate, dir=dir)
+        self.path = svg_path(*key, color=color, flip=flip, rotate=rotate, dir=dir)
         super().__init__(self.path)

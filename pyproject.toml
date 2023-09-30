@@ -73,7 +73,7 @@ font-fa5 = ["fonticon-fontawesome5"]
 font-fa6 = ["fonticon-fontawesome6"]
 font-mi6 = ["fonticon-materialdesignicons6"]
 font-mi7 = ["fonticon-materialdesignicons7"]
-iconify = ["pyconify"]
+iconify = ["pyconify >=0.1.2"]
 
 [project.urls]
 Documentation = "https://pyapp-kit.github.io/superqt/"
