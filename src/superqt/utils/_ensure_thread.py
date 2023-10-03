@@ -187,5 +187,5 @@ def _run_in_thread(
     f = CallCallable(func, args, kwargs)
     f.moveToThread(thread)
     f.finished.connect(future.set_result, Qt.ConnectionType.DirectConnection)
-    QMetaObject.invokeMethod(f, "call", Qt.ConnectionType.QueuedConnection)  # type: ignore  # noqa
+    QMetaObject.invokeMethod(f, "call", Qt.ConnectionType.QueuedConnection)  # type: ignore
     return future.result(timeout=timeout / 1000) if await_return else future
