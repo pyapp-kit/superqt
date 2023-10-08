@@ -47,7 +47,7 @@ jobs:
             platform: windows-latest
             backend: pyside6
 
-          - python-version: "3.12-dev"
+          - python-version: "3.12"
             platform: ubuntu-latest
             backend: pyqt6
 
