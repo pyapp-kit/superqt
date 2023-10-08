@@ -47,6 +47,10 @@ jobs:
             platform: windows-latest
             backend: pyside6
 
+          - python-version: "3.12"
+            platform: macos-latest
+            backend: pyqt6
+
           # legacy Qt
           - python-version: 3.8
             platform: ubuntu-latest
