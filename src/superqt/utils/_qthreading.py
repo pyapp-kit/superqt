@@ -881,7 +881,6 @@ def new_worker_qthread(
     worker.moveToThread(thread)
     thread.started.connect(worker.work)
     worker.finished.connect(thread.quit)
-    worker.finished.connect(worker.deleteLater)
     thread.finished.connect(thread.deleteLater)
 
     if _connect:
