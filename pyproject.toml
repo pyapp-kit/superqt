@@ -32,6 +32,7 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: Desktop Environment",
     "Topic :: Software Development :: User Interfaces",
     "Topic :: Software Development :: Widget Sets",
@@ -47,7 +48,7 @@ dependencies = [
 # extras
 # https://peps.python.org/pep-0621/#dependencies-optional-dependencies
 [project.optional-dependencies]
-test = ["pint", "pytest", "pytest-cov", "pytest-qt", "numpy", "cmap"]
+test = ["pint", "pytest", "pytest-cov", "pytest-qt", "numpy", "cmap", "pyconify"]
 dev = [
     "black",
     "ipython",
@@ -73,6 +74,7 @@ font-fa5 = ["fonticon-fontawesome5"]
 font-fa6 = ["fonticon-fontawesome6"]
 font-mi6 = ["fonticon-materialdesignicons6"]
 font-mi7 = ["fonticon-materialdesignicons7"]
+iconify = ["pyconify >=0.1.4"]
 
 [project.urls]
 Documentation = "https://pyapp-kit.github.io/superqt/"
