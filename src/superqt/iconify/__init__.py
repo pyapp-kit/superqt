@@ -65,7 +65,7 @@ class QIconifyIcon(QIcon):
     ):
         try:
             from pyconify import svg_path
-        except ModuleNotFoundError as e:
+        except ModuleNotFoundError as e:  # pragma: no cover
             raise ImportError(
                 "pyconify is required to use QIconifyIcon. "
                 "Please install it with `pip install pyconify` or use the "
