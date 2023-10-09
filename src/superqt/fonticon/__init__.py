@@ -10,6 +10,7 @@ __all__ = [
     "IconFontMeta",
     "IconOpts",
     "pulse",
+    "QIconifyIcon",
     "setTextIcon",
     "spin",
 ]
