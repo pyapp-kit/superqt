@@ -68,7 +68,7 @@ class QIconifyIcon(QIcon):
         except ModuleNotFoundError as e:
             raise ImportError(
                 "pyconify is required to use QIconifyIcon. "
-                "Please install it with `pip install iconify` or use the "
+                "Please install it with `pip install pyconify` or use the "
                 "`pip install superqt[iconify]` extra."
             ) from e
         self.path = svg_path(*key, color=color, flip=flip, rotate=rotate, dir=dir)
