@@ -1,4 +1,4 @@
-from PyQt5.QtGui import QColor, QPalette
+from qtpy.QtGui import QColor, QPalette
 from qtpy.QtWidgets import QApplication, QTextEdit
 
 from superqt.utils import CodeSyntaxHighlight
