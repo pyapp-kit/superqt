@@ -15,6 +15,7 @@ def test_qiconify(qtbot: "QtBot", monkeypatch: "pytest.MonkeyPatch") -> None:
 
     icon = QIconifyIcon("bi:alarm-fill", color="red", rotate=90)
     assert icon.path.name.endswith(".svg")
+    assert icon.name() == "bi:alarm-fill"
 
     btn = QPushButton()
     qtbot.addWidget(btn)

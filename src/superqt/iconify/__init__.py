@@ -71,5 +71,13 @@ class QIconifyIcon(QIcon):
                 "Please install it with `pip install pyconify` or use the "
                 "`pip install superqt[iconify]` extra."
             ) from e
+        if len(key) == 1:
+            self._name = key[0]
+        else:
+            self._name = ":".join(key)
         self.path = svg_path(*key, color=color, flip=flip, rotate=rotate, dir=dir)
         super().__init__(str(self.path))
+
+    def name(self) -> str:
+        """Return the iconify `prefix:icon` represented by this QIcon."""
+        return self._name
