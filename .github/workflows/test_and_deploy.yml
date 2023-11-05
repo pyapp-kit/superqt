@@ -18,7 +18,7 @@ on:
 jobs:
   test:
     name: Test
-    uses: pyapp-kit/.github/.github/workflows/reusable-ci.yml@main
+    uses: pyapp-kit/workflows/.github/workflows/test-pyrepo.yml@main
     with:
       os: ${{ matrix.platform }}
       python-version: ${{ matrix.python-version }}
@@ -66,9 +66,6 @@ jobs:
             platform: ubuntu-latest
             backend: "pyqt5==5.14.*"
 
-      # - name: Linux opengl
-      #   if: runner.os == 'Linux' && ( startsWith(matrix.backend, 'pyside6') || startsWith(matrix.backend, 'pyqt6') )
-      #   run: sudo apt-get install -y libopengl0 libegl1-mesa libxcb-xinput0
 
   test_old_qtpy:
     name: qtpy minreq
