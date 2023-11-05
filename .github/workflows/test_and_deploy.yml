@@ -17,8 +17,12 @@ on:
 
 jobs:
   test:
-    name: ${{ matrix.platform }} py${{ matrix.python-version }} ${{ matrix.backend }}
-    runs-on: ${{ matrix.platform }}
+    name: Test
+    uses: pyapp-kit/.github/.github/workflows/reusable-ci.yml@main
+    with:
+      os: ${{ matrix.platform }}
+      python-version: ${{ matrix.python-version }}
+      qt: ${{ matrix.backend }}
     strategy:
       fail-fast: false
       matrix:
@@ -62,33 +66,9 @@ jobs:
             platform: ubuntu-latest
             backend: "pyqt5==5.14.*"
 
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - uses: tlambert03/setup-qt-libs@v1.4
-
-      - name: Linux opengl
-        if: runner.os == 'Linux' && ( startsWith(matrix.backend, 'pyside6') || startsWith(matrix.backend, 'pyqt6') )
-        run: sudo apt-get install -y libopengl0 libegl1-mesa libxcb-xinput0
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -e .[test]
-          python -m pip install ${{ matrix.backend }}
-
-      - name: Test
-        uses: aganders3/headless-gui@v1.2
-        with:
-          run: python -m pytest --color=yes --cov=superqt --cov-report=xml
-
-      - name: Coverage
-        uses: codecov/codecov-action@v3
+      # - name: Linux opengl
+      #   if: runner.os == 'Linux' && ( startsWith(matrix.backend, 'pyside6') || startsWith(matrix.backend, 'pyqt6') )
+      #   run: sudo apt-get install -y libopengl0 libegl1-mesa libxcb-xinput0
 
   test_old_qtpy:
     name: qtpy minreq
