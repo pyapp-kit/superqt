@@ -66,69 +66,34 @@ jobs:
             platform: ubuntu-latest
             backend: "pyqt5==5.14.*"
 
-
-  test_old_qtpy:
-    name: qtpy minreq
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: tlambert03/setup-qt-libs@v1.4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.8"
-
-      - name: install
-        run: |
-          python -m pip install -U pip
-          python -m pip install -e .[test,pyqt5]
-          python -m pip install qtpy==1.1.0 typing-extensions==3.7.4.3
-
-      - name: Test
-        uses: aganders3/headless-gui@v1.2
-        with:
-          run: python -m pytest --color=yes
+  test-qt-minreqs:
+    uses: pyapp-kit/workflows/.github/workflows/test-pyrepo.yml@v1
+    with:
+      python-version: "3.8"
+      qt: pyqt5
+      pip-post-installs: 'qtpy==1.1.0 typing-extensions==3.7.4.3'
 
   test_napari:
-    name: napari tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          path: superqt
-
-      - uses: actions/checkout@v4
-        with:
-          repository: napari/napari
-          path: napari-repo
-          fetch-depth: 2
-
-      - uses: tlambert03/setup-qt-libs@v1
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
-
-      - name: install
-        run: |
-          python -m pip install -U pip
-          python -m pip install ./superqt
-          python -m pip install ./napari-repo[testing,pyqt5]
-
-      - name: Test napari
-        uses: aganders3/headless-gui@v1.2
-        with:
-          working-directory: napari-repo
-          run: python -m pytest --color=yes napari/_qt
+    uses: pyapp-kit/workflows/.github/workflows/test-dependents.yml@v1
+    with:
+      dependency-repo: napari/napari
+      dependency-ref: ${{ matrix.napari-version }}
+      dependency-extras: 'testing'
+      qt: ${{ matrix.qt }}
+      pytest-args: 'napari/_qt -k "not async and not qt_dims_2"'
+      python-version: "3.10"
+    strategy:
+      fail-fast: false
+      matrix:
+        napari-version: ["", "v0.4.18"]
+        qt: ["pyqt5", "pyside2"]
 
   check-manifest:
     name: Check Manifest
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.x"
-      - run: pip install check-manifest && check-manifest
+      - run: pipx run check-manifest
 
   deploy:
     # this will run when you have tagged a commit, starting with "v*"
