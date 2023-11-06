@@ -12,7 +12,7 @@ from qtpy.QtCore import (
     Signal,
 )
 from qtpy.QtGui import QIcon, QPainter, QPalette, QPixmap
-from qtpy.QtWidgets import QFrame, QPushButton, QVBoxLayout, QWidget
+from qtpy.QtWidgets import QFrame, QPushButton, QSizePolicy, QVBoxLayout, QWidget
 
 
 class QCollapsible(QFrame):
@@ -41,13 +41,15 @@ class QCollapsible(QFrame):
         self._toggle_btn.setCheckable(True)
         self.setCollapsedIcon(icon=collapsedIcon)
         self.setExpandedIcon(icon=expandedIcon)
+        self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
+
         self._toggle_btn.setStyleSheet("text-align: left; border: none; outline: none;")
         self._toggle_btn.toggled.connect(self._toggle)
 
         # frame layout
-        self.setLayout(QVBoxLayout())
-        self.layout().setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.layout().addWidget(self._toggle_btn)
+        layout = QVBoxLayout(self)
+        layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        layout.addWidget(self._toggle_btn)
 
         # Create animators
         self._animation = QPropertyAnimation(self)
@@ -126,7 +128,7 @@ class QCollapsible(QFrame):
         """Set duration of the collapse/expand animation."""
         self._animation.setDuration(msecs)
 
-    def setEasingCurve(self, easing: QEasingCurve) -> None:
+    def setEasingCurve(self, easing: QEasingCurve | QEasingCurve.Type) -> None:
         """Set the easing curve for the collapse/expand animation."""
         self._animation.setEasingCurve(easing)
 
