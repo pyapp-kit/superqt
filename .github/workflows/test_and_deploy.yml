@@ -6,23 +6,23 @@ concurrency:
 
 on:
   push:
-    branches:
-      - main
-    tags:
-      - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
+    branches: [main]
+    tags: [v*]
   pull_request:
-    branches:
-      - main
   workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * 0" # run weekly
 
 jobs:
   test:
     name: Test
-    uses: pyapp-kit/workflows/.github/workflows/test-pyrepo.yml@main
+    uses: pyapp-kit/workflows/.github/workflows/test-pyrepo.yml@v1
     with:
       os: ${{ matrix.platform }}
       python-version: ${{ matrix.python-version }}
       qt: ${{ matrix.backend }}
+      pip-install-pre-release: ${{ github.event_name == 'schedule' }}
+      report-failures: ${{ github.event_name == 'schedule' }}
     strategy:
       fail-fast: false
       matrix:
