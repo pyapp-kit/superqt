@@ -1,5 +1,5 @@
 """A collapsible widget to hide and unhide child widgets."""
-from typing import Optional, Union
+from __future__ import annotations
 
 from qtpy.QtCore import (
     QEasingCurve,
@@ -28,9 +28,9 @@ class QCollapsible(QFrame):
     def __init__(
         self,
         title: str = "",
-        parent: Optional[QWidget] = None,
-        expandedIcon: Optional[Union[QIcon, str]] = "▼",
-        collapsedIcon: Optional[Union[QIcon, str]] = "▲",
+        parent: QWidget | None = None,
+        expandedIcon: QIcon | str | None = "▼",
+        collapsedIcon: QIcon | str | None = "▲",
     ):
         super().__init__(parent)
         self._locked = False
@@ -100,7 +100,7 @@ class QCollapsible(QFrame):
         """Returns the icon used when the widget is expanded."""
         return self._expanded_icon
 
-    def setExpandedIcon(self, icon: Optional[Union[QIcon, str]] = None) -> None:
+    def setExpandedIcon(self, icon: QIcon | str | None = None) -> None:
         """Set the icon on the toggle button when the widget is expanded."""
         if icon and isinstance(icon, QIcon):
             self._expanded_icon = icon
@@ -114,7 +114,7 @@ class QCollapsible(QFrame):
         """Returns the icon used when the widget is collapsed."""
         return self._collapsed_icon
 
-    def setCollapsedIcon(self, icon: Optional[Union[QIcon, str]] = None) -> None:
+    def setCollapsedIcon(self, icon: QIcon | str | None = None) -> None:
         """Set the icon on the toggle button when the widget is collapsed."""
         if icon and isinstance(icon, QIcon):
             self._collapsed_icon = icon
