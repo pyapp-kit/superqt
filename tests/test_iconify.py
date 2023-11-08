@@ -14,7 +14,7 @@ def test_qiconify(qtbot: "QtBot", monkeypatch: "pytest.MonkeyPatch") -> None:
     monkeypatch.setenv("PYCONIFY_CACHE", "0")
     pytest.importorskip("pyconify")
 
-    icon = QIconifyIcon("bi:alarm-fill", color="red", flip='vertical')
+    icon = QIconifyIcon("bi:alarm-fill", color="red", flip="vertical")
     icon.addKey("bi:alarm", color="blue", rotate=90, state=QIcon.State.On)
 
     btn = QPushButton()
