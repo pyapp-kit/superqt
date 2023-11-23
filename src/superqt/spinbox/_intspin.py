@@ -65,12 +65,16 @@ class QLargeIntSpinBox(QAbstractSpinBox):
 
     def setMinimum(self, min):
         self._minimum = int(min)
+        if self._minimum > self._value:
+            self.setValue(self._minimum)
 
     def maximum(self):
         return self._maximum
 
     def setMaximum(self, max):
         self._maximum = int(max)
+        if self._maximum < self._value:
+            self.setValue(self._maximum)
 
     def setRange(self, minimum, maximum):
         self.setMinimum(minimum)
