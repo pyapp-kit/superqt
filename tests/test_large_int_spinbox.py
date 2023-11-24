@@ -31,6 +31,9 @@ def test_large_spinbox_range(qtbot):
     sb.setRange(-10, 10)
     assert sb.value() == 10
 
+    sb.setRange(100, 1000)
+    assert sb.value() == 100
+
 
 def test_large_spinbox_type(qtbot):
     sb = QLargeIntSpinBox()
