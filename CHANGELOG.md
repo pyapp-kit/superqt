@@ -1,5 +1,17 @@
 # Changelog
 
+## [v0.6.1](https://github.com/pyapp-kit/superqt/tree/v0.6.1) (2023-10-10)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.6.0...v0.6.1)
+
+**Implemented enhancements:**
+
+- feat: add QIcon backed by iconify [\#209](https://github.com/pyapp-kit/superqt/pull/209) ([tlambert03](https://github.com/tlambert03))
+
+**Merged pull requests:**
+
+- ci: test python 3.12 [\#181](https://github.com/pyapp-kit/superqt/pull/181) ([tlambert03](https://github.com/tlambert03))
+
 ## [v0.6.0](https://github.com/pyapp-kit/superqt/tree/v0.6.0) (2023-09-25)
 
 [Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.5.4...v0.6.0)
@@ -370,12 +382,16 @@
 
 ## [v0.2.1](https://github.com/pyapp-kit/superqt/tree/v0.2.1) (2021-07-10)
 
-[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.2.0...v0.2.1)
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.2.0rc0...v0.2.1)
 
 **Fixed bugs:**
 
 - Fix QLabeledRangeSlider API \(fix slider proxy\) [\#10](https://github.com/pyapp-kit/superqt/pull/10) ([tlambert03](https://github.com/tlambert03))
 - Fix range slider with negative min range [\#9](https://github.com/pyapp-kit/superqt/pull/9) ([tlambert03](https://github.com/tlambert03))
+
+## [v0.2.0rc0](https://github.com/pyapp-kit/superqt/tree/v0.2.0rc0) (2021-06-26)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.2.0...v0.2.0rc0)
 
 
 

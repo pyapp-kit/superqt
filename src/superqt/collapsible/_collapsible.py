@@ -1,5 +1,5 @@
 """A collapsible widget to hide and unhide child widgets."""
-from typing import Optional, Union
+from __future__ import annotations
 
 from qtpy.QtCore import (
     QEasingCurve,
@@ -12,7 +12,7 @@ from qtpy.QtCore import (
     Signal,
 )
 from qtpy.QtGui import QIcon, QPainter, QPalette, QPixmap
-from qtpy.QtWidgets import QFrame, QPushButton, QVBoxLayout, QWidget
+from qtpy.QtWidgets import QFrame, QPushButton, QSizePolicy, QVBoxLayout, QWidget
 
 
 class QCollapsible(QFrame):
@@ -28,9 +28,9 @@ class QCollapsible(QFrame):
     def __init__(
         self,
         title: str = "",
-        parent: Optional[QWidget] = None,
-        expandedIcon: Optional[Union[QIcon, str]] = "▼",
-        collapsedIcon: Optional[Union[QIcon, str]] = "▲",
+        parent: QWidget | None = None,
+        expandedIcon: QIcon | str | None = "▼",
+        collapsedIcon: QIcon | str | None = "▲",
     ):
         super().__init__(parent)
         self._locked = False
@@ -41,13 +41,15 @@ class QCollapsible(QFrame):
         self._toggle_btn.setCheckable(True)
         self.setCollapsedIcon(icon=collapsedIcon)
         self.setExpandedIcon(icon=expandedIcon)
+        self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
+
         self._toggle_btn.setStyleSheet("text-align: left; border: none; outline: none;")
         self._toggle_btn.toggled.connect(self._toggle)
 
         # frame layout
-        self.setLayout(QVBoxLayout())
-        self.layout().setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.layout().addWidget(self._toggle_btn)
+        layout = QVBoxLayout(self)
+        layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        layout.addWidget(self._toggle_btn)
 
         # Create animators
         self._animation = QPropertyAnimation(self)
@@ -98,7 +100,7 @@ class QCollapsible(QFrame):
         """Returns the icon used when the widget is expanded."""
         return self._expanded_icon
 
-    def setExpandedIcon(self, icon: Optional[Union[QIcon, str]] = None) -> None:
+    def setExpandedIcon(self, icon: QIcon | str | None = None) -> None:
         """Set the icon on the toggle button when the widget is expanded."""
         if icon and isinstance(icon, QIcon):
             self._expanded_icon = icon
@@ -112,7 +114,7 @@ class QCollapsible(QFrame):
         """Returns the icon used when the widget is collapsed."""
         return self._collapsed_icon
 
-    def setCollapsedIcon(self, icon: Optional[Union[QIcon, str]] = None) -> None:
+    def setCollapsedIcon(self, icon: QIcon | str | None = None) -> None:
         """Set the icon on the toggle button when the widget is collapsed."""
         if icon and isinstance(icon, QIcon):
             self._collapsed_icon = icon
@@ -126,7 +128,7 @@ class QCollapsible(QFrame):
         """Set duration of the collapse/expand animation."""
         self._animation.setDuration(msecs)
 
-    def setEasingCurve(self, easing: QEasingCurve) -> None:
+    def setEasingCurve(self, easing: QEasingCurve | QEasingCurve.Type) -> None:
         """Set the easing curve for the collapse/expand animation."""
         self._animation.setEasingCurve(easing)
 

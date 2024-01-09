@@ -22,6 +22,24 @@ def test_large_spinbox(qtbot):
         assert sb.value() == -(10**e)
 
 
+def test_large_spinbox_range(qtbot):
+    sb = QLargeIntSpinBox()
+    qtbot.addWidget(sb)
+    sb.setRange(-100, 100)
+    sb.setValue(50)
+
+    sb.setRange(-10, 10)
+    assert sb.value() == 10
+
+    sb.setRange(100, 1000)
+    assert sb.value() == 100
+
+    sb.setRange(50, 0)
+    assert sb.minimum() == 50
+    assert sb.maximum() == 50
+    assert sb.value() == 50
+
+
 def test_large_spinbox_type(qtbot):
     sb = QLargeIntSpinBox()
     qtbot.addWidget(sb)
