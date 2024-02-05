@@ -1,4 +1,5 @@
 """A collapsible widget to hide and unhide child widgets."""
+
 from __future__ import annotations
 
 from qtpy.QtCore import (

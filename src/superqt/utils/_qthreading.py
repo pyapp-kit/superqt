@@ -23,16 +23,13 @@ if TYPE_CHECKING:
 
     class SigInst(Generic[_T]):
         @staticmethod
-        def connect(slot: Callable[[_T], Any], type: type | None = ...) -> None:
-            ...
+        def connect(slot: Callable[[_T], Any], type: type | None = ...) -> None: ...
 
         @staticmethod
-        def disconnect(slot: Callable[[_T], Any] = ...) -> None:
-            ...
+        def disconnect(slot: Callable[[_T], Any] = ...) -> None: ...
 
         @staticmethod
-        def emit(*args: _T) -> None:
-            ...
+        def emit(*args: _T) -> None: ...
 
     from typing_extensions import Literal, ParamSpec
 
@@ -499,8 +496,7 @@ def create_worker(
     _worker_class: type[GeneratorWorker] | type[FunctionWorker] | None = None,
     _ignore_errors: bool = False,
     **kwargs,
-) -> GeneratorWorker[_Y, _S, _R]:
-    ...
+) -> GeneratorWorker[_Y, _S, _R]: ...
 
 
 @overload
@@ -512,8 +508,7 @@ def create_worker(
     _worker_class: type[GeneratorWorker] | type[FunctionWorker] | None = None,
     _ignore_errors: bool = False,
     **kwargs,
-) -> FunctionWorker[_R]:
-    ...
+) -> FunctionWorker[_R]: ...
 
 
 def create_worker(
@@ -630,8 +625,7 @@ def thread_worker(
     connect: dict[str, Callable | Sequence[Callable]] | None = None,
     worker_class: type[WorkerBase] | None = None,
     ignore_errors: bool = False,
-) -> Callable[_P, GeneratorWorker[_Y, _S, _R]]:
-    ...
+) -> Callable[_P, GeneratorWorker[_Y, _S, _R]]: ...
 
 
 @overload
@@ -641,8 +635,7 @@ def thread_worker(
     connect: dict[str, Callable | Sequence[Callable]] | None = None,
     worker_class: type[WorkerBase] | None = None,
     ignore_errors: bool = False,
-) -> Callable[_P, FunctionWorker[_R]]:
-    ...
+) -> Callable[_P, FunctionWorker[_R]]: ...
 
 
 @overload
@@ -652,8 +645,7 @@ def thread_worker(
     connect: dict[str, Callable | Sequence[Callable]] | None = None,
     worker_class: type[WorkerBase] | None = None,
     ignore_errors: bool = False,
-) -> Callable[[Callable], Callable[_P, FunctionWorker | GeneratorWorker]]:
-    ...
+) -> Callable[[Callable], Callable[_P, FunctionWorker | GeneratorWorker]]: ...
 
 
 def thread_worker(
@@ -790,8 +782,7 @@ if TYPE_CHECKING:
     class WorkerProtocol(QObject):
         finished: Signal
 
-        def work(self) -> None:
-            ...
+        def work(self) -> None: ...
 
 
 def new_worker_qthread(

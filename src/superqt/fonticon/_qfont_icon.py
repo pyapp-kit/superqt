@@ -157,9 +157,9 @@ class _QFontIconEngine(QIconEngine):
 
     def __init__(self, options: _IconOptions):
         super().__init__()
-        self._opts: defaultdict[
-            QIcon.State, dict[QIcon.Mode, _IconOptions | None]
-        ] = DefaultDict(dict)
+        self._opts: defaultdict[QIcon.State, dict[QIcon.Mode, _IconOptions | None]] = (
+            DefaultDict(dict)
+        )
         self._opts[QIcon.State.Off][QIcon.Mode.Normal] = options
         self.update_hash()
 

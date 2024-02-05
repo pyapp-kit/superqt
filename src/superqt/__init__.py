@@ -1,4 +1,5 @@
 """superqt is a collection of Qt components for python."""
+
 from importlib.metadata import PackageNotFoundError, version
 from typing import TYPE_CHECKING, Any
 
