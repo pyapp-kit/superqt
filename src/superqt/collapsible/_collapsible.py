@@ -66,6 +66,10 @@ class QCollapsible(QFrame):
         _content.layout().setContentsMargins(QMargins(5, 0, 0, 0))
         self.setContent(_content)
 
+    def toggleButton(self) -> QPushButton:
+        """Return the toggle button."""
+        return self._toggle_btn
+
     def setText(self, text: str) -> None:
         """Set the text of the toggle button."""
         self._toggle_btn.setText(text)
