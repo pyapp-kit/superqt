@@ -1,4 +1,5 @@
 """superqt is a collection of Qt components for python."""
+
 from importlib.metadata import PackageNotFoundError, version
 from typing import TYPE_CHECKING, Any
 
@@ -50,8 +51,8 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
-    from .combobox import QColormapComboBox
-    from .spinbox._quantity import QQuantity
+    from .combobox import QColormapComboBox  # noqa: TCH004
+    from .spinbox._quantity import QQuantity  # noqa: TCH004
 
 
 def __getattr__(name: str) -> Any:

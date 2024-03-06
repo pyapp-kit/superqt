@@ -1,4 +1,5 @@
 """Example for QCollapsible."""
+
 from qtpy.QtWidgets import QApplication, QLabel, QPushButton
 
 from superqt import QCollapsible
