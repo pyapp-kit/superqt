@@ -68,8 +68,6 @@ def ensure_main_thread(
     timeout: int = 1000,
 ) -> Callable[P, Future[R]]: ...
 # fmt: on
-
-
 def ensure_main_thread(
     func: Callable | None = None, await_return: bool = False, timeout: int = 1000
 ):
@@ -132,8 +130,6 @@ def ensure_object_thread(
     timeout: int = 1000,
 ) -> Callable[P, Future[R]]: ...
 # fmt: on
-
-
 def ensure_object_thread(
     func: Callable | None = None, await_return: bool = False, timeout: int = 1000
 ):

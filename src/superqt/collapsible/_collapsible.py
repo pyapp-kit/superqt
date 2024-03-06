@@ -1,4 +1,5 @@
 """A collapsible widget to hide and unhide child widgets."""
+
 from __future__ import annotations
 
 from qtpy.QtCore import (
@@ -65,6 +66,10 @@ class QCollapsible(QFrame):
         _content.setMaximumHeight(0)
         _content.layout().setContentsMargins(QMargins(5, 0, 0, 0))
         self.setContent(_content)
+
+    def toggleButton(self) -> QPushButton:
+        """Return the toggle button."""
+        return self._toggle_btn
 
     def setText(self, text: str) -> None:
         """Set the text of the toggle button."""

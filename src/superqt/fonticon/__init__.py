@@ -104,7 +104,7 @@ def icon(
     plugin is installed)
 
     >>> btn = QPushButton()
-    >>> btn.setIcon(icon('fa5s.smile'))
+    >>> btn.setIcon(icon("fa5s.smile"))
 
     can also directly import from fonticon_fa5
     >>> from fonticon_fa5 import FA5S
@@ -130,7 +130,7 @@ def icon(
     ...             "disabled": {
     ...                 "color": "green",
     ...                 "scale_factor": 0.8,
-    ...                 "animation": spin(btn)
+    ...                 "animation": spin(btn),
     ...             },
     ...         },
     ...     )

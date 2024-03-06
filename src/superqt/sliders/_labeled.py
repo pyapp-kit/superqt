@@ -132,14 +132,12 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
     _slider: QSlider
 
     @overload
-    def __init__(self, parent: QWidget | None = ...) -> None:
-        ...
+    def __init__(self, parent: QWidget | None = ...) -> None: ...
 
     @overload
     def __init__(
         self, orientation: Qt.Orientation, parent: QWidget | None = ...
-    ) -> None:
-        ...
+    ) -> None: ...
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         parent, orientation = _handle_overloaded_slider_sig(args, kwargs)
@@ -262,14 +260,12 @@ class QLabeledDoubleSlider(QLabeledSlider):
     _frangeChanged = Signal(float, float)
 
     @overload
-    def __init__(self, parent: QWidget | None = ...) -> None:
-        ...
+    def __init__(self, parent: QWidget | None = ...) -> None: ...
 
     @overload
     def __init__(
         self, orientation: Qt.Orientation, parent: QWidget | None = ...
-    ) -> None:
-        ...
+    ) -> None: ...
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
@@ -299,14 +295,12 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
     _slider: QRangeSlider
 
     @overload
-    def __init__(self, parent: QWidget | None = ...) -> None:
-        ...
+    def __init__(self, parent: QWidget | None = ...) -> None: ...
 
     @overload
     def __init__(
         self, orientation: Qt.Orientation, parent: QWidget | None = ...
-    ) -> None:
-        ...
+    ) -> None: ...
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         parent, orientation = _handle_overloaded_slider_sig(args, kwargs)
@@ -544,14 +538,12 @@ class QLabeledDoubleRangeSlider(QLabeledRangeSlider):
     _frangeChanged = Signal(float, float)
 
     @overload
-    def __init__(self, parent: QWidget | None = ...) -> None:
-        ...
+    def __init__(self, parent: QWidget | None = ...) -> None: ...
 
     @overload
     def __init__(
         self, orientation: Qt.Orientation, parent: QWidget | None = ...
-    ) -> None:
-        ...
+    ) -> None: ...
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)

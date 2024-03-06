@@ -4,7 +4,7 @@ import warnings
 from collections import abc, defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import ClassVar, DefaultDict, Sequence, Tuple, Union, cast
+from typing import TYPE_CHECKING, ClassVar, DefaultDict, Sequence, Tuple, Union, cast
 
 from qtpy import QT_VERSION
 from qtpy.QtCore import QObject, QPoint, QRect, QSize, Qt
@@ -25,7 +25,8 @@ from typing_extensions import TypedDict
 
 from superqt.utils import QMessageHandler
 
-from ._animations import Animation
+if TYPE_CHECKING:
+    from ._animations import Animation
 
 
 class Unset:
@@ -157,9 +158,9 @@ class _QFontIconEngine(QIconEngine):
 
     def __init__(self, options: _IconOptions):
         super().__init__()
-        self._opts: defaultdict[
-            QIcon.State, dict[QIcon.Mode, _IconOptions | None]
-        ] = DefaultDict(dict)
+        self._opts: defaultdict[QIcon.State, dict[QIcon.Mode, _IconOptions | None]] = (
+            DefaultDict(dict)
+        )
         self._opts[QIcon.State.Off][QIcon.Mode.Normal] = options
         self.update_hash()
 
