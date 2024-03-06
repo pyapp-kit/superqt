@@ -1,6 +1,7 @@
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from superqt.cmap import draw_colormap
+if TYPE_CHECKING:
+    from superqt.cmap import draw_colormap  # noqa: TCH004
 
 __all__ = (
     "CodeSyntaxHighlight",
