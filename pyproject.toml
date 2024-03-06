@@ -65,7 +65,8 @@ pyside2 = ["pyside2"]
 # see issues surrounding usage of Generics in pyside6.5.x
 # https://github.com/pyapp-kit/superqt/pull/177
 # https://github.com/pyapp-kit/superqt/pull/164
-pyside6 = ["pyside6 !=6.5.0,!=6.5.1"]
+# https://bugreports.qt.io/browse/PYSIDE-2627
+pyside6 = ["pyside6 !=6.5.0,!=6.5.1,!=6.6.2"]
 pyqt5 = ["pyqt5"]
 pyqt6 = ["pyqt6"]
 font-fa5 = ["fonticon-fontawesome5"]
