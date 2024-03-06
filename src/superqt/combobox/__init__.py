@@ -1,6 +1,4 @@
-from typing import Any
-
-from superqt.cmap import QColormapComboBox
+from typing import TYPE_CHECKING, Any
 
 from ._color_combobox import QColorComboBox
 from ._enum_combobox import QEnumComboBox
@@ -12,6 +10,10 @@ __all__ = (
     "QEnumComboBox",
     "QSearchableComboBox",
 )
+
+
+if TYPE_CHECKING:
+    from superqt.cmap import QColormapComboBox  # noqa: TCH004
 
 
 def __getattr__(name: str) -> Any:  # pragma: no cover
