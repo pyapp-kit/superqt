@@ -65,8 +65,8 @@ class exceptions_as_dialog:
     exception : BaseException | None
         Will hold the exception instance if an exception was raised and caught.
 
-    Examplez
-    -------
+    Examples
+    --------
     ```python
     from qtpy.QtWidgets import QApplication
     from superqt.utils import exceptions_as_dialog
