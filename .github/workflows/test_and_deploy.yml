@@ -38,20 +38,19 @@ jobs:
             backend: pyside2
 
         include:
+          # https://bugreports.qt.io/browse/PYSIDE-2627
           - python-version: "3.10"
             platform: macos-latest
-            backend: "'pyside6<6.5'"
+            backend: "'pyside6!=6.6.2'"
           - python-version: "3.11"
             platform: macos-latest
-            backend: "'pyside6<6.5'"
-          
-          # https://github.com/qtproject/pyside-pyside-setup/commit/db40e3e07932576bc54cd922eecd423c0f675613
+            backend: "'pyside6!=6.6.2'"          
           - python-version: "3.10"
             platform: windows-latest
-            backend: "'pyside6<6.5'"
+            backend: "'pyside6!=6.6.2'"
           - python-version: "3.11"
             platform: windows-latest
-            backend: "'pyside6<6.5'"
+            backend: "'pyside6!=6.6.2'"
 
           - python-version: "3.12"
             platform: macos-latest
