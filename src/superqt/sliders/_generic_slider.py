@@ -19,6 +19,7 @@ So that's what `_GenericSlider` is below.
 scalar (with one handle per item), and it forms the basis of
 QRangeSlider.
 """
+
 import os
 import platform
 from typing import TypeVar

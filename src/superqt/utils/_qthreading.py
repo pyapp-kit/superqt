@@ -23,16 +23,13 @@ if TYPE_CHECKING:
 
     class SigInst(Generic[_T]):
         @staticmethod
-        def connect(slot: Callable[[_T], Any], type: type | None = ...) -> None:
-            ...
+        def connect(slot: Callable[[_T], Any], type: type | None = ...) -> None: ...
 
         @staticmethod
-        def disconnect(slot: Callable[[_T], Any] = ...) -> None:
-            ...
+        def disconnect(slot: Callable[[_T], Any] = ...) -> None: ...
 
         @staticmethod
-        def emit(*args: _T) -> None:
-            ...
+        def emit(*args: _T) -> None: ...
 
     from typing_extensions import Literal, ParamSpec
 
@@ -52,7 +49,7 @@ _R = TypeVar("_R")
 
 
 def as_generator_function(
-    func: Callable[_P, _R]
+    func: Callable[_P, _R],
 ) -> Callable[_P, Generator[None, None, _R]]:
     """Turns a regular function (single return) into a generator function."""
 
@@ -211,7 +208,6 @@ class WorkerBase(QRunnable, Generic[_R]):
         --------
         ```python
         class MyWorker(WorkerBase):
-
             def work(self):
                 i = 0
                 while True:
@@ -499,8 +495,7 @@ def create_worker(
     _worker_class: type[GeneratorWorker] | type[FunctionWorker] | None = None,
     _ignore_errors: bool = False,
     **kwargs,
-) -> GeneratorWorker[_Y, _S, _R]:
-    ...
+) -> GeneratorWorker[_Y, _S, _R]: ...
 
 
 @overload
@@ -512,8 +507,7 @@ def create_worker(
     _worker_class: type[GeneratorWorker] | type[FunctionWorker] | None = None,
     _ignore_errors: bool = False,
     **kwargs,
-) -> FunctionWorker[_R]:
-    ...
+) -> FunctionWorker[_R]: ...
 
 
 def create_worker(
@@ -574,7 +568,9 @@ def create_worker(
     ```python
     def long_function(duration):
         import time
+
         time.sleep(duration)
+
 
     worker = create_worker(long_function, 10)
     ```
@@ -630,8 +626,7 @@ def thread_worker(
     connect: dict[str, Callable | Sequence[Callable]] | None = None,
     worker_class: type[WorkerBase] | None = None,
     ignore_errors: bool = False,
-) -> Callable[_P, GeneratorWorker[_Y, _S, _R]]:
-    ...
+) -> Callable[_P, GeneratorWorker[_Y, _S, _R]]: ...
 
 
 @overload
@@ -641,8 +636,7 @@ def thread_worker(
     connect: dict[str, Callable | Sequence[Callable]] | None = None,
     worker_class: type[WorkerBase] | None = None,
     ignore_errors: bool = False,
-) -> Callable[_P, FunctionWorker[_R]]:
-    ...
+) -> Callable[_P, FunctionWorker[_R]]: ...
 
 
 @overload
@@ -652,8 +646,7 @@ def thread_worker(
     connect: dict[str, Callable | Sequence[Callable]] | None = None,
     worker_class: type[WorkerBase] | None = None,
     ignore_errors: bool = False,
-) -> Callable[[Callable], Callable[_P, FunctionWorker | GeneratorWorker]]:
-    ...
+) -> Callable[[Callable], Callable[_P, FunctionWorker | GeneratorWorker]]: ...
 
 
 def thread_worker(
@@ -737,7 +730,8 @@ def thread_worker(
             yield i
 
         # do teardown
-        return 'anything'
+        return "anything"
+
 
     # call the function to start running in another thread.
     worker = long_function()
@@ -790,8 +784,7 @@ if TYPE_CHECKING:
     class WorkerProtocol(QObject):
         finished: Signal
 
-        def work(self) -> None:
-            ...
+        def work(self) -> None: ...
 
 
 def new_worker_qthread(
@@ -846,9 +839,7 @@ def new_worker_qthread(
     Create some QObject that has a long-running work method:
 
     ```python
-
     class Worker(QObject):
-
         finished = Signal()
         increment = Signal(int)
 
@@ -860,16 +851,18 @@ def new_worker_qthread(
         def work(self):
             # some long running task...
             import time
+
             for i in range(10):
                 time.sleep(1)
                 self.increment.emit(i)
             self.finished.emit()
 
+
     worker, thread = new_worker_qthread(
         Worker,
-        'argument',
+        "argument",
         _start_thread=True,
-        _connect={'increment': print},
+        _connect={"increment": print},
     )
     ```
     """

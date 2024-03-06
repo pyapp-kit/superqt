@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from superqt.cmap import draw_colormap
+    from superqt.cmap import draw_colormap  # noqa: TCH004
 
 __all__ = (
     "CodeSyntaxHighlight",

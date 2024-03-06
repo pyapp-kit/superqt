@@ -26,6 +26,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 """
+
 from __future__ import annotations
 
 from concurrent.futures import Future
@@ -301,8 +302,7 @@ def qthrottled(
     leading: bool = True,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
     parent: QObject | None = None,
-) -> ThrottledCallable[P, R]:
-    ...
+) -> ThrottledCallable[P, R]: ...
 
 
 @overload
@@ -312,8 +312,7 @@ def qthrottled(
     leading: bool = True,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
     parent: QObject | None = None,
-) -> Callable[[Callable[P, R]], ThrottledCallable[P, R]]:
-    ...
+) -> Callable[[Callable[P, R]], ThrottledCallable[P, R]]: ...
 
 
 def qthrottled(
@@ -364,8 +363,7 @@ def qdebounced(
     leading: bool = False,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
     parent: QObject | None = None,
-) -> ThrottledCallable[P, R]:
-    ...
+) -> ThrottledCallable[P, R]: ...
 
 
 @overload
@@ -375,8 +373,7 @@ def qdebounced(
     leading: bool = False,
     timer_type: Qt.TimerType = Qt.TimerType.PreciseTimer,
     parent: QObject | None = None,
-) -> Callable[[Callable[P, R]], ThrottledCallable[P, R]]:
-    ...
+) -> Callable[[Callable[P, R]], ThrottledCallable[P, R]]: ...
 
 
 def qdebounced(
