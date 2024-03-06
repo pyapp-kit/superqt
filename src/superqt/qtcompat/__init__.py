@@ -13,6 +13,8 @@ warnings.warn(
 
 # forward any requests for superqt.qtcompat.* to qtpy.*
 class SuperQtImporter(abc.MetaPathFinder):
+    """Pseudo-importer to forward superqt.qtcompat.* to qtpy.*."""
+
     def find_spec(self, fullname: str, path, target=None):  # type: ignore
         """Forward any requests for superqt.qtcompat.* to qtpy.*."""
         if fullname.startswith(__name__):

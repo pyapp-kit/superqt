@@ -1,11 +1,15 @@
 from __future__ import annotations
 
-from cmap import Colormap
+from typing import TYPE_CHECKING
+
 from qtpy.QtCore import Qt
 from qtpy.QtGui import QIcon, QPainter, QPaintEvent, QPalette
 from qtpy.QtWidgets import QApplication, QLineEdit, QStyle, QWidget
 
 from ._cmap_utils import draw_colormap, pick_font_color, try_cast_colormap
+
+if TYPE_CHECKING:
+    from cmap import Colormap
 
 MISSING = QStyle.StandardPixmap.SP_TitleBarContextHelpButton
 

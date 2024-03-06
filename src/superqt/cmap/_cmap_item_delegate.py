@@ -1,13 +1,15 @@
 from __future__ import annotations
 
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
-from cmap import Colormap
 from qtpy.QtCore import QModelIndex, QObject, QPersistentModelIndex, QRect, QSize, Qt
 from qtpy.QtGui import QColor, QPainter
 from qtpy.QtWidgets import QStyle, QStyledItemDelegate, QStyleOptionViewItem
 
 from ._cmap_utils import CMAP_ROLE, draw_colormap, pick_font_color, try_cast_colormap
+
+if TYPE_CHECKING:
+    from cmap import Colormap
 
 DEFAULT_SIZE = QSize(80, 22)
 DEFAULT_BORDER_COLOR = QColor(Qt.GlobalColor.transparent)

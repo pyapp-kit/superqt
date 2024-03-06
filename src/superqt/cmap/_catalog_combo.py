@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING, Container
 
 from cmap import Colormap
 from qtpy.QtCore import Qt, Signal
-from qtpy.QtGui import QKeyEvent
 from qtpy.QtWidgets import QComboBox, QCompleter, QWidget
 
 from ._cmap_item_delegate import QColormapItemDelegate
@@ -13,6 +12,7 @@ from ._cmap_utils import try_cast_colormap
 
 if TYPE_CHECKING:
     from cmap._catalog import Category, Interpolation
+    from qtpy.QtGui import QKeyEvent
 
 
 class CmapCatalogComboBox(QComboBox):

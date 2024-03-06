@@ -56,11 +56,13 @@ def draw_colormap(
     from qtpy.QtWidgets import QWidget
     from superqt.utils import draw_colormap
 
-    viridis = 'viridis'  # or cmap.Colormap('viridis')
+    viridis = "viridis"  # or cmap.Colormap('viridis')
+
 
     class W(QWidget):
         def paintEvent(self, event) -> None:
             draw_colormap(self, viridis, event.rect())
+
 
     # or draw onto a QPixmap
     pm = QPixmap(200, 200)

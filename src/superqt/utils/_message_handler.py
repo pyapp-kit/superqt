@@ -38,7 +38,7 @@ class QMessageHandler:
 
     >>> logger = logging.getLogger(__name__)
     >>> with QMessageHandler(logger):  # re-reoute Qt messages to a python logger.
-    ...    ...
+    ...     ...
     """
 
     _qt2loggertype: ClassVar[dict[QtMsgType, int]] = {
