@@ -94,6 +94,36 @@ class _SliderProxy:
     def setTickPosition(self, pos: QSlider.TickPosition) -> None:
         self._slider.setTickPosition(pos)
 
+    def triggerAction(self, action: QAbstractSlider.SliderAction) -> None:
+        return self._slider.triggerAction(action)
+
+    def invertedControls(self) -> bool:
+        return self._slider.invertedControls()
+
+    def setInvertedControls(self, a0: bool) -> None:
+        return self._slider.setInvertedControls(a0)
+
+    def invertedAppearance(self) -> bool:
+        return self._slider.invertedAppearance()
+
+    def setInvertedAppearance(self, a0: bool) -> None:
+        return self._slider.setInvertedAppearance(a0)
+
+    def isSliderDown(self) -> bool:
+        return self._slider.isSliderDown()
+
+    def setSliderDown(self, a0: bool) -> None:
+        return self._slider.setSliderDown(a0)
+
+    def hasTracking(self) -> bool:
+        return self._slider.hasTracking()
+
+    def setTracking(self, enable: bool) -> None:
+        return self._slider.setTracking(enable)
+
+    def orientation(self) -> Qt.Orientation:
+        return self._slider.orientation()
+
     def __getattr__(self, name: Any) -> Any:
         return getattr(self._slider, name)
 
@@ -290,6 +320,8 @@ class QLabeledDoubleSlider(QLabeledSlider):
 
 class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
     _valueChanged = Signal(tuple)
+    _sliderPressed = Signal()
+    _sliderReleased = Signal()
     editingFinished = Signal()
 
     _slider_class = QRangeSlider
@@ -318,6 +350,8 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
 
         self._slider = self._slider_class()
         self._slider.valueChanged.connect(self.valueChanged.emit)
+        self._slider.sliderPressed.connect(self.sliderPressed.emit)
+        self._slider.sliderReleased.connect(self.sliderReleased.emit)
         self._slider.rangeChanged.connect(self.rangeChanged.emit)
         self.sliderMoved = self._slider._slidersMoved
 
@@ -439,6 +473,8 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
     # ------------- private methods ----------------
     def _rename_signals(self) -> None:
         self.valueChanged = self._valueChanged
+        self.sliderReleased = self._sliderReleased
+        self.sliderPressed = self._sliderPressed
 
     def _reposition_labels(self) -> None:
         if (
