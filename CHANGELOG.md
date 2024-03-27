@@ -1,5 +1,17 @@
 # Changelog
 
+## [v0.6.3](https://github.com/pyapp-kit/superqt/tree/v0.6.3) (2024-03-27)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.6.2...v0.6.3)
+
+**Fixed bugs:**
+
+- fix: fix sliderReleased, sliderPressed signals, and setTracking [\#237](https://github.com/pyapp-kit/superqt/pull/237) ([tlambert03](https://github.com/tlambert03))
+
+**Merged pull requests:**
+
+- ci\(dependabot\): bump softprops/action-gh-release from 1 to 2 [\#236](https://github.com/pyapp-kit/superqt/pull/236) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v0.6.2](https://github.com/pyapp-kit/superqt/tree/v0.6.2) (2024-03-06)
 
 [Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.6.1...v0.6.2)
@@ -408,16 +420,12 @@
 
 ## [v0.2.1](https://github.com/pyapp-kit/superqt/tree/v0.2.1) (2021-07-10)
 
-[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.2.0rc0...v0.2.1)
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.2.0...v0.2.1)
 
 **Fixed bugs:**
 
 - Fix QLabeledRangeSlider API \(fix slider proxy\) [\#10](https://github.com/pyapp-kit/superqt/pull/10) ([tlambert03](https://github.com/tlambert03))
 - Fix range slider with negative min range [\#9](https://github.com/pyapp-kit/superqt/pull/9) ([tlambert03](https://github.com/tlambert03))
-
-## [v0.2.0rc0](https://github.com/pyapp-kit/superqt/tree/v0.2.0rc0) (2021-06-26)
-
-[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.2.0...v0.2.0rc0)
 
 
 
