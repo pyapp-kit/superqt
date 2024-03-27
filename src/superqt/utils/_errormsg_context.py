@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import traceback
-from contextlib import AbstractContextManager
 from typing import TYPE_CHECKING, cast
 
 from qtpy.QtCore import Qt
@@ -14,7 +13,7 @@ if TYPE_CHECKING:
 _DEFAULT_FLAGS = Qt.WindowType.Dialog | Qt.WindowType.MSWindowsFixedSizeDialogHint
 
 
-class exceptions_as_dialog(AbstractContextManager):
+class exceptions_as_dialog:
     """Context manager that shows a dialog when an exception is raised.
 
     See examples below for common usage patterns.
@@ -66,8 +65,8 @@ class exceptions_as_dialog(AbstractContextManager):
     exception : BaseException | None
         Will hold the exception instance if an exception was raised and caught.
 
-    Examplez
-    -------
+    Examples
+    --------
     ```python
     from qtpy.QtWidgets import QApplication
     from superqt.utils import exceptions_as_dialog

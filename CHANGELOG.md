@@ -1,5 +1,31 @@
 # Changelog
 
+## [v0.6.2](https://github.com/pyapp-kit/superqt/tree/v0.6.2) (2024-03-06)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.6.1...v0.6.2)
+
+**Implemented enhancements:**
+
+- feat: make toggle button public in QCollapsible [\#232](https://github.com/pyapp-kit/superqt/pull/232) ([tlambert03](https://github.com/tlambert03))
+- feat: add addKey method to QIconifyIcon [\#218](https://github.com/pyapp-kit/superqt/pull/218) ([tlambert03](https://github.com/tlambert03))
+- feat: Add QIconifyIcon.name\(\) method [\#213](https://github.com/pyapp-kit/superqt/pull/213) ([tlambert03](https://github.com/tlambert03))
+
+**Fixed bugs:**
+
+- fix: don't use AbstractContextManager for exceptions\_as\_dialog [\#234](https://github.com/pyapp-kit/superqt/pull/234) ([tlambert03](https://github.com/tlambert03))
+- fix: Check min max versus current value [\#221](https://github.com/pyapp-kit/superqt/pull/221) ([psobolewskiPhD](https://github.com/psobolewskiPhD))
+- fix: better default size policy for qcollapsible [\#217](https://github.com/pyapp-kit/superqt/pull/217) ([tlambert03](https://github.com/tlambert03))
+
+**Merged pull requests:**
+
+- style: use ruff format instead of black, update pre-commit, restrict pyside6 tests [\#235](https://github.com/pyapp-kit/superqt/pull/235) ([tlambert03](https://github.com/tlambert03))
+- ci: \[pre-commit.ci\] autoupdate [\#228](https://github.com/pyapp-kit/superqt/pull/228) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
+- ci\(dependabot\): bump actions/setup-python from 4 to 5 [\#225](https://github.com/pyapp-kit/superqt/pull/225) ([dependabot[bot]](https://github.com/apps/dependabot))
+- ci: \[pre-commit.ci\] autoupdate [\#223](https://github.com/pyapp-kit/superqt/pull/223) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
+- ci: \[pre-commit.ci\] autoupdate [\#216](https://github.com/pyapp-kit/superqt/pull/216) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
+- ci: use reusable test workflow [\#215](https://github.com/pyapp-kit/superqt/pull/215) ([tlambert03](https://github.com/tlambert03))
+- build: remove packaging dep [\#212](https://github.com/pyapp-kit/superqt/pull/212) ([tlambert03](https://github.com/tlambert03))
+
 ## [v0.6.1](https://github.com/pyapp-kit/superqt/tree/v0.6.1) (2023-10-10)
 
 [Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.6.0...v0.6.1)
