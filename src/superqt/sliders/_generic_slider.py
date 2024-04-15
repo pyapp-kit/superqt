@@ -74,6 +74,7 @@ class _GenericSlider(QSlider):
         self._position: _T = 0.0
         self._singleStep = 1.0
         self._offsetAccumulated = 0.0
+        self._inverted_appearance = False
         self._blocktracking = False
         self._tickInterval = 0.0
         self._pressedControl = SC_NONE
@@ -174,6 +175,13 @@ class _GenericSlider(QSlider):
         self._tickInterval = max(0.0, ts)
         self.update()
 
+    def invertedAppearance(self) -> bool:
+        return self._inverted_appearance
+
+    def setInvertedAppearance(self, inverted: bool) -> None:
+        self._inverted_appearance = inverted
+        self.update()
+
     def triggerAction(self, action: QSlider.SliderAction) -> None:
         self._blocktracking = True
         # other actions here
@@ -193,9 +201,8 @@ class _GenericSlider(QSlider):
             if self.orientation() == Qt.Orientation.Horizontal
             else not self.invertedAppearance()
         )
-        option.direction = (
-            Qt.LayoutDirection.LeftToRight
-        )  # we use the upsideDown option instead
+        # we use the upsideDown option instead
+        option.direction = Qt.LayoutDirection.LeftToRight
         # option.sliderValue = self._value  # type: ignore
         # option.singleStep = self._singleStep  # type: ignore
         if self.orientation() == Qt.Orientation.Horizontal:
