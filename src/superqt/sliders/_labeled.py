@@ -6,7 +6,7 @@ from functools import partial
 from typing import Any, Iterable, overload
 
 from qtpy.QtCore import QPoint, QSize, Qt, Signal
-from qtpy.QtGui import QFontMetrics, QResizeEvent, QValidator
+from qtpy.QtGui import QFontMetrics, QValidator
 from qtpy.QtWidgets import (
     QAbstractSlider,
     QApplication,
