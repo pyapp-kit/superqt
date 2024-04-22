@@ -71,6 +71,7 @@ jobs:
 
   test-qt-minreqs:
     uses: pyapp-kit/workflows/.github/workflows/test-pyrepo.yml@v1
+    secrets: inherit
     with:
       python-version: "3.8"
       qt: pyqt5
