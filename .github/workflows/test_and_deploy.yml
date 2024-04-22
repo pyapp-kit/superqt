@@ -23,7 +23,8 @@ jobs:
       qt: ${{ matrix.backend }}
       pip-install-pre-release: ${{ github.event_name == 'schedule' }}
       report-failures: ${{ github.event_name == 'schedule' }}
-    secrets: inherit
+    secrets:
+      codecov-token: ${{ secrets.CODECOV_TOKEN }}
     strategy:
       fail-fast: false
       matrix:
