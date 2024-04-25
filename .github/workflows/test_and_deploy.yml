@@ -30,11 +30,11 @@ jobs:
       matrix:
         platform: [ubuntu-latest, windows-latest, macos-13]
         python-version: ["3.8", "3.9", "3.10", "3.11"]
-        backend: [pyqt5, pyside2, "'PyQt6<6.7'"]
+        backend: [pyqt5, pyside2, "'PyQt6<6.6'"]
         exclude:
           # Abort (core dumped) on linux pyqt6, unknown reason
           - platform: ubuntu-latest
-            backend: "'PyQt6<6.7'"
+            backend: "'PyQt6<6.6'"
           # lack of wheels for pyside2/py3.11
           - python-version: "3.11"
             backend: pyside2
@@ -56,7 +56,7 @@ jobs:
 
           - python-version: "3.12"
             platform: macos-latest
-            backend: "'PyQt6<6.7'"
+            backend: "'PyQt6<6.6'"
 
           # legacy Qt
           - python-version: 3.8
