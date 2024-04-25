@@ -1,5 +1,17 @@
 # Changelog
 
+## [v0.6.4](https://github.com/pyapp-kit/superqt/tree/v0.6.4) (2024-04-25)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.6.3...v0.6.4)
+
+**Fixed bugs:**
+
+- fix: fix inverted appearance [\#240](https://github.com/pyapp-kit/superqt/pull/240) ([tlambert03](https://github.com/tlambert03))
+
+**Merged pull requests:**
+
+- ci: \[pre-commit.ci\] autoupdate [\#238](https://github.com/pyapp-kit/superqt/pull/238) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
+
 ## [v0.6.3](https://github.com/pyapp-kit/superqt/tree/v0.6.3) (2024-03-27)
 
 [Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.6.2...v0.6.3)
