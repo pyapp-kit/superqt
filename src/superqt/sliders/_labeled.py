@@ -9,7 +9,6 @@ from qtpy.QtCore import QPoint, QSize, Qt, Signal
 from qtpy.QtGui import QFontMetrics, QValidator
 from qtpy.QtWidgets import (
     QAbstractSlider,
-    QApplication,
     QBoxLayout,
     QDoubleSpinBox,
     QHBoxLayout,
@@ -257,8 +256,6 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
             self.layout().setContentsMargins(0, 0, 0, 0)
         self._on_slider_range_changed(self.minimum(), self.maximum())
 
-        QApplication.processEvents()
-
     # putting this after labelMode methods for the sake of mypy
     EdgeLabelMode = EdgeLabelMode
 
@@ -415,7 +412,6 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
         elif opt == EdgeLabelMode.LabelIsRange:
             self._min_label.setValue(self._slider.minimum())
             self._max_label.setValue(self._slider.maximum())
-        QApplication.processEvents()
         self._reposition_labels()
 
     def setRange(self, min: int, max: int) -> None:
@@ -465,7 +461,6 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
         self.setLayout(layout)
         layout.setContentsMargins(*marg)
         super().setOrientation(orientation)
-        QApplication.processEvents()
         self._reposition_labels()
 
     def setInvertedAppearance(self, a0: bool) -> None:

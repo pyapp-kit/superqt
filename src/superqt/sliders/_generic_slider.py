@@ -342,8 +342,12 @@ class _GenericSlider(QSlider):
         option.sliderValue = self._to_qinteger_space(self._value - self._minimum)
 
     def _to_qinteger_space(self, val, _max=None):
+        """Converts a value to the internal integer space."""
         _max = _max or self.MAX_DISPLAY
-        return int(min(QOVERFLOW, val / (self._maximum - self._minimum) * _max))
+        range_ = self._maximum - self._minimum
+        if range_ == 0:
+            return self._minimum
+        return int(min(QOVERFLOW, val / range_ * _max))
 
     def _pick(self, pt: QPoint) -> int:
         return pt.x() if self.orientation() == Qt.Orientation.Horizontal else pt.y()
