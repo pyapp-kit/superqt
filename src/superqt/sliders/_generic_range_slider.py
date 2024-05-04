@@ -124,11 +124,27 @@ class _GenericRangeSlider(_GenericSlider):
         """
         return tuple(float(i) for i in self._position)
 
-    def setSliderPosition(self, pos: Union[float, Sequence[float]], index=None) -> None:
+    def setSliderPosition(  # type: ignore
+        self,
+        pos: Union[float, Sequence[float]],
+        index: int | None = None,
+        *,
+        reversed: bool = False,
+    ) -> None:
         """Set current position of the handles with a sequence of integers.
 
-        If `pos` is a sequence, it must have the same length as `value()`.
-        If it is a scalar, index will be
+        Parameters
+        ----------
+        pos : Union[float, Sequence[float]]
+            The new position of the slider handle(s). If a sequence, it must have the
+            same length as `value()`. If it is a scalar, index will be used to set the
+            position of the handle at that index.
+        index : int | None
+            The index of the handle to set the position of. If None, the "pressedIndex"
+            will be used.
+        reversed : bool
+            Order in which to set the positions.  Can be useful when setting multiple
+            positions, to avoid intermediate overlapping values.
         """
         if isinstance(pos, (list, tuple)):
             val_len = len(self.value())
@@ -138,6 +154,9 @@ class _GenericRangeSlider(_GenericSlider):
             pairs = list(enumerate(pos))
         else:
             pairs = [(self._pressedIndex if index is None else index, pos)]
+
+        if reversed:
+            pairs = pairs[::-1]
 
         for idx, position in pairs:
             self._position[idx] = self._bound(position, idx)
@@ -222,7 +241,7 @@ class _GenericRangeSlider(_GenericSlider):
                 offset = self.maximum() - ref[-1]
             elif ref[0] + offset < self.minimum():
                 offset = self.minimum() - ref[0]
-        self.setSliderPosition([i + offset for i in ref])
+        self.setSliderPosition([i + offset for i in ref], reversed=offset > 0)
 
     def _fixStyleOption(self, option):
         pass

@@ -31,6 +31,7 @@ class LabelPosition(IntEnum):
     LabelsBelow = auto()
     LabelsRight = LabelsAbove
     LabelsLeft = LabelsBelow
+    LabelsOnHandle = auto()
 
 
 class EdgeLabelMode(IntFlag):
@@ -42,10 +43,10 @@ class EdgeLabelMode(IntFlag):
 class _SliderProxy:
     _slider: QSlider
 
-    def value(self) -> int:
+    def value(self) -> Any:
         return self._slider.value()
 
-    def setValue(self, value: int) -> None:
+    def setValue(self, value: Any) -> None:
         self._slider.setValue(value)
 
     def sliderPosition(self) -> int:
@@ -157,6 +158,9 @@ def _handle_overloaded_slider_sig(
 
 class QLabeledSlider(_SliderProxy, QAbstractSlider):
     editingFinished = Signal()
+    _ivalueChanged = Signal(int)
+    _isliderMoved = Signal(int)
+    _irangeChanged = Signal(int, int)
 
     _slider_class = QSlider
     _slider: QSlider
@@ -276,8 +280,9 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         self._slider.setValue(int(value))
 
     def _rename_signals(self) -> None:
-        # for subclasses
-        pass
+        self.valueChanged = self._ivalueChanged
+        self.sliderMoved = self._isliderMoved
+        self.rangeChanged = self._irangeChanged
 
 
 class QLabeledDoubleSlider(QLabeledSlider):
@@ -383,10 +388,10 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
         """Set where/whether labels are shown adjacent to slider handles."""
         self._handle_label_position = opt
         for lbl in self._handle_labels:
-            if not opt:
-                lbl.hide()
-            else:
-                lbl.show()
+            lbl.setVisible(bool(opt))
+            trans = opt == LabelPosition.LabelsOnHandle
+            # TODO: make double clickable to edit
+            lbl.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, trans)
         self.setOrientation(self.orientation())
 
     def edgeLabelMode(self) -> EdgeLabelMode:
@@ -430,6 +435,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
         """Set orientation, value will be 'horizontal' or 'vertical'."""
         self._slider.setOrientation(orientation)
         inverted = self._slider.invertedAppearance()
+        marg = (0, 0, 0, 0)
         if orientation == Qt.Orientation.Vertical:
             layout: QBoxLayout = QVBoxLayout()
             layout.setSpacing(1)
@@ -437,9 +443,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
             # TODO: set margins based on label width
             if self._handle_label_position == LabelPosition.LabelsLeft:
                 marg = (30, 0, 0, 0)
-            elif self._handle_label_position == LabelPosition.NoLabel:
-                marg = (0, 0, 0, 0)
-            else:
+            elif self._handle_label_position == LabelPosition.LabelsRight:
                 marg = (0, 0, 20, 0)
             layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         else:
@@ -447,9 +451,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
             layout.setSpacing(7)
             if self._handle_label_position == LabelPosition.LabelsBelow:
                 marg = (0, 0, 0, 25)
-            elif self._handle_label_position == LabelPosition.NoLabel:
-                marg = (0, 0, 0, 0)
-            else:
+            elif self._handle_label_position == LabelPosition.LabelsAbove:
                 marg = (0, 25, 0, 0)
             self._add_labels(layout, inverted=inverted)
 
@@ -461,6 +463,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
         self.setLayout(layout)
         layout.setContentsMargins(*marg)
         super().setOrientation(orientation)
+        # QApplication.processEvents()
         self._reposition_labels()
 
     def setInvertedAppearance(self, a0: bool) -> None:
@@ -490,6 +493,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
 
         horizontal = self.orientation() == Qt.Orientation.Horizontal
         labels_above = self._handle_label_position == LabelPosition.LabelsAbove
+        labels_on_handle = self._handle_label_position == LabelPosition.LabelsOnHandle
 
         last_edge = None
         labels: Iterable[tuple[int, SliderLabel]] = enumerate(self._handle_labels)
@@ -497,12 +501,15 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
             labels = reversed(list(labels))
         for i, label in labels:
             rect = self._slider._handleRect(i)
-            dx = -label.width() / 2
-            dy = -label.height() / 2
-            if labels_above:
+            dx = (-label.width() / 2) + 1.5
+            dy = (-label.height() / 2) + 0.5
+            if labels_above:  # or on the right
                 if horizontal:
                     dy *= 3
                 else:
+                    dx *= -1
+            elif labels_on_handle:
+                if not horizontal:
                     dx *= -1
             else:
                 if horizontal:
@@ -520,6 +527,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
             label.move(pos)
             last_edge = pos
             label.clearFocus()
+            label.raise_()
             label.show()
         self.update()
 
