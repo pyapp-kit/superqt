@@ -23,8 +23,7 @@ jobs:
       qt: ${{ matrix.backend }}
       pip-install-pre-release: ${{ github.event_name == 'schedule' }}
       report-failures: ${{ github.event_name == 'schedule' }}
-    secrets:
-      codecov-token: ${{ secrets.CODECOV_TOKEN }}
+      coverage-upload: artifact
     strategy:
       fail-fast: false
       matrix:
@@ -71,11 +70,16 @@ jobs:
 
   test-qt-minreqs:
     uses: pyapp-kit/workflows/.github/workflows/test-pyrepo.yml@v1
-    secrets: inherit
     with:
       python-version: "3.8"
       qt: pyqt5
       pip-post-installs: 'qtpy==1.1.0 typing-extensions==3.7.4.3'
+      coverage-upload: artifact
+
+  upload_coverage:
+    needs: [test, test-qt-minreqs]
+    uses: pyapp-kit/workflows/.github/workflows/upload-coverage.yml@v1
+    secrets: inherit
 
   test_napari:
     uses: pyapp-kit/workflows/.github/workflows/test-dependents.yml@v1
