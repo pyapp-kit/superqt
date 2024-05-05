@@ -463,7 +463,6 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
         self.setLayout(layout)
         layout.setContentsMargins(*marg)
         super().setOrientation(orientation)
-        # QApplication.processEvents()
         self._reposition_labels()
 
     def setInvertedAppearance(self, a0: bool) -> None:
