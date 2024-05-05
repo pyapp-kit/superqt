@@ -16,7 +16,7 @@ on:
 jobs:
   test:
     name: Test
-    uses: pyapp-kit/workflows/.github/workflows/test-pyrepo.yml@v1
+    uses: pyapp-kit/workflows/.github/workflows/test-pyrepo.yml@main
     with:
       os: ${{ matrix.platform }}
       python-version: ${{ matrix.python-version }}
