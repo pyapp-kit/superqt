@@ -86,10 +86,11 @@ jobs:
       qt: ${{ matrix.qt }}
       pytest-args: 'napari/_qt -k "not async and not qt_dims_2"'
       python-version: "3.10"
+      post-install-cmd: 'pip install lxml_html_clean'
     strategy:
       fail-fast: false
       matrix:
-        napari-version: ["", "v0.4.18"]
+        napari-version: ["", "v0.4.19post1"]
         qt: ["pyqt5", "pyside2"]
 
   check-manifest:
