@@ -76,7 +76,6 @@ jobs:
       pip-post-installs: 'qtpy==1.1.0 typing-extensions==3.7.4.3'
       coverage-upload: artifact
 
-      
   upload_coverage:
     needs: [test, test-qt-minreqs]
     uses: pyapp-kit/workflows/.github/workflows/upload-coverage.yml@v1
