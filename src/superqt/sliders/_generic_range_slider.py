@@ -103,7 +103,7 @@ class _GenericRangeSlider(_GenericSlider):
         """Show the bar between the first and last handle."""
         self.setBarVisible(True)
 
-    def applyMacStylePatch(self) -> str:
+    def applyMacStylePatch(self) -> None:
         """Apply a QSS patch to fix sliders on macos>=12 with QT < 6.
 
         see [FAQ](../faq.md#sliders-not-dragging-properly-on-macos-12) for more details.
@@ -127,7 +127,7 @@ class _GenericRangeSlider(_GenericSlider):
     def setSliderPosition(  # type: ignore
         self,
         pos: Union[float, Sequence[float]],
-        index: int | None = None,
+        index: Optional[int] = None,
         *,
         reversed: bool = False,
     ) -> None:

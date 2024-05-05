@@ -99,7 +99,7 @@ class _GenericSlider(QSlider):
         if USE_MAC_SLIDER_PATCH:
             self.applyMacStylePatch()
 
-    def applyMacStylePatch(self) -> str:
+    def applyMacStylePatch(self) -> None:
         """Apply a QSS patch to fix sliders on macos>=12 with QT < 6.
 
         see [FAQ](../faq.md#sliders-not-dragging-properly-on-macos-12) for more details.
