@@ -21,7 +21,6 @@ jobs:
       os: ${{ matrix.platform }}
       python-version: ${{ matrix.python-version }}
       qt: ${{ matrix.backend }}
-      pip-install-flags: -e
       pip-install-pre-release: ${{ github.event_name == 'schedule' }}
       report-failures: ${{ github.event_name == 'schedule' }}
       coverage-upload: artifact
@@ -75,7 +74,6 @@ jobs:
       python-version: "3.8"
       qt: pyqt5
       pip-post-installs: 'qtpy==1.1.0 typing-extensions==3.7.4.3'
-      pip-install-flags: -e
       coverage-upload: artifact
 
   upload_coverage:
