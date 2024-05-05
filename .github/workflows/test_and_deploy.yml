@@ -81,7 +81,7 @@ jobs:
   upload_coverage:
     needs: [test, test-qt-minreqs]
     if: always()
-    uses: pyapp-kit/workflows/.github/workflows/upload-coverage.yml@v1
+    uses: pyapp-kit/workflows/.github/workflows/upload-coverage.yml@main
     secrets: inherit
 
   test_napari:
