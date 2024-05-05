@@ -30,7 +30,7 @@ jobs:
       matrix:
         platform: [ubuntu-latest, windows-latest, macos-13]
         python-version: ["3.8", "3.9", "3.10", "3.11"]
-        backend: [pyqt5, pyside2, "'PyQt6<6.6'"]
+        backend: [pyqt5, pyside2, pyqt6]
         exclude:
           # Abort (core dumped) on linux pyqt6, unknown reason
           - platform: ubuntu-latest
