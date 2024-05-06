@@ -16,21 +16,19 @@ on:
 jobs:
   test:
     name: Test
-    uses: pyapp-kit/workflows/.github/workflows/test-pyrepo.yml@v1
+    uses: pyapp-kit/workflows/.github/workflows/test-pyrepo.yml@v2
     with:
       os: ${{ matrix.platform }}
       python-version: ${{ matrix.python-version }}
       qt: ${{ matrix.backend }}
       pip-install-pre-release: ${{ github.event_name == 'schedule' }}
-      report-failures: ${{ github.event_name == 'schedule' }}
-    secrets:
-      codecov-token: ${{ secrets.CODECOV_TOKEN }}
+      coverage-upload: artifact
     strategy:
       fail-fast: false
       matrix:
         platform: [ubuntu-latest, windows-latest, macos-13]
         python-version: ["3.8", "3.9", "3.10", "3.11"]
-        backend: [pyqt5, pyside2, "'PyQt6<6.6'"]
+        backend: [pyqt5, pyside2, pyqt6]
         exclude:
           # Abort (core dumped) on linux pyqt6, unknown reason
           - platform: ubuntu-latest
@@ -38,7 +36,6 @@ jobs:
           # lack of wheels for pyside2/py3.11
           - python-version: "3.11"
             backend: pyside2
-
         include:
           # https://bugreports.qt.io/browse/PYSIDE-2627
           - python-version: "3.10"
@@ -53,11 +50,9 @@ jobs:
           - python-version: "3.11"
             platform: windows-latest
             backend: "'pyside6!=6.6.2'"
-
           - python-version: "3.12"
             platform: macos-latest
             backend: "'PyQt6<6.6'"
-
           # legacy Qt
           - python-version: 3.8
             platform: ubuntu-latest
@@ -70,26 +65,34 @@ jobs:
             backend: "pyqt5==5.14.*"
 
   test-qt-minreqs:
-    uses: pyapp-kit/workflows/.github/workflows/test-pyrepo.yml@v1
-    secrets: inherit
+    uses: pyapp-kit/workflows/.github/workflows/test-pyrepo.yml@v2
     with:
       python-version: "3.8"
       qt: pyqt5
       pip-post-installs: 'qtpy==1.1.0 typing-extensions==3.7.4.3'
+      pip-install-flags: -e
+      coverage-upload: artifact
+
+  upload_coverage:
+    if: always()
+    needs: [test, test-qt-minreqs]
+    uses: pyapp-kit/workflows/.github/workflows/upload-coverage.yml@v2
+    secrets: inherit
 
   test_napari:
-    uses: pyapp-kit/workflows/.github/workflows/test-dependents.yml@v1
+    uses: pyapp-kit/workflows/.github/workflows/test-dependents.yml@v2
     with:
       dependency-repo: napari/napari
       dependency-ref: ${{ matrix.napari-version }}
       dependency-extras: 'testing'
       qt: ${{ matrix.qt }}
-      pytest-args: 'napari/_qt -k "not async and not qt_dims_2"'
+      pytest-args: 'napari/_qt -k "not async and not qt_dims_2 and not qt_viewer_console_focus and not keybinding_editor"'
       python-version: "3.10"
+      post-install-cmd: 'pip install lxml_html_clean'
     strategy:
       fail-fast: false
       matrix:
-        napari-version: ["", "v0.4.18"]
+        napari-version: ["", "v0.4.19.post1"]
         qt: ["pyqt5", "pyside2"]
 
   check-manifest:
