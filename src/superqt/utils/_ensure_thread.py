@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from concurrent.futures import Future
+from contextlib import suppress
 from functools import wraps
 from typing import TYPE_CHECKING, Any, Callable, ClassVar, overload
 
@@ -41,7 +42,8 @@ class CallCallable(QObject):
     def call(self):
         CallCallable.instances.remove(self)
         res = self._callable(*self._args, **self._kwargs)
-        self.finished.emit(res)
+        with suppress(RuntimeError):
+            self.finished.emit(res)
 
 
 # fmt: off

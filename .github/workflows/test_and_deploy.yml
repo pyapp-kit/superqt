@@ -32,7 +32,7 @@ jobs:
         exclude:
           # Abort (core dumped) on linux pyqt6, unknown reason
           - platform: ubuntu-latest
-            backend: "'PyQt6<6.6'"
+            backend: pyqt6
           # lack of wheels for pyside2/py3.11
           - python-version: "3.11"
             backend: pyside2
@@ -52,7 +52,7 @@ jobs:
             backend: "'pyside6!=6.6.2'"
           - python-version: "3.12"
             platform: macos-latest
-            backend: "'PyQt6<6.6'"
+            backend: pyqt6
           # legacy Qt
           - python-version: 3.8
             platform: ubuntu-latest
