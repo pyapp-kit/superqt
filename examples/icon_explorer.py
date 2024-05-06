@@ -88,7 +88,7 @@ class IconPreviewArea(QtWidgets.QWidget):
             self.updatePixmapLabels()
 
     def createHeaderLabel(self, text):
-        label = QtWidgets.QLabel("<b>%s</b>" % text)
+        label = QtWidgets.QLabel(f"<b>{text}</b>")
         label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         return label
 
