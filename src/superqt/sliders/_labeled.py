@@ -5,7 +5,8 @@ from enum import IntEnum, IntFlag, auto
 from functools import partial
 from typing import Any, Iterable, overload
 
-from qtpy.QtCore import QPoint, QSize, Qt, Signal
+from qtpy import QtGui
+from qtpy.QtCore import Property, QPoint, QSize, Qt, Signal
 from qtpy.QtGui import QFontMetrics, QValidator
 from qtpy.QtWidgets import (
     QAbstractSlider,
@@ -469,13 +470,22 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
         self._slider.setInvertedAppearance(a0)
         self.setOrientation(self._slider.orientation())
 
-    def resizeEvent(self, a0) -> None:
+    def resizeEvent(self, a0: Any) -> None:
         super().resizeEvent(a0)
         self._reposition_labels()
 
     # putting this after methods above for the sake of mypy
     LabelPosition = LabelPosition
     EdgeLabelMode = EdgeLabelMode
+
+    def _getBarColor(self) -> QtGui.QBrush:
+        return self._slider._style.brush(self._slider._styleOption)
+
+    def _setBarColor(self, color: str) -> None:
+        self._slider._style.brush_active = color
+
+    barColor = Property(QtGui.QBrush, _getBarColor, _setBarColor)
+    """The color of the bar between the first and last handle."""
 
     # ------------- private methods ----------------
     def _rename_signals(self) -> None:
@@ -500,16 +510,18 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
             labels = reversed(list(labels))
         for i, label in labels:
             rect = self._slider._handleRect(i)
-            dx = (-label.width() / 2) + 1.5
-            dy = (-label.height() / 2) + 0.5
+            dx = (-label.width() / 2) + 2
+            dy = -label.height() / 2
             if labels_above:  # or on the right
                 if horizontal:
                     dy *= 3
                 else:
                     dx *= -1
             elif labels_on_handle:
-                if not horizontal:
-                    dx *= -1
+                if horizontal:
+                    dy += 0.5
+                else:
+                    dx += 0.5
             else:
                 if horizontal:
                     dy *= -1
@@ -613,6 +625,15 @@ class QLabeledDoubleRangeSlider(QLabeledRangeSlider):
         self._max_label.setDecimals(prec)
         for lbl in self._handle_labels:
             lbl.setDecimals(prec)
+
+    def _getBarColor(self) -> QtGui.QBrush:
+        return self._slider._style.brush(self._slider._styleOption)
+
+    def _setBarColor(self, color: str) -> None:
+        self._slider._style.brush_active = color
+
+    barColor = Property(QtGui.QBrush, _getBarColor, _setBarColor)
+    """The color of the bar between the first and last handle."""
 
 
 class SliderLabel(QDoubleSpinBox):
