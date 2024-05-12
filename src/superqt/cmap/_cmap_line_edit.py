@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
-from qtpy.QtCore import Qt
+from qtpy.QtCore import Qt, QRect
 from qtpy.QtGui import QIcon, QPainter, QPaintEvent, QPalette
 from qtpy.QtWidgets import QApplication, QLineEdit, QStyle, QWidget
 
@@ -103,6 +103,19 @@ class QColormapLineEdit(QLineEdit):
     def _cmap_is_full_width(self):
         return self._colormap_fraction >= 0.75
 
+    def _cmap_rect(self) -> QRect:
+        cmap_rect = self.rect().adjusted(2, 0, 0, 0)
+        cmap_rect.setWidth(int(cmap_rect.width() * self._colormap_fraction))
+        return cmap_rect
+
+    def resizeEvent(self, e: Any) -> None:
+        left_margin = 6
+        if not self._cmap_is_full_width():
+            # leave room for the colormap
+            left_margin += self._cmap_rect().width()
+        self.setTextMargins(left_margin, 2, 0, 0)
+        super().resizeEvent(e)
+
     def paintEvent(self, e: QPaintEvent) -> None:
         # don't draw the background
         # otherwise it will cover the colormap during super().paintEvent
@@ -112,15 +125,7 @@ class QColormapLineEdit(QLineEdit):
         palette.setColor(palette.ColorRole.Base, Qt.GlobalColor.transparent)
         self.setPalette(palette)
 
-        cmap_rect = self.rect().adjusted(2, 0, 0, 0)
-        cmap_rect.setWidth(int(cmap_rect.width() * self._colormap_fraction))
-
-        left_margin = 6
-        if not self._cmap_is_full_width():
-            # leave room for the colormap
-            left_margin += cmap_rect.width()
-        self.setTextMargins(left_margin, 2, 0, 0)
-
+        cmap_rect = self._cmap_rect()
         if self._cmap:
             draw_colormap(
                 self, self._cmap, cmap_rect, checkerboard_size=self._checkerboard_size
