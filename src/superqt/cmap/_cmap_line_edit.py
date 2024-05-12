@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from qtpy.QtCore import Qt, QRect
+from qtpy.QtCore import QRect, Qt
 from qtpy.QtGui import QIcon, QPainter, QPaintEvent, QPalette
 from qtpy.QtWidgets import QApplication, QLineEdit, QStyle, QWidget
 
