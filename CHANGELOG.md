@@ -1,10 +1,22 @@
 # Changelog
 
+## [v0.6.6](https://github.com/pyapp-kit/superqt/tree/v0.6.6) (2024-05-12)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.6.5...v0.6.6)
+
+**Refactors:**
+
+- perf: improve paint time for QColormapLineEdit [\#245](https://github.com/pyapp-kit/superqt/pull/245) ([tlambert03](https://github.com/tlambert03))
+
+**Merged pull requests:**
+
+- ci: \[pre-commit.ci\] autoupdate [\#244](https://github.com/pyapp-kit/superqt/pull/244) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
+
 ## [v0.6.5](https://github.com/pyapp-kit/superqt/tree/v0.6.5) (2024-05-06)
 
 [Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.6.4...v0.6.5)
 
-**Fixed bugs:**
+**Implemented enhancements:**
 
 - fix: fix a number of issues with Labeled and Range Sliders, add LabelsOnHandle mode. [\#242](https://github.com/pyapp-kit/superqt/pull/242) ([tlambert03](https://github.com/tlambert03))
 
