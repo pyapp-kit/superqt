@@ -1,5 +1,3 @@
-from itertools import takewhile
-
 from pygments import highlight
 from pygments.formatter import Formatter
 from pygments.lexers import find_lexer_class, get_lexer_by_name
@@ -68,21 +66,10 @@ class CodeSyntaxHighlight(QtGui.QSyntaxHighlighter):
         return self.formatter.style.background_color
 
     def highlightBlock(self, text):
-        cb = self.currentBlock()
-        p = cb.position()
-        text_ = self.document().toPlainText() + "\n"
-        highlight(text_, self.lexer, self.formatter)
-
-        enters = sum(1 for _ in takewhile(lambda x: x == "\n", text_))
-        # pygments lexer ignore leading empty lines, so we need to do correction
-        # here calculating the number of empty lines.
-
         # dirty, dirty hack
         # The core problem is that pygemnts by default use string streams,
         # that will not handle QTextCharFormat, so we need use `data` property to
         # work around this.
+        highlight(text, self.lexer, self.formatter)
         for i in range(len(text)):
-            try:
-                self.setFormat(i, 1, self.formatter.data[p + i - enters])
-            except IndexError:  # pragma: no cover
-                pass
+            self.setFormat(i, 1, self.formatter.data[i])
