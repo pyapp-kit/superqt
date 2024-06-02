@@ -251,6 +251,7 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
 
         max_args = get_max_args(func)
         self._func = _weak_func(func)
+        self.__wrapped__ = self._func
 
         self._args: tuple = ()
         self._kwargs: dict = {}
