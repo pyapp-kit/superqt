@@ -1,7 +1,6 @@
 import gc
-from socket import timeout
-from unittest.mock import Mock
 import weakref
+from unittest.mock import Mock
 
 import pytest
 from qtpy.QtCore import QObject, Signal

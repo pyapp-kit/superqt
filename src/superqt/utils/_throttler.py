@@ -29,11 +29,11 @@ SOFTWARE.
 
 from __future__ import annotations
 
-from types import MethodType
 import weakref
 from concurrent.futures import Future
 from enum import IntFlag, auto
 from functools import wraps
+from types import MethodType
 from typing import TYPE_CHECKING, Any, Callable, Generic, TypeVar, overload
 from weakref import WeakKeyDictionary
 
@@ -211,7 +211,7 @@ class QSignalDebouncer(GenericSignalThrottler):
 # below here part is unique to superqt (not from KD)
 
 
-def _weak_func(func: Callable) -> Callable:
+def _weak_func(func: Callable[P, R]) -> Callable[P, R]:
     if isinstance(func, MethodType):
         # this is a bound method, we need to avoid strong references
         owner = func.__self__
@@ -227,7 +227,7 @@ def _weak_func(func: Callable) -> Callable:
             method = class_func.__get__(obj, type(obj))
             return method(*args, **kwargs)
 
-        func = weak_func
+        return weak_func
 
     return func
 
