@@ -29,10 +29,12 @@ SOFTWARE.
 
 from __future__ import annotations
 
+from types import MethodType
+import weakref
 from concurrent.futures import Future
 from enum import IntFlag, auto
 from functools import wraps
-from typing import TYPE_CHECKING, Callable, Generic, TypeVar, overload
+from typing import TYPE_CHECKING, Any, Callable, Generic, TypeVar, overload
 from weakref import WeakKeyDictionary
 
 from qtpy.QtCore import QObject, Qt, QTimer, Signal
@@ -53,6 +55,12 @@ else:
         P = TypeVar("P")
 
 R = TypeVar("R")
+REF_ERROR = (
+    "To use qthrottled or qdebounced as a method decorator, "
+    "objects must have  `__dict__` or be weak referenceable. "
+    "Please either add `__weakref__` to `__slots__` or use"
+    "qthrottled/qdebounced as a function (not a decorator)."
+)
 
 
 class Kind(IntFlag):
@@ -157,7 +165,7 @@ class GenericSignalThrottler(QObject):
         self.triggered.emit()
         self._timer.start()
 
-    def _maybeEmitTriggered(self, restart_timer=True) -> None:
+    def _maybeEmitTriggered(self, restart_timer: bool = True) -> None:
         if self._hasPendingEmission:
             self._emitTriggered()
         if not restart_timer:
@@ -203,6 +211,27 @@ class QSignalDebouncer(GenericSignalThrottler):
 # below here part is unique to superqt (not from KD)
 
 
+def _weak_func(func: Callable) -> Callable:
+    if isinstance(func, MethodType):
+        # this is a bound method, we need to avoid strong references
+        owner = func.__self__
+        class_func = func.__func__
+        try:
+            instance_ref = weakref.ref(owner)
+        except TypeError as e:
+            raise TypeError(REF_ERROR) from e
+
+        def weak_func(*args, **kwargs):
+            if (obj := instance_ref()) is None:
+                raise RuntimeError("Method called on dead object")
+            method = class_func.__get__(obj, type(obj))
+            return method(*args, **kwargs)
+
+        func = weak_func
+
+    return func
+
+
 class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
     def __init__(
         self,
@@ -214,26 +243,28 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
         super().__init__(kind, emissionPolicy, parent)
 
         self._future: Future[R] = Future()
-        if isinstance(func, staticmethod):
-            self._func = func.__func__
-        else:
-            self._func = func
 
-        self.__wrapped__ = func
+        self._is_static_method: bool = False
+        if isinstance(func, staticmethod):
+            self._is_static_method = True
+            func = func.__func__
+
+        max_args = get_max_args(func)
+        self._func = _weak_func(func)
 
         self._args: tuple = ()
         self._kwargs: dict = {}
         self.triggered.connect(self._set_future_result)
         self._name = None
 
-        self._obj_dkt = WeakKeyDictionary()
+        self._obj_dkt: WeakKeyDictionary[Any, ThrottledCallable] = WeakKeyDictionary()
 
         # even if we were to compile __call__ with a signature matching that of func,
         # PySide wouldn't correctly inspect the signature of the ThrottledCallable
         # instance: https://bugreports.qt.io/browse/PYSIDE-2423
         # so we do it ourselfs and limit the number of positional arguments
         # that we pass to func
-        self._max_args: int | None = get_max_args(self._func)
+        self._max_args: int | None = max_args
 
     def __call__(self, *args: P.args, **kwargs: P.kwargs) -> "Future[R]":  # noqa
         if not self._future.done():
@@ -251,12 +282,18 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
         self._future.set_result(result)
 
     def __set_name__(self, owner, name):
-        if not isinstance(self.__wrapped__, staticmethod):
+        if not self._is_static_method:
             self._name = name
 
-    def _get_throttler(self, instance, owner, parent, obj):
+    def _get_throttler(self, instance, owner, parent, obj, name):
+        try:
+            bound_method = self._func.__get__(instance, owner)
+        except Exception as e:  # pragma: no cover
+            raise RuntimeError(
+                f"Failed to bind function {self._func!r} to object {instance!r}"
+            ) from e
         throttler = ThrottledCallable(
-            self.__wrapped__.__get__(instance, owner),
+            bound_method,
             self._kind,
             self._emissionPolicy,
             parent=parent,
@@ -264,21 +301,12 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
         throttler.setTimerType(self.timerType())
         throttler.setTimeout(self.timeout())
         try:
-            setattr(
-                obj,
-                self._name,
-                throttler,
-            )
+            setattr(obj, name, throttler)
         except AttributeError:
             try:
                 self._obj_dkt[obj] = throttler
             except TypeError as e:
-                raise TypeError(
-                    "To use qthrottled or qdebounced as a method decorator, "
-                    "objects must have  `__dict__` or be weak referenceable. "
-                    "Please either add `__weakref__` to `__slots__` or use"
-                    "qthrottled/qdebounced as a function (not a decorator)."
-                ) from e
+                raise TypeError(REF_ERROR) from e
         return throttler
 
     def __get__(self, instance, owner):
@@ -292,7 +320,7 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
         if parent is None and isinstance(instance, QObject):
             parent = instance
 
-        return self._get_throttler(instance, owner, parent, instance)
+        return self._get_throttler(instance, owner, parent, instance, self._name)
 
 
 @overload
@@ -438,6 +466,11 @@ def _make_decorator(
         obj = ThrottledCallable(func, kind, policy, parent=parent)
         obj.setTimerType(timer_type)
         obj.setTimeout(timeout)
+
+        if instance is not None:
+            # this is a bound method, we need to avoid strong references,
+            # and functools.wraps will prevent garbage collection on bound methods
+            return obj
         return wraps(func)(obj)
 
     return deco(func) if func is not None else deco

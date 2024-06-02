@@ -1,4 +1,7 @@
+import gc
+from socket import timeout
 from unittest.mock import Mock
+import weakref
 
 import pytest
 from qtpy.QtCore import QObject, Signal
@@ -116,7 +119,6 @@ def test_debouncer_method_definition(qtbot):
         A.call2(32)
 
     qtbot.wait(5)
-
     assert a.count == 1
     mock1.assert_called_once()
     mock2.assert_called_once()
@@ -201,3 +203,29 @@ def test_ensure_throttled_sig_inspection(deco, qtbot):
     mock.assert_called_once_with(1, 2)
     assert func.__doc__ == "docstring"
     assert func.__name__ == "func"
+
+
+def test_qthrottled_does_not_prevent_gc(qtbot):
+    mock = Mock()
+
+    class Thing:
+        @qdebounced(timeout=1)
+        def dmethod(self) -> None:
+            mock()
+
+        @qthrottled(timeout=1)
+        def tmethod(self) -> None:
+            mock()
+
+    thing = Thing()
+    thing_ref = weakref.ref(thing)
+    assert thing_ref() is not None
+    thing.dmethod()
+    qtbot.waitUntil(thing.dmethod._future.done, timeout=2000)
+    assert mock.call_count == 1
+    thing.tmethod()
+    qtbot.waitUntil(thing.tmethod._future.done, timeout=2000)
+    assert mock.call_count == 2
+    del thing
+    gc.collect()
+    assert thing_ref() is None

@@ -47,7 +47,15 @@ dependencies = [
 # extras
 # https://peps.python.org/pep-0621/#dependencies-optional-dependencies
 [project.optional-dependencies]
-test = ["pint", "pytest", "pytest-cov", "pytest-qt", "numpy", "cmap", "pyconify"]
+test = [
+    "pint",
+    "pytest",
+    "pytest-cov",
+    "pytest-qt",
+    "numpy",
+    "cmap",
+    "pyconify",
+]
 dev = [
     "ipython",
     "ruff",
@@ -58,7 +66,13 @@ dev = [
     "rich",
     "types-Pygments",
 ]
-docs = ["mkdocs-macros-plugin", "mkdocs-material", "mkdocstrings[python]", "pint", "cmap"]
+docs = [
+    "mkdocs-macros-plugin",
+    "mkdocs-material",
+    "mkdocstrings[python]",
+    "pint",
+    "cmap",
+]
 quantity = ["pint"]
 cmap = ["cmap >=0.1.1"]
 pyside2 = ["pyside2"]
@@ -104,11 +118,21 @@ python = ["3.8"]
 
 [tool.hatch.envs.test.overrides]
 matrix.qt.extra-dependencies = [
-  {value = "pyside2", if = ["pyside2"]},
-  {value = "pyside6", if = ["pyside6"]},
-  {value = "pyqt5", if = ["pyqt5"]},
-  {value = "pyqt6", if = ["pyqt6"]},
-  {value = "pyqt5==5.12", if = ["pyqt5.12"]},
+    { value = "pyside2", if = [
+        "pyside2",
+    ] },
+    { value = "pyside6", if = [
+        "pyside6",
+    ] },
+    { value = "pyqt5", if = [
+        "pyqt5",
+    ] },
+    { value = "pyqt6", if = [
+        "pyqt6",
+    ] },
+    { value = "pyqt5==5.12", if = [
+        "pyqt5.12",
+    ] },
 ]
 
 # https://github.com/charliermarsh/ruff
@@ -155,6 +179,7 @@ minversion = "6.0"
 testpaths = ["tests"]
 filterwarnings = [
     "error",
+    "ignore:Failed to disconnect::pytestqt",
     "ignore:QPixmapCache.find:DeprecationWarning:",
     "ignore:SelectableGroups dict interface:DeprecationWarning",
     "ignore:The distutils package is deprecated:DeprecationWarning",
@@ -191,7 +216,7 @@ exclude_lines = [
     "@overload",
     "except ImportError",
     "\\.\\.\\.",
-    "pass"
+    "pass",
 ]
 
 # https://github.com/mgedmin/check-manifest#configuration
