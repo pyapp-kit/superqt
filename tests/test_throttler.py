@@ -226,6 +226,12 @@ def test_qthrottled_does_not_prevent_gc(qtbot):
     qtbot.waitUntil(thing.tmethod._future.done, timeout=2000)
     assert mock.call_count == 2
 
+    wm = thing.tmethod
+    assert isinstance(wm, ThrottledCallable)
     del thing
     gc.collect()
     assert thing_ref() is None
+
+    with pytest.warns(RuntimeWarning, match="Method has been garbage collected"):
+        wm()
+        wm._set_future_result()

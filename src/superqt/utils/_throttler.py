@@ -29,6 +29,7 @@ SOFTWARE.
 
 from __future__ import annotations
 
+import warnings
 from concurrent.futures import Future
 from contextlib import suppress
 from enum import IntFlag, auto
@@ -223,6 +224,9 @@ def _weak_func(func: Callable[P, R]) -> Callable[P, R]:
         def weak_func(*args, **kwargs):
             if method := weak_method():
                 return method(*args, **kwargs)
+            warnings.warn(
+                "Method has been garbage collected", RuntimeWarning, stacklevel=2
+            )
 
         return weak_func
 
