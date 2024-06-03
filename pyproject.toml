@@ -155,6 +155,7 @@ minversion = "6.0"
 testpaths = ["tests"]
 filterwarnings = [
     "error",
+    "ignore:Failed to disconnect::pytestqt",
     "ignore:QPixmapCache.find:DeprecationWarning:",
     "ignore:SelectableGroups dict interface:DeprecationWarning",
     "ignore:The distutils package is deprecated:DeprecationWarning",
@@ -191,7 +192,7 @@ exclude_lines = [
     "@overload",
     "except ImportError",
     "\\.\\.\\.",
-    "pass"
+    "pass",
 ]
 
 # https://github.com/mgedmin/check-manifest#configuration
