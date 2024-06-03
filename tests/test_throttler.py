@@ -213,7 +213,7 @@ def test_qthrottled_does_not_prevent_gc(qtbot):
             mock()
 
         @qthrottled(timeout=1)
-        def tmethod(self) -> None:
+        def tmethod(self, x: int = 1) -> None:
             mock()
 
     thing = Thing()
@@ -225,6 +225,7 @@ def test_qthrottled_does_not_prevent_gc(qtbot):
     thing.tmethod()
     qtbot.waitUntil(thing.tmethod._future.done, timeout=2000)
     assert mock.call_count == 2
+
     del thing
     gc.collect()
     assert thing_ref() is None

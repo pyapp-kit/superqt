@@ -29,13 +29,14 @@ SOFTWARE.
 
 from __future__ import annotations
 
-import weakref
 from concurrent.futures import Future
+from contextlib import suppress
 from enum import IntFlag, auto
 from functools import wraps
+from inspect import signature
 from types import MethodType
 from typing import TYPE_CHECKING, Any, Callable, Generic, TypeVar, overload
-from weakref import WeakKeyDictionary
+from weakref import WeakKeyDictionary, WeakMethod
 
 from qtpy.QtCore import QObject, Qt, QTimer, Signal
 
@@ -214,18 +215,14 @@ class QSignalDebouncer(GenericSignalThrottler):
 def _weak_func(func: Callable[P, R]) -> Callable[P, R]:
     if isinstance(func, MethodType):
         # this is a bound method, we need to avoid strong references
-        owner = func.__self__
-        class_func = func.__func__
         try:
-            instance_ref = weakref.ref(owner)
+            weak_method = WeakMethod(func)
         except TypeError as e:
             raise TypeError(REF_ERROR) from e
 
         def weak_func(*args, **kwargs):
-            if (obj := instance_ref()) is None:
-                raise RuntimeError("Method called on dead object")
-            method = class_func.__get__(obj, type(obj))
-            return method(*args, **kwargs)
+            if method := weak_method():
+                return method(*args, **kwargs)
 
         return weak_func
 
@@ -250,6 +247,9 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
             func = func.__func__
 
         max_args = get_max_args(func)
+        with suppress(TypeError, ValueError):
+            self.__signature__ = signature(func)
+
         self._func = _weak_func(func)
         self.__wrapped__ = self._func
 
