@@ -1,5 +1,17 @@
 # Changelog
 
+## [v0.6.7](https://github.com/pyapp-kit/superqt/tree/v0.6.7) (2024-06-07)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.6.6...v0.6.7)
+
+**Fixed bugs:**
+
+- fix: prevent qthrottled and qdebounced from holding strong references with bound methods [\#247](https://github.com/pyapp-kit/superqt/pull/247) ([tlambert03](https://github.com/tlambert03))
+
+**Merged pull requests:**
+
+- Prevent computing full document content highlight per block and only compute current block content for performance [\#246](https://github.com/pyapp-kit/superqt/pull/246) ([dalthviz](https://github.com/dalthviz))
+
 ## [v0.6.6](https://github.com/pyapp-kit/superqt/tree/v0.6.6) (2024-05-12)
 
 [Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.6.5...v0.6.6)
@@ -7,10 +19,6 @@
 **Refactors:**
 
 - perf: improve paint time for QColormapLineEdit [\#245](https://github.com/pyapp-kit/superqt/pull/245) ([tlambert03](https://github.com/tlambert03))
-
-**Merged pull requests:**
-
-- ci: \[pre-commit.ci\] autoupdate [\#244](https://github.com/pyapp-kit/superqt/pull/244) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
 
 ## [v0.6.5](https://github.com/pyapp-kit/superqt/tree/v0.6.5) (2024-05-06)
 
@@ -20,7 +28,7 @@
 
 - fix: fix a number of issues with Labeled and Range Sliders, add LabelsOnHandle mode. [\#242](https://github.com/pyapp-kit/superqt/pull/242) ([tlambert03](https://github.com/tlambert03))
 
-**Merged pull requests:**
+**Tests & CI:**
 
 - ci: trying to fix tests on various platforms [\#243](https://github.com/pyapp-kit/superqt/pull/243) ([tlambert03](https://github.com/tlambert03))
 
