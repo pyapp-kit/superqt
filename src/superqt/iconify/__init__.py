@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import warnings
 from typing import TYPE_CHECKING
 
-from qtpy.QtCore import QSize
-from qtpy.QtGui import QIcon
+from qtpy.QtCore import QSize, Qt
+from qtpy.QtGui import QIcon, QPainter, QPixmap
+from qtpy.QtWidgets import QApplication
 
 if TYPE_CHECKING:
     from typing import Literal
@@ -122,5 +124,25 @@ class QIconifyIcon(QIcon):
         state : QIcon.State, optional
             State specified for the icon, passed to `QIcon.addFile`.
         """
-        path = svg_path(*key, color=color, flip=flip, rotate=rotate, dir=dir)
-        self.addFile(str(path), size or QSize(), mode, state)
+        try:
+            path = svg_path(*key, color=color, flip=flip, rotate=rotate, dir=dir)
+        except OSError:
+            warnings.warn(
+                f"Unable to connect to internet, and icon {key} not cached.",
+                stacklevel=2,
+            )
+            self._draw_text_fallback(key)
+        else:
+            self.addFile(str(path), size or QSize(), mode, state)
+
+    def _draw_text_fallback(self, key: tuple[str, ...]) -> None:
+        if style := QApplication.style():
+            pixmap = style.standardPixmap(style.StandardPixmap.SP_MessageBoxQuestion)
+        else:
+            pixmap = QPixmap(18, 18)
+            pixmap.fill(Qt.GlobalColor.transparent)
+            painter = QPainter(pixmap)
+            painter.drawText(pixmap.rect(), Qt.AlignmentFlag.AlignCenter, "?")
+            painter.end()
+
+        self.addPixmap(pixmap)
