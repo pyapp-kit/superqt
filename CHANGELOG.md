@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.6.8](https://github.com/pyapp-kit/superqt/tree/v0.6.8) (2024-06-15)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.6.7...v0.6.8)
+
+**Implemented enhancements:**
+
+- feat: graceful offline fallback for qiconify [\#251](https://github.com/pyapp-kit/superqt/pull/251) ([tlambert03](https://github.com/tlambert03))
+
 ## [v0.6.7](https://github.com/pyapp-kit/superqt/tree/v0.6.7) (2024-06-07)
 
 [Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.6.6...v0.6.7)
