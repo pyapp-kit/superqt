@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import contextlib
 from enum import IntEnum, IntFlag, auto
-from functools import partial
-from typing import Any, Iterable, overload
+from typing import Any, Iterable, cast, overload
 
 from qtpy import QtGui
 from qtpy.QtCore import Property, QPoint, QSize, Qt, Signal
@@ -183,7 +182,9 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         self.setFocusPolicy(Qt.FocusPolicy(fp))
 
         self._slider = self._slider_class(parent=self)
-        self._label = SliderLabel(self._slider, connect=self._setValue, parent=self)
+        self._label = SliderLabel(self._slider, parent=self)
+        self._label.editingFinished.connect(self._on_label_edited)
+
         self._edge_label_mode: EdgeLabelMode = EdgeLabelMode.LabelIsValue
 
         self._rename_signals()
@@ -265,6 +266,8 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
     EdgeLabelMode = EdgeLabelMode
 
     # --------------------- private api --------------------
+    def _on_label_edited(self) -> None:
+        self._setValue(self._label.value())
 
     def _on_slider_range_changed(self, min_: int, max_: int) -> None:
         slash = " / " if self._edge_label_mode & EdgeLabelMode.LabelIsValue else ""
@@ -359,15 +362,14 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
         self.sliderMoved = self._slider._slidersMoved
 
         self._min_label = SliderLabel(
-            self._slider,
-            alignment=Qt.AlignmentFlag.AlignLeft,
-            connect=self._min_label_edited,
+            self._slider, alignment=Qt.AlignmentFlag.AlignLeft
         )
+        self._min_label.editingFinished.connect(self._min_label_edited)
         self._max_label = SliderLabel(
-            self._slider,
-            alignment=Qt.AlignmentFlag.AlignRight,
-            connect=self._max_label_edited,
+            self._slider, parent=self, alignment=Qt.AlignmentFlag.AlignRight
         )
+        self._max_label.editingFinished.connect(self._max_label_edited)
+
         self._min_label.editingFinished.connect(self.editingFinished)
         self._max_label.editingFinished.connect(self.editingFinished)
         self.setEdgeLabelMode(EdgeLabelMode.LabelIsRange)
@@ -542,7 +544,8 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
             label.show()
         self.update()
 
-    def _min_label_edited(self, val: float) -> None:
+    def _min_label_edited(self) -> None:
+        val = self._min_label.value()
         if self._edge_label_mode == EdgeLabelMode.LabelIsRange:
             self.setMinimum(val)
         else:
@@ -551,7 +554,8 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
             self.setValue(v)
         self._reposition_labels()
 
-    def _max_label_edited(self, val: float) -> None:
+    def _max_label_edited(self) -> None:
+        val = self._max_label.value()
         if self._edge_label_mode == EdgeLabelMode.LabelIsRange:
             self.setMaximum(val)
         else:
@@ -571,15 +575,19 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
                 lbl.deleteLater()
             self._handle_labels.clear()
             for n, val in enumerate(self._slider.value()):
-                _cb = partial(self._slider.setSliderPosition, index=n)
-                s = SliderLabel(self._slider, parent=self, connect=_cb)
-                s.editingFinished.connect(self.editingFinished)
+                s = SliderLabel(self._slider, parent=self, index=n)
+                s.editingFinished.connect(self._on_slider_label_edited)
                 s.setValue(val)
                 self._handle_labels.append(s)
         else:
             for val, label in zip(v, self._handle_labels):
                 label.setValue(val)
         self._reposition_labels()
+
+    def _on_slider_label_edited(self):
+        label = cast("SliderLabel", self.sender())
+        self._slider.setSliderPosition(label.value(), label.index)
+        self.editingFinished.emit()
 
     def _on_range_changed(self, min: int, max: int) -> None:
         if (min, max) != (self._slider.minimum(), self._slider.maximum()):
@@ -640,12 +648,13 @@ class SliderLabel(QDoubleSpinBox):
     def __init__(
         self,
         slider: QSlider,
-        parent=None,
-        alignment=Qt.AlignmentFlag.AlignCenter,
-        connect=None,
+        parent: QWidget | None = None,
+        alignment: Qt.AlignmentFlag = Qt.AlignmentFlag.AlignCenter,
+        index: int = 0,
     ) -> None:
-        super().__init__(parent=parent)
+        super().__init__(parent)
         self._slider = slider
+        self.index = index
         self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
         self.setMode(EdgeLabelMode.LabelIsValue)
         self.setDecimals(0)
@@ -655,8 +664,6 @@ class SliderLabel(QDoubleSpinBox):
         self.setAlignment(alignment)
         self.setButtonSymbols(QSpinBox.ButtonSymbols.NoButtons)
         self.setStyleSheet("background:transparent; border: 0;")
-        if connect is not None:
-            self.editingFinished.connect(lambda: connect(self.value()))
         self.editingFinished.connect(self._silent_clear_focus)
         self._update_size()
 
