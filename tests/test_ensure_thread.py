@@ -162,7 +162,7 @@ def test_names(qapp):
     signature = inspect.signature(ob.check_object_thread_return_future)
     assert len(signature.parameters) == 1
     assert next(iter(signature.parameters.values())).name == "a"
-    assert next(iter(signature.parameters.values())).annotation == int
+    assert next(iter(signature.parameters.values())).annotation is int
     assert ob.check_main_thread_return.__name__ == "check_main_thread_return"
 
 
