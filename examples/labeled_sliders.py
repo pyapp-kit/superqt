@@ -7,6 +7,7 @@ from superqt import (
     QLabeledRangeSlider,
     QLabeledSlider,
 )
+from superqt.sliders._labeled import QLabeledCategoricalSlider
 
 app = QApplication([])
 
@@ -36,6 +37,8 @@ qldrs.setRange(0, 1)
 qldrs.setSingleStep(0.01)
 qldrs.setValue((0.2, 0.7))
 
+qlcs = QLabeledCategoricalSlider()
+qlcs.setCategories(["dog", "cat", "elephant", "bird", "fish"])
 
 w.setLayout(
     QVBoxLayout() if ORIENTATION == Qt.Orientation.Horizontal else QHBoxLayout()
@@ -44,6 +47,7 @@ w.layout().addWidget(qls)
 w.layout().addWidget(qlds)
 w.layout().addWidget(qlrs)
 w.layout().addWidget(qldrs)
+w.layout().addWidget(qlcs)
 w.show()
 w.resize(500, 150)
 app.exec_()

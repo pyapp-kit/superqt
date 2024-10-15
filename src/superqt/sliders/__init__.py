@@ -1,4 +1,5 @@
 from ._labeled import (
+    QLabeledCategoricalSlider,
     QLabeledDoubleRangeSlider,
     QLabeledDoubleSlider,
     QLabeledRangeSlider,
@@ -10,6 +11,7 @@ from ._sliders import QDoubleRangeSlider, QDoubleSlider, QRangeSlider
 __all__ = [
     "QDoubleRangeSlider",
     "QDoubleSlider",
+    "QLabeledCategoricalSlider",
     "QLabeledDoubleRangeSlider",
     "QLabeledDoubleSlider",
     "QLabeledRangeSlider",
