@@ -13,7 +13,7 @@ from qtpy.QtWidgets import (
     QBoxLayout,
     QDoubleSpinBox,
     QHBoxLayout,
-    QLabel,
+    QComboBox,
     QSlider,
     QSpinBox,
     QStyle,
@@ -131,7 +131,7 @@ class _SliderProxy:
         return getattr(self._slider, name)
 
 
-class TextSliderLabel(QLabel):
+class TextSliderLabel(QComboBox):
     editingFinished = Signal()
 
     def __init__(
@@ -143,10 +143,15 @@ class TextSliderLabel(QLabel):
     ) -> None:
         super().__init__(parent=parent)
         self._slider = slider
-        self.setAlignment(alignment)
+        if connect is not None:
+            self.currentIndexChanged.connect(lambda: connect(self.currentIndex()))
 
     def setValue(self, val: str) -> None:
-        self.setText(str(val))
+        self.setCurrentText(str(val))
+
+    def setAlignment(self, alignment: Qt.AlignmentFlag) -> None:
+        # self.lineEdit().setAlignment(alignment)
+        ...
 
 
 class SliderLabel(QDoubleSpinBox):
@@ -442,23 +447,13 @@ class QLabeledCategoricalSlider(QLabeledSlider):
         self._on_categories_changed(self._slider.categories())
 
     def _on_slider_value_changed(self, v: Any) -> None:
-        category = self._slider.category()
-        self._label.setValue(str(category))
-        self.categoryChanged.emit(category)
+        self._label.setCurrentIndex(v)
+        self.categoryChanged.emit(self._slider.category())
         self.valueChanged.emit(v)
 
-    def _setValue(self, value: Any) -> None:
-        """Convert the value from float to int before setting the slider value."""
-        self._slider.setCategory(value)
-
     def _on_categories_changed(self, categories: Iterable) -> None:
-        strings = [str(c) for c in categories]
-        if not strings:
-            self._label.setFixedWidth(0)
-            return
-        fm = QFontMetrics(self._label.font())
-        w = max(fm.horizontalAdvance(x) for x in strings) + 5
-        self._label.setFixedWidth(w)
+        self._label.clear()
+        self._label.addItems([str(c) for c in categories])
         self._label.setValue(str(self._slider.category()))
 
 
