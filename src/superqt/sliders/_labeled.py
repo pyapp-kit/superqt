@@ -11,9 +11,9 @@ from qtpy.QtGui import QFontMetrics, QValidator
 from qtpy.QtWidgets import (
     QAbstractSlider,
     QBoxLayout,
+    QComboBox,
     QDoubleSpinBox,
     QHBoxLayout,
-    QComboBox,
     QSlider,
     QSpinBox,
     QStyle,
