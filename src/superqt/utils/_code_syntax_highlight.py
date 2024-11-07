@@ -9,7 +9,9 @@ from qtpy import QtGui
 # https://pygments.org/docs/formatterdevelopment/#html-3-2-formatter
 
 
-def get_text_char_format(style):
+def get_text_char_format(
+    style: dict[str, QtGui.QTextCharFormat],
+) -> QtGui.QTextCharFormat:
     text_char_format = QtGui.QTextCharFormat()
     if hasattr(text_char_format, "setFontFamilies"):
         text_char_format.setFontFamilies(["monospace"])
