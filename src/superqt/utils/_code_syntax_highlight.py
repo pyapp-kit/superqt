@@ -36,7 +36,7 @@ def get_text_char_format(style):
 class QFormatter(Formatter):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.data = []
+        self.data: list[QtGui.QTextCharFormat] = []
         self._style = {name: get_text_char_format(style) for name, style in self.style}
 
     def format(self, tokensource, outfile):
@@ -49,7 +49,9 @@ class QFormatter(Formatter):
         self.data = []
 
         for token, value in tokensource:
-            self.data.extend([self._style[token]] * len(value))
+            self.data.extend(
+                [self._style.get(token, QtGui.QTextCharFormat())] * len(value)
+            )
 
 
 class CodeSyntaxHighlight(QtGui.QSyntaxHighlighter):
