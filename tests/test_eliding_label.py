@@ -69,3 +69,14 @@ def test_wrap_text():
     assert isinstance(wrap, list)
     assert all(isinstance(x, str) for x in wrap)
     assert 9 <= len(wrap) <= 13
+
+
+def test_minimum_size_hint():
+    # The hint should always just be the space needed for "..."
+    wdg = QElidingLabel()
+    size_hint = wdg.minimumSizeHint()
+    # Regardless of what text is contained
+    wdg.setText(TEXT)
+    new_hint = wdg.minimumSizeHint()
+    assert size_hint.width() == new_hint.width()
+    assert size_hint.height() == new_hint.height()

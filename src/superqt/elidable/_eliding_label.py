@@ -73,3 +73,10 @@ class QElidingLabel(_GenericEliding, QLabel):
         flags = int(self.alignment() | Qt.TextFlag.TextWordWrap)
         r = fm.boundingRect(QRect(QPoint(0, 0), self.size()), flags, self._text)
         return QSize(self.width(), r.height())
+
+    def minimumSizeHint(self) -> QSize:
+        # The smallest that self._elidedText can be is just the ellipsis.
+        fm = QFontMetrics(self.font())
+        flags = int(self.alignment() | Qt.TextFlag.TextWordWrap)
+        r = fm.boundingRect(QRect(QPoint(0, 0), self.size()), flags, "...")
+        return QSize(r.width(), r.height())
