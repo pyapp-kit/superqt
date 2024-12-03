@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import contextlib
 from enum import IntEnum, IntFlag, auto
-from functools import partial
-from typing import Any, Iterable, overload
+from typing import Any, Callable, Iterable, overload
 
 from qtpy import QtGui
 from qtpy.QtCore import Property, QPoint, QSize, Qt, Signal
@@ -571,8 +570,13 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
                 lbl.deleteLater()
             self._handle_labels.clear()
             for n, val in enumerate(self._slider.value()):
-                _cb = partial(self._slider.setSliderPosition, index=n)
-                s = SliderLabel(self._slider, parent=self, connect=_cb)
+                # so gross... fix me
+                s = SliderLabel(
+                    self._slider,
+                    parent=self,
+                    connect=self._on_slider_label_edited,
+                    index=n,
+                )
                 s.editingFinished.connect(self.editingFinished)
                 s.setValue(val)
                 self._handle_labels.append(s)
@@ -580,6 +584,10 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
             for val, label in zip(v, self._handle_labels):
                 label.setValue(val)
         self._reposition_labels()
+
+    def _on_slider_label_edited(self, pos: float) -> None:
+        idx = getattr(self.sender(), "_index", 0)
+        self._slider.setSliderPosition(pos, idx)
 
     def _on_range_changed(self, min: int, max: int) -> None:
         if (min, max) != (self._slider.minimum(), self._slider.maximum()):
@@ -640,12 +648,14 @@ class SliderLabel(QDoubleSpinBox):
     def __init__(
         self,
         slider: QSlider,
-        parent=None,
-        alignment=Qt.AlignmentFlag.AlignCenter,
-        connect=None,
+        parent: QWidget | None = None,
+        alignment: Qt.AlignmentFlag = Qt.AlignmentFlag.AlignCenter,
+        connect: Callable | None = None,
+        index: int = 0,
     ) -> None:
         super().__init__(parent=parent)
         self._slider = slider
+        self._index = index
         self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
         self.setMode(EdgeLabelMode.LabelIsValue)
         self.setDecimals(0)
