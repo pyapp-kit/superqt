@@ -125,7 +125,7 @@ def test_debouncer_method_definition(qtbot):
 
 def test_class_with_slots(qtbot):
     class A:
-        __slots__ = ("count", "__weakref__")
+        __slots__ = ("__weakref__", "count")
 
         def __init__(self):
             self.count = 0
