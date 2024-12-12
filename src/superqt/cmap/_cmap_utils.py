@@ -120,6 +120,7 @@ def draw_colormap(
             gradient.setColorAt(stop.position, QColor(stop.color.hex).lighter(lighter))
         painter.setBrush(gradient)
         painter.drawRect(rect)
+    painter.end()
 
 
 def _draw_checkerboard(
