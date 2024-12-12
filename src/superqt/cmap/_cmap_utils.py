@@ -120,7 +120,10 @@ def draw_colormap(
             gradient.setColorAt(stop.position, QColor(stop.color.hex).lighter(lighter))
         painter.setBrush(gradient)
         painter.drawRect(rect)
-    painter.end()
+
+    # If we created a new Painter, free its resources
+    if isinstance(painter_or_device, QPaintDevice):
+        painter.end()
 
 
 def _draw_checkerboard(
