@@ -181,6 +181,7 @@ filterwarnings = [
     "ignore:QPixmapCache.find:DeprecationWarning:",
     "ignore:SelectableGroups dict interface:DeprecationWarning",
     "ignore:The distutils package is deprecated:DeprecationWarning",
+    "ignore:.*Skipping callback call set_result",
 ]
 
 # https://mypy.readthedocs.io/en/stable/config_file.html
