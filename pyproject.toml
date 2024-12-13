@@ -40,7 +40,7 @@ dynamic = ["version"]
 dependencies = [
     "pygments>=2.4.0",
     "qtpy>=1.1.0",
-    "typing-extensions >=3.7.4.3,!=3.10.0.0",
+    "typing-extensions >=4.0.0", # this actually is only for flexcache (via pint)
 ]
 
 # extras
@@ -154,7 +154,7 @@ select = [
     "B",    # flake8-bugbear
     "A001", # flake8-builtins
     "RUF",  # ruff-specific rules
-    "TC",  # flake8-type-checking
+    "TC",   # flake8-type-checking
     "TID",  # flake8-tidy-imports
 ]
 ignore = [
