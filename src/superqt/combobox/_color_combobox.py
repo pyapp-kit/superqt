@@ -3,7 +3,7 @@ from __future__ import annotations
 import warnings
 from contextlib import suppress
 from enum import IntEnum, auto
-from typing import Any, Literal, Sequence, cast
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from qtpy.QtCore import QModelIndex, QPersistentModelIndex, QRect, QSize, Qt, Signal
 from qtpy.QtGui import QColor, QPainter
@@ -18,6 +18,9 @@ from qtpy.QtWidgets import (
 )
 
 from superqt.utils import signals_blocked
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 _NAME_MAP = {QColor(x).name(): x for x in QColor.colorNames()}
 

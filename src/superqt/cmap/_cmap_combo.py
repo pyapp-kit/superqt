@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Sequence
+from typing import TYPE_CHECKING, Any
 
 from cmap import Colormap
 from qtpy.QtCore import Qt, Signal
@@ -23,6 +23,8 @@ from ._cmap_line_edit import QColormapLineEdit
 from ._cmap_utils import try_cast_colormap
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from cmap._colormap import ColorStopsLike
 
 

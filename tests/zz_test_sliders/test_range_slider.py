@@ -1,6 +1,7 @@
 import math
+from collections.abc import Iterable
 from itertools import product
-from typing import Any, Iterable
+from typing import Any
 from unittest.mock import Mock
 
 import pytest
