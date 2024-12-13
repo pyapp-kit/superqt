@@ -26,8 +26,6 @@ from .spinbox import QLargeIntSpinBox
 from .utils import QMessageHandler, ensure_main_thread, ensure_object_thread
 
 __all__ = [
-    "ensure_main_thread",
-    "ensure_object_thread",
     "QCollapsible",
     "QColorComboBox",
     "QColormapComboBox",
@@ -36,8 +34,8 @@ __all__ = [
     "QElidingLabel",
     "QElidingLineEdit",
     "QEnumComboBox",
-    "QLabeledDoubleRangeSlider",
     "QIconifyIcon",
+    "QLabeledDoubleRangeSlider",
     "QLabeledDoubleSlider",
     "QLabeledRangeSlider",
     "QLabeledSlider",
@@ -48,11 +46,13 @@ __all__ = [
     "QSearchableComboBox",
     "QSearchableListWidget",
     "QSearchableTreeWidget",
+    "ensure_main_thread",
+    "ensure_object_thread",
 ]
 
 if TYPE_CHECKING:
-    from .combobox import QColormapComboBox  # noqa: TCH004
-    from .spinbox._quantity import QQuantity  # noqa: TCH004
+    from .combobox import QColormapComboBox  # noqa: TC004
+    from .spinbox._quantity import QQuantity  # noqa: TC004
 
 
 def __getattr__(name: str) -> Any:
