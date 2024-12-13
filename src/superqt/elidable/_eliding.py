@@ -1,5 +1,3 @@
-from typing import List
-
 from qtpy.QtCore import Qt
 from qtpy.QtGui import QFont, QFontMetrics, QTextLayout
 
@@ -36,7 +34,7 @@ class _GenericEliding:
         self._ellipses_width = width
 
     @staticmethod
-    def wrapText(text, width, font=None) -> List[str]:
+    def wrapText(text, width, font=None) -> list[str]:
         """Returns `text`, split as it would be wrapped for `width`, given `font`.
 
         Static method.
@@ -74,5 +72,5 @@ class _GenericEliding:
         # join them
         return "".join(text[:nlines] + [last_line])
 
-    def _wrappedText(self) -> List[str]:
+    def _wrappedText(self) -> list[str]:
         return _GenericEliding.wrapText(self._text, self.width(), self.font())

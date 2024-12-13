@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Container
+from typing import TYPE_CHECKING
 
 from cmap import Colormap
 from qtpy.QtCore import Qt, Signal
@@ -11,6 +11,8 @@ from ._cmap_line_edit import QColormapLineEdit
 from ._cmap_utils import try_cast_colormap
 
 if TYPE_CHECKING:
+    from collections.abc import Container
+
     from cmap._catalog import Category, Interpolation
     from qtpy.QtGui import QKeyEvent
 

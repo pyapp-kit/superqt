@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import warnings
 from collections import abc, defaultdict
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, ClassVar, DefaultDict, Sequence, Tuple, Union, cast
+from typing import TYPE_CHECKING, ClassVar, Union, cast
 
 from qtpy import QT_VERSION
 from qtpy.QtCore import QObject, QPoint, QRect, QSize, Qt
@@ -47,8 +48,8 @@ ValidColor = Union[
     int,
     str,
     Qt.GlobalColor,
-    Tuple[int, int, int, int],
-    Tuple[int, int, int],
+    tuple[int, int, int, int],
+    tuple[int, int, int],
     None,
 ]
 
@@ -159,7 +160,7 @@ class _QFontIconEngine(QIconEngine):
     def __init__(self, options: _IconOptions):
         super().__init__()
         self._opts: defaultdict[QIcon.State, dict[QIcon.Mode, _IconOptions | None]] = (
-            DefaultDict(dict)
+            defaultdict(dict)
         )
         self._opts[QIcon.State.Off][QIcon.Mode.Normal] = options
         self.update_hash()

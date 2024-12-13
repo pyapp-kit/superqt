@@ -9,9 +9,7 @@ from typing import (
     Any,
     Callable,
     ClassVar,
-    Generator,
     Generic,
-    Sequence,
     TypeVar,
     overload,
 )
@@ -19,6 +17,8 @@ from typing import (
 from qtpy.QtCore import QObject, QRunnable, QThread, QThreadPool, QTimer, Signal
 
 if TYPE_CHECKING:
+    from collections.abc import Generator, Sequence
+
     _T = TypeVar("_T")
 
     class SigInst(Generic[_T]):

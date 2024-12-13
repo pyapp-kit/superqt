@@ -3,7 +3,7 @@ from __future__ import annotations
 import contextlib
 from enum import IntEnum, IntFlag, auto
 from functools import partial
-from typing import Any, Iterable, overload
+from typing import TYPE_CHECKING, Any, overload
 
 from qtpy import QtGui
 from qtpy.QtCore import Property, QPoint, QSize, Qt, Signal
@@ -24,6 +24,9 @@ from qtpy.QtWidgets import (
 from superqt.utils import signals_blocked
 
 from ._sliders import QDoubleRangeSlider, QDoubleSlider, QRangeSlider
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 class LabelPosition(IntEnum):
