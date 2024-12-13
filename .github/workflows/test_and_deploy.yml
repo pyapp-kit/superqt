@@ -41,6 +41,13 @@ jobs:
           - python-version: "3.12"
             backend: pyqt5
         include:
+          - python-version: "3.13"
+            platform: ubuntu-latest
+            backend: "'pyside6<6.8'"
+          - python-version: "3.13"
+            platform: windows-latest
+            backend: "'pyqt6"
+
           - python-version: "3.10"
             platform: macos-latest
             backend: "'pyside6<6.8'"
