@@ -1,4 +1,5 @@
-from typing import List, Optional, Sequence, Tuple, TypeVar, Union
+from collections.abc import Sequence
+from typing import Optional, TypeVar, Union
 
 from qtpy import QtGui
 from qtpy.QtCore import Property, QEvent, QPoint, QPointF, QRect, QRectF, Qt, Signal
@@ -42,11 +43,11 @@ class _GenericRangeSlider(_GenericSlider):
         self.valueChanged = self._valuesChanged
         self.sliderMoved = self._slidersMoved
         # list of values
-        self._value: List[_T] = [20, 80]
+        self._value: list[_T] = [20, 80]
 
         # list of current positions of each handle. same length as _value
         # If tracking is enabled (the default) this will be identical to _value
-        self._position: List[_T] = [20, 80]
+        self._position: list[_T] = [20, 80]
 
         # which handle is being pressed/hovered
         self._pressedIndex = 0
@@ -113,7 +114,7 @@ class _GenericRangeSlider(_GenericSlider):
 
     # ###############  QtOverrides  #######################
 
-    def value(self) -> Tuple[_T, ...]:
+    def value(self) -> tuple[_T, ...]:
         """Get current value of the widget as a tuple of integers."""
         return tuple(self._value)
 
@@ -332,7 +333,7 @@ class _GenericRangeSlider(_GenericSlider):
     # NOTE: this is very much tied to mousepress... not a generic "get control"
     def _getControlAtPos(
         self, pos: QPoint, opt: Optional[QStyleOptionSlider] = None
-    ) -> Tuple[QStyle.SubControl, int]:
+    ) -> tuple[QStyle.SubControl, int]:
         """Update self._pressedControl based on ev.pos()."""
         opt = opt or self._styleOption
 

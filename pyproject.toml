@@ -8,7 +8,7 @@ build-backend = "hatchling.build"
 name = "superqt"
 description = "Missing widgets and components for PyQt/PySide"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 license = { text = "BSD 3-Clause License" }
 authors = [{ email = "talley.lambert@gmail.com", name = "Talley Lambert" }]
 keywords = [
@@ -28,7 +28,6 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -41,13 +40,21 @@ dynamic = ["version"]
 dependencies = [
     "pygments>=2.4.0",
     "qtpy>=1.1.0",
-    "typing-extensions >=3.7.4.3,!=3.10.0.0",
+    "typing-extensions >=3.7.4.3,!=3.10.0.0",  # however, pint requires >4.5.0
 ]
 
 # extras
 # https://peps.python.org/pep-0621/#dependencies-optional-dependencies
 [project.optional-dependencies]
-test = ["pint", "pytest", "pytest-cov", "pytest-qt", "numpy", "cmap", "pyconify"]
+test = [
+    "pint",
+    "pytest",
+    "pytest-cov",
+    "pytest-qt",
+    "numpy",
+    "cmap",
+    "pyconify",
+]
 dev = [
     "ipython",
     "ruff",
@@ -58,7 +65,13 @@ dev = [
     "rich",
     "types-Pygments",
 ]
-docs = ["mkdocs-macros-plugin", "mkdocs-material", "mkdocstrings[python]", "pint", "cmap"]
+docs = [
+    "mkdocs-macros-plugin",
+    "mkdocs-material",
+    "mkdocstrings[python]",
+    "pint",
+    "cmap",
+]
 quantity = ["pint"]
 cmap = ["cmap >=0.1.1"]
 pyside2 = ["pyside2"]
@@ -100,21 +113,30 @@ python = ["3.11"]
 
 [[tool.hatch.envs.test.matrix]]
 qt = ["pyside2", "pyqt5", "pyqt5.12"]
-python = ["3.8"]
+python = ["3.9"]
 
 [tool.hatch.envs.test.overrides]
 matrix.qt.extra-dependencies = [
-  {value = "pyside2", if = ["pyside2"]},
-  {value = "pyside6", if = ["pyside6"]},
-  {value = "pyqt5", if = ["pyqt5"]},
-  {value = "pyqt6", if = ["pyqt6"]},
-  {value = "pyqt5==5.12", if = ["pyqt5.12"]},
+    { value = "pyside2", if = [
+        "pyside2",
+    ] },
+    { value = "pyside6", if = [
+        "pyside6",
+    ] },
+    { value = "pyqt5", if = [
+        "pyqt5",
+    ] },
+    { value = "pyqt6", if = [
+        "pyqt6",
+    ] },
+    { value = "pyqt5==5.12", if = [
+        "pyqt5.12",
+    ] },
 ]
 
-# https://github.com/charliermarsh/ruff
 [tool.ruff]
 line-length = 88
-target-version = "py38"
+target-version = "py39"
 src = ["src", "tests"]
 
 # https://docs.astral.sh/ruff/rules
@@ -132,7 +154,7 @@ select = [
     "B",    # flake8-bugbear
     "A001", # flake8-builtins
     "RUF",  # ruff-specific rules
-    "TCH",  # flake8-type-checking
+    "TC",   # flake8-type-checking
     "TID",  # flake8-tidy-imports
 ]
 ignore = [
@@ -159,6 +181,7 @@ filterwarnings = [
     "ignore:QPixmapCache.find:DeprecationWarning:",
     "ignore:SelectableGroups dict interface:DeprecationWarning",
     "ignore:The distutils package is deprecated:DeprecationWarning",
+    "ignore:.*Skipping callback call set_result",
 ]
 
 # https://mypy.readthedocs.io/en/stable/config_file.html
