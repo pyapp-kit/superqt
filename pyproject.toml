@@ -40,7 +40,7 @@ dynamic = ["version"]
 dependencies = [
     "pygments>=2.4.0",
     "qtpy>=1.1.0",
-    "typing-extensions >=4.1.0", # this minimum is actually is only for pint
+    "typing-extensions >=3.7.4.3,!=3.10.0.0",  # however, pint requires >4.5.0
 ]
 
 # extras
