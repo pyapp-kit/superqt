@@ -1,4 +1,5 @@
 from ._labeled import (
+    QLabeledCategoricalSlider,
     QLabeledDoubleRangeSlider,
     QLabeledDoubleSlider,
     QLabeledRangeSlider,
@@ -11,6 +12,7 @@ __all__ = [
     "MONTEREY_SLIDER_STYLES_FIX",
     "QDoubleRangeSlider",
     "QDoubleSlider",
+    "QLabeledCategoricalSlider",
     "QLabeledDoubleRangeSlider",
     "QLabeledDoubleSlider",
     "QLabeledRangeSlider",
