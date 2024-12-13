@@ -41,7 +41,7 @@ dynamic = ["version"]
 dependencies = [
     "pygments>=2.4.0",
     "qtpy>=1.1.0",
-    "typing-extensions >=4.0.0", # this actually is only for flexcache (via pint)
+    "typing-extensions >=3.7.4.3,!=3.10.0.0",  # however, pint requires >4.5.0
 ]
 
 # extras
@@ -182,6 +182,7 @@ filterwarnings = [
     "ignore:QPixmapCache.find:DeprecationWarning:",
     "ignore:SelectableGroups dict interface:DeprecationWarning",
     "ignore:The distutils package is deprecated:DeprecationWarning",
+    "ignore:.*Skipping callback call set_result",
 ]
 
 # https://mypy.readthedocs.io/en/stable/config_file.html

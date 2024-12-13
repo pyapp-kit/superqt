@@ -77,7 +77,7 @@ jobs:
     with:
       python-version: "3.9"
       qt: pyqt5
-      pip-post-installs: "qtpy==1.1.0 typing-extensions==3.7.4.3"
+      pip-post-installs: "qtpy==1.1.0 typing-extensions==4.5.0"  # 4.5.0 is just for pint
       pip-install-flags: -e
       coverage-upload: artifact
 
