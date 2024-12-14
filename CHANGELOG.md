@@ -1,5 +1,27 @@
 # Changelog
 
+## [v0.7.0](https://github.com/pyapp-kit/superqt/tree/v0.7.0) (2024-12-14)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.6.8...v0.7.0)
+
+**Fixed bugs:**
+
+- fix: End painter when drawing colormap [\#262](https://github.com/pyapp-kit/superqt/pull/262) ([gselzer](https://github.com/gselzer))
+- fix: minimum size hint for QElidingLabel [\#260](https://github.com/pyapp-kit/superqt/pull/260) ([gselzer](https://github.com/gselzer))
+- fix: KeyError in CodeSyntaxHighlight [\#258](https://github.com/pyapp-kit/superqt/pull/258) ([hanjinliu](https://github.com/hanjinliu))
+
+**Refactors:**
+
+- chore: Revert "remove stylesheet on sliderLabel \(\#254\)" [\#265](https://github.com/pyapp-kit/superqt/pull/265) ([tlambert03](https://github.com/tlambert03))
+- refactor: remove stylesheet on sliderLabel [\#254](https://github.com/pyapp-kit/superqt/pull/254) ([tlambert03](https://github.com/tlambert03))
+
+**Merged pull requests:**
+
+- build: support py313 [\#264](https://github.com/pyapp-kit/superqt/pull/264) ([tlambert03](https://github.com/tlambert03))
+- build: drop py38 [\#263](https://github.com/pyapp-kit/superqt/pull/263) ([tlambert03](https://github.com/tlambert03))
+- ci: \[pre-commit.ci\] autoupdate [\#257](https://github.com/pyapp-kit/superqt/pull/257) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
+- ci: \[pre-commit.ci\] autoupdate [\#253](https://github.com/pyapp-kit/superqt/pull/253) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
+
 ## [v0.6.8](https://github.com/pyapp-kit/superqt/tree/v0.6.8) (2024-06-15)
 
 [Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.6.7...v0.6.8)
@@ -472,12 +494,20 @@
 
 ## [v0.2.1](https://github.com/pyapp-kit/superqt/tree/v0.2.1) (2021-07-10)
 
-[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.2.0...v0.2.1)
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.2.0rc1...v0.2.1)
 
 **Fixed bugs:**
 
 - Fix QLabeledRangeSlider API \(fix slider proxy\) [\#10](https://github.com/pyapp-kit/superqt/pull/10) ([tlambert03](https://github.com/tlambert03))
 - Fix range slider with negative min range [\#9](https://github.com/pyapp-kit/superqt/pull/9) ([tlambert03](https://github.com/tlambert03))
+
+## [v0.2.0rc1](https://github.com/pyapp-kit/superqt/tree/v0.2.0rc1) (2021-06-26)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.2.0rc0...v0.2.0rc1)
+
+## [v0.2.0rc0](https://github.com/pyapp-kit/superqt/tree/v0.2.0rc0) (2021-06-26)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.2.0...v0.2.0rc0)
 
 
 
