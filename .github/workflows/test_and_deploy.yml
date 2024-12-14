@@ -45,7 +45,7 @@ jobs:
             platform: windows-latest
             backend: "pyqt6"
           - python-version: "3.13"
-            platform: ubunt-latest
+            platform: ubuntu-latest
             backend: "pyqt6"
 
           - python-version: "3.10"
