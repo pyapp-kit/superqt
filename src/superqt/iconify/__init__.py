@@ -126,9 +126,9 @@ class QIconifyIcon(QIcon):
         """
         try:
             path = svg_path(*key, color=color, flip=flip, rotate=rotate, dir=dir)
-        except OSError:
+        except OSError as e:
             warnings.warn(
-                f"Unable to connect to internet, and icon {key} not cached.",
+                f"Error fetching icon: {e}.\nIcon {key} not cached. Using fallback.",
                 stacklevel=2,
             )
             self._draw_text_fallback(key)
