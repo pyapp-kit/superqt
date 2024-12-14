@@ -657,14 +657,7 @@ class SliderLabel(QDoubleSpinBox):
         slider.rangeChanged.connect(self._update_size)
         self.setAlignment(alignment)
         self.setButtonSymbols(QSpinBox.ButtonSymbols.NoButtons)
-
-        le = self.lineEdit()
-        # make the lineedit transparent
-        palette = le.palette()
-        palette.setColor(palette.ColorRole.Base, Qt.GlobalColor.transparent)
-        le.setPalette(palette)
-        le.setFrame(False)  # no border
-
+        self.setStyleSheet("background:transparent; border: 0;")
         if connect is not None:
             self.editingFinished.connect(lambda: connect(self.value()))
         self.editingFinished.connect(self._silent_clear_focus)
