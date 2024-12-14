@@ -9,7 +9,9 @@ from qtpy import QtGui
 # https://pygments.org/docs/formatterdevelopment/#html-3-2-formatter
 
 
-def get_text_char_format(style):
+def get_text_char_format(
+    style: dict[str, QtGui.QTextCharFormat],
+) -> QtGui.QTextCharFormat:
     text_char_format = QtGui.QTextCharFormat()
     if hasattr(text_char_format, "setFontFamilies"):
         text_char_format.setFontFamilies(["monospace"])
@@ -36,7 +38,7 @@ def get_text_char_format(style):
 class QFormatter(Formatter):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.data = []
+        self.data: list[QtGui.QTextCharFormat] = []
         self._style = {name: get_text_char_format(style) for name, style in self.style}
 
     def format(self, tokensource, outfile):
@@ -49,7 +51,11 @@ class QFormatter(Formatter):
         self.data = []
 
         for token, value in tokensource:
-            self.data.extend([self._style[token]] * len(value))
+            # using get method to workaround not defined style for plain token
+            # https://github.com/pygments/pygments/issues/2149
+            self.data.extend(
+                [self._style.get(token, QtGui.QTextCharFormat())] * len(value)
+            )
 
 
 class CodeSyntaxHighlight(QtGui.QSyntaxHighlighter):
