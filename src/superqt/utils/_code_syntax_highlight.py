@@ -51,6 +51,8 @@ class QFormatter(Formatter):
         self.data = []
 
         for token, value in tokensource:
+            # using get method to workaround not defined style for plain token
+            # https://github.com/pygments/pygments/issues/2149
             self.data.extend(
                 [self._style.get(token, QtGui.QTextCharFormat())] * len(value)
             )
