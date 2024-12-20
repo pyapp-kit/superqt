@@ -81,7 +81,8 @@ class QIconifyIcon(QIcon):
                 "`pip install superqt[iconify]` extra."
             )
         super().__init__()
-        self.addKey(*key, color=color, flip=flip, rotate=rotate, dir=dir)
+        if key:
+            self.addKey(*key, color=color, flip=flip, rotate=rotate, dir=dir)
 
     def addKey(
         self,
@@ -93,7 +94,7 @@ class QIconifyIcon(QIcon):
         size: QSize | None = None,
         mode: QIcon.Mode = QIcon.Mode.Normal,
         state: QIcon.State = QIcon.State.Off,
-    ) -> None:
+    ) -> QIconifyIcon:
         """Add an icon to this QIcon.
 
         This is a variant of `QIcon.addFile` that uses an iconify icon keys and
@@ -123,6 +124,11 @@ class QIconifyIcon(QIcon):
             Mode specified for the icon, passed to `QIcon.addFile`.
         state : QIcon.State, optional
             State specified for the icon, passed to `QIcon.addFile`.
+
+        Returns
+        -------
+        QIconifyIcon
+            This QIconifyIcon instance, for chaining.
         """
         try:
             path = svg_path(*key, color=color, flip=flip, rotate=rotate, dir=dir)
@@ -134,6 +140,8 @@ class QIconifyIcon(QIcon):
             self._draw_text_fallback(key)
         else:
             self.addFile(str(path), size or QSize(), mode, state)
+
+        return self
 
     def _draw_text_fallback(self, key: tuple[str, ...]) -> None:
         if style := QApplication.style():
