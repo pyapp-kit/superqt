@@ -220,18 +220,15 @@ class CodeSyntaxHighlight(QSyntaxHighlighter):
             parent = doc
 
         super().__init__(parent)
-        try:
-            self.lexer = get_lexer_by_name(lang)
-        except ClassNotFound as e:
-            if cls := find_lexer_class(lang):
-                self.lexer = cls()
-            else:
-                raise ValueError(f"Could not find lexer for language {lang!r}.") from e
-        self.formatter: QFormatter
-        self.set_theme(theme)
+        self.setLanguage(lang)
+        self.setTheme(theme)
 
-    def set_theme(self, theme: KnownStyle | str) -> None:
-        """Set the theme for the syntax highlighting."""
+    def setTheme(self, theme: KnownStyle | str) -> None:
+        """Set the theme for the syntax highlighting.
+
+        This should be a string that Pygments recognizes, e.g. 'monokai', 'solarized'.
+        Use `pygments.styles.get_all_styles()` to see a list of available styles.
+        """
         self.formatter = QFormatter(style=theme)
         if self._doc_parent is not None:
             palette = self._doc_parent.palette()
@@ -240,6 +237,20 @@ class CodeSyntaxHighlight(QSyntaxHighlighter):
             self._doc_parent.setPalette(palette)
 
         self.rehighlight()
+
+    def setLanguage(self, lang: str) -> None:
+        """Set the language for the syntax highlighting.
+
+        This should be a string that Pygments recognizes, e.g. 'python', 'pytb', 'cpp',
+        'java', etc.
+        """
+        try:
+            self.lexer = get_lexer_by_name(lang)
+        except ClassNotFound as e:
+            if cls := find_lexer_class(lang):
+                self.lexer = cls()
+            else:
+                raise ValueError(f"Could not find lexer for language {lang!r}.") from e
 
     @property
     def background_color(self) -> str:
