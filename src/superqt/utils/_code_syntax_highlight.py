@@ -231,6 +231,7 @@ class CodeSyntaxHighlight(QSyntaxHighlighter):
         self.set_theme(theme)
 
     def set_theme(self, theme: KnownStyle | str) -> None:
+        """Set the theme for the syntax highlighting."""
         self.formatter = QFormatter(style=theme)
         if self._doc_parent is not None:
             palette = self._doc_parent.palette()
