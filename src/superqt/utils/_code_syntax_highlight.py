@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, cast
 
-import pygments.token
 from pygments import highlight
 from pygments.formatter import Formatter
 from pygments.lexers import find_lexer_class, get_lexer_by_name
