@@ -94,7 +94,7 @@ jobs:
       dependency-ref: ${{ matrix.napari-version }}
       dependency-extras: "testing"
       qt: ${{ matrix.qt }}
-      pytest-args: 'napari/_qt -k "not async and not qt_dims_2 and not qt_viewer_console_focus and not keybinding_editor"'
+      pytest-args: 'napari/_qt -k "not async and not qt_dims_2 and not qt_viewer_console_focus and not keybinding_editor and not preferences_dialog_not_dismissed"'
       python-version: "3.10"
       post-install-cmd: "pip install lxml_html_clean"
     strategy:
@@ -102,6 +102,51 @@ jobs:
       matrix:
         napari-version: ["", "v0.4.19.post1"]
         qt: ["pyqt5", "pyside2"]
+
+  test_napari2:
+    name: test herb
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout ${{ github.repository }}
+        uses: actions/checkout@v4
+        with:
+          path: ${{ github.repository }}
+          fetch-depth: 0
+
+      - name: Checkout napari/napari
+        uses: actions/checkout@v4
+        with:
+          path: napari/napari
+          repository: napari/napari
+          fetch-depth: 0
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.10
+          allow-prereleases: true
+
+      - name: Setup Headless Display
+        uses: tlambert03/setup-headless-display-action/tree/herbstluftwm@1338c4dc941d771e3311d0a43a5e5e66f27b2ea6
+        with:
+          qt: true
+
+      - name: Install dependencies
+        run: |
+          python -m pip install -U pip
+          python -m pip install ./napari/napari[testing]
+          echo "##############################################################"
+          echo "##############################################################"
+          python -m pip install ./${{ github.repository }}
+
+      - name: Install Qt
+        run: |
+          python -m pip install pyqt5
+          pip install lxml_html_clean
+
+      - name: Run tests
+        run: python -m pytest --color=yes -W default napari/_qt -k "not async and not qt_dims_2 and not qt_viewer_console_focus and not keybinding_editor"
+        working-directory: napari/napari
 
   check-manifest:
     name: Check Manifest
