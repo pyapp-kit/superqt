@@ -97,6 +97,7 @@ MONO_FAMILIES = [
     "Consolas",
     "Andale Mono",
     "Source Code Pro",
+    "Ubuntu Mono",
     "monospace",
 ]
 
@@ -126,7 +127,7 @@ def get_text_char_format(style: _StyleDict) -> QTextCharFormat:
     if color := style.get("color"):
         text_char_format.setForeground(QColor(f"#{color}"))
     if bgcolor := style.get("bgcolor"):
-        text_char_format.setBackground(QColor(bgcolor))
+        text_char_format.setBackground(QColor(f"#{bgcolor}"))
     if style.get("bold"):
         text_char_format.setFontWeight(QFont.Weight.Bold)
     if style.get("italic"):
