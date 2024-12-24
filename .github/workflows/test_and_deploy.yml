@@ -104,7 +104,7 @@ jobs:
         qt: ["pyqt5", "pyside2"]
 
   test_napari2:
-    name: test herb
+    name: test setup action
     runs-on: ubuntu-latest
     steps:
       - name: Checkout ${{ github.repository }}
@@ -127,7 +127,7 @@ jobs:
           allow-prereleases: true
 
       - name: Setup Headless Display
-        uses: tlambert03/setup-headless-display-action/tree/herbstluftwm@1338c4dc941d771e3311d0a43a5e5e66f27b2ea6
+        uses: tlambert03/setup-headless-display-action@1338c4dc941d771e3311d0a43a5e5e66f27b2ea6
         with:
           qt: true
 
