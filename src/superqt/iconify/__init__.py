@@ -13,11 +13,6 @@ if TYPE_CHECKING:
     Flip = Literal["horizontal", "vertical", "horizontal,vertical"]
     Rotation = Literal["90", "180", "270", 90, 180, 270, "-90", 1, 2, 3]
 
-try:
-    from pyconify import svg_path
-except ModuleNotFoundError:  # pragma: no cover
-    svg_path = None
-
 
 class QIconifyIcon(QIcon):
     """QIcon backed by an iconify icon.
@@ -74,12 +69,14 @@ class QIconifyIcon(QIcon):
         rotate: Rotation | None = None,
         dir: str | None = None,
     ):
-        if svg_path is None:  # pragma: no cover
+        try:
+            import pyconify  # noqa: F401
+        except ModuleNotFoundError:  # pragma: no cover
             raise ModuleNotFoundError(
                 "pyconify is required to use QIconifyIcon. "
                 "Please install it with `pip install pyconify` or use the "
                 "`pip install superqt[iconify]` extra."
-            )
+            ) from None
         super().__init__()
         if key:
             self.addKey(*key, color=color, flip=flip, rotate=rotate, dir=dir)
@@ -130,6 +127,8 @@ class QIconifyIcon(QIcon):
         QIconifyIcon
             This QIconifyIcon instance, for chaining.
         """
+        from pyconify import svg_path
+
         try:
             path = svg_path(*key, color=color, flip=flip, rotate=rotate, dir=dir)
         except OSError as e:
