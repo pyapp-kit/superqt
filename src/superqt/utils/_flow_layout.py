@@ -10,11 +10,11 @@ class QFlowLayout(QLayout):
     The widget placement changes depending on the width of the application window.
 
     Code translated from C++ at:
-    https://code.qt.io/cgit/qt/qtbase.git/tree/examples/widgets/layouts/flowlayout?h=6.8
+    <https://code.qt.io/cgit/qt/qtbase.git/tree/examples/widgets/layouts/flowlayout>
 
-    described at: https://doc.qt.io/qt-6/qtwidgets-layouts-flowlayout-example.html
+    described at: <https://doc.qt.io/qt-6/qtwidgets-layouts-flowlayout-example.html>
 
-    See also: https://doc.qt.io/qt-6/layout.html
+    See also: <https://doc.qt.io/qt-6/layout.html>
 
     Parameters
     ----------

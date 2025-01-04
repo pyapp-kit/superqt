@@ -33,3 +33,4 @@ The following are QWidget subclasses:
 | Widget                          | Description           |
 | -----------                     | --------------------- |
 | [`QCollapsible`](./qcollapsible.md)              | A collapsible widget to hide and unhide child widgets. |
+| [`QFlowLayout`](./qflowlayout.md)                | A layout that rearranges items based on parent width. |
