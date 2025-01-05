@@ -7,6 +7,7 @@ __all__ = (
     "CodeSyntaxHighlight",
     "FunctionWorker",
     "GeneratorWorker",
+    "QFlowLayout",
     "QMessageHandler",
     "QSignalDebouncer",
     "QSignalThrottler",
@@ -27,6 +28,7 @@ __all__ = (
 from ._code_syntax_highlight import CodeSyntaxHighlight
 from ._ensure_thread import ensure_main_thread, ensure_object_thread
 from ._errormsg_context import exceptions_as_dialog
+from ._flow_layout import QFlowLayout
 from ._img_utils import qimage_to_array
 from ._message_handler import QMessageHandler
 from ._misc import signals_blocked

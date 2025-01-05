@@ -23,7 +23,12 @@ from .sliders import (
     QRangeSlider,
 )
 from .spinbox import QLargeIntSpinBox
-from .utils import QMessageHandler, ensure_main_thread, ensure_object_thread
+from .utils import (
+    QFlowLayout,
+    QMessageHandler,
+    ensure_main_thread,
+    ensure_object_thread,
+)
 
 __all__ = [
     "QCollapsible",
@@ -34,6 +39,7 @@ __all__ = [
     "QElidingLabel",
     "QElidingLineEdit",
     "QEnumComboBox",
+    "QFlowLayout",
     "QIconifyIcon",
     "QLabeledDoubleRangeSlider",
     "QLabeledDoubleSlider",
