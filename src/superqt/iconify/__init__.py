@@ -7,16 +7,22 @@ from qtpy.QtCore import QSize, Qt
 from qtpy.QtGui import QIcon, QPainter, QPixmap
 from qtpy.QtWidgets import QApplication
 
+try:
+    from pyconify import svg_path
+except ModuleNotFoundError:  # pragma: no cover
+    raise ModuleNotFoundError(
+        "pyconify is required to use QIconifyIcon. "
+        "Please install it with `pip install pyconify` or use the "
+        "`pip install superqt[iconify]` extra."
+    ) from None
+
 if TYPE_CHECKING:
     from typing import Literal
 
     Flip = Literal["horizontal", "vertical", "horizontal,vertical"]
     Rotation = Literal["90", "180", "270", 90, 180, 270, "-90", 1, 2, 3]
 
-try:
-    from pyconify import svg_path
-except ModuleNotFoundError:  # pragma: no cover
-    svg_path = None
+__all__ = ["QIconifyIcon"]
 
 
 class QIconifyIcon(QIcon):
@@ -74,12 +80,6 @@ class QIconifyIcon(QIcon):
         rotate: Rotation | None = None,
         dir: str | None = None,
     ):
-        if svg_path is None:  # pragma: no cover
-            raise ModuleNotFoundError(
-                "pyconify is required to use QIconifyIcon. "
-                "Please install it with `pip install pyconify` or use the "
-                "`pip install superqt[iconify]` extra."
-            )
         super().__init__()
         if key:
             self.addKey(*key, color=color, flip=flip, rotate=rotate, dir=dir)
