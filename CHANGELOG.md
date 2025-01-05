@@ -1,5 +1,23 @@
 # Changelog
 
+## [v0.7.1](https://github.com/pyapp-kit/superqt/tree/v0.7.1) (2025-01-05)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.7.0...v0.7.1)
+
+**Implemented enhancements:**
+
+- feat: add QFlowLayout, for variable width widgets [\#271](https://github.com/pyapp-kit/superqt/pull/271) ([tlambert03](https://github.com/tlambert03))
+- feat: Improve CodeSyntaxHighlight object [\#268](https://github.com/pyapp-kit/superqt/pull/268) ([tlambert03](https://github.com/tlambert03))
+- feat: allow chaining of QIconifyIcon.addKey [\#267](https://github.com/pyapp-kit/superqt/pull/267) ([tlambert03](https://github.com/tlambert03))
+
+**Fixed bugs:**
+
+- fix: better warning for download error [\#266](https://github.com/pyapp-kit/superqt/pull/266) ([tlambert03](https://github.com/tlambert03))
+
+**Merged pull requests:**
+
+- Lazy-import `pyconify` [\#270](https://github.com/pyapp-kit/superqt/pull/270) ([hanjinliu](https://github.com/hanjinliu))
+
 ## [v0.7.0](https://github.com/pyapp-kit/superqt/tree/v0.7.0) (2024-12-14)
 
 [Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.6.8...v0.7.0)
