@@ -67,11 +67,11 @@ dev = [
     "types-Pygments",
 ]
 docs = [
-    "mkdocs-macros-plugin",
-    "mkdocs-material",
-    "mkdocstrings[python]",
-    "pint",
-    "cmap",
+    "mkdocs-macros-plugin ==1.3.7",
+    "mkdocs-material ==9.5.49",
+    "mkdocstrings ==0.27.0",
+    "mkdocstrings-python ==1.13.0",
+    "superqt[font-fa5, cmap, quantity]",
 ]
 quantity = ["pint"]
 cmap = ["cmap >=0.1.1"]
