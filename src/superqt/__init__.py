@@ -11,7 +11,6 @@ except PackageNotFoundError:
 from .collapsible import QCollapsible
 from .combobox import QColorComboBox, QEnumComboBox, QSearchableComboBox
 from .elidable import QElidingLabel, QElidingLineEdit
-from .iconify import QIconifyIcon
 from .selection import QSearchableListWidget, QSearchableTreeWidget
 from .sliders import (
     QDoubleRangeSlider,
@@ -58,16 +57,21 @@ __all__ = [
 
 if TYPE_CHECKING:
     from .combobox import QColormapComboBox  # noqa: TC004
+    from .iconify import QIconifyIcon  # noqa: TC004
     from .spinbox._quantity import QQuantity  # noqa: TC004
 
 
 def __getattr__(name: str) -> Any:
-    if name == "QQuantity":
-        from .spinbox._quantity import QQuantity
-
-        return QQuantity
     if name == "QColormapComboBox":
         from .cmap import QColormapComboBox
 
         return QColormapComboBox
+    if name == "QIconifyIcon":
+        from .iconify import QIconifyIcon
+
+        return QIconifyIcon
+    if name == "QQuantity":
+        from .spinbox._quantity import QQuantity
+
+        return QQuantity
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
