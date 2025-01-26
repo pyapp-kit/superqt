@@ -13,7 +13,10 @@ git clone https://github.com/<your_organization>/superqt
 cd superqt
 
 # install in editable mode
-pip install -e .[dev]
+pip install -e .[dev, test]
+
+# install a Qt backend (PySide2, PySide6, PyQt5 or PyQt6):
+pip install PyQt6
 
 # install pre-commit hooks
 pre-commit install
