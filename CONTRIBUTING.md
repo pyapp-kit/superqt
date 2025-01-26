@@ -12,11 +12,8 @@ To get started fork this repository, and clone your fork:
 git clone https://github.com/<your_organization>/superqt
 cd superqt
 
-# install in editable mode
-pip install -e .[dev, test]
-
-# install a Qt backend (PySide2, PySide6, PyQt5 or PyQt6):
-pip install PyQt6
+# install in editable mode (this will install PyQt6 as the Qt backend)
+pip install -e .[dev]
 
 # install pre-commit hooks
 pre-commit install
