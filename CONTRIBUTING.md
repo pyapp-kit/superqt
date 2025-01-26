@@ -12,11 +12,11 @@ To get started fork this repository, and clone your fork:
 git clone https://github.com/<your_organization>/superqt
 cd superqt
 
-# install pre-commit hooks
-pre-commit install
-
 # install in editable mode
 pip install -e .[dev]
+
+# install pre-commit hooks
+pre-commit install
 
 # run tests & make sure everything is working!
 pytest
