@@ -64,7 +64,6 @@ class QColormapFilterComboBox(QComboBox):
         self.setDuplicatesEnabled(False)
         # (must come before setCompleter)
         self.setLineEdit(_PopupColormapLineEdit(self))
-#        self.setItemDelegate(QColormapItemDelegate(self))
 
         # use string list model as source model
         self._source_model = QStringListModel(self)
