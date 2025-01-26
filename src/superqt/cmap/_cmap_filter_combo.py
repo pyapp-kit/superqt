@@ -5,20 +5,13 @@ from typing import TYPE_CHECKING, Any
 from cmap import Colormap
 from qtpy.QtCore import QSortFilterProxyModel, QStringListModel, Qt, Signal
 from qtpy.QtWidgets import (
-    QButtonGroup,
-    QCheckBox,
     QComboBox,
     QCompleter,
-    QDialog,
-    QDialogButtonBox,
-    QSizePolicy,
-    QVBoxLayout,
     QWidget,
 )
 
 from superqt.utils import signals_blocked
 
-from ._catalog_combo import CmapCatalogComboBox
 from ._cmap_combo import _CmapNameDialog
 from ._cmap_item_delegate import QColormapItemDelegate
 from ._cmap_line_edit import QColormapLineEdit
@@ -35,7 +28,7 @@ CMAP_ROLE = Qt.ItemDataRole.UserRole + 1
 
 
 class QColormapFilterComboBox(QComboBox):
-    """A drop down menu for selecting colors.
+    """A drop down menu for selecting colors that allows for text filtering.
 
     Parameters
     ----------
