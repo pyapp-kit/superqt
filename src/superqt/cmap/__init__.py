@@ -18,7 +18,8 @@ from ._cmap_utils import draw_colormap
 __all__ = [
     "CmapCatalogComboBox",
     "QColormapComboBox",
-    "QColormapFilterComboBox" "QColormapItemDelegate",
+    "QColormapFilterComboBox", 
+    "QColormapItemDelegate",
     "QColormapLineEdit",
     "draw_colormap",
 ]
