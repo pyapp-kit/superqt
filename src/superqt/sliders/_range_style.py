@@ -300,7 +300,7 @@ def update_styles_from_stylesheet(obj: _GenericRangeSlider) -> None:
         for line in reversed(match.groups()[0].splitlines()):
             bgrd = re.search(r"qproperty-barColor\s*:\s*(.+);", line)
             if bgrd:
-                obj.setBarColor(bgrd.groups()[-1])
+                obj._setBarColor(bgrd.groups()[-1])
                 obj._style.has_stylesheet = True
 
 
