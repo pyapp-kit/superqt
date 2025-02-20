@@ -64,6 +64,15 @@ class _GenericRangeSlider(_GenericSlider):
 
         self.setStyleSheet("")
 
+        # Add QSS styles to ensure compatibility with qdarkstyle
+        self.setStyleSheet(
+            """
+            QSlider { background-color: none; }
+            QSlider::add-page:vertical { background: none; border: none; }
+            QRangeSlider { qproperty-barColor: #9FCBFF; }
+            """
+        )
+
     # ###############  New Public API  #######################
 
     def barIsRigid(self) -> bool:
