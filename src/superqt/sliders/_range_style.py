@@ -68,7 +68,13 @@ class RangeSliderStyle:
             val = _val
 
         if opt.tickPosition != QSlider.TickPosition.NoTicks:
-            val.setAlphaF(self.tick_bar_alpha or SYSTEM_STYLE.tick_bar_alpha)
+            if isinstance(val, QColor):
+                val.setAlphaF(self.tick_bar_alpha or SYSTEM_STYLE.tick_bar_alpha)
+            elif isinstance(val, QGradient):
+                for i in range(val.colorCount()):
+                    color = val.colorAt(i)
+                    color.setAlphaF(self.tick_bar_alpha or SYSTEM_STYLE.tick_bar_alpha)
+                    val.setColorAt(i, color)
 
         return QBrush(val)
 
