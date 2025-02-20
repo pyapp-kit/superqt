@@ -288,6 +288,15 @@ def update_styles_from_stylesheet(obj: _GenericRangeSlider) -> None:
                     setattr(obj._style, f"{orient}_thickness", thickness)
                     obj._style.has_stylesheet = True
 
+    # Find bar color
+    match = re.search(r"QRangeSlider\s*{\s*([^}]+)}", qss, re.S)
+    if match:
+        for line in reversed(match.groups()[0].splitlines()):
+            bgrd = re.search(r"qproperty-barColor\s*:\s*(.+);", line)
+            if bgrd:
+                obj.setBarColor(bgrd.groups()[-1])
+                obj._style.has_stylesheet = True
+
 
 # a fix for https://bugreports.qt.io/browse/QTBUG-98093
 
