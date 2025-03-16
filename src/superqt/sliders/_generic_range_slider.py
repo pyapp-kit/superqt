@@ -65,6 +65,8 @@ class _GenericRangeSlider(_GenericSlider):
         self.setStyleSheet("")
 
     def __getattr__(self, name: str):
+        # this is just for napari test compatibility
+        # should be removed once napari updates its tests
         if name == "_valuesChanged":
             warnings.warn(
                 "_valuesChanged is now publicly available as 'valuesChanged', "
