@@ -280,9 +280,7 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         """Convert the value from float to int before setting the slider value."""
         self._slider.setValue(int(value))
 
-    def _rename_signals(self) -> None:
-        ...
-
+    def _rename_signals(self) -> None: ...
 
 
 class QLabeledDoubleSlider(QLabeledSlider):
