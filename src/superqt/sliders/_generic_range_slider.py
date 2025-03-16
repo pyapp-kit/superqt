@@ -1,5 +1,6 @@
 from collections.abc import Sequence
 from typing import Optional, TypeVar, Union
+import warnings
 
 from qtpy import QtGui
 from qtpy.QtCore import Property, QEvent, QPoint, QPointF, QRect, QRectF, Qt, Signal
@@ -62,6 +63,17 @@ class _GenericRangeSlider(_GenericSlider):
         # color
 
         self.setStyleSheet("")
+
+    def __getattr__(self, name: str):
+        if name == '_valuesChanged':
+            warnings.warn(
+                "_valuesChanged is now publicly available as 'valuesChanged', "
+                "and will be removed in a future release.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            return self.valuesChanged
+        return object.__getattribute__(self, name)
 
     def _rename_signals(self) -> None:
         self.valueChanged = self.valuesChanged
