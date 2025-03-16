@@ -78,7 +78,7 @@ class _GenericRangeSlider(_GenericSlider):
     def _rename_signals(self) -> None:
         self.valueChanged = self.valuesChanged
         self.sliderMoved = self.slidersMoved
-        
+
     # ###############  New Public API  #######################
 
     def barIsRigid(self) -> bool:

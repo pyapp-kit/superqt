@@ -22,7 +22,7 @@ QRangeSlider.
 
 import os
 import platform
-from typing import TypeVar, Any
+from typing import Any, TypeVar
 
 from qtpy import QT_VERSION, QtGui
 from qtpy.QtCore import QEvent, QPoint, QPointF, QRect, Qt, Signal
