@@ -3,11 +3,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from cmap import Colormap
-from qtpy.QtCore import Qt, Signal
+from qtpy.QtCore import QSortFilterProxyModel, QStringListModel, Qt, Signal
 from qtpy.QtWidgets import (
     QButtonGroup,
     QCheckBox,
     QComboBox,
+    QCompleter,
     QDialog,
     QDialogButtonBox,
     QSizePolicy,
@@ -26,6 +27,7 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
 
     from cmap._colormap import ColorStopsLike
+    from qtpy.QtGui import QKeyEvent
 
 
 CMAP_ROLE = Qt.ItemDataRole.UserRole + 1
@@ -45,6 +47,9 @@ class QColormapComboBox(QComboBox):
     add_colormap_text: str, optional
         The text to display for the "Add Colormap..." item.
         Default is "Add Colormap...".
+    filterable: bool, optional
+        Whether the user can filter colormaps by typing in the line edit.
+        Default is True. Can also be set with `setFilterable`.
     """
 
     currentColormapChanged = Signal(Colormap)
@@ -55,18 +60,20 @@ class QColormapComboBox(QComboBox):
         *,
         allow_user_colormaps: bool = False,
         add_colormap_text: str = "Add Colormap...",
+        filterable: bool = True,
     ) -> None:
         # init QComboBox
         super().__init__(parent)
         self._add_color_text: str = add_colormap_text
         self._allow_user_colors: bool = allow_user_colormaps
         self._last_cmap: Colormap | None = None
+        self._filterable: bool = False
 
-        self.setLineEdit(_PopupColormapLineEdit(self))
-        self.lineEdit().setReadOnly(True)
+        line_edit = _PopupColormapLineEdit(self, allow_invalid=False)
+        self.setLineEdit(line_edit)
+        self.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
         self.setItemDelegate(QColormapItemDelegate(self))
 
-        self.currentIndexChanged.connect(self._on_index_changed)
         # there's a little bit of a potential bug here:
         # if the user clicks on the "Add Colormap..." item
         # then an indexChanged signal will be emitted, but it may not
@@ -74,6 +81,33 @@ class QColormapComboBox(QComboBox):
         self.activated.connect(self._on_activated)
 
         self.setUserAdditionsAllowed(allow_user_colormaps)
+
+        # Create a proxy model to handle filtering
+        self._proxy_model = QSortFilterProxyModel(self)
+        # use string list model as source model
+        self._proxy_model.setSourceModel(QStringListModel(self))
+        self._proxy_model.setFilterCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+
+        # Setup completer
+        self._completer = QCompleter(self)
+        self._completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+        self._completer.setCompletionMode(QCompleter.CompletionMode.PopupCompletion)
+        self._completer.setFilterMode(Qt.MatchFlag.MatchContains)
+        self._completer.setModel(self._proxy_model)
+
+        # set the delegate for both the popup and the combobox
+        if popup := self._completer.popup():
+            popup.setItemDelegate(self.itemDelegate())
+
+        # Update completer model when items change
+        if model := self.model():
+            model.rowsInserted.connect(self._update_completer_model)
+            model.rowsRemoved.connect(self._update_completer_model)
+
+        self.setFilterable(filterable)
+
+        self.currentIndexChanged.connect(self._on_index_changed)
+        line_edit.editingFinished.connect(self._on_editing_finished)
 
     def userAdditionsAllowed(self) -> bool:
         """Returns whether the user can add custom colors."""
@@ -96,9 +130,26 @@ class QColormapComboBox(QComboBox):
         elif not self._allow_user_colors:
             self.removeItem(idx)
 
+    def setFilterable(self, filterable: bool) -> None:
+        """Set whether the user can enter/filter colormaps by typing in the line edit.
+
+        If enabled, the user can select the text in the line edit and type to
+        filter the list of colormaps. The completer will show a list of matching
+        colormaps as the user types.  If disabled, the user can only select from
+        the combo box dropdown.
+        """
+        self._filterable = bool(filterable)
+        self.setCompleter(self._completer if self._filterable else None)
+        self.lineEdit().setReadOnly(not self._filterable)
+
+    def isFilterable(self) -> bool:
+        """Returns whether the user can filter the list of colormaps."""
+        return self._filterable
+
     def clear(self) -> None:
         super().clear()
         self.setUserAdditionsAllowed(self._allow_user_colors)
+        self._update_completer_model()
 
     def itemColormap(self, index: int) -> Colormap | None:
         """Returns the color of the item at the given index."""
@@ -124,14 +175,23 @@ class QColormapComboBox(QComboBox):
         # make sure the "Add Colormap..." item is last
         idx = self.findData(self._add_color_text, Qt.ItemDataRole.DisplayRole)
         if idx >= 0:
-            with signals_blocked(self):
-                self.removeItem(idx)
-                self.addItem(self._add_color_text)
+            self._block_completer_update = True
+            try:
+                with signals_blocked(self):
+                    self.removeItem(idx)
+                    self.addItem(self._add_color_text)
+            finally:
+                self._block_completer_update = False
 
     def addColormaps(self, colors: Sequence[Any]) -> None:
         """Adds colors to the QComboBox."""
-        for color in colors:
-            self.addColormap(color)
+        self._block_completer_update = True
+        try:
+            for color in colors:
+                self.addColormap(color)
+        finally:
+            self._block_completer_update = False
+            self._update_completer_model()
 
     def currentColormap(self) -> Colormap | None:
         """Returns the currently selected Colormap or None if not yet selected."""
@@ -172,6 +232,37 @@ class QColormapComboBox(QComboBox):
             self.currentColormapChanged.emit(colormap)
             self.lineEdit().setColormap(colormap)
             self._last_cmap = colormap
+
+    def _update_completer_model(self) -> None:
+        """Update the completer's model with current items."""
+        if getattr(self, "_block_completer_update", False):
+            return
+
+        # Ensure we are updating the source model of the proxy
+        if isinstance(src_model := self._proxy_model.sourceModel(), QStringListModel):
+            words = [
+                txt
+                for i in range(self.count())
+                if (txt := self.itemText(i)) != self._add_color_text
+            ]
+            src_model.setStringList(words)
+            self._proxy_model.invalidate()
+
+    def _on_editing_finished(self) -> None:
+        text = self.lineEdit().text()
+        if (cmap := try_cast_colormap(text)) is not None:
+            self.currentColormapChanged.emit(cmap)
+
+            # if the cmap is not in the list, add it
+            if self.findData(cmap, CMAP_ROLE) < 0:
+                self.addColormap(cmap)
+
+    def keyPressEvent(self, e: QKeyEvent | None) -> None:
+        if e and e.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):
+            # select the first completion when pressing enter if the popup is visible
+            if (completer := self.completer()) and completer.completionCount():
+                self.lineEdit().setText(completer.currentCompletion())  # type: ignore
+        return super().keyPressEvent(e)
 
 
 CATEGORIES = ("sequential", "diverging", "cyclic", "qualitative", "miscellaneous")
@@ -220,7 +311,9 @@ class _PopupColormapLineEdit(QColormapLineEdit):
 
         Without this, only the down arrow will show the popup.  And if mousePressEvent
         is used instead, the popup will show and then immediately hide.
+        Also ensure that the popup is not shown when the user selects text.
         """
-        parent = self.parent()
-        if parent and hasattr(parent, "showPopup"):
-            parent.showPopup()
+        if not self.hasSelectedText():
+            parent = self.parent()
+            if parent and hasattr(parent, "showPopup"):
+                parent.showPopup()

@@ -76,8 +76,9 @@ def test_catalog_combo(qtbot):
     assert wdg.currentColormap() == Colormap("viridis")
 
 
-def test_cmap_combo(qtbot):
-    wdg = QColormapComboBox(allow_user_colormaps=True)
+@pytest.mark.parametrize("filterable", [False, True])
+def test_cmap_combo(qtbot, filterable):
+    wdg = QColormapComboBox(allow_user_colormaps=True, filterable=filterable)
     qtbot.addWidget(wdg)
     wdg.show()
     assert wdg.userAdditionsAllowed()
