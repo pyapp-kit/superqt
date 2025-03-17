@@ -64,19 +64,6 @@ class _GenericRangeSlider(_GenericSlider):
 
         self.setStyleSheet("")
 
-    def __getattr__(self, name: str):
-        # this is just for napari test compatibility
-        # should be removed once napari updates its tests
-        if name == "_valuesChanged":
-            warnings.warn(
-                "_valuesChanged is now publicly available as 'valuesChanged', "
-                "and will be removed in a future release.",
-                DeprecationWarning,
-                stacklevel=2,
-            )
-            return self.valuesChanged
-        return object.__getattribute__(self, name)
-
     def _rename_signals(self) -> None:
         self.valueChanged = self.valuesChanged
         self.sliderMoved = self.slidersMoved
