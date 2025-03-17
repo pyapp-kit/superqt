@@ -14,10 +14,6 @@ class _IntMixin:
 
 
 class _FloatMixin:
-    _fvalueChanged = Signal(float)
-    _fsliderMoved = Signal(float)
-    _frangeChanged = Signal(float, float)
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._singleStep = 0.01
@@ -41,7 +37,9 @@ class QRangeSlider(_IntMixin, _GenericRangeSlider):
 
 
 class QDoubleRangeSlider(_FloatMixin, QRangeSlider):
-    pass
+    def _rename_signals(self) -> None:
+        super()._rename_signals()
+        self.rangeChanged = self.frangeChanged
 
 
 # QRangeSlider.__doc__ += "\n" + textwrap.indent(QSlider.__doc__, "    ")

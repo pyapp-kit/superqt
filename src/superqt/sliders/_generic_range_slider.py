@@ -29,19 +29,21 @@ class _GenericRangeSlider(_GenericSlider):
     """
 
     # Emitted when the slider value has changed, with the new slider values
-    _valuesChanged = Signal(tuple)
+    valuesChanged = Signal(tuple)
+    # this is just a hack to allow napari v0.4.19 tests to pass)
+    # since it used the presence of this private signal as a duck-typing check.
+    _valuesChanged = valuesChanged
 
     # Emitted when sliderDown is true and the slider moves
     # This usually happens when the user is dragging the slider
     # The value is the positions of *all* handles.
-    _slidersMoved = Signal(tuple)
+    slidersMoved = Signal(tuple)
 
     def __init__(self, *args, **kwargs):
         self._style = RangeSliderStyle()
 
         super().__init__(*args, **kwargs)
-        self.valueChanged = self._valuesChanged
-        self.sliderMoved = self._slidersMoved
+
         # list of values
         self._value: list[_T] = [20, 80]
 
@@ -63,6 +65,10 @@ class _GenericRangeSlider(_GenericSlider):
         # color
 
         self.setStyleSheet("")
+
+    def _rename_signals(self) -> None:
+        self.valueChanged = self.valuesChanged
+        self.sliderMoved = self.slidersMoved
 
     # ###############  New Public API  #######################
 

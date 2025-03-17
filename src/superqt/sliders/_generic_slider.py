@@ -22,7 +22,7 @@ QRangeSlider.
 
 import os
 import platform
-from typing import TypeVar
+from typing import Any, TypeVar
 
 from qtpy import QT_VERSION, QtGui
 from qtpy.QtCore import QEvent, QPoint, QPointF, QRect, Qt, Signal
@@ -60,13 +60,13 @@ USE_MAC_SLIDER_PATCH = (
 
 
 class _GenericSlider(QSlider):
-    _fvalueChanged = Signal(int)
-    _fsliderMoved = Signal(int)
-    _frangeChanged = Signal(int, int)
+    fvalueChanged = Signal(float)
+    fsliderMoved = Signal(float)
+    frangeChanged = Signal(float, float)
 
     MAX_DISPLAY = 5000
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         self._minimum = 0.0
         self._maximum = 99.0
         self._pageStep = 10.0
@@ -90,14 +90,17 @@ class _GenericSlider(QSlider):
         self._control_fraction = 0.04
 
         super().__init__(*args, **kwargs)
-        self.valueChanged = self._fvalueChanged
-        self.sliderMoved = self._fsliderMoved
-        self.rangeChanged = self._frangeChanged
+        self._rename_signals()
 
         self.setAttribute(Qt.WidgetAttribute.WA_Hover)
         self.setStyleSheet("")
         if USE_MAC_SLIDER_PATCH:
             self.applyMacStylePatch()
+
+    def _rename_signals(self) -> None:
+        self.valueChanged = self.fvalueChanged
+        self.sliderMoved = self.fsliderMoved
+        self.rangeChanged = self.frangeChanged
 
     def applyMacStylePatch(self) -> None:
         """Apply a QSS patch to fix sliders on macos>=12 with QT < 6.
