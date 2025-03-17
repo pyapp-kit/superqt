@@ -22,6 +22,7 @@ from .sliders import (
     QRangeSlider,
 )
 from .spinbox import QLargeIntSpinBox
+from .switch import QLabeledToggleSwitch, QToggleSwitch
 from .utils import (
     QFlowLayout,
     QMessageHandler,
@@ -44,6 +45,7 @@ __all__ = [
     "QLabeledDoubleSlider",
     "QLabeledRangeSlider",
     "QLabeledSlider",
+    "QLabeledToggleSwitch",
     "QLargeIntSpinBox",
     "QMessageHandler",
     "QQuantity",
@@ -51,6 +53,7 @@ __all__ = [
     "QSearchableComboBox",
     "QSearchableListWidget",
     "QSearchableTreeWidget",
+    "QToggleSwitch",
     "ensure_main_thread",
     "ensure_object_thread",
 ]
