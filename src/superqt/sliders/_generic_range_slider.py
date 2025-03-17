@@ -30,6 +30,9 @@ class _GenericRangeSlider(_GenericSlider):
 
     # Emitted when the slider value has changed, with the new slider values
     valuesChanged = Signal(tuple)
+    # this is just a hack to allow napari v0.4.19 tests to pass)
+    # since it used the presence of this private signal as a duck-typing check.
+    _valuesChanged = valuesChanged
 
     # Emitted when sliderDown is true and the slider moves
     # This usually happens when the user is dragging the slider
