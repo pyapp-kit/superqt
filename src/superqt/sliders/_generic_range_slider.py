@@ -1,4 +1,3 @@
-import warnings
 from collections.abc import Sequence
 from typing import Optional, TypeVar, Union
 
