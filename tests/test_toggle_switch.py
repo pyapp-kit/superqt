@@ -1,12 +1,12 @@
-import pytest
+from unittest.mock import Mock
+
 from qtpy.QtCore import Qt
 
-from superqt import QLabeledToggleSwitch, QToggleSwitch
+from superqt import QToggleSwitch
 
 
-@pytest.mark.parametrize("qtwidget_class", [QToggleSwitch, QLabeledToggleSwitch])
-def test_on_and_off(qtbot, qtwidget_class):
-    wdg = qtwidget_class()
+def test_on_and_off(qtbot):
+    wdg = QToggleSwitch()
     qtbot.addWidget(wdg)
     assert not wdg.isChecked()
     wdg.setChecked(True)
@@ -19,9 +19,8 @@ def test_on_and_off(qtbot, qtwidget_class):
     assert not wdg.isChecked()
 
 
-@pytest.mark.parametrize("qtwidget_class", [QToggleSwitch, QLabeledToggleSwitch])
-def test_widget_size(qtbot, qtwidget_class):
-    wdg = qtwidget_class()
+def test_widget_size(qtbot):
+    wdg = QToggleSwitch()
     qtbot.addWidget(wdg)
     wdg.setSize(20)
     assert wdg.size() == 20
@@ -44,17 +43,20 @@ def test_get_set_color(qtbot):
 
 def test_mouse_click(qtbot):
     wdg = QToggleSwitch()
+    mock = Mock()
+    wdg.toggled.connect(mock)
     qtbot.addWidget(wdg)
     assert not wdg.isChecked()
-    qtbot.mouseClick(wdg, Qt.MouseButton.LeftButton)
+    mock.assert_not_called()
+    qtbot.mouseClick(wdg._text_label, Qt.MouseButton.LeftButton)
     assert wdg.isChecked()
-    qtbot.mouseClick(wdg, Qt.MouseButton.LeftButton)
+    mock.assert_called_once_with(True)
+    qtbot.mouseClick(wdg._text_label, Qt.MouseButton.LeftButton)
     assert not wdg.isChecked()
 
-    wdg = QLabeledToggleSwitch()
-    qtbot.addWidget(wdg)
-    assert not wdg.isChecked()
-    qtbot.mouseClick(wdg._text_label, Qt.MouseButton.LeftButton)
+    mock.reset_mock()
+    qtbot.mouseClick(wdg._switch, Qt.MouseButton.LeftButton)
     assert wdg.isChecked()
-    qtbot.mouseClick(wdg._text_label, Qt.MouseButton.LeftButton)
+    mock.assert_called_once_with(True)
+    qtbot.mouseClick(wdg._switch, Qt.MouseButton.LeftButton)
     assert not wdg.isChecked()

@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+from typing import overload
+
 from qtpy import QtCore, QtGui
 from qtpy import QtWidgets as QtW
 from qtpy.QtCore import Property, Qt, Signal
 
 
-class QToggleSwitch(QtW.QWidget):
+class _QToggleSwitch(QtW.QWidget):
     toggled = Signal(bool)
 
     def __init__(self, parent: QtW.QWidget | None = None):
@@ -36,33 +38,6 @@ class QToggleSwitch(QtW.QWidget):
         self.setFixedSize(
             (self._size + self._margin) * 2, self._size + self._margin * 2
         )
-
-    def _get_onColor(self) -> QtGui.QColor:
-        return self._on_color
-
-    def _set_onColor(self, color: QtGui.QColor | QtGui.QBrush) -> None:
-        self._on_color = QtGui.QColor(color)
-        self.update()
-
-    onColor = Property(QtGui.QColor, _get_onColor, _set_onColor)
-
-    def _get_offColor(self) -> QtGui.QColor:
-        return self._off_color
-
-    def _set_offColor(self, color: QtGui.QColor | QtGui.QBrush) -> None:
-        self._off_color = QtGui.QColor(color)
-        self.update()
-
-    offColor = Property(QtGui.QColor, _get_offColor, _set_offColor)
-
-    def _get_handleColor(self) -> QtGui.QColor:
-        return self._handle_color
-
-    def _set_handleColor(self, color: QtGui.QColor | QtGui.QBrush) -> None:
-        self._handle_color = QtGui.QColor(color)
-        self.update()
-
-    handleColor = Property(QtGui.QColor, _get_handleColor, _set_handleColor)
 
     def _get_offset(self) -> float:
         return self._offset_value
@@ -147,13 +122,19 @@ class _QToggleSwitchLabel(QtW.QLabel):
         return None
 
 
-class QLabeledToggleSwitch(QtW.QWidget):
-    def __init__(self, label: str = "", parent: QtW.QWidget | None = None):
-        super().__init__(parent)
+class QToggleSwitch(QtW.QCheckBox):
+    @overload
+    def __init__(self, parent: QtW.QWidget | None = None) -> None: ...
+    @overload
+    def __init__(self, text: str, parent: QtW.QWidget | None = None) -> None: ...
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         layout = QtW.QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
-        self._switch = QToggleSwitch(self)
-        self._text_label = _QToggleSwitchLabel(label, self)
+        self._text_label = _QToggleSwitchLabel(super().text(), self)
+        super().setText("")
+        self._switch = _QToggleSwitch(self)
         self._text_label.clicked.connect(self._switch.toggle)
         layout.addWidget(self._switch)
         layout.addWidget(self._text_label)
@@ -164,7 +145,10 @@ class QLabeledToggleSwitch(QtW.QWidget):
     def toggled(self):
         return self.toggleSwitch().toggled
 
-    def toggleSwitch(self) -> QToggleSwitch:
+    def paintEvent(self, e):
+        return QtW.QWidget.paintEvent(self, e)
+
+    def toggleSwitch(self) -> _QToggleSwitch:
         """Return the toggle switch widget."""
         return self._switch
 
@@ -207,3 +191,30 @@ class QLabeledToggleSwitch(QtW.QWidget):
             switch_hint.width() + text_hint.width(),
             max(switch_hint.height(), text_hint.height()),
         )
+
+    def _get_onColor(self) -> QtGui.QColor:
+        return self._switch._on_color
+
+    def _set_onColor(self, color: QtGui.QColor | QtGui.QBrush) -> None:
+        self._switch._on_color = QtGui.QColor(color)
+        self._switch.update()
+
+    onColor = Property(QtGui.QColor, _get_onColor, _set_onColor)
+
+    def _get_offColor(self) -> QtGui.QColor:
+        return self._switch._off_color
+
+    def _set_offColor(self, color: QtGui.QColor | QtGui.QBrush) -> None:
+        self._switch._off_color = QtGui.QColor(color)
+        self._switch.update()
+
+    offColor = Property(QtGui.QColor, _get_offColor, _set_offColor)
+
+    def _get_handleColor(self) -> QtGui.QColor:
+        return self._switch._handle_color
+
+    def _set_handleColor(self, color: QtGui.QColor | QtGui.QBrush) -> None:
+        self._switch._handle_color = QtGui.QColor(color)
+        self._switch.update()
+
+    handleColor = Property(QtGui.QColor, _get_handleColor, _set_handleColor)
