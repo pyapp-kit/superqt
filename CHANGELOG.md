@@ -1,5 +1,21 @@
 # Changelog
 
+## [v0.7.2](https://github.com/pyapp-kit/superqt/tree/v0.7.2) (2025-03-17)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.7.1...v0.7.2)
+
+**Implemented enhancements:**
+
+- fix: less Slider signal renaming, make alternate signal types public [\#283](https://github.com/pyapp-kit/superqt/pull/283) ([tlambert03](https://github.com/tlambert03))
+
+**Merged pull requests:**
+
+- ci: \[pre-commit.ci\] autoupdate [\#282](https://github.com/pyapp-kit/superqt/pull/282) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
+- ci: \[pre-commit.ci\] autoupdate [\#279](https://github.com/pyapp-kit/superqt/pull/279) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
+- Update CONTRIBUTING.md to include \[test\] and mention Qt backend [\#276](https://github.com/pyapp-kit/superqt/pull/276) ([psobolewskiPhD](https://github.com/psobolewskiPhD))
+- Update CONTRIBUTING.md to install .\[dev\] first then pre-commit [\#275](https://github.com/pyapp-kit/superqt/pull/275) ([psobolewskiPhD](https://github.com/psobolewskiPhD))
+- ci: \[pre-commit.ci\] autoupdate [\#272](https://github.com/pyapp-kit/superqt/pull/272) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
+
 ## [v0.7.1](https://github.com/pyapp-kit/superqt/tree/v0.7.1) (2025-01-05)
 
 [Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.7.0...v0.7.1)
