@@ -56,9 +56,9 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
-    from .combobox import QColormapComboBox  # noqa: TC004
-    from .iconify import QIconifyIcon  # noqa: TC004
-    from .spinbox._quantity import QQuantity  # noqa: TC004
+    from .combobox import QColormapComboBox
+    from .iconify import QIconifyIcon
+    from .spinbox._quantity import QQuantity
 
 
 def __getattr__(name: str) -> Any:

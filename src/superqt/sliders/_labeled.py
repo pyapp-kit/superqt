@@ -162,9 +162,6 @@ def _handle_overloaded_slider_sig(
 
 class QLabeledSlider(_SliderProxy, QAbstractSlider):
     editingFinished = Signal()
-    _ivalueChanged = Signal(int)
-    _isliderMoved = Signal(int)
-    _irangeChanged = Signal(int, int)
 
     _slider_class = QSlider
     _slider: QSlider
@@ -283,18 +280,15 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         """Convert the value from float to int before setting the slider value."""
         self._slider.setValue(int(value))
 
-    def _rename_signals(self) -> None:
-        self.valueChanged = self._ivalueChanged
-        self.sliderMoved = self._isliderMoved
-        self.rangeChanged = self._irangeChanged
+    def _rename_signals(self) -> None: ...
 
 
 class QLabeledDoubleSlider(QLabeledSlider):
     _slider_class = QDoubleSlider
     _slider: QDoubleSlider
-    _fvalueChanged = Signal(float)
-    _fsliderMoved = Signal(float)
-    _frangeChanged = Signal(float, float)
+    fvalueChanged = Signal(float)
+    fsliderMoved = Signal(float)
+    frangeChanged = Signal(float, float)
 
     @overload
     def __init__(self, parent: QWidget | None = ...) -> None: ...
@@ -313,9 +307,9 @@ class QLabeledDoubleSlider(QLabeledSlider):
         self._slider.setValue(value)
 
     def _rename_signals(self) -> None:
-        self.valueChanged = self._fvalueChanged
-        self.sliderMoved = self._fsliderMoved
-        self.rangeChanged = self._frangeChanged
+        self.valueChanged = self.fvalueChanged
+        self.sliderMoved = self.fsliderMoved
+        self.rangeChanged = self.frangeChanged
 
     def decimals(self) -> int:
         return self._label.decimals()
@@ -325,9 +319,7 @@ class QLabeledDoubleSlider(QLabeledSlider):
 
 
 class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
-    _valueChanged = Signal(tuple)
-    _sliderPressed = Signal()
-    _sliderReleased = Signal()
+    valuesChanged = Signal(tuple)
     editingFinished = Signal()
 
     _slider_class = QRangeSlider
@@ -359,7 +351,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
         self._slider.sliderPressed.connect(self.sliderPressed.emit)
         self._slider.sliderReleased.connect(self.sliderReleased.emit)
         self._slider.rangeChanged.connect(self.rangeChanged.emit)
-        self.sliderMoved = self._slider._slidersMoved
+        self.sliderMoved = self._slider.slidersMoved
 
         self._min_label = SliderLabel(
             self._slider,
@@ -492,9 +484,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
 
     # ------------- private methods ----------------
     def _rename_signals(self) -> None:
-        self.valueChanged = self._valueChanged
-        self.sliderReleased = self._sliderReleased
-        self.sliderPressed = self._sliderPressed
+        self.valueChanged = self.valuesChanged
 
     def _reposition_labels(self) -> None:
         if (
@@ -602,7 +592,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
 class QLabeledDoubleRangeSlider(QLabeledRangeSlider):
     _slider_class = QDoubleRangeSlider
     _slider: QDoubleRangeSlider
-    _frangeChanged = Signal(float, float)
+    frangeChanged = Signal(float, float)
 
     @overload
     def __init__(self, parent: QWidget | None = ...) -> None: ...
@@ -618,7 +608,7 @@ class QLabeledDoubleRangeSlider(QLabeledRangeSlider):
 
     def _rename_signals(self) -> None:
         super()._rename_signals()
-        self.rangeChanged = self._frangeChanged
+        self.rangeChanged = self.frangeChanged
 
     def decimals(self) -> int:
         return self._min_label.decimals()
