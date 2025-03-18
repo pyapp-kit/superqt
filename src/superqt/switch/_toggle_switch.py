@@ -80,8 +80,7 @@ class _QToggleSwitch(QtW.QWidget):
 
     def mouseReleaseEvent(self, e: QtGui.QMouseEvent):
         if e.button() & Qt.MouseButton.LeftButton:
-            self.toggled.emit(not self.isChecked())
-        return super().mouseReleaseEvent(e)
+            self.toggle()
 
     def toggle(self):
         return self.setChecked(not self.isChecked())
@@ -123,6 +122,8 @@ class _QToggleSwitchLabel(QtW.QLabel):
 
 
 class QToggleSwitch(QtW.QCheckBox):
+    toggled = Signal(bool)
+
     @overload
     def __init__(self, parent: QtW.QWidget | None = None) -> None: ...
     @overload
@@ -133,17 +134,14 @@ class QToggleSwitch(QtW.QCheckBox):
         layout = QtW.QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         self._text_label = _QToggleSwitchLabel(super().text(), self)
-        super().setText("")
+        super().setText("")  # QToggleSwitch has its own text label
         self._switch = _QToggleSwitch(self)
+        self._switch.toggled.connect(self.toggled.emit)
         self._text_label.clicked.connect(self._switch.toggle)
         layout.addWidget(self._switch)
         layout.addWidget(self._text_label)
         self.setMaximumHeight(self._switch.height())
         self.setCursor(Qt.CursorShape.PointingHandCursor)
-
-    @property
-    def toggled(self):
-        return self.toggleSwitch().toggled
 
     def paintEvent(self, e):
         return QtW.QWidget.paintEvent(self, e)
@@ -179,7 +177,7 @@ class QToggleSwitch(QtW.QCheckBox):
 
     def toggle(self) -> None:
         """Toggle the check state of the switch."""
-        self.setChecked(not self.isChecked())
+        self.toggleSwitch().toggle()
 
     def minimumHeight(self) -> int:
         return self.toggleSwitch().minimumHeight()
@@ -193,28 +191,28 @@ class QToggleSwitch(QtW.QCheckBox):
         )
 
     def _get_onColor(self) -> QtGui.QColor:
-        return self._switch._on_color
+        return self.toggleSwitch()._on_color
 
     def _set_onColor(self, color: QtGui.QColor | QtGui.QBrush) -> None:
-        self._switch._on_color = QtGui.QColor(color)
-        self._switch.update()
+        self.toggleSwitch()._on_color = QtGui.QColor(color)
+        self.toggleSwitch().update()
 
     onColor = Property(QtGui.QColor, _get_onColor, _set_onColor)
 
     def _get_offColor(self) -> QtGui.QColor:
-        return self._switch._off_color
+        return self.toggleSwitch()._off_color
 
     def _set_offColor(self, color: QtGui.QColor | QtGui.QBrush) -> None:
-        self._switch._off_color = QtGui.QColor(color)
-        self._switch.update()
+        self.toggleSwitch()._off_color = QtGui.QColor(color)
+        self.toggleSwitch().update()
 
     offColor = Property(QtGui.QColor, _get_offColor, _set_offColor)
 
     def _get_handleColor(self) -> QtGui.QColor:
-        return self._switch._handle_color
+        return self.toggleSwitch()._handle_color
 
     def _set_handleColor(self, color: QtGui.QColor | QtGui.QBrush) -> None:
-        self._switch._handle_color = QtGui.QColor(color)
-        self._switch.update()
+        self.toggleSwitch()._handle_color = QtGui.QColor(color)
+        self.toggleSwitch().update()
 
     handleColor = Property(QtGui.QColor, _get_handleColor, _set_handleColor)
