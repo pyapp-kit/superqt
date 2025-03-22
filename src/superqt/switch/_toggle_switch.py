@@ -4,40 +4,158 @@ from typing import overload
 
 from qtpy import QtCore, QtGui
 from qtpy import QtWidgets as QtW
-from qtpy.QtCore import Property, Qt, Signal
+from qtpy.QtCore import Property, Qt
 
 
-class _QToggleSwitch(QtW.QWidget):
-    toggled = Signal(bool)
+class QStyleOptionToggleSwitch(QtW.QStyleOptionButton):
+    def __init__(self, other=None):
+        if other is None:
+            super().__init__()
+        else:
+            super().__init__(other)
+        self.margin = 2
+        self.on_color = QtGui.QColor("#4D79C7")
+        self.off_color = QtGui.QColor("#909090")
+        self.handle_color = QtGui.QColor("#d5d5d5")
+        self.switch_width = 24
+        self.switch_height = 12
+        self.handle_size = 14
+        self.text_alignment = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
 
-    def __init__(self, parent: QtW.QWidget | None = None):
+
+class QToggleSwitch(QtW.QAbstractButton):
+    @overload
+    def __init__(self, parent: QtW.QWidget | None = ...) -> None: ...
+    @overload
+    def __init__(self, text: str | None, parent: QtW.QWidget | None = ...) -> None: ...
+
+    def __init__(self, text=None, parent=None):
+        if isinstance(text, QtW.QWidget):
+            if parent is not None:
+                raise TypeError("No overload of QToggleSwitch matches the arguments")
+            parent = text
+            text = None
         super().__init__(parent)
-        self.setSizePolicy(
-            QtW.QSizePolicy.Policy.Minimum, QtW.QSizePolicy.Policy.Expanding
-        )
-        self._on_color = QtGui.QColor("#4D79C7")
-        self._off_color = QtGui.QColor("#909090")
-        self._handle_color = QtGui.QColor("#d5d5d5")
-        self._margin = 2
-        self._offset_value = 6
+        self._style_option = QStyleOptionToggleSwitch()
+        self._style_option.text = text
         self._checked = False
-        self.setSize(12)
-        self.toggled.connect(self._set_checked)
+        self._offset_value = self._offset_for_checkstate(self._checked)
         self._anim = QtCore.QPropertyAnimation(self, b"_offset", self)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
 
-    def size(self) -> int:
-        """Size of the toggle switch."""
-        return self._size
+    def paintEvent(self, a0: QtGui.QPaintEvent | None) -> None:
+        p = QtGui.QPainter(self)
+        p.setFont(self.font())
+        opt = self._style_option
+        opt.initFrom(self)
+        self._paint_toggle_switch(p)
+        self._paint_text(p)
+        return None
 
-    def setSize(self, size: int):
-        """Set the size of the toggle switch."""
-        size = int(size)
-        self._size = size
-        self._offset = size // 2
-        self.setFixedSize(
-            (self._size + self._margin) * 2, self._size + self._margin * 2
+    def minimumSizeHint(self) -> QtCore.QSize:
+        return self.sizeHint()
+
+    def sizeHint(self) -> QtCore.QSize:
+        self.ensurePolished()
+        fm = QtGui.QFontMetrics(self.font())
+        text_size = fm.size(0, self.text())
+        height = (
+            max(self._style_option.switch_height, text_size.height())
+            + self._style_option.margin * 2
         )
+        width = (
+            self._style_option.switch_width
+            + text_size.width()
+            + self._style_option.margin * 2
+        )
+        return QtCore.QSize(width, height)
+
+    def mousePressEvent(self, e):
+        if e.button() & Qt.MouseButton.LeftButton:
+            self.pressed.emit()
+        return None
+
+    def mouseReleaseEvent(self, e):
+        if e.button() & Qt.MouseButton.LeftButton and self.rect().contains(e.pos()):
+            self.toggle()
+            self.released.emit()
+            self.clicked.emit()
+        return None
+
+    def isChecked(self) -> bool:
+        return self._checked
+
+    def setChecked(self, checked: bool) -> None:
+        if self._checked == checked:
+            return
+        self._set_checked_animated(checked)
+        self.toggled.emit(checked)
+
+    def toggle(self) -> None:
+        self.setChecked(not self.isChecked())
+        return None
+
+    def click(self) -> None:
+        self.pressed.emit()
+        self.toggle()
+        self.released.emit()
+        self.clicked.emit()
+        return None
+
+    def text(self) -> str:
+        """Text displayed next to the switch."""
+        return self._style_option.text or ""
+
+    def setText(self, text: str | None) -> None:
+        """Set the text displayed next to the switch."""
+        self._style_option.text = text
+        self.update()
+        return None
+
+    ### Colors ###
+
+    def _get_onColor(self) -> QtGui.QColor:
+        return self._style_option.on_color
+
+    def _set_onColor(self, color: QtGui.QColor | QtGui.QBrush) -> None:
+        self._style_option.on_color = QtGui.QColor(color)
+        self.update()
+        return None
+
+    onColor = Property(QtGui.QColor, _get_onColor, _set_onColor)
+
+    def _get_offColor(self) -> QtGui.QColor:
+        return self._style_option.off_color
+
+    def _set_offColor(self, color: QtGui.QColor | QtGui.QBrush) -> None:
+        self._style_option.off_color = QtGui.QColor(color)
+        self.update()
+        return None
+
+    offColor = Property(QtGui.QColor, _get_offColor, _set_offColor)
+
+    def _get_handleColor(self) -> QtGui.QColor:
+        return self._style_option.handle_color
+
+    def _set_handleColor(self, color: QtGui.QColor | QtGui.QBrush) -> None:
+        self._style_option.handle_color = QtGui.QColor(color)
+        self.update()
+        return None
+
+    handleColor = Property(QtGui.QColor, _get_handleColor, _set_handleColor)
+
+    ### Other private methods ###
+
+    def _set_checked_animated(self, val: bool):
+        start = self._offset_for_checkstate(self._checked)
+        end = self._offset_for_checkstate(val)
+
+        self._checked = val
+        self._anim.setStartValue(start)
+        self._anim.setEndValue(end)
+        self._anim.setDuration(120)
+        self._anim.start()
+        return None
 
     def _get_offset(self) -> float:
         return self._offset_value
@@ -45,174 +163,71 @@ class _QToggleSwitch(QtW.QWidget):
     def _set_offset(self, offset: float) -> None:
         self._offset_value = offset
         self.update()
+        return None
 
     _offset = Property(float, _get_offset, _set_offset)
 
-    def sizeHint(self) -> QtCore.QSize:
-        return QtCore.QSize(2 * (self._size + self._margin), self.minimumHeight())
+    def _offset_for_checkstate(self, val: bool) -> int:
+        opt = self._style_option
+        if val:
+            offset = opt.margin + opt.switch_width - opt.switch_height / 2
+        else:
+            offset = opt.margin + opt.switch_height / 2
+        return offset
 
-    def minimumHeight(self) -> int:
-        return self._size + 2 * self._margin
-
-    def paintEvent(self, e):
-        p = QtGui.QPainter(self)
+    def _paint_toggle_switch(self, p: QtGui.QPainter):
         p.setPen(Qt.PenStyle.NoPen)
-        radius = self._size / 2
+        opt = self._style_option
+
+        # draw the groove
         rrect = QtCore.QRect(
-            self._margin,
-            self._margin,
-            self.width() - 2 * self._margin,
-            self.height() - 2 * self._margin,
+            opt.margin,
+            self._vertical_offset(),
+            opt.switch_width,
+            opt.switch_height,
         )
         if self.isEnabled():
-            p.setBrush(self._on_color if self._checked else self._off_color)
+            p.setBrush(opt.on_color if self.isChecked() else opt.off_color)
             p.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing, True)
             p.setOpacity(0.8)
         else:
-            p.setBrush(self._off_color)
+            p.setBrush(opt.off_color)
             p.setOpacity(0.6)
-        p.drawRoundedRect(rrect, radius, radius)
-        p.setBrush(self._handle_color)
+        p.drawRoundedRect(rrect, opt.switch_height / 2, opt.switch_height / 2)
+
+        # draw the circle of the handle
+        p.setBrush(opt.handle_color)
         p.setOpacity(1.0)
+        pad = (opt.handle_size - opt.switch_height) / 2
         p.drawEllipse(
-            QtCore.QRectF(self._offset - radius, 0, self.height(), self.height())
+            QtCore.QRectF(
+                self._offset_value - opt.handle_size / 2,
+                self._vertical_offset() - pad,
+                opt.handle_size,
+                opt.handle_size,
+            )
         )
-
-    def mouseReleaseEvent(self, e: QtGui.QMouseEvent):
-        if e.button() & Qt.MouseButton.LeftButton:
-            self.toggle()
-
-    def toggle(self):
-        return self.setChecked(not self.isChecked())
-
-    def isChecked(self) -> bool:
-        return self._checked
-
-    def setChecked(self, val: bool):
-        self._set_checked(val)
-        self.toggled.emit(val)
-
-    def _set_checked(self, val: bool):
-        # Do not re-animate if the value is the same
-        if self._checked == val:
-            return
-        start = self._position_for_value(self._checked)
-        end = self._position_for_value(val)
-
-        self._checked = val
-        self._anim.setStartValue(start)
-        self._anim.setEndValue(end)
-        self._anim.setDuration(120)
-        self._anim.start()
-
-    def _position_for_value(self, val: bool) -> int:
-        if val:
-            return int(self.width() - self.height() / 2 - self._margin)
-        else:
-            return self.height() // 2
-
-
-class _QToggleSwitchLabel(QtW.QLabel):
-    clicked = Signal()
-
-    def mousePressEvent(self, ev: QtGui.QMouseEvent) -> None:
-        if ev.button() & Qt.MouseButton.LeftButton:
-            self.clicked.emit()
         return None
 
-
-class QToggleSwitch(QtW.QCheckBox):
-    toggled = Signal(bool)
-
-    @overload
-    def __init__(self, parent: QtW.QWidget | None = None) -> None: ...
-    @overload
-    def __init__(self, text: str, parent: QtW.QWidget | None = None) -> None: ...
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        layout = QtW.QHBoxLayout(self)
-        layout.setContentsMargins(0, 0, 0, 0)
-        self._text_label = _QToggleSwitchLabel(super().text(), self)
-        super().setText("")  # QToggleSwitch has its own text label
-        self._switch = _QToggleSwitch(self)
-        self._switch.toggled.connect(self.toggled.emit)
-        self._text_label.clicked.connect(self._switch.toggle)
-        layout.addWidget(self._switch)
-        layout.addWidget(self._text_label)
-        self.setMaximumHeight(self._switch.height())
-        self.setCursor(Qt.CursorShape.PointingHandCursor)
-
-    def paintEvent(self, e):
-        return QtW.QWidget.paintEvent(self, e)
-
-    def toggleSwitch(self) -> _QToggleSwitch:
-        """Return the toggle switch widget."""
-        return self._switch
-
-    def size(self) -> int:
-        """Size of the switch."""
-        return self.toggleSwitch().size()
-
-    def setSize(self, size: int) -> None:
-        """Set the size of the switch."""
-        self.toggleSwitch().setSize(size)
-        self.setMaximumHeight(self.toggleSwitch().height())
-
-    def isChecked(self) -> bool:
-        """Return True if the switch is checked."""
-        return self.toggleSwitch().isChecked()
-
-    def setChecked(self, val: bool) -> None:
-        """Set the checked state of the switch."""
-        self.toggleSwitch().setChecked(val)
-
-    def text(self) -> str:
-        """Text on the right side of the switch."""
-        return self._text_label.text()
-
-    def setText(self, text: str) -> None:
-        """Set the text on the right side of the switch."""
-        self._text_label.setText(text)
-
-    def toggle(self) -> None:
-        """Toggle the check state of the switch."""
-        self.toggleSwitch().toggle()
-
-    def minimumHeight(self) -> int:
-        return self.toggleSwitch().minimumHeight()
-
-    def sizeHint(self) -> QtCore.QSize:
-        switch_hint = self.toggleSwitch().sizeHint()
-        text_hint = self._text_label.sizeHint()
-        return QtCore.QSize(
-            switch_hint.width() + text_hint.width(),
-            max(switch_hint.height(), text_hint.height()),
+    def _paint_text(self, p: QtGui.QPainter):
+        opt = self._style_option
+        text_rect = QtCore.QRect(
+            opt.switch_width
+            + (opt.handle_size - opt.switch_height) // 2
+            + opt.margin * 2
+            + 2,
+            0,
+            self.width() - opt.switch_width - opt.margin * 2,
+            self.height(),
         )
+        text_color = self.palette().color(self.foregroundRole())
+        pen = QtGui.QPen(text_color, 1)
+        p.setPen(pen)
+        p.drawText(text_rect, opt.text_alignment, self.text())
+        return None
 
-    def _get_onColor(self) -> QtGui.QColor:
-        return self.toggleSwitch()._on_color
-
-    def _set_onColor(self, color: QtGui.QColor | QtGui.QBrush) -> None:
-        self.toggleSwitch()._on_color = QtGui.QColor(color)
-        self.toggleSwitch().update()
-
-    onColor = Property(QtGui.QColor, _get_onColor, _set_onColor)
-
-    def _get_offColor(self) -> QtGui.QColor:
-        return self.toggleSwitch()._off_color
-
-    def _set_offColor(self, color: QtGui.QColor | QtGui.QBrush) -> None:
-        self.toggleSwitch()._off_color = QtGui.QColor(color)
-        self.toggleSwitch().update()
-
-    offColor = Property(QtGui.QColor, _get_offColor, _set_offColor)
-
-    def _get_handleColor(self) -> QtGui.QColor:
-        return self.toggleSwitch()._handle_color
-
-    def _set_handleColor(self, color: QtGui.QColor | QtGui.QBrush) -> None:
-        self.toggleSwitch()._handle_color = QtGui.QColor(color)
-        self.toggleSwitch().update()
-
-    handleColor = Property(QtGui.QColor, _get_handleColor, _set_handleColor)
+    def _vertical_offset(self):
+        """Offset for the vertical centering of the switch."""
+        return (
+            self.height() - self._style_option.switch_height
+        ) // 2 + self._style_option.margin
