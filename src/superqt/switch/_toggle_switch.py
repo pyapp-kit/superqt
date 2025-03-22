@@ -94,20 +94,20 @@ class QToggleSwitch(QtW.QAbstractButton):
         fm = QtGui.QFontMetrics(self.font())
         text_size = fm.size(0, self.text())
         height = max(opt.switch_height, text_size.height()) + opt.margin * 2
-        width = opt.switch_width + text_size.width() + opt.margin * 2
+        width = opt.switch_width + text_size.width() + opt.margin * 2 + 8
         return QtCore.QSize(width, height)
 
     def mousePressEvent(self, e):
         if e.button() & Qt.MouseButton.LeftButton:
             self.pressed.emit()
-        return None
+        return super().mousePressEvent(e)
 
     def mouseReleaseEvent(self, e):
         if e.button() & Qt.MouseButton.LeftButton and self.rect().contains(e.pos()):
             self.toggle()
             self.released.emit()
             self.clicked.emit()
-        return None
+        return super().mouseReleaseEvent(e)
 
     def isChecked(self) -> bool:
         return self._checked
@@ -123,6 +123,7 @@ class QToggleSwitch(QtW.QAbstractButton):
         return None
 
     def click(self) -> None:
+        """Simulate a click on the switch."""
         self.pressed.emit()
         self.toggle()
         self.released.emit()
