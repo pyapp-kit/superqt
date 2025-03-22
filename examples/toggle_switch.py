@@ -1,14 +1,24 @@
 from qtpy import QtCore, QtGui
-from qtpy.QtWidgets import QApplication, QVBoxLayout, QWidget
+from qtpy.QtWidgets import QApplication, QStyle, QVBoxLayout, QWidget
 
 from superqt import QToggleSwitch
+from superqt.switch import QStyleOptionToggleSwitch
 
 
 class QRectangleToggleSwitch(QToggleSwitch):
     """A rectangle shaped toggle switch."""
 
-    def drawGroove(self, painter, rect, option) -> None:
+    def drawGroove(
+        self,
+        painter: QtGui.QPainter,
+        rect: QtCore.QRectF,
+        option: QStyleOptionToggleSwitch,
+    ) -> None:
         """Draw the groove of the switch."""
+        painter.setPen(QtCore.Qt.PenStyle.NoPen)
+        is_checked = option.state & QStyle.StateFlag.State_On
+        painter.setBrush(option.on_color if is_checked else option.off_color)
+        painter.setOpacity(0.8)
         painter.drawRect(rect)
 
     def drawHandle(self, painter, rect, option):
@@ -19,12 +29,15 @@ class QRectangleToggleSwitch(QToggleSwitch):
 class QToggleSwitchWithText(QToggleSwitch):
     """A toggle switch with text on the handle."""
 
-    def drawHandle(self, painter, rect, option):
+    def drawHandle(
+        self,
+        painter: QtGui.QPainter,
+        rect: QtCore.QRectF,
+        option: QStyleOptionToggleSwitch,
+    ) -> None:
         super().drawHandle(painter, rect, option)
-        if self.isChecked():
-            text = "ON"
-        else:
-            text = "OFF"
+
+        text = "ON" if option.state & QStyle.StateFlag.State_On else "OFF"
         painter.setPen(QtGui.QPen(QtGui.QColor("black")))
         font = painter.font()
         font.setPointSize(5)
@@ -39,4 +52,4 @@ layout.addWidget(QToggleSwitch("original"))
 layout.addWidget(QRectangleToggleSwitch("rectangle"))
 layout.addWidget(QToggleSwitchWithText("with text"))
 widget.show()
-app.exec_()
+app.exec()
