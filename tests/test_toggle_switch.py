@@ -1,7 +1,7 @@
 from unittest.mock import Mock
 
 from qtpy.QtCore import Qt
-from qtpy.QtWidgets import QCheckBox, QVBoxLayout, QWidget
+from qtpy.QtWidgets import QApplication, QCheckBox, QVBoxLayout, QWidget
 
 from superqt import QToggleSwitch
 
@@ -9,9 +9,14 @@ from superqt import QToggleSwitch
 def test_on_and_off(qtbot):
     wdg = QToggleSwitch()
     qtbot.addWidget(wdg)
+    wdg.show()
     assert not wdg.isChecked()
     wdg.setChecked(True)
     assert wdg.isChecked()
+    QApplication.processEvents()
+    wdg.setChecked(False)
+    assert not wdg.isChecked()
+    QApplication.processEvents()
     wdg.setChecked(False)
     assert not wdg.isChecked()
     wdg.toggle()
@@ -22,9 +27,10 @@ def test_on_and_off(qtbot):
     assert wdg.isChecked()
     wdg.click()
     assert not wdg.isChecked()
+    QApplication.processEvents()
 
 
-def test_get_set_color(qtbot):
+def test_get_set(qtbot):
     wdg = QToggleSwitch()
     qtbot.addWidget(wdg)
     wdg.onColor = "#ff0000"
@@ -33,6 +39,8 @@ def test_get_set_color(qtbot):
     assert wdg.offColor.name() == "#00ff00"
     wdg.handleColor = "#0000ff"
     assert wdg.handleColor.name() == "#0000ff"
+    wdg.setText("new text")
+    assert wdg.text() == "new text"
 
 
 def test_mouse_click(qtbot):

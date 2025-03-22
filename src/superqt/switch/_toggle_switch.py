@@ -8,11 +8,8 @@ from qtpy.QtCore import Property, Qt
 
 
 class QStyleOptionToggleSwitch(QtW.QStyleOptionButton):
-    def __init__(self, other=None):
-        if other is None:
-            super().__init__()
-        else:
-            super().__init__(other)
+    def __init__(self):
+        super().__init__()
         self.margin = 2
         self.on_color = QtGui.QColor("#4D79C7")
         self.off_color = QtGui.QColor("#909090")
@@ -24,6 +21,8 @@ class QStyleOptionToggleSwitch(QtW.QStyleOptionButton):
 
 
 class QToggleSwitch(QtW.QAbstractButton):
+    StyleOption = QStyleOptionToggleSwitch
+
     @overload
     def __init__(self, parent: QtW.QWidget | None = ...) -> None: ...
     @overload
@@ -36,20 +35,52 @@ class QToggleSwitch(QtW.QAbstractButton):
             parent = text
             text = None
         super().__init__(parent)
-        self._style_option = QStyleOptionToggleSwitch()
+        self._style_option = self.StyleOption()  # the default style option
         self._style_option.text = text
         self._checked = False
         self._offset_value = self._offset_for_checkstate(self._checked)
         self._anim = QtCore.QPropertyAnimation(self, b"_offset", self)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
 
+    def initStyleOption(self, option: QStyleOptionToggleSwitch) -> None:
+        """Initialize the style option for the switch."""
+        option.initFrom(self)
+        option.text = self.text()
+        option.on_color = self.onColor
+        option.off_color = self.offColor
+        option.handle_color = self.handleColor
+        option.switch_width = self._style_option.switch_width
+        option.switch_height = self._style_option.switch_height
+        option.handle_size = self._style_option.handle_size
+        option.margin = self._style_option.margin
+        option.text_alignment = self._style_option.text_alignment
+        return None
+
     def paintEvent(self, a0: QtGui.QPaintEvent | None) -> None:
         p = QtGui.QPainter(self)
+        opt = QStyleOptionToggleSwitch()
+        self.initStyleOption(opt)
+
+        groove_rect = self._prep_draw_groove(p, opt)
+        self.drawGroove(p, groove_rect, opt)
+        handle_rect = self._prep_draw_handle(p, opt)
+        self.drawHandle(p, handle_rect, opt)
+
+        # paint text next to the switch
+        text_rect = QtCore.QRect(
+            opt.switch_width
+            + (opt.handle_size - opt.switch_height) // 2
+            + opt.margin * 2
+            + 2,
+            0,
+            self.width() - opt.switch_width - opt.margin * 2,
+            self.height(),
+        )
+        text_color = self.palette().color(self.foregroundRole())
+        pen = QtGui.QPen(text_color, 1)
+        p.setPen(pen)
         p.setFont(self.font())
-        opt = self._style_option
-        opt.initFrom(self)
-        self._paint_toggle_switch(p)
-        self._paint_text(p)
+        p.drawText(text_rect, opt.text_alignment, self.text())
         return None
 
     def minimumSizeHint(self) -> QtCore.QSize:
@@ -57,17 +88,13 @@ class QToggleSwitch(QtW.QAbstractButton):
 
     def sizeHint(self) -> QtCore.QSize:
         self.ensurePolished()
+        opt = self.StyleOption()
+        self.initStyleOption(opt)
+
         fm = QtGui.QFontMetrics(self.font())
         text_size = fm.size(0, self.text())
-        height = (
-            max(self._style_option.switch_height, text_size.height())
-            + self._style_option.margin * 2
-        )
-        width = (
-            self._style_option.switch_width
-            + text_size.width()
-            + self._style_option.margin * 2
-        )
+        height = max(opt.switch_height, text_size.height()) + opt.margin * 2
+        width = opt.switch_width + text_size.width() + opt.margin * 2
         return QtCore.QSize(width, height)
 
     def mousePressEvent(self, e):
@@ -110,6 +137,52 @@ class QToggleSwitch(QtW.QAbstractButton):
         """Set the text displayed next to the switch."""
         self._style_option.text = text
         self.update()
+        return None
+
+    ### Re-implementable methods for drawing the switch ###
+
+    def drawGroove(
+        self,
+        painter: QtGui.QPainter,
+        rect: QtCore.QRectF,
+        option: QStyleOptionToggleSwitch,
+    ) -> None:
+        """Draw the groove of the switch.
+
+        Parameters
+        ----------
+        painter : QtGui.QPainter
+            The painter to use for drawing.
+        rect : QtCore.QRectF
+            The rectangle in which to draw the groove.
+        option : QStyleOptionToggleSwitch
+            The style options (QToggleSwitch.StyleOption) used for drawing.
+        """
+        painter.drawRoundedRect(
+            rect,
+            option.switch_height / 2,
+            option.switch_height / 2,
+        )
+        return None
+
+    def drawHandle(
+        self,
+        painter: QtGui.QPainter,
+        rect: QtCore.QRectF,
+        option: QStyleOptionToggleSwitch,
+    ) -> None:
+        """Draw the handle of the switch.
+
+        Parameters
+        ----------
+        painter : QtGui.QPainter
+            The painter to use for drawing.
+        rect : QtCore.QRectF
+            The rectangle in which to draw the groove.
+        option : QStyleOptionToggleSwitch
+            The style options (QToggleSwitch.StyleOption) used for drawing.
+        """
+        painter.drawEllipse(rect)
         return None
 
     ### Colors ###
@@ -175,17 +248,12 @@ class QToggleSwitch(QtW.QAbstractButton):
             offset = opt.margin + opt.switch_height / 2
         return offset
 
-    def _paint_toggle_switch(self, p: QtGui.QPainter):
+    def _prep_draw_groove(
+        self, p: QtGui.QPainter, opt: QStyleOptionToggleSwitch
+    ) -> QtCore.QRect:
         p.setPen(Qt.PenStyle.NoPen)
-        opt = self._style_option
 
         # draw the groove
-        rrect = QtCore.QRect(
-            opt.margin,
-            self._vertical_offset(),
-            opt.switch_width,
-            opt.switch_height,
-        )
         if self.isEnabled():
             p.setBrush(opt.on_color if self.isChecked() else opt.off_color)
             p.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing, True)
@@ -193,41 +261,26 @@ class QToggleSwitch(QtW.QAbstractButton):
         else:
             p.setBrush(opt.off_color)
             p.setOpacity(0.6)
-        p.drawRoundedRect(rrect, opt.switch_height / 2, opt.switch_height / 2)
+        return QtCore.QRect(
+            opt.margin,
+            self._vertical_offset(opt),
+            opt.switch_width,
+            opt.switch_height,
+        )
 
-        # draw the circle of the handle
+    def _prep_draw_handle(
+        self, p: QtGui.QPainter, opt: QStyleOptionToggleSwitch
+    ) -> QtCore.QRectF:
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(opt.handle_color)
         p.setOpacity(1.0)
-        pad = (opt.handle_size - opt.switch_height) / 2
-        p.drawEllipse(
-            QtCore.QRectF(
-                self._offset_value - opt.handle_size / 2,
-                self._vertical_offset() - pad,
-                opt.handle_size,
-                opt.handle_size,
-            )
+        return QtCore.QRectF(
+            self._offset_value - opt.handle_size / 2,
+            self._vertical_offset(opt) - (opt.handle_size - opt.switch_height) / 2,
+            opt.handle_size,
+            opt.handle_size,
         )
-        return None
 
-    def _paint_text(self, p: QtGui.QPainter):
-        opt = self._style_option
-        text_rect = QtCore.QRect(
-            opt.switch_width
-            + (opt.handle_size - opt.switch_height) // 2
-            + opt.margin * 2
-            + 2,
-            0,
-            self.width() - opt.switch_width - opt.margin * 2,
-            self.height(),
-        )
-        text_color = self.palette().color(self.foregroundRole())
-        pen = QtGui.QPen(text_color, 1)
-        p.setPen(pen)
-        p.drawText(text_rect, opt.text_alignment, self.text())
-        return None
-
-    def _vertical_offset(self):
+    def _vertical_offset(self, opt: QStyleOptionToggleSwitch) -> int:
         """Offset for the vertical centering of the switch."""
-        return (
-            self.height() - self._style_option.switch_height
-        ) // 2 + self._style_option.margin
+        return (self.height() - opt.switch_height) // 2 + opt.margin
