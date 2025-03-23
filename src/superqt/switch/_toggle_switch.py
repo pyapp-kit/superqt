@@ -13,12 +13,12 @@ class QStyleOptionToggleSwitch(QtW.QStyleOptionButton):
         self.on_color = QtGui.QColor("#4D79C7")
         self.off_color = QtGui.QColor("#909090")
         self.handle_color = QtGui.QColor("#d5d5d5")
-
-        # these aren't yet overrideable in QToggleSwitch
-        self.margin = 2
         self.switch_width = 24
         self.switch_height = 12
         self.handle_size = 14
+
+        # these aren't yet overrideable in QToggleSwitch
+        self.margin = 2
         self.text_alignment = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
 
 
@@ -38,10 +38,16 @@ class QToggleSwitch(QtW.QAbstractButton):
                 raise TypeError("No overload of QToggleSwitch matches the arguments")
             parent = text
             text = None
+
+        # attributes for drawing the switch
         self._on_color = QtGui.QColor("#4D79C7")
         self._off_color = QtGui.QColor("#909090")
         self._handle_color = QtGui.QColor("#d5d5d5")
+        self._switch_width = 24
+        self._switch_height = 12
+        self._handle_size = 14
         self._offset_value = 8.0
+
         super().__init__(parent)
         self.setCheckable(True)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -69,6 +75,9 @@ class QToggleSwitch(QtW.QAbstractButton):
         option.on_color = self.onColor
         option.off_color = self.offColor
         option.handle_color = self.handleColor
+        option.switch_width = self.switchWidth
+        option.switch_height = self.switchHeight
+        option.handle_size = self.handleSize
 
     def paintEvent(self, a0: QtGui.QPaintEvent | None) -> None:
         p = QtGui.QPainter(self)
@@ -198,6 +207,7 @@ class QToggleSwitch(QtW.QAbstractButton):
         self.update()
 
     onColor = Property(QtGui.QColor, _get_onColor, _set_onColor)
+    """Color of the switch groove when it is on."""
 
     def _get_offColor(self) -> QtGui.QColor:
         return self._off_color
@@ -207,6 +217,7 @@ class QToggleSwitch(QtW.QAbstractButton):
         self.update()
 
     offColor = Property(QtGui.QColor, _get_offColor, _set_offColor)
+    """Color of the switch groove when it is off."""
 
     def _get_handleColor(self) -> QtGui.QColor:
         return self._handle_color
@@ -216,6 +227,39 @@ class QToggleSwitch(QtW.QAbstractButton):
         self.update()
 
     handleColor = Property(QtGui.QColor, _get_handleColor, _set_handleColor)
+    """Color of the switch handle."""
+
+    def _get_switchWidth(self) -> int:
+        return self._switch_width
+
+    def _set_switchWidth(self, width: int) -> None:
+        self._switch_width = width
+        self._offset_value = self._offset_for_checkstate(self.isChecked())
+        self.update()
+
+    switchWidth = Property(int, _get_switchWidth, _set_switchWidth)
+    """Width of the switch groove."""
+
+    def _get_switchHeight(self) -> int:
+        return self._switch_height
+
+    def _set_switchHeight(self, height: int) -> None:
+        self._switch_height = height
+        self._offset_value = self._offset_for_checkstate(self.isChecked())
+        self.update()
+
+    switchHeight = Property(int, _get_switchHeight, _set_switchHeight)
+    """Height of the switch groove."""
+
+    def _get_handleSize(self) -> int:
+        return self._handle_size
+
+    def _set_handleSize(self, size: int) -> None:
+        self._handle_size = size
+        self.update()
+
+    handleSize = Property(int, _get_handleSize, _set_handleSize)
+    """Width/height of the switch handle."""
 
     ### Other private methods ###
 
@@ -260,9 +304,11 @@ class QToggleSwitch(QtW.QAbstractButton):
         )
 
     def _text_rect(self, opt: QStyleOptionToggleSwitch) -> QtCore.QRectF:
+        # If handle is bigger than groove, adjust the text to the right of the handle.
+        # If groove is bigger, adjust the text to the right of the groove.
         return QtCore.QRectF(
             opt.switch_width
-            + (opt.handle_size - opt.switch_height) // 2
+            + max(opt.handle_size - opt.switch_height, 0) // 2
             + opt.margin * 2
             + 2,
             0,

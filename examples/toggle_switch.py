@@ -4,6 +4,15 @@ from qtpy.QtWidgets import QApplication, QStyle, QVBoxLayout, QWidget
 from superqt import QToggleSwitch
 from superqt.switch import QStyleOptionToggleSwitch
 
+QSS_EXAMPLE = """
+QToggleSwitch {
+    qproperty-onColor: red;
+    qproperty-handleSize: 12;
+    qproperty-switchWidth: 30;
+    qproperty-switchHeight: 16;
+}
+"""
+
 
 class QRectangleToggleSwitch(QToggleSwitch):
     """A rectangle shaped toggle switch."""
@@ -49,6 +58,9 @@ app = QApplication([])
 widget = QWidget()
 layout = QVBoxLayout(widget)
 layout.addWidget(QToggleSwitch("original"))
+switch_styled = QToggleSwitch("stylesheet")
+switch_styled.setStyleSheet(QSS_EXAMPLE)
+layout.addWidget(switch_styled)
 layout.addWidget(QRectangleToggleSwitch("rectangle"))
 layout.addWidget(QToggleSwitchWithText("with text"))
 widget.show()

@@ -41,6 +41,12 @@ def test_get_set(qtbot):
     assert wdg.handleColor.name() == "#0000ff"
     wdg.setText("new text")
     assert wdg.text() == "new text"
+    wdg.switchWidth = 100
+    assert wdg.switchWidth == 100
+    wdg.switchHeight = 100
+    assert wdg.switchHeight == 100
+    wdg.handleSize = 80
+    assert wdg.handleSize == 80
 
 
 def test_mouse_click(qtbot):
