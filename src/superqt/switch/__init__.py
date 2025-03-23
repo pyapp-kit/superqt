@@ -1,3 +1,3 @@
-from superqt.switch._toggle_switch import QToggleSwitch
+from superqt.switch._toggle_switch import QStyleOptionToggleSwitch, QToggleSwitch
 
-__all__ = ["QToggleSwitch"]
+__all__ = ["QStyleOptionToggleSwitch", "QToggleSwitch"]
