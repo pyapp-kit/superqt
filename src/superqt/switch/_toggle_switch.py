@@ -195,7 +195,7 @@ class QToggleSwitch(QtW.QAbstractButton):
         text_color = option.palette.color(self.foregroundRole())
         pen = QtGui.QPen(text_color, 1)
         painter.setPen(pen)
-        painter.drawText(rect, option.text_alignment, option.text)
+        painter.drawText(rect, int(option.text_alignment), option.text)
 
     ### Properties ###
 
