@@ -64,6 +64,7 @@ def test_mouse_click(qtbot):
 
 
 def test_signal_emission_order(qtbot):
+    """Check if event emmision is same for QToggleSwitch and QCheckBox"""
     wdg = QToggleSwitch()
     emitted_from_toggleswitch = []
     wdg.toggled.connect(lambda: emitted_from_toggleswitch.append("toggled"))
