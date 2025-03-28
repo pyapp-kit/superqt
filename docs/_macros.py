@@ -127,7 +127,6 @@ def define_env(env: "MacrosPlugin"):
 
 def _grab(dest: str | Path, width) -> list[Path]:
     """Grab the top widgets of the application."""
-    from qtpy.QtCore import QTimer
     from qtpy.QtWidgets import QApplication
 
     w = QApplication.topLevelWidgets()[-1]
