@@ -19,6 +19,6 @@ switch.show()
 app.exec_()
 ```
 
-{{ show_widget() }}
+{{ show_widget(80) }}
 
 {{ show_members('superqt.QToggleSwitch') }}
