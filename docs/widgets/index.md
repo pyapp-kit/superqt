@@ -27,6 +27,7 @@ The following are QWidget subclasses:
 | [`QSearchableTreeWidget`](./qsearchabletreewidget.md)     | `QTreeWidget` variant with search field that filters available options |
 | [`QColorComboBox`](./qcolorcombobox.md)            | `QComboBox` to select from a specified set of colors |
 | [`QColormapComboBox`](./qcolormap.md)            | `QComboBox` to select from a specified set of colormaps. |
+| [`QToggleSwitch`](./qtoggleswitch.md)            | `QAbstractButton` that represents a boolean value with a toggle switch. |
 
 ## Frames and containers
 

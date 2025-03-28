@@ -766,7 +766,7 @@ def thread_worker(
 ############################################################################
 
 # This is a variant on the above pattern, it uses QThread instead of Qrunnable
-# see https://doc.qt.io/qt-5/threads-technologies.html#comparison-of-solutions
+# see https://doc.qt.io/qt-6/threads-technologies.html#comparison-of-solutions
 # (it appears from that table that QRunnable cannot emit or receive signals,
 # but we circumvent that here with our WorkerBase class that also inherits from
 # QObject... providing signals/slots).
@@ -777,7 +777,7 @@ def thread_worker(
 #
 # However, a disadvantage is that you have no access to (and therefore less
 # control over) the QThread itself.  See for example all of the methods
-# provided on the QThread object: https://doc.qt.io/qt-5/qthread.html
+# provided on the QThread object: https://doc.qt.io/qt-6/qthread.html
 
 if TYPE_CHECKING:
 
@@ -808,7 +808,7 @@ def new_worker_qthread(
         standard "single-threaded" signals & slots, note that inter-thread
         signals and slots (automatically) use an event-based QueuedConnection, while
         intra-thread signals use a DirectConnection. See [Signals and Slots Across
-        Threads](https://doc.qt.io/qt-5/threads-qobject.html#signals-and-slots-across-threads>)
+        Threads](https://doc.qt.io/qt-6/threads-qobject.html#signals-and-slots-across-threads>)
 
     Parameters
     ----------
