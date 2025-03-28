@@ -1,5 +1,14 @@
 # Changelog
 
+## [v0.7.3](https://github.com/pyapp-kit/superqt/tree/v0.7.3) (2025-03-28)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.7.2...v0.7.3)
+
+**Implemented enhancements:**
+
+- feat: toggle switch [\#284](https://github.com/pyapp-kit/superqt/pull/284) ([hanjinliu](https://github.com/hanjinliu))
+- Enh: Adds a filterable kwarg to ColormapComboBox enabling filtering \(like Catalog\) [\#278](https://github.com/pyapp-kit/superqt/pull/278) ([psobolewskiPhD](https://github.com/psobolewskiPhD))
+
 ## [v0.7.2](https://github.com/pyapp-kit/superqt/tree/v0.7.2) (2025-03-17)
 
 [Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.7.1...v0.7.2)
