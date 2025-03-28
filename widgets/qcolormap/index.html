@@ -599,6 +599,8 @@
       
         
       
+        
+      
     
     
     
@@ -850,6 +852,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#superqt.QColormapComboBox.isFilterable" class="md-nav__link">
+    <span class="md-ellipsis">
+      isFilterable
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#superqt.QColormapComboBox.itemColormap" class="md-nav__link">
     <span class="md-ellipsis">
       itemColormap
@@ -862,6 +873,15 @@
   <a href="#superqt.QColormapComboBox.setCurrentColormap" class="md-nav__link">
     <span class="md-ellipsis">
       setCurrentColormap
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#superqt.QColormapComboBox.setFilterable" class="md-nav__link">
+    <span class="md-ellipsis">
+      setFilterable
     </span>
   </a>
   
@@ -1214,6 +1234,27 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../qtoggleswitch/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    QToggleSwitch
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1345,6 +1386,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#superqt.QColormapComboBox.isFilterable" class="md-nav__link">
+    <span class="md-ellipsis">
+      isFilterable
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#superqt.QColormapComboBox.itemColormap" class="md-nav__link">
     <span class="md-ellipsis">
       itemColormap
@@ -1357,6 +1407,15 @@
   <a href="#superqt.QColormapComboBox.setCurrentColormap" class="md-nav__link">
     <span class="md-ellipsis">
       setCurrentColormap
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#superqt.QColormapComboBox.setFilterable" class="md-nav__link">
+    <span class="md-ellipsis">
+      setFilterable
     </span>
   </a>
   
@@ -1415,7 +1474,7 @@ pip<span class="w"> </span>install<span class="w"> </span>superqt<span class="o"
 </div>
 <h3 id="colormaplike-objects">ColorMapLike objects<a class="headerlink" href="#colormaplike-objects" title="Permanent link">#</a></h3>
 <p>Colormaps may be specified in a variety of ways, such as by name (string), an iterable of a color/color-like objects, or as
-a <a class="autorefs autorefs-external" href="https://cmap-docs.readthedocs.io/en/latest/api/colormap/#cmap.Colormap"><code>cmap.Colormap</code></a> instance. See <a href="https://cmap-docs.readthedocs.io/en/latest/colormaps/#colormaplike-objects">cmap documentation for details on
+a <a class="autorefs autorefs-external" href="https://cmap-docs.readthedocs.io/en/latest/reference/cmap/#cmap.Colormap"><code>cmap.Colormap</code></a> instance. See <a href="https://cmap-docs.readthedocs.io/en/latest/colormaps/#colormaplike-objects">cmap documentation for details on
 all ColormapLike types</a></p>
 <h3 id="example">Example<a class="headerlink" href="#example" title="Permanent link">#</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">cmap</span> <span class="kn">import</span> <span class="n">Colormap</span>
@@ -1531,6 +1590,23 @@ Default is "Add Colormap...".</p>
                   <code>&#39;Add Colormap...&#39;</code>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>filterable</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether the user can filter colormaps by typing in the line edit.
+Default is True. Can also be set with <code>setFilterable</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -1606,6 +1682,23 @@ Default is "Add Colormap...".</p>
 <div class="doc doc-object doc-function">
 
 
+<h3 id="superqt.QColormapComboBox.isFilterable" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">isFilterable</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span></code>
+
+<a href="#superqt.QColormapComboBox.isFilterable" class="headerlink" title="Permanent link">#</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Returns whether the user can filter the list of colormaps.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
 <h3 id="superqt.QColormapComboBox.itemColormap" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">itemColormap</span><span class="p">(</span><span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Colormap</span> <span class="o">|</span> <span class="kc">None</span></code>
 
@@ -1632,6 +1725,27 @@ Default is "Add Colormap...".</p>
     <div class="doc doc-contents ">
 
         <p>Adds the color to the QComboBox and selects it.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="superqt.QColormapComboBox.setFilterable" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">setFilterable</span><span class="p">(</span><span class="n">filterable</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+<a href="#superqt.QColormapComboBox.setFilterable" class="headerlink" title="Permanent link">#</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Set whether the user can enter/filter colormaps by typing in the line edit.</p>
+<p>If enabled, the user can select the text in the line edit and type to
+filter the list of colormaps. The completer will show a list of matching
+colormaps as the user types.  If disabled, the user can only select from
+the combo box dropdown.</p>
 
     </div>
 

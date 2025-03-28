@@ -664,6 +664,8 @@
       
         
       
+        
+      
     
     
     
@@ -1103,6 +1105,27 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../widgets/qtoggleswitch/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    QToggleSwitch
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1236,7 +1259,7 @@ which to paint the colormap.</p>
                 <code>cmap</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" title="cmap.Colormap" href="https://cmap-docs.readthedocs.io/en/latest/api/colormap/#cmap.Colormap">Colormap</a> | <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
+                  <code><a class="autorefs autorefs-external" title="cmap.Colormap" href="https://cmap-docs.readthedocs.io/en/latest/reference/cmap/#cmap.Colormap">Colormap</a> | <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1436,7 +1459,7 @@ Default is 0.33.</p>
                 <code>fallback_cmap</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" title="cmap.Colormap" href="https://cmap-docs.readthedocs.io/en/latest/api/colormap/#cmap.Colormap">Colormap</a> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>
+                  <code><a class="autorefs autorefs-external" title="cmap.Colormap" href="https://cmap-docs.readthedocs.io/en/latest/reference/cmap/#cmap.Colormap">Colormap</a> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1480,6 +1503,27 @@ transparency, by default 4. If 0, no checkerboard is drawn.</p>
             </td>
             <td>
                   <code>4</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>allow_invalid</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If True, the user can enter any text, even if it does not represent a valid
+colormap (and <code>fallback_cmap</code> will be shown if it's invalid). If False, the text
+will be validated when editing is finished or focus is lost, and if the text is
+not a valid colormap, it will be reverted to the first available valid option
+from the completer, or, if that's not available, the last valid colormap.
+Default is True.  This is only settable at initialization.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
             </td>
           </tr>
       </tbody>
