@@ -1,3 +1,5 @@
+import sys
+
 from typing import TYPE_CHECKING
 
 from qtpy.QtGui import QImage
@@ -37,4 +39,8 @@ def qimage_to_array(img: QImage) -> "np.ndarray":
     arr = np.frombuffer(b, np.uint8).reshape(h, w, c)
 
     # reverse channel colors for numpy
-    return arr.take([2, 1, 0, 3], axis=2)
+    # On big endian we need to specify a different order
+    if sys.byteorder == 'big':
+        return arr.take([1, 2, 3, 0], axis=2)
+    else:
+        return arr.take([2, 1, 0, 3], axis=2)
