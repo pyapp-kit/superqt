@@ -40,6 +40,6 @@ def qimage_to_array(img: QImage) -> "np.ndarray":
     # reverse channel colors for numpy
     # On big endian we need to specify a different order
     if sys.byteorder == "big":
-        return arr.take([1, 2, 3, 0], axis=2)
+        return arr.take([1, 2, 3, 0], axis=2)  # pragma: no cover
     else:
         return arr.take([2, 1, 0, 3], axis=2)
