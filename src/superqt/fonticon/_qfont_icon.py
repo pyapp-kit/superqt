@@ -132,7 +132,7 @@ class IconOpts:
     def dict(self) -> IconOptionDict:
         # not using asdict due to pickle errors on animation
         d = {k: v for k, v in vars(self).items() if v is not _Unset}
-        return cast(IconOptionDict, d)
+        return cast("IconOptionDict", d)
 
 
 @dataclass
@@ -151,7 +151,7 @@ class _IconOptions:
 
     def dict(self) -> IconOptionDict:
         # not using asdict due to pickle errors on animation
-        return cast(IconOptionDict, vars(self))
+        return cast("IconOptionDict", vars(self))
 
 
 class _QFontIconEngine(QIconEngine):
@@ -167,7 +167,7 @@ class _QFontIconEngine(QIconEngine):
 
     @property
     def _default_opts(self) -> _IconOptions:
-        return cast(_IconOptions, self._opts[QIcon.State.Off][QIcon.Mode.Normal])
+        return cast("_IconOptions", self._opts[QIcon.State.Off][QIcon.Mode.Normal])
 
     def _add_opts(self, state: QIcon.State, mode: QIcon.Mode, opts: IconOpts) -> None:
         self._opts[state][mode] = self._default_opts._update(opts)
@@ -358,7 +358,7 @@ class QFontIconStore(QObject):
 
     def __init__(self, parent: QObject | None = None) -> None:
         super().__init__(parent=parent)
-        if tuple(cast(str, QT_VERSION).split(".")) < ("6", "0"):
+        if tuple(cast("str", QT_VERSION).split(".")) < ("6", "0"):
             # QT6 drops this
             QApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
 
@@ -480,7 +480,7 @@ class QFontIconStore(QObject):
         # in Qt6, everything becomes a static member
         QFd: QFontDatabase | type[QFontDatabase] = (
             QFontDatabase()
-            if tuple(cast(str, QT_VERSION).split(".")) < ("6", "0")
+            if tuple(cast("str", QT_VERSION).split(".")) < ("6", "0")
             else QFontDatabase
         )
 

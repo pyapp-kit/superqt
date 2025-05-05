@@ -10,7 +10,7 @@ class _IntMixin:
         self._singleStep = 1
 
     def _type_cast(self, value) -> int:
-        return int(round(value))
+        return round(value)
 
 
 class _FloatMixin:
