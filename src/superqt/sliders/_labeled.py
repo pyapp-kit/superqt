@@ -703,10 +703,12 @@ class SliderLabel(QLineEdit):
             if len(mantissa) + len(exponent) + 1 < available_chars:
                 text = f"{mantissa}e{exponent}"
             else:
-                text = f"{val:.{available_chars - len(exponent) - 3}e}"
+                decimals = max(available_chars - len(exponent) - 3, 2)
+                text = f"{val:.{decimals}e}"
 
         else:
-            text = f"{val:.{available_chars - len(total) - 1}f}"
+            decimals = max(available_chars - len(total) - 1, 2)
+            text = f"{val:.{decimals}f}"
             text = text.rstrip("0").rstrip(".")
 
         self.setText(text)
