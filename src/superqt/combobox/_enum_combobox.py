@@ -3,7 +3,7 @@ from enum import Enum, EnumMeta, Flag
 from functools import reduce
 from itertools import combinations
 from operator import or_
-from typing import Optional, Tuple, TypeVar
+from typing import Optional, TypeVar
 
 from qtpy.QtCore import Signal
 from qtpy.QtWidgets import QComboBox
@@ -47,7 +47,7 @@ def _get_name(enum_value: Enum):
     return name
 
 
-def _get_name_with_value(enum_value: Enum) -> Tuple[str, Enum]:
+def _get_name_with_value(enum_value: Enum) -> tuple[str, Enum]:
     return _get_name(enum_value), enum_value
 
 

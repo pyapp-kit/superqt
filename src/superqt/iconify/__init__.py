@@ -1,9 +1,20 @@
 from __future__ import annotations
 
+import warnings
 from typing import TYPE_CHECKING
 
-from qtpy.QtCore import QSize
-from qtpy.QtGui import QIcon
+from qtpy.QtCore import QSize, Qt
+from qtpy.QtGui import QIcon, QPainter, QPixmap
+from qtpy.QtWidgets import QApplication
+
+try:
+    from pyconify import svg_path
+except ModuleNotFoundError:  # pragma: no cover
+    raise ModuleNotFoundError(
+        "pyconify is required to use QIconifyIcon. "
+        "Please install it with `pip install pyconify` or use the "
+        "`pip install superqt[iconify]` extra."
+    ) from None
 
 if TYPE_CHECKING:
     from typing import Literal
@@ -11,10 +22,7 @@ if TYPE_CHECKING:
     Flip = Literal["horizontal", "vertical", "horizontal,vertical"]
     Rotation = Literal["90", "180", "270", 90, 180, 270, "-90", 1, 2, 3]
 
-try:
-    from pyconify import svg_path
-except ModuleNotFoundError:  # pragma: no cover
-    svg_path = None
+__all__ = ["QIconifyIcon"]
 
 
 class QIconifyIcon(QIcon):
@@ -72,14 +80,9 @@ class QIconifyIcon(QIcon):
         rotate: Rotation | None = None,
         dir: str | None = None,
     ):
-        if svg_path is None:  # pragma: no cover
-            raise ModuleNotFoundError(
-                "pyconify is required to use QIconifyIcon. "
-                "Please install it with `pip install pyconify` or use the "
-                "`pip install superqt[iconify]` extra."
-            )
         super().__init__()
-        self.addKey(*key, color=color, flip=flip, rotate=rotate, dir=dir)
+        if key:
+            self.addKey(*key, color=color, flip=flip, rotate=rotate, dir=dir)
 
     def addKey(
         self,
@@ -91,7 +94,7 @@ class QIconifyIcon(QIcon):
         size: QSize | None = None,
         mode: QIcon.Mode = QIcon.Mode.Normal,
         state: QIcon.State = QIcon.State.Off,
-    ) -> None:
+    ) -> QIconifyIcon:
         """Add an icon to this QIcon.
 
         This is a variant of `QIcon.addFile` that uses an iconify icon keys and
@@ -121,6 +124,33 @@ class QIconifyIcon(QIcon):
             Mode specified for the icon, passed to `QIcon.addFile`.
         state : QIcon.State, optional
             State specified for the icon, passed to `QIcon.addFile`.
+
+        Returns
+        -------
+        QIconifyIcon
+            This QIconifyIcon instance, for chaining.
         """
-        path = svg_path(*key, color=color, flip=flip, rotate=rotate, dir=dir)
-        self.addFile(str(path), size or QSize(), mode, state)
+        try:
+            path = svg_path(*key, color=color, flip=flip, rotate=rotate, dir=dir)
+        except OSError as e:
+            warnings.warn(
+                f"Error fetching icon: {e}.\nIcon {key} not cached. Using fallback.",
+                stacklevel=2,
+            )
+            self._draw_text_fallback(key)
+        else:
+            self.addFile(str(path), size or QSize(), mode, state)
+
+        return self
+
+    def _draw_text_fallback(self, key: tuple[str, ...]) -> None:
+        if style := QApplication.style():
+            pixmap = style.standardPixmap(style.StandardPixmap.SP_MessageBoxQuestion)
+        else:
+            pixmap = QPixmap(18, 18)
+            pixmap.fill(Qt.GlobalColor.transparent)
+            painter = QPainter(pixmap)
+            painter.drawText(pixmap.rect(), Qt.AlignmentFlag.AlignCenter, "?")
+            painter.end()
+
+        self.addPixmap(pixmap)

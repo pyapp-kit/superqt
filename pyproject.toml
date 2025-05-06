@@ -8,7 +8,7 @@ build-backend = "hatchling.build"
 name = "superqt"
 description = "Missing widgets and components for PyQt/PySide"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 license = { text = "BSD 3-Clause License" }
 authors = [{ email = "talley.lambert@gmail.com", name = "Talley Lambert" }]
 keywords = [
@@ -28,11 +28,11 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Desktop Environment",
     "Topic :: Software Development :: User Interfaces",
     "Topic :: Software Development :: Widget Sets",
@@ -41,13 +41,21 @@ dynamic = ["version"]
 dependencies = [
     "pygments>=2.4.0",
     "qtpy>=1.1.0",
-    "typing-extensions >=3.7.4.3,!=3.10.0.0",
+    "typing-extensions >=3.7.4.3,!=3.10.0.0",  # however, pint requires >4.5.0
 ]
 
 # extras
 # https://peps.python.org/pep-0621/#dependencies-optional-dependencies
 [project.optional-dependencies]
-test = ["pint", "pytest", "pytest-cov", "pytest-qt", "numpy", "cmap", "pyconify"]
+test = [
+    "pint",
+    "pytest",
+    "pytest-cov",
+    "pytest-qt",
+    "numpy",
+    "cmap",
+    "pyconify",
+]
 dev = [
     "ipython",
     "ruff",
@@ -57,8 +65,15 @@ dev = [
     "pydocstyle",
     "rich",
     "types-Pygments",
+    "superqt[test,pyqt6]",
 ]
-docs = ["mkdocs-macros-plugin", "mkdocs-material", "mkdocstrings[python]", "pint", "cmap"]
+docs = [
+    "mkdocs-macros-plugin ==1.3.7",
+    "mkdocs-material ==9.5.49",
+    "mkdocstrings ==0.27.0",
+    "mkdocstrings-python ==1.13.0",
+    "superqt[font-fa5, cmap, quantity]",
+]
 quantity = ["pint"]
 cmap = ["cmap >=0.1.1"]
 pyside2 = ["pyside2"]
@@ -66,9 +81,9 @@ pyside2 = ["pyside2"]
 # https://github.com/pyapp-kit/superqt/pull/177
 # https://github.com/pyapp-kit/superqt/pull/164
 # https://bugreports.qt.io/browse/PYSIDE-2627
-pyside6 = ["pyside6 !=6.5.0,!=6.5.1,!=6.6.2"]
+pyside6 = ["pyside6 !=6.5.0,!=6.5.1,!=6.6.2,<6.8"]
 pyqt5 = ["pyqt5"]
-pyqt6 = ["pyqt6"]
+pyqt6 = ["pyqt6<6.7"]
 font-fa5 = ["fonticon-fontawesome5"]
 font-fa6 = ["fonticon-fontawesome6"]
 font-mi6 = ["fonticon-materialdesignicons6"]
@@ -100,21 +115,30 @@ python = ["3.11"]
 
 [[tool.hatch.envs.test.matrix]]
 qt = ["pyside2", "pyqt5", "pyqt5.12"]
-python = ["3.8"]
+python = ["3.9"]
 
 [tool.hatch.envs.test.overrides]
 matrix.qt.extra-dependencies = [
-  {value = "pyside2", if = ["pyside2"]},
-  {value = "pyside6", if = ["pyside6"]},
-  {value = "pyqt5", if = ["pyqt5"]},
-  {value = "pyqt6", if = ["pyqt6"]},
-  {value = "pyqt5==5.12", if = ["pyqt5.12"]},
+    { value = "pyside2", if = [
+        "pyside2",
+    ] },
+    { value = "pyside6", if = [
+        "pyside6",
+    ] },
+    { value = "pyqt5", if = [
+        "pyqt5",
+    ] },
+    { value = "pyqt6", if = [
+        "pyqt6",
+    ] },
+    { value = "pyqt5==5.12", if = [
+        "pyqt5.12",
+    ] },
 ]
 
-# https://github.com/charliermarsh/ruff
 [tool.ruff]
 line-length = 88
-target-version = "py38"
+target-version = "py39"
 src = ["src", "tests"]
 
 # https://docs.astral.sh/ruff/rules
@@ -132,7 +156,7 @@ select = [
     "B",    # flake8-bugbear
     "A001", # flake8-builtins
     "RUF",  # ruff-specific rules
-    "TCH",  # flake8-type-checking
+    "TC",   # flake8-type-checking
     "TID",  # flake8-tidy-imports
 ]
 ignore = [
@@ -155,9 +179,11 @@ minversion = "6.0"
 testpaths = ["tests"]
 filterwarnings = [
     "error",
+    "ignore:Failed to disconnect::pytestqt",
     "ignore:QPixmapCache.find:DeprecationWarning:",
     "ignore:SelectableGroups dict interface:DeprecationWarning",
     "ignore:The distutils package is deprecated:DeprecationWarning",
+    "ignore:.*Skipping callback call set_result",
 ]
 
 # https://mypy.readthedocs.io/en/stable/config_file.html
@@ -191,7 +217,7 @@ exclude_lines = [
     "@overload",
     "except ImportError",
     "\\.\\.\\.",
-    "pass"
+    "pass",
 ]
 
 # https://github.com/mgedmin/check-manifest#configuration

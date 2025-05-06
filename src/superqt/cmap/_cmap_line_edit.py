@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
-from qtpy.QtCore import Qt
+from qtpy.QtCore import QRect, Qt
 from qtpy.QtGui import QIcon, QPainter, QPaintEvent, QPalette
 from qtpy.QtWidgets import QApplication, QLineEdit, QStyle, QWidget
 
@@ -43,6 +43,13 @@ class QColormapLineEdit(QLineEdit):
     checkerboard_size : int, optional
         Size (in pixels) of the checkerboard pattern to draw behind colormaps with
         transparency, by default 4. If 0, no checkerboard is drawn.
+    allow_invalid : bool, optional
+        If True, the user can enter any text, even if it does not represent a valid
+        colormap (and `fallback_cmap` will be shown if it's invalid). If False, the text
+        will be validated when editing is finished or focus is lost, and if the text is
+        not a valid colormap, it will be reverted to the first available valid option
+        from the completer, or, if that's not available, the last valid colormap.
+        Default is True.  This is only settable at initialization.
     """
 
     def __init__(
@@ -53,6 +60,7 @@ class QColormapLineEdit(QLineEdit):
         fallback_cmap: Colormap | str | None = "gray",
         missing_icon: QIcon | QStyle.StandardPixmap = MISSING,
         checkerboard_size: int = 4,
+        allow_invalid: bool = True,
     ) -> None:
         super().__init__(parent)
         self.setFractionalColormapWidth(fractional_colormap_width)
@@ -68,6 +76,45 @@ class QColormapLineEdit(QLineEdit):
 
         self._cmap: Colormap | None = None  # current colormap
         self.textChanged.connect(self.setColormap)
+
+        self._lastValidColormap: Colormap | None = None
+        if not allow_invalid:
+            self.editingFinished.connect(self._validate)
+
+    def _validate(self) -> None:
+        """Called when editing is finished or focus is lost.
+
+        If the current text does not represent a valid colormap, revert to the first
+        available valid option from the completer, or, if that's not available, revert
+        to the last valid colormap.
+        """
+        if self._cmap is None:
+            candidate = self._fist_completer_option()
+            if candidate is not None:
+                self.setColormap(candidate)
+                self.setText(candidate.name.rsplit(":", 1)[-1])
+            elif self._lastValidColormap is not None:
+                self.setColormap(self._lastValidColormap)
+                self.setText(self._lastValidColormap.name.rsplit(":", 1)[-1])
+            # Optionally, if neither is available, you might decide to clear the text.
+        else:
+            # Update the last valid value.
+            self._lastValidColormap = self._cmap
+
+    def _fist_completer_option(self) -> Colormap | None:
+        """Return the first valid Colormap from the completer's current filtered list.
+
+        or None if no valid option is available.
+        """
+        if (
+            (completer := self.completer()) is None
+            or (model := completer.model()) is None
+            or model.rowCount() == 0
+        ):
+            return None
+
+        first_item = model.index(0, 0).data(Qt.ItemDataRole.DisplayRole)
+        return try_cast_colormap(first_item)
 
     def setFractionalColormapWidth(self, fraction: float) -> None:
         self._colormap_fraction: float = float(fraction)
@@ -103,6 +150,19 @@ class QColormapLineEdit(QLineEdit):
     def _cmap_is_full_width(self):
         return self._colormap_fraction >= 0.75
 
+    def _cmap_rect(self) -> QRect:
+        cmap_rect = self.rect().adjusted(2, 0, 0, 0)
+        cmap_rect.setWidth(int(cmap_rect.width() * self._colormap_fraction))
+        return cmap_rect
+
+    def resizeEvent(self, e: Any) -> None:
+        left_margin = 6
+        if not self._cmap_is_full_width():
+            # leave room for the colormap
+            left_margin += self._cmap_rect().width()
+        self.setTextMargins(left_margin, 2, 0, 0)
+        super().resizeEvent(e)
+
     def paintEvent(self, e: QPaintEvent) -> None:
         # don't draw the background
         # otherwise it will cover the colormap during super().paintEvent
@@ -112,15 +172,7 @@ class QColormapLineEdit(QLineEdit):
         palette.setColor(palette.ColorRole.Base, Qt.GlobalColor.transparent)
         self.setPalette(palette)
 
-        cmap_rect = self.rect().adjusted(2, 0, 0, 0)
-        cmap_rect.setWidth(int(cmap_rect.width() * self._colormap_fraction))
-
-        left_margin = 6
-        if not self._cmap_is_full_width():
-            # leave room for the colormap
-            left_margin += cmap_rect.width()
-        self.setTextMargins(left_margin, 2, 0, 0)
-
+        cmap_rect = self._cmap_rect()
         if self._cmap:
             draw_colormap(
                 self, self._cmap, cmap_rect, checkerboard_size=self._checkerboard_size

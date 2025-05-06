@@ -121,6 +121,10 @@ def draw_colormap(
         painter.setBrush(gradient)
         painter.drawRect(rect)
 
+    # If we created a new Painter, free its resources
+    if isinstance(painter_or_device, QPaintDevice):
+        painter.end()
+
 
 def _draw_checkerboard(
     painter: QPainter, rect: QRect | QRectF, checker_size: int

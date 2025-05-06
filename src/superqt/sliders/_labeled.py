@@ -3,13 +3,13 @@ from __future__ import annotations
 import contextlib
 from enum import IntEnum, IntFlag, auto
 from functools import partial
-from typing import Any, overload
+from typing import TYPE_CHECKING, Any, overload
 
-from qtpy.QtCore import QPoint, QSize, Qt, Signal
+from qtpy import QtGui
+from qtpy.QtCore import Property, QPoint, QSize, Qt, Signal
 from qtpy.QtGui import QDoubleValidator, QFontMetrics, QValidator
 from qtpy.QtWidgets import (
     QAbstractSlider,
-    QApplication,
     QBoxLayout,
     QHBoxLayout,
     QLineEdit,
@@ -24,6 +24,9 @@ from superqt.utils import signals_blocked
 
 from ._sliders import QDoubleRangeSlider, QDoubleSlider, QRangeSlider
 
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
 
 class LabelPosition(IntEnum):
     NoLabel = 0
@@ -31,6 +34,7 @@ class LabelPosition(IntEnum):
     LabelsBelow = auto()
     LabelsRight = LabelsAbove
     LabelsLeft = LabelsBelow
+    LabelsOnHandle = auto()
 
 
 class EdgeLabelMode(IntFlag):
@@ -42,10 +46,10 @@ class EdgeLabelMode(IntFlag):
 class _SliderProxy:
     _slider: QSlider
 
-    def value(self) -> int:
+    def value(self) -> Any:
         return self._slider.value()
 
-    def setValue(self, value: int) -> None:
+    def setValue(self, value: Any) -> None:
         self._slider.setValue(value)
 
     def sliderPosition(self) -> int:
@@ -92,6 +96,36 @@ class _SliderProxy:
 
     def setTickPosition(self, pos: QSlider.TickPosition) -> None:
         self._slider.setTickPosition(pos)
+
+    def triggerAction(self, action: QAbstractSlider.SliderAction) -> None:
+        return self._slider.triggerAction(action)
+
+    def invertedControls(self) -> bool:
+        return self._slider.invertedControls()
+
+    def setInvertedControls(self, a0: bool) -> None:
+        return self._slider.setInvertedControls(a0)
+
+    def invertedAppearance(self) -> bool:
+        return self._slider.invertedAppearance()
+
+    def setInvertedAppearance(self, a0: bool) -> None:
+        return self._slider.setInvertedAppearance(a0)
+
+    def isSliderDown(self) -> bool:
+        return self._slider.isSliderDown()
+
+    def setSliderDown(self, a0: bool) -> None:
+        return self._slider.setSliderDown(a0)
+
+    def hasTracking(self) -> bool:
+        return self._slider.hasTracking()
+
+    def setTracking(self, enable: bool) -> None:
+        return self._slider.setTracking(enable)
+
+    def orientation(self) -> Qt.Orientation:
+        return self._slider.orientation()
 
     def __getattr__(self, name: Any) -> Any:
         return getattr(self._slider, name)
@@ -226,8 +260,6 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
             self.layout().setContentsMargins(0, 0, 0, 0)
         self._on_slider_range_changed(self.minimum(), self.maximum())
 
-        QApplication.processEvents()
-
     # putting this after labelMode methods for the sake of mypy
     EdgeLabelMode = EdgeLabelMode
 
@@ -247,17 +279,15 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         """Convert the value from float to int before setting the slider value."""
         self._slider.setValue(int(value))
 
-    def _rename_signals(self) -> None:
-        # for subclasses
-        pass
+    def _rename_signals(self) -> None: ...
 
 
 class QLabeledDoubleSlider(QLabeledSlider):
     _slider_class = QDoubleSlider
     _slider: QDoubleSlider
-    _fvalueChanged = Signal(float)
-    _fsliderMoved = Signal(float)
-    _frangeChanged = Signal(float, float)
+    fvalueChanged = Signal(float)
+    fsliderMoved = Signal(float)
+    frangeChanged = Signal(float, float)
 
     @overload
     def __init__(self, parent: QWidget | None = ...) -> None: ...
@@ -276,9 +306,9 @@ class QLabeledDoubleSlider(QLabeledSlider):
         self._slider.setValue(value)
 
     def _rename_signals(self) -> None:
-        self.valueChanged = self._fvalueChanged
-        self.sliderMoved = self._fsliderMoved
-        self.rangeChanged = self._frangeChanged
+        self.valueChanged = self.fvalueChanged
+        self.sliderMoved = self.fsliderMoved
+        self.rangeChanged = self.frangeChanged
 
     def decimals(self) -> int:
         return self._label.decimals()
@@ -288,7 +318,7 @@ class QLabeledDoubleSlider(QLabeledSlider):
 
 
 class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
-    _valueChanged = Signal(tuple)
+    valuesChanged = Signal(tuple)
     editingFinished = Signal()
 
     _slider_class = QRangeSlider
@@ -308,7 +338,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
         self._rename_signals()
 
         self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating)
-        self._handle_labels = []
+        self._handle_labels: list[SliderLabel] = []
         self._handle_label_position: LabelPosition = LabelPosition.LabelsAbove
 
         # for fine tuning label position
@@ -317,8 +347,10 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
 
         self._slider = self._slider_class()
         self._slider.valueChanged.connect(self.valueChanged.emit)
+        self._slider.sliderPressed.connect(self.sliderPressed.emit)
+        self._slider.sliderReleased.connect(self.sliderReleased.emit)
         self._slider.rangeChanged.connect(self.rangeChanged.emit)
-        self.sliderMoved = self._slider._slidersMoved
+        self.sliderMoved = self._slider.slidersMoved
 
         self._min_label = SliderLabel(
             self._slider,
@@ -351,10 +383,10 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
         """Set where/whether labels are shown adjacent to slider handles."""
         self._handle_label_position = opt
         for lbl in self._handle_labels:
-            if not opt:
-                lbl.hide()
-            else:
-                lbl.show()
+            lbl.setVisible(bool(opt))
+            trans = opt == LabelPosition.LabelsOnHandle
+            # TODO: make double clickable to edit
+            lbl.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, trans)
         self.setOrientation(self.orientation())
 
     def edgeLabelMode(self) -> EdgeLabelMode:
@@ -380,27 +412,33 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
         elif opt == EdgeLabelMode.LabelIsRange:
             self._min_label.setValue(self._slider.minimum())
             self._max_label.setValue(self._slider.maximum())
-        QApplication.processEvents()
         self._reposition_labels()
 
     def setRange(self, min: int, max: int) -> None:
         self._on_range_changed(min, max)
 
+    def _add_labels(self, layout: QBoxLayout, inverted: bool = False) -> None:
+        if inverted:
+            first, second = self._max_label, self._min_label
+        else:
+            first, second = self._min_label, self._max_label
+        layout.addWidget(first)
+        layout.addWidget(self._slider)
+        layout.addWidget(second)
+
     def setOrientation(self, orientation: Qt.Orientation) -> None:
         """Set orientation, value will be 'horizontal' or 'vertical'."""
         self._slider.setOrientation(orientation)
+        inverted = self._slider.invertedAppearance()
+        marg = (0, 0, 0, 0)
         if orientation == Qt.Orientation.Vertical:
             layout: QBoxLayout = QVBoxLayout()
             layout.setSpacing(1)
-            layout.addWidget(self._max_label)
-            layout.addWidget(self._slider)
-            layout.addWidget(self._min_label)
+            self._add_labels(layout, inverted=not inverted)
             # TODO: set margins based on label width
             if self._handle_label_position == LabelPosition.LabelsLeft:
                 marg = (30, 0, 0, 0)
-            elif self._handle_label_position == LabelPosition.NoLabel:
-                marg = (0, 0, 0, 0)
-            else:
+            elif self._handle_label_position == LabelPosition.LabelsRight:
                 marg = (0, 0, 20, 0)
             layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         else:
@@ -408,13 +446,9 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
             layout.setSpacing(7)
             if self._handle_label_position == LabelPosition.LabelsBelow:
                 marg = (0, 0, 0, 25)
-            elif self._handle_label_position == LabelPosition.NoLabel:
-                marg = (0, 0, 0, 0)
-            else:
+            elif self._handle_label_position == LabelPosition.LabelsAbove:
                 marg = (0, 25, 0, 0)
-            layout.addWidget(self._min_label)
-            layout.addWidget(self._slider)
-            layout.addWidget(self._max_label)
+            self._add_labels(layout, inverted=inverted)
 
         # remove old layout
         old_layout = self.layout()
@@ -424,10 +458,13 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
         self.setLayout(layout)
         layout.setContentsMargins(*marg)
         super().setOrientation(orientation)
-        QApplication.processEvents()
         self._reposition_labels()
 
-    def resizeEvent(self, a0) -> None:
+    def setInvertedAppearance(self, a0: bool) -> None:
+        self._slider.setInvertedAppearance(a0)
+        self.setOrientation(self._slider.orientation())
+
+    def resizeEvent(self, a0: Any) -> None:
         super().resizeEvent(a0)
         self._reposition_labels()
 
@@ -435,9 +472,18 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
     LabelPosition = LabelPosition
     EdgeLabelMode = EdgeLabelMode
 
+    def _getBarColor(self) -> QtGui.QBrush:
+        return self._slider._style.brush(self._slider._styleOption)
+
+    def _setBarColor(self, color: str) -> None:
+        self._slider._style.brush_active = color
+
+    barColor = Property(QtGui.QBrush, _getBarColor, _setBarColor)
+    """The color of the bar between the first and last handle."""
+
     # ------------- private methods ----------------
     def _rename_signals(self) -> None:
-        self.valueChanged = self._valueChanged
+        self.valueChanged = self.valuesChanged
 
     def _reposition_labels(self) -> None:
         if (
@@ -448,17 +494,26 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
 
         horizontal = self.orientation() == Qt.Orientation.Horizontal
         labels_above = self._handle_label_position == LabelPosition.LabelsAbove
+        labels_on_handle = self._handle_label_position == LabelPosition.LabelsOnHandle
 
         last_edge = None
-        for i, label in enumerate(self._handle_labels):
+        labels: Iterable[tuple[int, SliderLabel]] = enumerate(self._handle_labels)
+        if self._slider.invertedAppearance():
+            labels = reversed(list(labels))
+        for i, label in labels:
             rect = self._slider._handleRect(i)
-            dx = -label.width() / 2
+            dx = (-label.width() / 2) + 2
             dy = -label.height() / 2
-            if labels_above:
+            if labels_above:  # or on the right
                 if horizontal:
                     dy *= 3
                 else:
                     dx *= -1
+            elif labels_on_handle:
+                if horizontal:
+                    dy += 0.5
+                else:
+                    dx += 0.5
             else:
                 if horizontal:
                     dy *= -1
@@ -475,6 +530,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
             label.move(pos)
             last_edge = pos
             label.clearFocus()
+            label.raise_()
             label.show()
         self.update()
 
@@ -535,7 +591,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
 class QLabeledDoubleRangeSlider(QLabeledRangeSlider):
     _slider_class = QDoubleRangeSlider
     _slider: QDoubleRangeSlider
-    _frangeChanged = Signal(float, float)
+    frangeChanged = Signal(float, float)
 
     @overload
     def __init__(self, parent: QWidget | None = ...) -> None: ...
@@ -551,7 +607,7 @@ class QLabeledDoubleRangeSlider(QLabeledRangeSlider):
 
     def _rename_signals(self) -> None:
         super()._rename_signals()
-        self.rangeChanged = self._frangeChanged
+        self.rangeChanged = self.frangeChanged
 
     def decimals(self) -> int:
         return self._min_label.decimals()
@@ -561,6 +617,15 @@ class QLabeledDoubleRangeSlider(QLabeledRangeSlider):
         self._max_label.setDecimals(prec)
         for lbl in self._handle_labels:
             lbl.setDecimals(prec)
+
+    def _getBarColor(self) -> QtGui.QBrush:
+        return self._slider._style.brush(self._slider._styleOption)
+
+    def _setBarColor(self, color: str) -> None:
+        self._slider._style.brush_active = color
+
+    barColor = Property(QtGui.QBrush, _getBarColor, _setBarColor)
+    """The color of the bar between the first and last handle."""
 
 
 class SliderLabel(QLineEdit):

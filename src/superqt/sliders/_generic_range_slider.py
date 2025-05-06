@@ -1,4 +1,5 @@
-from typing import List, Optional, Sequence, Tuple, TypeVar, Union
+from collections.abc import Sequence
+from typing import Optional, TypeVar, Union
 
 from qtpy import QtGui
 from qtpy.QtCore import Property, QEvent, QPoint, QPointF, QRect, QRectF, Qt, Signal
@@ -28,25 +29,27 @@ class _GenericRangeSlider(_GenericSlider):
     """
 
     # Emitted when the slider value has changed, with the new slider values
-    _valuesChanged = Signal(tuple)
+    valuesChanged = Signal(tuple)
+    # this is just a hack to allow napari v0.4.19 tests to pass)
+    # since it used the presence of this private signal as a duck-typing check.
+    _valuesChanged = valuesChanged
 
     # Emitted when sliderDown is true and the slider moves
     # This usually happens when the user is dragging the slider
     # The value is the positions of *all* handles.
-    _slidersMoved = Signal(tuple)
+    slidersMoved = Signal(tuple)
 
     def __init__(self, *args, **kwargs):
         self._style = RangeSliderStyle()
 
         super().__init__(*args, **kwargs)
-        self.valueChanged = self._valuesChanged
-        self.sliderMoved = self._slidersMoved
+
         # list of values
-        self._value: List[_T] = [20, 80]
+        self._value: list[_T] = [20, 80]
 
         # list of current positions of each handle. same length as _value
         # If tracking is enabled (the default) this will be identical to _value
-        self._position: List[_T] = [20, 80]
+        self._position: list[_T] = [20, 80]
 
         # which handle is being pressed/hovered
         self._pressedIndex = 0
@@ -62,6 +65,10 @@ class _GenericRangeSlider(_GenericSlider):
         # color
 
         self.setStyleSheet("")
+
+    def _rename_signals(self) -> None:
+        self.valueChanged = self.valuesChanged
+        self.sliderMoved = self.slidersMoved
 
     # ###############  New Public API  #######################
 
@@ -103,7 +110,7 @@ class _GenericRangeSlider(_GenericSlider):
         """Show the bar between the first and last handle."""
         self.setBarVisible(True)
 
-    def applyMacStylePatch(self) -> str:
+    def applyMacStylePatch(self) -> None:
         """Apply a QSS patch to fix sliders on macos>=12 with QT < 6.
 
         see [FAQ](../faq.md#sliders-not-dragging-properly-on-macos-12) for more details.
@@ -113,7 +120,7 @@ class _GenericRangeSlider(_GenericSlider):
 
     # ###############  QtOverrides  #######################
 
-    def value(self) -> Tuple[_T, ...]:
+    def value(self) -> tuple[_T, ...]:
         """Get current value of the widget as a tuple of integers."""
         return tuple(self._value)
 
@@ -124,11 +131,27 @@ class _GenericRangeSlider(_GenericSlider):
         """
         return tuple(float(i) for i in self._position)
 
-    def setSliderPosition(self, pos: Union[float, Sequence[float]], index=None) -> None:
+    def setSliderPosition(  # type: ignore
+        self,
+        pos: Union[float, Sequence[float]],
+        index: Optional[int] = None,
+        *,
+        reversed: bool = False,
+    ) -> None:
         """Set current position of the handles with a sequence of integers.
 
-        If `pos` is a sequence, it must have the same length as `value()`.
-        If it is a scalar, index will be
+        Parameters
+        ----------
+        pos : Union[float, Sequence[float]]
+            The new position of the slider handle(s). If a sequence, it must have the
+            same length as `value()`. If it is a scalar, index will be used to set the
+            position of the handle at that index.
+        index : int | None
+            The index of the handle to set the position of. If None, the "pressedIndex"
+            will be used.
+        reversed : bool
+            Order in which to set the positions.  Can be useful when setting multiple
+            positions, to avoid intermediate overlapping values.
         """
         if isinstance(pos, (list, tuple)):
             val_len = len(self.value())
@@ -138,6 +161,9 @@ class _GenericRangeSlider(_GenericSlider):
             pairs = list(enumerate(pos))
         else:
             pairs = [(self._pressedIndex if index is None else index, pos)]
+
+        if reversed:
+            pairs = pairs[::-1]
 
         for idx, position in pairs:
             self._position[idx] = self._bound(position, idx)
@@ -222,7 +248,7 @@ class _GenericRangeSlider(_GenericSlider):
                 offset = self.maximum() - ref[-1]
             elif ref[0] + offset < self.minimum():
                 offset = self.minimum() - ref[0]
-        self.setSliderPosition([i + offset for i in ref])
+        self.setSliderPosition([i + offset for i in ref], reversed=offset > 0)
 
     def _fixStyleOption(self, option):
         pass
@@ -313,7 +339,7 @@ class _GenericRangeSlider(_GenericSlider):
     # NOTE: this is very much tied to mousepress... not a generic "get control"
     def _getControlAtPos(
         self, pos: QPoint, opt: Optional[QStyleOptionSlider] = None
-    ) -> Tuple[QStyle.SubControl, int]:
+    ) -> tuple[QStyle.SubControl, int]:
         """Update self._pressedControl based on ev.pos()."""
         opt = opt or self._styleOption
 

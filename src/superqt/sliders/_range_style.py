@@ -5,7 +5,6 @@ import re
 from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING
 
-from qtpy import QT_VERSION
 from qtpy.QtCore import Qt
 from qtpy.QtGui import (
     QBrush,
@@ -140,8 +139,9 @@ CATALINA_STYLE = replace(
     tick_offset=4,
 )
 
-if QT_VERSION and int(QT_VERSION.split(".")[0]) == 6:
-    CATALINA_STYLE = replace(CATALINA_STYLE, tick_offset=2)
+# I can no longer reproduce the cases in which this was necessary
+# if QT_VERSION and int(QT_VERSION.split(".")[0]) == 6:
+#     CATALINA_STYLE = replace(CATALINA_STYLE, tick_offset=2)
 
 BIG_SUR_STYLE = replace(
     CATALINA_STYLE,
@@ -155,8 +155,9 @@ BIG_SUR_STYLE = replace(
     tick_bar_alpha=0.2,
 )
 
-if QT_VERSION and int(QT_VERSION.split(".")[0]) == 6:
-    BIG_SUR_STYLE = replace(BIG_SUR_STYLE, tick_offset=-3)
+# I can no longer reproduce the cases in which this was necessary
+# if QT_VERSION and int(QT_VERSION.split(".")[0]) == 6:
+#     BIG_SUR_STYLE = replace(BIG_SUR_STYLE, tick_offset=-3)
 
 WINDOWS_STYLE = replace(
     BASE_STYLE,
@@ -229,7 +230,7 @@ rgba_pattern = re.compile(
 )
 
 
-def parse_color(color: str, default_attr) -> QColor | QGradient:
+def parse_color(color: str, default_attr: str) -> QColor | QGradient:
     qc = QColor(color)
     if qc.isValid():
         return qc
@@ -241,6 +242,7 @@ def parse_color(color: str, default_attr) -> QColor | QGradient:
 
     # try linear gradient:
     match = qlineargrad_pattern.search(color)
+    grad: QGradient
     if match:
         grad = QLinearGradient(*(float(i) for i in match.groups()[:4]))
         grad.setColorAt(0, QColor(match.groupdict()["stop0"]))
@@ -259,11 +261,11 @@ def parse_color(color: str, default_attr) -> QColor | QGradient:
     return QColor(getattr(SYSTEM_STYLE, default_attr))
 
 
-def update_styles_from_stylesheet(obj: _GenericRangeSlider):
+def update_styles_from_stylesheet(obj: _GenericRangeSlider) -> None:
     qss: str = obj.styleSheet()
 
     parent = obj.parent()
-    while parent is not None:
+    while parent and hasattr(parent, "styleSheet"):
         qss = parent.styleSheet() + qss
         parent = parent.parent()
     qss = QApplication.instance().styleSheet() + qss

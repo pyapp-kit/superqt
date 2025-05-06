@@ -12,11 +12,11 @@ To get started fork this repository, and clone your fork:
 git clone https://github.com/<your_organization>/superqt
 cd superqt
 
+# install in editable mode (this will install PyQt6 as the Qt backend)
+pip install -e .[dev]
+
 # install pre-commit hooks
 pre-commit install
-
-# install in editable mode
-pip install -e .[dev]
 
 # run tests & make sure everything is working!
 pytest
@@ -26,7 +26,7 @@ pytest
 
 All widgets must be well-tested, and should work on:
 
-- Python 3.8 and above
+- Python 3.9 and above
 - PyQt5 (5.11 and above) & PyQt6
 - PySide2 (5.11 and above) & PySide6
 - macOS, Windows, & Linux

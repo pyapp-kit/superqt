@@ -22,7 +22,7 @@ QRangeSlider.
 
 import os
 import platform
-from typing import TypeVar
+from typing import Any, TypeVar
 
 from qtpy import QT_VERSION, QtGui
 from qtpy.QtCore import QEvent, QPoint, QPointF, QRect, Qt, Signal
@@ -60,13 +60,13 @@ USE_MAC_SLIDER_PATCH = (
 
 
 class _GenericSlider(QSlider):
-    _fvalueChanged = Signal(int)
-    _fsliderMoved = Signal(int)
-    _frangeChanged = Signal(int, int)
+    fvalueChanged = Signal(float)
+    fsliderMoved = Signal(float)
+    frangeChanged = Signal(float, float)
 
     MAX_DISPLAY = 5000
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         self._minimum = 0.0
         self._maximum = 99.0
         self._pageStep = 10.0
@@ -74,6 +74,7 @@ class _GenericSlider(QSlider):
         self._position: _T = 0.0
         self._singleStep = 1.0
         self._offsetAccumulated = 0.0
+        self._inverted_appearance = False
         self._blocktracking = False
         self._tickInterval = 0.0
         self._pressedControl = SC_NONE
@@ -89,16 +90,19 @@ class _GenericSlider(QSlider):
         self._control_fraction = 0.04
 
         super().__init__(*args, **kwargs)
-        self.valueChanged = self._fvalueChanged
-        self.sliderMoved = self._fsliderMoved
-        self.rangeChanged = self._frangeChanged
+        self._rename_signals()
 
         self.setAttribute(Qt.WidgetAttribute.WA_Hover)
         self.setStyleSheet("")
         if USE_MAC_SLIDER_PATCH:
             self.applyMacStylePatch()
 
-    def applyMacStylePatch(self) -> str:
+    def _rename_signals(self) -> None:
+        self.valueChanged = self.fvalueChanged
+        self.sliderMoved = self.fsliderMoved
+        self.rangeChanged = self.frangeChanged
+
+    def applyMacStylePatch(self) -> None:
         """Apply a QSS patch to fix sliders on macos>=12 with QT < 6.
 
         see [FAQ](../faq.md#sliders-not-dragging-properly-on-macos-12) for more details.
@@ -174,6 +178,13 @@ class _GenericSlider(QSlider):
         self._tickInterval = max(0.0, ts)
         self.update()
 
+    def invertedAppearance(self) -> bool:
+        return self._inverted_appearance
+
+    def setInvertedAppearance(self, inverted: bool) -> None:
+        self._inverted_appearance = inverted
+        self.update()
+
     def triggerAction(self, action: QSlider.SliderAction) -> None:
         self._blocktracking = True
         # other actions here
@@ -193,9 +204,8 @@ class _GenericSlider(QSlider):
             if self.orientation() == Qt.Orientation.Horizontal
             else not self.invertedAppearance()
         )
-        option.direction = (
-            Qt.LayoutDirection.LeftToRight
-        )  # we use the upsideDown option instead
+        # we use the upsideDown option instead
+        option.direction = Qt.LayoutDirection.LeftToRight
         # option.sliderValue = self._value  # type: ignore
         # option.singleStep = self._singleStep  # type: ignore
         if self.orientation() == Qt.Orientation.Horizontal:
@@ -335,8 +345,12 @@ class _GenericSlider(QSlider):
         option.sliderValue = self._to_qinteger_space(self._value - self._minimum)
 
     def _to_qinteger_space(self, val, _max=None):
+        """Converts a value to the internal integer space."""
         _max = _max or self.MAX_DISPLAY
-        return int(min(QOVERFLOW, val / (self._maximum - self._minimum) * _max))
+        range_ = self._maximum - self._minimum
+        if range_ == 0:
+            return self._minimum
+        return int(min(QOVERFLOW, val / range_ * _max))
 
     def _pick(self, pt: QPoint) -> int:
         return pt.x() if self.orientation() == Qt.Orientation.Horizontal else pt.y()

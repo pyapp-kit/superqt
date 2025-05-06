@@ -27,9 +27,11 @@ The following are QWidget subclasses:
 | [`QSearchableTreeWidget`](./qsearchabletreewidget.md)     | `QTreeWidget` variant with search field that filters available options |
 | [`QColorComboBox`](./qcolorcombobox.md)            | `QComboBox` to select from a specified set of colors |
 | [`QColormapComboBox`](./qcolormap.md)            | `QComboBox` to select from a specified set of colormaps. |
+| [`QToggleSwitch`](./qtoggleswitch.md)            | `QAbstractButton` that represents a boolean value with a toggle switch. |
 
 ## Frames and containers
 
 | Widget                          | Description           |
 | -----------                     | --------------------- |
 | [`QCollapsible`](./qcollapsible.md)              | A collapsible widget to hide and unhide child widgets. |
+| [`QFlowLayout`](./qflowlayout.md)                | A layout that rearranges items based on parent width. |
