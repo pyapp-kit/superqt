@@ -685,7 +685,31 @@ class SliderLabel(QLineEdit):
         elif val > self._max:
             val = self._max
         self._value = val
-        self.setText(str(val))
+        val = float(val)
+        use_scientific = (abs(val) < 0.0001 or abs(val) > 9999999.0) and val != 0.0
+        font_metrics = QFontMetrics(self.font())
+        eight_len = _fm_width(font_metrics, "8")
+
+        available_chars = self.width() // eight_len
+
+        total, _fraction = f"{val:.<f}".split(".")
+
+        if len(total) > available_chars:
+            use_scientific = True
+
+        if use_scientific:
+            mantissa, exponent = f"{val:.{available_chars}e}".split("e")
+            mantissa = mantissa.rstrip("0").rstrip(".")
+            if len(mantissa) + len(exponent) + 1 < available_chars:
+                text = f"{mantissa}e{exponent}"
+            else:
+                text = f"{val:.{available_chars - len(exponent) - 3}e}"
+
+        else:
+            text = f"{val:.{available_chars - len(total) - 1}f}"
+            text = text.rstrip("0").rstrip(".")
+
+        self.setText(text)
         if self._mode == EdgeLabelMode.LabelIsRange:
             self._update_size()
 
