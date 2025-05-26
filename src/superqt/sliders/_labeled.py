@@ -656,11 +656,11 @@ class SliderLabel(QLineEdit):
         self.setAlignment(alignment)
         self.setStyleSheet("background:transparent; border: 0;")
         if connect is not None:
-            self.editingFinished.connect(self._editig_finished)
+            self.editingFinished.connect(self._editing_finished)
         self.editingFinished.connect(self._silent_clear_focus)
         self._update_size()
 
-    def _editig_finished(self):
+    def _editing_finished(self):
         self._silent_clear_focus()
         self.setValue(float(self.text()))
         if self._callback:
