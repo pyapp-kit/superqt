@@ -644,6 +644,7 @@ class SliderLabel(QLineEdit):
         self._max = slider.maximum()
         self._value = self._min
         self._callback = connect
+        self._decimals = 0
         self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
         self.setMode(EdgeLabelMode.LabelIsValue)
         self.setDecimals(0)
@@ -667,14 +668,17 @@ class SliderLabel(QLineEdit):
             self._callback(self.value())
 
     def setRange(self, min_: float, max_: float) -> None:
-        if max_ < min_:
-            max_ = min_
+        max_ = max(max_, min_)
         self._min = min_
         self._max = max_
 
     def setDecimals(self, prec: int) -> None:
         # super().setDecimals(prec)
         self._update_size()
+
+    def decimals(self) -> int:
+        """Return the number of decimals used in the label."""
+        return self._decimals
 
     def value(self) -> float:
         return self._value
@@ -685,7 +689,10 @@ class SliderLabel(QLineEdit):
         elif val > self._max:
             val = self._max
         self._value = val
-        val = float(val)
+        self.updateText()
+
+    def updateText(self) -> None:
+        val = float(self._value)
         use_scientific = (abs(val) < 0.0001 or abs(val) > 9999999.0) and val != 0.0
         font_metrics = QFontMetrics(self.font())
         eight_len = _fm_width(font_metrics, "8")
@@ -702,6 +709,7 @@ class SliderLabel(QLineEdit):
             mantissa = mantissa.rstrip("0").rstrip(".")
             if len(mantissa) + len(exponent) + 1 < available_chars:
                 text = f"{mantissa}e{exponent}"
+                decimals = len(exponent)
             else:
                 decimals = max(available_chars - len(exponent) - 3, 2)
                 text = f"{val:.{decimals}e}"
@@ -710,6 +718,8 @@ class SliderLabel(QLineEdit):
             decimals = max(available_chars - len(total) - 1, 2)
             text = f"{val:.{decimals}f}"
             text = text.rstrip("0").rstrip(".")
+
+        self._decimals = decimals
 
         self.setText(text)
         if self._mode == EdgeLabelMode.LabelIsRange:
