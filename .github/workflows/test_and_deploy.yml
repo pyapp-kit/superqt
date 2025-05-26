@@ -110,7 +110,7 @@ jobs:
       dependency-ref: ${{ matrix.napari-version }}
       dependency-extras: "testing"
       qt: ${{ matrix.qt }}
-      pytest-args: 'src/napari/_qt -k "not async and not qt_dims_2 and not qt_viewer_console_focus and not keybinding_editor and not preferences_dialog_not_dismissed"'
+      pytest-args: 'src/napari/_qt --import-mode=importlib -k "not async and not qt_dims_2 and not qt_viewer_console_focus and not keybinding_editor and not preferences_dialog_not_dismissed"'
       python-version: "3.10"
       post-install-cmd: "pip install lxml_html_clean"
     strategy:
