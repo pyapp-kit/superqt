@@ -668,7 +668,7 @@ class SliderLabel(QLineEdit):
 
     def setRange(self, min_: float, max_: float) -> None:
         if self._mode == EdgeLabelMode.LabelIsRange:
-            max_val = max(max(abs(min_), abs(max_)) * 10)
+            max_val = max(abs(min_), abs(max_))
             n_digits = max(len(str(int(max_val))), 7)
             upper_bound = int("9" * n_digits)
             self._min = -upper_bound
