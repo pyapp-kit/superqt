@@ -726,8 +726,8 @@ class SliderLabel(QLineEdit):
                 text = f"{mantissa}e{exponent}"
             else:
                 text = f"{val:.{self._decimals}f}"
-                text = text.rstrip("0").rstrip(".")
-
+        if text == "":
+            text = "0"
         self.setText(text)
         if self._mode == EdgeLabelMode.LabelIsRange:
             self._update_size()
