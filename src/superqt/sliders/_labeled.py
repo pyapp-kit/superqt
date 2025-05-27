@@ -755,7 +755,7 @@ class SliderLabel(QLineEdit):
         # when the edge labels are controlling slider range,
         # we want them to have a big range, but not have a huge label
         self._mode = opt
-        self.setRange(self._slider.minimum(), self._slider.minimum())
+        self.setRange(self._slider.minimum(), self._slider.maximum())
         self._update_size()
 
     def prefix(self) -> str:
