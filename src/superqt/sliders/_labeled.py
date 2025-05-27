@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import contextlib
 from enum import IntEnum, IntFlag, auto
 from functools import partial
 from typing import TYPE_CHECKING, Any, overload
@@ -668,9 +667,15 @@ class SliderLabel(QLineEdit):
             self._callback(self.value())
 
     def setRange(self, min_: float, max_: float) -> None:
-        max_ = max(max_, min_)
-        self._min = min_
-        self._max = max_
+        if self._mode == EdgeLabelMode.LabelIsRange:
+            max_val = max(abs(min_), abs(max_)) * 10
+            self._min = -max_val
+            self._max = max_val
+            self._update_size()
+        else:
+            max_ = max(max_, min_)
+            self._min = min_
+            self._max = max_
 
     def setDecimals(self, prec: int) -> None:
         # super().setDecimals(prec)
@@ -736,35 +741,19 @@ class SliderLabel(QLineEdit):
         return self._min
 
     def setMaximum(self, max_: float) -> None:
-        if max_ < self._min:
-            max_ = self._min
-        self._max = max_
-        if self._mode == EdgeLabelMode.LabelIsValue:
-            self._update_size()
+        self.setRange(self._min, max_)
 
     def maximum(self):
         return self._max
 
     def setMinimum(self, min_: float) -> None:
-        if min_ > self._max:
-            min_ = self._max
-        self._min = min_
-        if self._mode == EdgeLabelMode.LabelIsValue:
-            self._update_size()
+        self.setRange(self._min, min_)
 
     def setMode(self, opt: EdgeLabelMode) -> None:
         # when the edge labels are controlling slider range,
         # we want them to have a big range, but not have a huge label
         self._mode = opt
-        if opt == EdgeLabelMode.LabelIsRange:
-            self.setMinimum(-9999999)
-            self.setMaximum(9999999)
-            with contextlib.suppress(Exception):
-                self._slider.rangeChanged.disconnect(self.setRange)
-        else:
-            self.setMinimum(self._slider.minimum())
-            self.setMaximum(self._slider.maximum())
-            self._slider.rangeChanged.connect(self.setRange)
+        self.setRange(self._slider.minimum(), self._slider.minimum())
         self._update_size()
 
     def prefix(self) -> str:
