@@ -644,7 +644,7 @@ class SliderLabel(QLineEdit):
         self._max = slider.maximum()
         self._value = self._min
         self._callback = connect
-        self._decimals = 0
+        self._decimals = -1
         self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
         self.setMode(EdgeLabelMode.LabelIsValue)
         self.setDecimals(0)
@@ -674,6 +674,7 @@ class SliderLabel(QLineEdit):
 
     def setDecimals(self, prec: int) -> None:
         # super().setDecimals(prec)
+        self._decimals = prec
         self._update_size()
 
     def decimals(self) -> int:
@@ -704,22 +705,28 @@ class SliderLabel(QLineEdit):
         if len(total) > available_chars:
             use_scientific = True
 
-        if use_scientific:
-            mantissa, exponent = f"{val:.{available_chars}e}".split("e")
-            mantissa = mantissa.rstrip("0").rstrip(".")
-            if len(mantissa) + len(exponent) + 1 < available_chars:
-                text = f"{mantissa}e{exponent}"
-                decimals = len(exponent)
+        if self._decimals < 0:
+            if use_scientific:
+                mantissa, exponent = f"{val:.{available_chars}e}".split("e")
+                mantissa = mantissa.rstrip("0").rstrip(".")
+                if len(mantissa) + len(exponent) + 1 < available_chars:
+                    text = f"{mantissa}e{exponent}"
+                else:
+                    decimals = max(available_chars - len(exponent) - 3, 2)
+                    text = f"{val:.{decimals}e}"
+
             else:
-                decimals = max(available_chars - len(exponent) - 3, 2)
-                text = f"{val:.{decimals}e}"
-
+                decimals = max(available_chars - len(total) - 1, 2)
+                text = f"{val:.{decimals}f}"
+                text = text.rstrip("0").rstrip(".")
         else:
-            decimals = max(available_chars - len(total) - 1, 2)
-            text = f"{val:.{decimals}f}"
-            text = text.rstrip("0").rstrip(".")
-
-        self._decimals = decimals
+            if use_scientific:
+                mantissa, exponent = f"{val:.{self._decimals}e}".split("e")
+                mantissa = mantissa.rstrip("0").rstrip(".")
+                text = f"{mantissa}e{exponent}"
+            else:
+                text = f"{val:.{self._decimals}f}"
+                text = text.rstrip("0").rstrip(".")
 
         self.setText(text)
         if self._mode == EdgeLabelMode.LabelIsRange:
