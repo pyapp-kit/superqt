@@ -283,9 +283,7 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
     def setEdgeLabelPosition(self, opt: LabelPosition) -> None:
         """Set where/whether a label is shown at the edge of the slider."""
         if opt is LabelPosition.LabelsOnHandle:
-            raise ValueError(
-                "position cannot be 'LabelPosition.LabelsOnHandle'"
-            )
+            raise ValueError("position cannot be 'LabelPosition.LabelsOnHandle'")
 
         self._edge_label_position = opt
         self._label.setVisible(bool(opt))
