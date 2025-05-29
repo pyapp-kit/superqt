@@ -44,14 +44,6 @@ class EdgeLabelMode(IntFlag):
     LabelIsValue = auto()
 
 
-class EdgeLabelPosition(IntEnum):
-    NoLabel = 0
-    LabelsAbove = auto()
-    LabelsBelow = auto()
-    LabelsRight = LabelsAbove
-    LabelsLeft = LabelsBelow
-
-
 class _SliderProxy:
     _slider: QSlider
 
@@ -214,8 +206,14 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         marg = (0, 0, 0, 0)
         if orientation == Qt.Orientation.Vertical:
             layout = QVBoxLayout()
-            layout.addWidget(self._slider, alignment=Qt.AlignmentFlag.AlignHCenter)
-            layout.addWidget(self._label, alignment=Qt.AlignmentFlag.AlignHCenter)
+            if not self._edge_label_position:
+                layout.addWidget(self._slider, alignment=Qt.AlignmentFlag.AlignHCenter)
+            elif self._edge_label_position == LabelPosition.LabelsBelow:
+                layout.addWidget(self._slider, alignment=Qt.AlignmentFlag.AlignHCenter)
+                layout.addWidget(self._label, alignment=Qt.AlignmentFlag.AlignHCenter)
+            else:
+                layout.addWidget(self._label, alignment=Qt.AlignmentFlag.AlignHCenter)
+                layout.addWidget(self._slider, alignment=Qt.AlignmentFlag.AlignHCenter)
             self._label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             layout.setSpacing(1)
         else:
@@ -267,7 +265,10 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         if not self._edge_label_mode:
             self._label.hide()
             w = 5 if self.orientation() == Qt.Orientation.Horizontal else 0
-            self.layout().setContentsMargins(0, 0, w, 0)
+            if self._edge_label_position == LabelPosition.LabelsRight:
+                self.layout().setContentsMargins(0, 0, w, 0)
+            elif self._edge_label_position == LabelPosition.LabelLeft:
+                self.layout().setContentsMargins(0, 0, 0, w)
         if opt & EdgeLabelMode.LabelIsValue:
             if self.isVisible():
                 self._label.show()
@@ -282,6 +283,11 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
 
     def setEdgeLabelPosition(self, opt: LabelPosition) -> None:
         """Set where/whether a label is shown at the edge of the slider."""
+        if opt is LabelPosition.LabelsOnHandle:
+            raise ValueError(
+                "position cannot be 'LabelPosition.LabelsOnHandle'"
+            )
+
         self._edge_label_position = opt
         self._label.setVisible(bool(opt))
         # TODO: make double clickable to edit
@@ -289,7 +295,7 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
 
     # putting this after labelMode methods for the sake of mypy
     EdgeLabelMode = EdgeLabelMode
-    EdgeLabelPosition = EdgeLabelPosition
+    LabelPosition = LabelPosition
 
     # --------------------- private api --------------------
 
