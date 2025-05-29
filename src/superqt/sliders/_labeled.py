@@ -217,9 +217,6 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
             self._label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             layout.setSpacing(1)
         else:
-            if self._edge_label_mode == EdgeLabelMode.NoLabel:
-                marg = (0, 0, 5, 0)
-
             layout = QHBoxLayout()  # type: ignore
             if not self._edge_label_position:
                 layout.addWidget(self._slider)
@@ -264,12 +261,13 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
             )
 
         self._edge_label_mode = opt
+        self._on_slider_range_changed(self.minimum(), self.maximum())
         if not self._edge_label_mode:
             self._label.hide()
             w = 5 if self.orientation() == Qt.Orientation.Horizontal else 0
             if self._edge_label_position == LabelPosition.LabelsRight:
                 self.layout().setContentsMargins(0, 0, w, 0)
-            elif self._edge_label_position == LabelPosition.LabelLeft:
+            elif self._edge_label_position == LabelPosition.LabelsLeft:
                 self.layout().setContentsMargins(0, 0, 0, w)
         if opt & EdgeLabelMode.LabelIsValue:
             if self.isVisible():
@@ -277,7 +275,6 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
             self._label.setMode(opt)
             self._label.setValue(self._slider.value())
             self.layout().setContentsMargins(0, 0, 0, 0)
-        self._on_slider_range_changed(self.minimum(), self.maximum())
 
     def edgeLabelPosition(self) -> LabelPosition:
         """Return where/whether a label is shown at the edge of the slider."""
@@ -302,9 +299,10 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
     # --------------------- private api --------------------
 
     def _on_slider_range_changed(self, min_: int, max_: int) -> None:
-        slash = " / " if self._edge_label_mode & EdgeLabelMode.LabelIsValue else ""
         if self._edge_label_mode & EdgeLabelMode.LabelIsRange:
-            self._label.setSuffix(f"{slash}{max_}")
+            self._label.setSuffix(f" / {max_}")
+        else:
+            self._label.setSuffix("")
         self.rangeChanged.emit(min_, max_)
 
     def _on_slider_value_changed(self, v: Any) -> None:
