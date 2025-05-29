@@ -221,7 +221,9 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
                 marg = (0, 0, 5, 0)
 
             layout = QHBoxLayout()  # type: ignore
-            if self._edge_label_position == LabelPosition.LabelsRight:
+            if not self._edge_label_position:
+                layout.addWidget(self._slider)
+            elif self._edge_label_position == LabelPosition.LabelsRight:
                 layout.addWidget(self._slider)
                 layout.addWidget(self._label)
                 self._label.setAlignment(Qt.AlignmentFlag.AlignRight)
