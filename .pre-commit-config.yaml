@@ -5,14 +5,14 @@ ci:
 
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.9
+    rev: v0.11.8
     hooks:
       - id: ruff
         args: [--fix, --unsafe-fixes]
       - id: ruff-format
 
   - repo: https://github.com/abravalheri/validate-pyproject
-    rev: v0.23
+    rev: v0.24.1
     hooks:
       - id: validate-pyproject
 
