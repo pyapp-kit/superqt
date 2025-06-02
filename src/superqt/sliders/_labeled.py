@@ -83,7 +83,7 @@ class _SliderProxy:
     def setPageStep(self, step: int) -> None:
         self._slider.setPageStep(step)
 
-    def setRange(self, min: Any, max: Any) -> None:
+    def setRange(self, min: float, max: float) -> None:
         self._slider.setRange(min, max)
 
     def tickInterval(self) -> int:
