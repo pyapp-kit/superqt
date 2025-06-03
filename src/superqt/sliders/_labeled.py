@@ -1,20 +1,18 @@
 from __future__ import annotations
 
-import contextlib
 from enum import IntEnum, IntFlag, auto
 from functools import partial
 from typing import TYPE_CHECKING, Any, overload
 
 from qtpy import QtGui
 from qtpy.QtCore import Property, QPoint, QSize, Qt, Signal
-from qtpy.QtGui import QFontMetrics, QValidator
+from qtpy.QtGui import QDoubleValidator, QFontMetrics, QValidator
 from qtpy.QtWidgets import (
     QAbstractSlider,
     QBoxLayout,
-    QDoubleSpinBox,
     QHBoxLayout,
+    QLineEdit,
     QSlider,
-    QSpinBox,
     QStyle,
     QStyleOptionSpinBox,
     QVBoxLayout,
@@ -660,7 +658,7 @@ class QLabeledDoubleRangeSlider(QLabeledRangeSlider):
     """The color of the bar between the first and last handle."""
 
 
-class SliderLabel(QDoubleSpinBox):
+class SliderLabel(QLineEdit):
     def __init__(
         self,
         slider: QSlider,
@@ -670,52 +668,139 @@ class SliderLabel(QDoubleSpinBox):
     ) -> None:
         super().__init__(parent=parent)
         self._slider = slider
+        self._prefix = ""
+        self._suffix = ""
+        self._min = slider.minimum()
+        self._max = slider.maximum()
+        self._value = self._min
+        self._callback = connect
+        self._decimals = -1
         self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
         self.setMode(EdgeLabelMode.LabelIsValue)
         self.setDecimals(0)
+        self.setText(str(self._value))
+        validator = QDoubleValidator(self)
+        validator.setNotation(QDoubleValidator.Notation.ScientificNotation)
+        self.setValidator(validator)
 
-        self.setRange(slider.minimum(), slider.maximum())
         slider.rangeChanged.connect(self._update_size)
         self.setAlignment(alignment)
-        self.setButtonSymbols(QSpinBox.ButtonSymbols.NoButtons)
         self.setStyleSheet("background:transparent; border: 0;")
         if connect is not None:
-            self.editingFinished.connect(lambda: connect(self.value()))
+            self.editingFinished.connect(self._editing_finished)
         self.editingFinished.connect(self._silent_clear_focus)
         self._update_size()
 
+    def _editing_finished(self):
+        self._silent_clear_focus()
+        self.setValue(float(self.text()))
+        if self._callback:
+            self._callback(self.value())
+
+    def setRange(self, min_: float, max_: float) -> None:
+        if self._mode == EdgeLabelMode.LabelIsRange:
+            max_val = max(abs(min_), abs(max_))
+            n_digits = max(len(str(int(max_val))), 7)
+            upper_bound = int("9" * n_digits)
+            self._min = -upper_bound
+            self._max = upper_bound
+            self._update_size()
+        else:
+            max_ = max(max_, min_)
+            self._min = min_
+            self._max = max_
+
     def setDecimals(self, prec: int) -> None:
-        super().setDecimals(prec)
+        # super().setDecimals(prec)
+        self._decimals = prec
         self._update_size()
 
+    def decimals(self) -> int:
+        """Return the number of decimals used in the label."""
+        return self._decimals
+
+    def value(self) -> float:
+        return self._value
+
     def setValue(self, val: Any) -> None:
-        super().setValue(val)
+        if val < self._min:
+            val = self._min
+        elif val > self._max:
+            val = self._max
+        self._value = val
+        self.updateText()
+
+    def updateText(self) -> None:
+        val = float(self._value)
+        use_scientific = (abs(val) < 0.0001 or abs(val) > 9999999.0) and val != 0.0
+        font_metrics = QFontMetrics(self.font())
+        eight_len = _fm_width(font_metrics, "8")
+
+        available_chars = self.width() // eight_len
+
+        total, _fraction = f"{val:.<f}".split(".")
+
+        if len(total) > available_chars:
+            use_scientific = True
+
+        if self._decimals < 0:
+            if use_scientific:
+                mantissa, exponent = f"{val:.{available_chars}e}".split("e")
+                mantissa = mantissa.rstrip("0").rstrip(".")
+                if len(mantissa) + len(exponent) + 1 < available_chars:
+                    text = f"{mantissa}e{exponent}"
+                else:
+                    decimals = max(available_chars - len(exponent) - 3, 2)
+                    text = f"{val:.{decimals}e}"
+
+            else:
+                decimals = max(available_chars - len(total) - 1, 2)
+                text = f"{val:.{decimals}f}"
+                text = text.rstrip("0").rstrip(".")
+        else:
+            if use_scientific:
+                mantissa, exponent = f"{val:.{self._decimals}e}".split("e")
+                mantissa = mantissa.rstrip("0").rstrip(".")
+                text = f"{mantissa}e{exponent}"
+            else:
+                text = f"{val:.{self._decimals}f}"
+        if text == "":
+            text = "0"
+        self.setText(text)
         if self._mode == EdgeLabelMode.LabelIsRange:
             self._update_size()
 
-    def setMaximum(self, max: float) -> None:
-        super().setMaximum(max)
-        if self._mode == EdgeLabelMode.LabelIsValue:
-            self._update_size()
+    def minimum(self):
+        return self._min
 
-    def setMinimum(self, min: float) -> None:
-        super().setMinimum(min)
-        if self._mode == EdgeLabelMode.LabelIsValue:
-            self._update_size()
+    def setMaximum(self, max_: float) -> None:
+        self.setRange(self._min, max_)
+
+    def maximum(self):
+        return self._max
+
+    def setMinimum(self, min_: float) -> None:
+        self.setRange(min_, self._max)
 
     def setMode(self, opt: EdgeLabelMode) -> None:
         # when the edge labels are controlling slider range,
         # we want them to have a big range, but not have a huge label
         self._mode = opt
-        if opt == EdgeLabelMode.LabelIsRange:
-            self.setMinimum(-9999999)
-            self.setMaximum(9999999)
-            with contextlib.suppress(Exception):
-                self._slider.rangeChanged.disconnect(self.setRange)
-        else:
-            self.setMinimum(self._slider.minimum())
-            self.setMaximum(self._slider.maximum())
-            self._slider.rangeChanged.connect(self.setRange)
+        self.setRange(self._slider.minimum(), self._slider.maximum())
+        self._update_size()
+
+    def prefix(self) -> str:
+        return self._prefix
+
+    def setPrefix(self, prefix: str) -> None:
+        self._prefix = prefix
+        self._update_size()
+
+    def suffix(self) -> str:
+        return self._suffix
+
+    def setSuffix(self, suffix: str) -> None:
+        self._suffix = suffix
         self._update_size()
 
     # --------------- private ----------------
@@ -732,21 +817,19 @@ class SliderLabel(QDoubleSpinBox):
 
         if self._mode & EdgeLabelMode.LabelIsValue:
             # determine width based on min/max/specialValue
-            mintext = self.textFromValue(self.minimum())[:18]
-            maxtext = self.textFromValue(self.maximum())[:18]
+            mintext = str(self.minimum())[:18]
+            maxtext = str(self.maximum())[:18]
             w = max(0, _fm_width(fm, mintext + fixed_content))
             w = max(w, _fm_width(fm, maxtext + fixed_content))
-            if self.specialValueText():
-                w = max(w, _fm_width(fm, self.specialValueText()))
             if self._mode & EdgeLabelMode.LabelIsRange:
                 w += 8  # it seems as thought suffix() is not enough
         else:
-            w = max(0, _fm_width(fm, self.textFromValue(self.value()))) + 3
+            w = max(0, _fm_width(fm, str(self.value()))) + 3
 
         w += 3  # cursor blinking space
         # get the final size hint
         opt = QStyleOptionSpinBox()
-        self.initStyleOption(opt)
+        # self.initStyleOption(opt)
         size = self.style().sizeFromContents(
             QStyle.ContentsType.CT_SpinBox, opt, QSize(w, h), self
         )
