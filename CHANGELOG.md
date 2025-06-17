@@ -1,5 +1,26 @@
 # Changelog
 
+## [v0.7.4](https://github.com/pyapp-kit/superqt/tree/v0.7.4) (2025-06-10)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.7.3...v0.7.4)
+
+**Implemented enhancements:**
+
+- feat: Allow setting label position on labeled slider [\#294](https://github.com/pyapp-kit/superqt/pull/294) ([brisvag](https://github.com/brisvag))
+
+**Fixed bugs:**
+
+- fix: Set SliderProxy range params to Any [\#290](https://github.com/pyapp-kit/superqt/pull/290) ([gselzer](https://github.com/gselzer))
+- Make qimage\_to\_array\(\) work on big endian [\#288](https://github.com/pyapp-kit/superqt/pull/288) ([penguinpee](https://github.com/penguinpee))
+
+**Documentation updates:**
+
+- docs: document QToggleSwitch [\#286](https://github.com/pyapp-kit/superqt/pull/286) ([tlambert03](https://github.com/tlambert03))
+
+**Tests & CI:**
+
+- Fix napari test [\#295](https://github.com/pyapp-kit/superqt/pull/295) ([brisvag](https://github.com/brisvag))
+
 ## [v0.7.3](https://github.com/pyapp-kit/superqt/tree/v0.7.3) (2025-03-28)
 
 [Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.7.2...v0.7.3)
@@ -537,20 +558,12 @@
 
 ## [v0.2.1](https://github.com/pyapp-kit/superqt/tree/v0.2.1) (2021-07-10)
 
-[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.2.0rc1...v0.2.1)
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.2.0...v0.2.1)
 
 **Fixed bugs:**
 
 - Fix QLabeledRangeSlider API \(fix slider proxy\) [\#10](https://github.com/pyapp-kit/superqt/pull/10) ([tlambert03](https://github.com/tlambert03))
 - Fix range slider with negative min range [\#9](https://github.com/pyapp-kit/superqt/pull/9) ([tlambert03](https://github.com/tlambert03))
-
-## [v0.2.0rc1](https://github.com/pyapp-kit/superqt/tree/v0.2.0rc1) (2021-06-26)
-
-[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.2.0rc0...v0.2.0rc1)
-
-## [v0.2.0rc0](https://github.com/pyapp-kit/superqt/tree/v0.2.0rc0) (2021-06-26)
-
-[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.2.0...v0.2.0rc0)
 
 
 
