@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.7.5](https://github.com/pyapp-kit/superqt/tree/v0.7.5) (2025-06-18)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.7.4...v0.7.5)
+
+**Implemented enhancements:**
+
+- feat: Use scientific notation for big values in labeled slider [\#226](https://github.com/pyapp-kit/superqt/pull/226) ([Czaki](https://github.com/Czaki))
+
 ## [v0.7.4](https://github.com/pyapp-kit/superqt/tree/v0.7.4) (2025-06-10)
 
 [Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.7.3...v0.7.4)
