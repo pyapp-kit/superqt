@@ -70,7 +70,7 @@ class _GenericEliding:
         text = self._wrappedText()
         last_line = fm.elidedText("".join(text[nlines:]), self._elide_mode, width)
         # join them
-        return "".join(text[:nlines] + [last_line])
+        return "".join([*text[:nlines], last_line])
 
     def _wrappedText(self) -> list[str]:
         return _GenericEliding.wrapText(self._text, self.width(), self.font())
