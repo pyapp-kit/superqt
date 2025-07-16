@@ -20,6 +20,7 @@ jobs:
     env:
       UV_PRERELEASE: ${{ github.event_name == 'schedule' && 'allow' || 'if-necessary-or-explicit' }}
       UV_NO_SYNC: 1
+      UV_MANAGED_PYTHON: 1
     strategy:
       fail-fast: false
       matrix:
