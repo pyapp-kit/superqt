@@ -16,7 +16,7 @@ description = "Missing widgets and components for PyQt/PySide"
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "BSD 3-Clause License" }
-authors = [{ email = "talley.lambert@gmail.com", name = "Talley Lambert" }]
+authors = [{ name = "superqt community" }]
 keywords = [
     "qt",
     "pyqt",
