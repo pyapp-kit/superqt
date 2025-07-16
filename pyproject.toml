@@ -51,7 +51,7 @@ test = [
     "pint",
     "pytest",
     "pytest-cov",
-    "pytest-qt",
+    "pytest-qt==4.4.0",
     "numpy",
     "cmap",
     "pyconify",
