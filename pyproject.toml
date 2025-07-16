@@ -3,6 +3,12 @@
 requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.targets.sdist]
+include = ["src", "tests", "CHANGELOG.md"]
+
 # https://peps.python.org/pep-0621/
 [project]
 name = "superqt"
@@ -38,34 +44,51 @@ classifiers = [
     "Topic :: Software Development :: Widget Sets",
 ]
 dynamic = ["version"]
-dependencies = [
-    "pygments>=2.4.0",
-    "qtpy>=1.1.0",
-    "typing-extensions >=3.7.4.3,!=3.10.0.0",  # however, pint requires >4.5.0
-]
+dependencies = ["pygments>=2.4.0", "qtpy>=1.1.0", "typing-extensions >=4.5.0"]
 
-# extras
-# https://peps.python.org/pep-0621/#dependencies-optional-dependencies
 [project.optional-dependencies]
+cmap = ["cmap >=0.2"]
+font-fa5 = ["fonticon-fontawesome5>=5.15.4"]
+font-fa6 = ["fonticon-fontawesome6>=6.4.0"]
+font-mi6 = ["fonticon-materialdesignicons6>=6.9.96"]
+font-mi7 = ["fonticon-materialdesignicons7>=7.2.96"]
+iconify = ["pyconify >=0.1.4"]
+pyqt5 = [
+    "PyQt5>=5.15.10",
+    "pyqt5-qt5>=5.15.16; sys_platform != 'win32'",
+    "pyqt5-qt5==5.15.2; sys_platform == 'win32'",
+]
+pyqt6 = ["pyqt6>=6.4.0"]
+pyside2 = ["pyside2>=5.15"]
+# see issues surrounding usage of Generics in pyside6.5.x
+# https://github.com/pyapp-kit/superqt/pull/177
+# https://github.com/pyapp-kit/superqt/pull/164
+# https://bugreports.qt.io/browse/PYSIDE-2627
+pyside6 = ["pyside6>=6.4.0,!=6.5.0,!=6.5.1,!=6.6.2"]
+quantity = ["pint>=0.21"]
+
+[dependency-groups]
 test = [
-    "pint",
-    "pytest",
-    "pytest-cov",
-    "pytest-qt==4.4.0",
-    "numpy",
-    "cmap",
-    "pyconify",
+    "cmap>=0.6.2",
+    "numpy>=1.19; python_version >= '3.9'",
+    "numpy>=1.26; python_version >= '3.11'",
+    "numpy>=2.1; python_version >= '3.13'",
+    "pint>=0.24.4",
+    "pyconify>=0.2.1",
+    "pytest>=8.4.1",
+    "pytest-cov>=6.2.1",
+    "pytest-qt==4.4.0",                      # for pyside2 support
 ]
 dev = [
-    "ipython",
-    "ruff",
-    "mypy",
-    "pdbpp",
-    "pre-commit",
-    "pydocstyle",
-    "rich",
-    "types-Pygments",
-    "superqt[test,pyqt6]",
+    { include-group = "test" },
+    "ipython>=8.18.1",
+    "mypy>=1.17.0",
+    "pre-commit-uv>=4.1.4",
+    "pdbpp>=0.11.6; sys_platform != 'win32'",
+    "pydocstyle>=6.3.0",
+    "rich>=14.0.0",
+    "ruff>=0.12.3",
+    "types-pygments>=2.19.0.20250715",
 ]
 docs = [
     "mkdocs-macros-plugin ==1.3.7",
@@ -74,21 +97,7 @@ docs = [
     "mkdocstrings-python ==1.13.0",
     "superqt[font-fa5, cmap, quantity]",
 ]
-quantity = ["pint"]
-cmap = ["cmap >=0.1.1"]
-pyside2 = ["pyside2"]
-# see issues surrounding usage of Generics in pyside6.5.x
-# https://github.com/pyapp-kit/superqt/pull/177
-# https://github.com/pyapp-kit/superqt/pull/164
-# https://bugreports.qt.io/browse/PYSIDE-2627
-pyside6 = ["pyside6 !=6.5.0,!=6.5.1,!=6.6.2,<6.8"]
-pyqt5 = ["pyqt5"]
-pyqt6 = ["pyqt6<6.7"]
-font-fa5 = ["fonticon-fontawesome5"]
-font-fa6 = ["fonticon-fontawesome6"]
-font-mi6 = ["fonticon-materialdesignicons6"]
-font-mi7 = ["fonticon-materialdesignicons7"]
-iconify = ["pyconify >=0.1.4"]
+
 
 [project.urls]
 Documentation = "https://pyapp-kit.github.io/superqt/"
@@ -96,45 +105,9 @@ Source = "https://github.com/pyapp-kit/superqt"
 Tracker = "https://github.com/pyapp-kit/superqt/issues"
 Changelog = "https://github.com/pyapp-kit/superqt/blob/main/CHANGELOG.md"
 
-[tool.hatch.version]
-source = "vcs"
+[tool.uv.sources]
+superqt = { workspace = true }
 
-[tool.hatch.build.targets.sdist]
-include = ["src", "tests", "CHANGELOG.md"]
-
-# these let you run tests across all backends easily with:
-# hatch run test:test
-[tool.hatch.envs.test]
-
-[tool.hatch.envs.test.scripts]
-test = "pytest"
-
-[[tool.hatch.envs.test.matrix]]
-qt = ["pyside6", "pyqt6"]
-python = ["3.11"]
-
-[[tool.hatch.envs.test.matrix]]
-qt = ["pyside2", "pyqt5", "pyqt5.12"]
-python = ["3.9"]
-
-[tool.hatch.envs.test.overrides]
-matrix.qt.extra-dependencies = [
-    { value = "pyside2", if = [
-        "pyside2",
-    ] },
-    { value = "pyside6", if = [
-        "pyside6",
-    ] },
-    { value = "pyqt5", if = [
-        "pyqt5",
-    ] },
-    { value = "pyqt6", if = [
-        "pyqt6",
-    ] },
-    { value = "pyqt5==5.12", if = [
-        "pyqt5.12",
-    ] },
-]
 
 [tool.ruff]
 line-length = 88

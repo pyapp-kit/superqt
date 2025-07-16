@@ -15,93 +15,94 @@ on:
 
 jobs:
   test:
-    name: Test
-    uses: pyapp-kit/workflows/.github/workflows/test-pyrepo.yml@v2
-    with:
-      os: ${{ matrix.platform }}
-      python-version: ${{ matrix.python-version }}
-      qt: ${{ matrix.backend }}
-      pip-install-pre-release: ${{ github.event_name == 'schedule' }}
-      coverage-upload: artifact
+    name: ${{ matrix.os }} (${{ matrix.python-version }}) ${{ matrix.add-extra || '' }} ${{ matrix.resolution || ''}}
+    runs-on: ${{ matrix.os }}
+    env:
+      UV_PRERELEASE: ${{ github.event_name == 'schedule' && 'allow' || 'if-necessary-or-explicit' }}
+      UV_NO_SYNC: 1
     strategy:
       fail-fast: false
       matrix:
-        platform: [ubuntu-latest, windows-latest, macos-13]
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
-        backend: [pyqt5, pyside2, pyqt6]
-        exclude:
-          # Abort (core dumped) on linux pyqt6, unknown reason
-          - platform: ubuntu-latest
-            backend: pyqt6
-          # lack of wheels for pyside2/py3.11
-          - python-version: "3.11"
-            backend: pyside2
-          - python-version: "3.12"
-            backend: pyside2
-          - python-version: "3.12"
-            backend: pyqt5
+        python-version: ["3.9", "3.13"]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        add-extra: [pyqt6, pyside6]
         include:
-          - python-version: "3.13"
-            platform: windows-latest
-            backend: "pyqt6"
-          - python-version: "3.13"
-            platform: ubuntu-latest
-            backend: "pyqt6"
-
-          - python-version: "3.10"
-            platform: macos-latest
-            backend: "'pyside6<6.8'"
+          - os: windows-latest
+            python-version: "3.11"
+            resolution: "lowest-direct"
+            add-extra: pyside6
+          - os: macos-latest
+            python-version: "3.12"
+            resolution: "lowest-direct"
+            add-extra: pyqt6
+          - python-version: "3.9"
+            os: ubuntu-latest
+            add-extra: pyqt5
+          - python-version: "3.9"
+            os: ubuntu-latest
+            add-extra: pyside2
           - python-version: "3.11"
-            platform: macos-latest
-            backend: "'pyside6<6.8'"
+            os: windows-latest
+            add-extra: pyqt5
           - python-version: "3.10"
-            platform: windows-latest
-            backend: "'pyside6<6.8'"
+            os: ubuntu-latest
+            add-extra: pyside2
           - python-version: "3.12"
-            platform: windows-latest
-            backend: "'pyside6<6.8'"
+            os: ubuntu-latest
+            add-extra: pyqt6
+          - python-version: "3.12"
+            os: ubuntu-latest
+            add-extra: pyside6
 
-          # legacy Qt
-          - python-version: 3.9
-            platform: ubuntu-latest
-            backend: "pyqt5==5.12.*"
-          - python-version: 3.9
-            platform: ubuntu-latest
-            backend: "pyqt5==5.13.*"
-          - python-version: 3.9
-            platform: ubuntu-latest
-            backend: "pyqt5==5.14.*"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
-  test-qt-minreqs:
-    uses: pyapp-kit/workflows/.github/workflows/test-pyrepo.yml@v2
-    with:
-      python-version: "3.9"
-      qt: pyqt5
-      pip-post-installs: "qtpy==1.1.0 typing-extensions==4.5.0"  # 4.5.0 is just for pint
-      pip-install-flags: -e
-      coverage-upload: artifact
+      - name: 🐍 Set up Python ${{ matrix.python-version }}
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+          cache-dependency-glob: "**/pyproject.toml"
+
+      - uses: pyvista/setup-headless-display-action@v4
+        with:
+          qt: true
+
+      - name: Install Dependencies
+        run: uv sync --no-dev --group test --extra ${{ matrix.add-extra }} --resolution ${{ matrix.resolution || 'highest'}}
+
+      - name: 🧪 Run Tests
+        run: uv run coverage run -p -m pytest -v
+
+      # If something goes wrong with --pre tests, we can open an issue in the repo
+      - name: 📝 Report --pre Failures
+        if: failure() && github.event_name == 'schedule'
+        uses: JasonEtco/create-an-issue@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PLATFORM: ${{ matrix.os }}
+          PYTHON: ${{ matrix.python-version }}
+          RUN_ID: ${{ github.run_id }}
+          TITLE: "[test-bot] pip install --pre is failing"
+        with:
+          filename: .github/TEST_FAIL_TEMPLATE.md
+          update_existing: true
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: covreport-${{ matrix.os }}-py${{ matrix.python-version }}-${{ matrix.add-extra }}-${{ matrix.resolution }}
+          path: ./.coverage*
+          include-hidden-files: true
 
   upload_coverage:
     if: always()
     needs: [test, test-qt-minreqs]
     uses: pyapp-kit/workflows/.github/workflows/upload-coverage.yml@v2
     secrets: inherit
-
-  test_napari_old:
-    uses: pyapp-kit/workflows/.github/workflows/test-dependents.yml@v2
-    with:
-      dependency-repo: napari/napari
-      dependency-ref: ${{ matrix.napari-version }}
-      dependency-extras: "testing"
-      qt: ${{ matrix.qt }}
-      pytest-args: 'napari/_qt -k "not async and not qt_dims_2 and not qt_viewer_console_focus and not keybinding_editor and not preferences_dialog_not_dismissed"'
-      python-version: "3.10"
-      post-install-cmd: "pip install lxml_html_clean"
-    strategy:
-      fail-fast: false
-      matrix:
-        napari-version: ["v0.4.19.post1"]
-        qt: ["pyqt5", "pyside2"]
 
   test_napari:
     uses: pyapp-kit/workflows/.github/workflows/test-dependents.yml@v2
@@ -116,8 +117,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        napari-version: [ "" ]
-        qt: [ "pyqt5", "pyside2" ]
+        napari-version: [""]
+        qt: ["pyqt5", "pyside2"]
 
   check-manifest:
     name: Check Manifest
