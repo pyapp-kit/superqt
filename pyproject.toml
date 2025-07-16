@@ -44,7 +44,7 @@ classifiers = [
     "Topic :: Software Development :: Widget Sets",
 ]
 dynamic = ["version"]
-dependencies = ["pygments>=2.4.0", "qtpy>=1.1.0", "typing-extensions >=4.5.0"]
+dependencies = ["pygments>=2.4.0", "qtpy>=2.4.0", "typing-extensions >=4.5.0"]
 
 [project.optional-dependencies]
 cmap = ["cmap >=0.2"]
