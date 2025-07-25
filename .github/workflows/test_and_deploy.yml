@@ -109,16 +109,15 @@ jobs:
     uses: pyapp-kit/workflows/.github/workflows/test-dependents.yml@v2
     with:
       dependency-repo: napari/napari
-      dependency-ref: ${{ matrix.napari-version }}
       dependency-extras: "testing"
       qt: ${{ matrix.qt }}
       pytest-args: 'src/napari/_qt --import-mode=importlib -k "not async and not qt_dims_2 and not qt_viewer_console_focus and not keybinding_editor and not preferences_dialog_not_dismissed"'
       python-version: "3.10"
-      post-install-cmd: "pip install lxml_html_clean"
+      # napari hasn't pinned pytest-qt, but still requires pyside2 tests
+      post-install-cmd: "pip install lxml_html_clean pytest-qt==4.4.0"
     strategy:
       fail-fast: false
       matrix:
-        napari-version: [""]
         qt: ["pyqt5", "pyside2"]
 
   check-manifest:
