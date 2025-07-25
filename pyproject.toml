@@ -44,7 +44,12 @@ classifiers = [
     "Topic :: Software Development :: Widget Sets",
 ]
 dynamic = ["version"]
-dependencies = ["pygments>=2.4.0", "qtpy>=2.4.0", "typing-extensions >=4.5.0"]
+dependencies = [
+    "pygments>=2.4.0",
+    "qtpy>=2.4.0",
+    "typing-extensions >=4.5.0",
+    "typing-extensions >=4.12.0; python_version >= '3.13'",
+]
 
 [project.optional-dependencies]
 cmap = ["cmap >=0.2"]
@@ -58,7 +63,10 @@ pyqt5 = [
     "pyqt5-qt5>=5.15.16; sys_platform != 'win32'",
     "pyqt5-qt5==5.15.2; sys_platform == 'win32'",
 ]
-pyqt6 = ["pyqt6>=6.4.0"]
+pyqt6 = [ # 6.6 has segfaults with QElidingLabel
+    "pyqt6>=6.4.0,!=6.6",
+    "pyqt6>=6.7.0,!=6.6; python_version >= '3.12'",
+]
 pyside2 = [
     "pyside2>=5.15",
     "numpy>=1.20,<2; python_version < '3.11'",
@@ -68,13 +76,16 @@ pyside2 = [
 # https://github.com/pyapp-kit/superqt/pull/177
 # https://github.com/pyapp-kit/superqt/pull/164
 # https://bugreports.qt.io/browse/PYSIDE-2627
-pyside6 = ["pyside6>=6.4.0,!=6.5.0,!=6.5.1,!=6.6.2"]
+pyside6 = [
+    "pyside6>=6.4.0,!=6.5.0,!=6.5.1,!=6.6.2",
+    "pyside6>=6.7.0; python_version >= '3.12'",
+]
 quantity = ["pint>=0.21"]
 
 [dependency-groups]
 test = [
     "cmap>=0.6.2",
-    "numpy>=1.19; python_version >= '3.9' and python_version < '3.11'",
+    "numpy>=1.21; python_version >= '3.9' and python_version < '3.11'",
     "numpy>=1.26; python_version >= '3.11' and python_version < '3.13'",
     "numpy>=2.1; python_version >= '3.13'",
     "pint>=0.24.4",
