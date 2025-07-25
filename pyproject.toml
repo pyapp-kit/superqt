@@ -69,7 +69,7 @@ pyqt6 = [ # 6.6 has segfaults with QElidingLabel
 ]
 pyside2 = [
     "pyside2>=5.15",
-    "numpy>=1.20,<2; python_version < '3.11'",
+    "numpy>=1.19,<2; python_version < '3.11'",
     "numpy>=1.26,<2; python_version >= '3.11' and python_version < '3.13'",
 ]
 # see issues surrounding usage of Generics in pyside6.5.x
@@ -85,7 +85,7 @@ quantity = ["pint>=0.21"]
 [dependency-groups]
 test = [
     "cmap>=0.6.2",
-    "numpy>=1.21; python_version >= '3.9' and python_version < '3.11'",
+    "numpy>=1.19; python_version < '3.11'",
     "numpy>=1.26; python_version >= '3.11' and python_version < '3.13'",
     "numpy>=2.1; python_version >= '3.13'",
     "pint>=0.24.4",
