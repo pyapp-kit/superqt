@@ -15,75 +15,93 @@ on:
 
 jobs:
   test:
-    name: Test
-    uses: pyapp-kit/workflows/.github/workflows/test-pyrepo.yml@v2
-    with:
-      os: ${{ matrix.platform }}
-      python-version: ${{ matrix.python-version }}
-      qt: ${{ matrix.backend }}
-      pip-install-pre-release: ${{ github.event_name == 'schedule' }}
-      coverage-upload: artifact
+    name: ${{ matrix.os }} (${{ matrix.python-version }}) ${{ matrix.add-extra || '' }} ${{ matrix.resolution || ''}}
+    runs-on: ${{ matrix.os }}
+    env:
+      UV_PRERELEASE: ${{ github.event_name == 'schedule' && 'allow' || 'if-necessary-or-explicit' }}
+      UV_NO_SYNC: 1
+      UV_MANAGED_PYTHON: 1
     strategy:
       fail-fast: false
       matrix:
-        platform: [ubuntu-latest, windows-latest, macos-13]
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
-        backend: [pyqt5, pyside2, pyqt6]
-        exclude:
-          # Abort (core dumped) on linux pyqt6, unknown reason
-          - platform: ubuntu-latest
-            backend: pyqt6
-          # lack of wheels for pyside2/py3.11
-          - python-version: "3.11"
-            backend: pyside2
-          - python-version: "3.12"
-            backend: pyside2
-          - python-version: "3.12"
-            backend: pyqt5
+        python-version: ["3.9", "3.13"]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        add-extra: [pyqt6, pyside6]
         include:
-          - python-version: "3.13"
-            platform: windows-latest
-            backend: "pyqt6"
-          - python-version: "3.13"
-            platform: ubuntu-latest
-            backend: "pyqt6"
-
-          - python-version: "3.10"
-            platform: macos-latest
-            backend: "'pyside6<6.8'"
+          - os: windows-latest
+            python-version: "3.11"
+            resolution: "lowest-direct"
+            add-extra: pyside6
+          - os: macos-latest
+            python-version: "3.12"
+            resolution: "lowest-direct"
+            add-extra: pyqt6
+          - python-version: "3.9"
+            os: ubuntu-latest
+            add-extra: pyqt5
+          - python-version: "3.9"
+            os: ubuntu-latest
+            add-extra: pyside2
           - python-version: "3.11"
-            platform: macos-latest
-            backend: "'pyside6<6.8'"
+            os: windows-latest
+            add-extra: pyqt5
           - python-version: "3.10"
-            platform: windows-latest
-            backend: "'pyside6<6.8'"
+            os: ubuntu-latest
+            add-extra: pyside2
           - python-version: "3.12"
-            platform: windows-latest
-            backend: "'pyside6<6.8'"
+            os: ubuntu-latest
+            add-extra: pyqt6
+          - python-version: "3.12"
+            os: ubuntu-latest
+            add-extra: pyside6
 
-          # legacy Qt
-          - python-version: 3.9
-            platform: ubuntu-latest
-            backend: "pyqt5==5.12.*"
-          - python-version: 3.9
-            platform: ubuntu-latest
-            backend: "pyqt5==5.13.*"
-          - python-version: 3.9
-            platform: ubuntu-latest
-            backend: "pyqt5==5.14.*"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
-  test-qt-minreqs:
-    uses: pyapp-kit/workflows/.github/workflows/test-pyrepo.yml@v2
-    with:
-      python-version: "3.9"
-      qt: pyqt5
-      pip-post-installs: "qtpy==1.1.0 typing-extensions==4.5.0"  # 4.5.0 is just for pint
-      pip-install-flags: -e
-      coverage-upload: artifact
+      - name: 🐍 Set up Python ${{ matrix.python-version }}
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+          cache-dependency-glob: "**/pyproject.toml"
+
+      - uses: pyvista/setup-headless-display-action@v4
+        with:
+          qt: true
+
+      - name: Install Dependencies
+        run: uv sync --no-dev --group test --extra ${{ matrix.add-extra }} --resolution ${{ matrix.resolution || 'highest'}}
+
+      - name: 🧪 Run Tests
+        run: uv run coverage run -p -m pytest -v
+
+      # If something goes wrong with --pre tests, we can open an issue in the repo
+      - name: 📝 Report --pre Failures
+        if: failure() && github.event_name == 'schedule'
+        uses: JasonEtco/create-an-issue@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PLATFORM: ${{ matrix.os }}
+          PYTHON: ${{ matrix.python-version }}
+          RUN_ID: ${{ github.run_id }}
+          TITLE: "[test-bot] pip install --pre is failing"
+        with:
+          filename: .github/TEST_FAIL_TEMPLATE.md
+          update_existing: true
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: covreport-${{ matrix.os }}-py${{ matrix.python-version }}-${{ matrix.add-extra }}-${{ matrix.resolution }}
+          path: ./.coverage*
+          include-hidden-files: true
 
   upload_coverage:
     if: always()
-    needs: [test, test-qt-minreqs]
+    needs: [test]
     uses: pyapp-kit/workflows/.github/workflows/upload-coverage.yml@v2
     secrets: inherit
 
@@ -91,17 +109,16 @@ jobs:
     uses: pyapp-kit/workflows/.github/workflows/test-dependents.yml@v2
     with:
       dependency-repo: napari/napari
-      dependency-ref: ${{ matrix.napari-version }}
       dependency-extras: "testing"
       qt: ${{ matrix.qt }}
       pytest-args: 'src/napari/_qt --import-mode=importlib -k "not async and not qt_dims_2 and not qt_viewer_console_focus and not keybinding_editor and not preferences_dialog_not_dismissed"'
       python-version: "3.10"
-      post-install-cmd: "pip install lxml_html_clean"
+      # napari hasn't pinned pytest-qt, but still requires pyside2 tests
+      post-install-cmd: "pip install lxml_html_clean pytest-qt==4.4.0"
     strategy:
       fail-fast: false
       matrix:
-        napari-version: [ "" ]
-        qt: [ "pyqt5", "pyside2" ]
+        qt: ["pyqt5", "pyside2"]
 
   check-manifest:
     name: Check Manifest
@@ -110,35 +127,33 @@ jobs:
       - uses: actions/checkout@v4
       - run: pipx run check-manifest
 
-  deploy:
-    # this will run when you have tagged a commit, starting with "v*"
-    # and requires that you have put your twine API key in your
-    # github secrets (see readme for details)
-    needs: [test, check-manifest]
-    if: ${{ github.repository == 'pyapp-kit/superqt' && contains(github.ref, 'tags') }}
+  build-and-inspect-package:
+    name: Build & inspect package.
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.x"
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install build twine
-      - name: Build and publish
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.TWINE_API_KEY }}
-        run: |
-          git tag
-          python -m build
-          twine check dist/*
-          twine upload dist/*
+      - uses: hynek/build-and-inspect-python-package@v2
 
+  upload-to-pypi:
+    if: success() && startsWith(github.ref, 'refs/tags/') && github.event_name != 'schedule' && github.repository == 'pyapp-kit/superqt'
+    name: Upload package to PyPI
+    needs: build-and-inspect-package
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+    steps:
+      - name: Download built artifact to dist/
+        uses: actions/download-artifact@v4
+        with:
+          name: Packages
+          path: dist
+      - name: 🚢 Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
       - uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
+          files: "./dist/*"
