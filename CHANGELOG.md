@@ -1,5 +1,24 @@
 # Changelog
 
+## [v0.7.6](https://github.com/pyapp-kit/superqt/tree/v0.7.6) (2025-08-12)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.7.5...v0.7.6)
+
+**Fixed bugs:**
+
+- fix: Fix size of Slider label to not ocupy to much space [\#304](https://github.com/pyapp-kit/superqt/pull/304) ([Czaki](https://github.com/Czaki))
+
+**Tests & CI:**
+
+- test: drop old napari test [\#296](https://github.com/pyapp-kit/superqt/pull/296) ([tlambert03](https://github.com/tlambert03))
+
+**Merged pull requests:**
+
+- ci\(dependabot\): bump actions/download-artifact from 4 to 5 [\#303](https://github.com/pyapp-kit/superqt/pull/303) ([dependabot[bot]](https://github.com/apps/dependabot))
+- ci: \[pre-commit.ci\] autoupdate [\#302](https://github.com/pyapp-kit/superqt/pull/302) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
+- build: support uv-based workflows, use on CI [\#301](https://github.com/pyapp-kit/superqt/pull/301) ([tlambert03](https://github.com/tlambert03))
+- ci: \[pre-commit.ci\] autoupdate [\#299](https://github.com/pyapp-kit/superqt/pull/299) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
+
 ## [v0.7.5](https://github.com/pyapp-kit/superqt/tree/v0.7.5) (2025-06-18)
 
 [Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.7.4...v0.7.5)
