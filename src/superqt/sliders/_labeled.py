@@ -14,7 +14,7 @@ from qtpy.QtWidgets import (
     QLineEdit,
     QSlider,
     QStyle,
-    QStyleOptionSpinBox,
+    QStyleOption,
     QVBoxLayout,
     QWidget,
 )
@@ -809,7 +809,7 @@ class SliderLabel(QLineEdit):
         with signals_blocked(self):
             self.clearFocus()
 
-    def _update_size(self, *_: Any) -> None:
+    def _get_size(self):
         # fontmetrics to measure the width of text
         fm = QFontMetrics(self.font())
         h = self.sizeHint().height()
@@ -828,12 +828,14 @@ class SliderLabel(QLineEdit):
 
         w += 3  # cursor blinking space
         # get the final size hint
-        opt = QStyleOptionSpinBox()
+        opt = QStyleOption()
         # self.initStyleOption(opt)
-        size = self.style().sizeFromContents(
-            QStyle.ContentsType.CT_SpinBox, opt, QSize(w, h), self
+        return self.style().sizeFromContents(
+            QStyle.ContentsType.CT_LineEdit, opt, QSize(w, h), self
         )
-        self.setFixedSize(size)
+
+    def _update_size(self, *_: Any) -> None:
+        self.setFixedSize(self._get_size())
 
     def validate(
         self, input_: str | None, pos: int
@@ -842,6 +844,12 @@ class SliderLabel(QLineEdit):
         if input_ and "." in input_ and self.decimals() < 1:
             return QValidator.State.Invalid, input_, len(input_)
         return super().validate(input_, pos)
+
+    def showEvent(self, event: Any) -> None:
+        # need to update size after showing
+        # to handle the qss font size change
+        super().showEvent(event)
+        self._update_size()
 
 
 def _fm_width(fm: QFontMetrics, text: str) -> int:
