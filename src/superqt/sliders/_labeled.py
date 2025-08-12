@@ -6,11 +6,7 @@ from typing import TYPE_CHECKING, Any, overload
 
 from qtpy import QtGui
 from qtpy.QtCore import Property, QPoint, QSize, Qt, Signal
-from qtpy.QtGui import (
-    QDoubleValidator,
-    QFontMetrics,
-    QValidator,
-)
+from qtpy.QtGui import QDoubleValidator, QFontMetrics, QValidator
 from qtpy.QtWidgets import (
     QAbstractSlider,
     QBoxLayout,
