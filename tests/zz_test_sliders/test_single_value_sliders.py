@@ -229,3 +229,32 @@ def test_slider_extremes(sld: _GenericSlider, mag, qtbot):
     for i in _linspace(-_mag, _mag, 10):
         sld.setValue(i)
         assert math.isclose(sld.value(), i, rel_tol=1e-8)
+
+
+def test_slider_with_equal_min_max(sld: _GenericSlider, qtbot):
+    """Test that slider works when min == max (issue #307).
+
+    Previously, this would raise a TypeError: 'float' object cannot be
+    interpreted as an integer when calling show() because _to_qinteger_space
+    returned a float instead of an int when range was 0.
+    """
+    # Test with min=max=99 (the specific case from issue #307)
+    with qtbot.waitSignal(sld.rangeChanged, timeout=400):
+        sld.setMinimum(99)
+
+    # This should not raise a TypeError
+    sld.show()
+
+    # Verify the slider state
+    assert sld.minimum() == 99
+    assert sld.maximum() == 99
+    assert sld.value() == 99
+
+    # Test that we can also set max first
+    with qtbot.waitSignal(sld.rangeChanged, timeout=400):
+        sld.setMaximum(0)
+
+    sld.show()
+    assert sld.minimum() == 0
+    assert sld.maximum() == 0
+    assert sld.value() == 0
