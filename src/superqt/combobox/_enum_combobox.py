@@ -40,7 +40,7 @@ def _get_name(enum_value: Enum):
 
             from enum import _decompose
 
-            members, not_covered = _decompose(enum_value.__class__, enum_value.value)
+            members, _not_covered = _decompose(enum_value.__class__, enum_value.value)
             name = "|".join(m.name.replace("_", " ") for m in members[::-1])
         else:
             name = enum_value.name.replace("_", " ")
