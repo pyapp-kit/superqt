@@ -254,3 +254,39 @@ def test_rangeslider_signals(cls, orientation, qtbot):
         sld.setRange(1, 2)
     mock.assert_called_once_with(1, 2)
     _assert_types(mock.call_args.args, type_)
+
+
+@pytest.mark.parametrize("cls, orientation", ALL_SLIDER_COMBOS)
+def test_range_slider_with_equal_min_max(cls, orientation, qtbot):
+    """Test that slider works when min == max (issue #307).
+
+    Previously, this would raise a TypeError: 'float' object cannot be
+    interpreted as an integer when calling show() because _to_qinteger_space
+    returned a float instead of an int when range was 0.
+    """
+    sld = cls(orientation)
+    qtbot.addWidget(sld)
+
+    # Test with min=max=99 (the specific case from issue #307)
+    with qtbot.waitSignal(sld.rangeChanged):
+        sld.setMinimum(99)
+
+    # This should not raise a TypeError
+    sld.show()
+
+    # Verify the slider state
+    assert sld.minimum() == 99
+    assert sld.maximum() == 99
+    assert sld.value() == (99, 99)
+
+    # Test that we can also set max first
+    sld2 = cls(orientation)
+    qtbot.addWidget(sld2)
+
+    with qtbot.waitSignal(sld2.rangeChanged):
+        sld2.setMaximum(0)
+
+    sld2.show()
+    assert sld2.minimum() == 0
+    assert sld2.maximum() == 0
+    assert sld2.value() == (0, 0)

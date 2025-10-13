@@ -349,7 +349,7 @@ class _GenericSlider(QSlider):
         _max = _max or self.MAX_DISPLAY
         range_ = self._maximum - self._minimum
         if range_ == 0:
-            return self._minimum
+            return 0
         return int(min(QOVERFLOW, val / range_ * _max))
 
     def _pick(self, pt: QPoint) -> int:
