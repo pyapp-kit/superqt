@@ -111,7 +111,9 @@ def test_cmap_combo(qtbot, filterable):
         self.exec = lambda: True
 
     with qtbot.waitSignal(wdg.currentColormapChanged):
-        with patch.object(_cmap_combo._CmapNameDialog, "__init__", _init_with_mock_exec):
+        with patch.object(
+            _cmap_combo._CmapNameDialog, "__init__", _init_with_mock_exec
+        ):
             wdg._on_activated(wdg.count() - 1)
 
     assert wdg.count() == 5
@@ -124,7 +126,9 @@ def test_cmap_combo(qtbot, filterable):
         _original_init(self, *args, **kwargs)
         self.exec = lambda: False
 
-    with patch.object(_cmap_combo._CmapNameDialog, "__init__", _init_with_mock_exec_false):
+    with patch.object(
+        _cmap_combo._CmapNameDialog, "__init__", _init_with_mock_exec_false
+    ):
         wdg._on_activated(wdg.count() - 1)
 
 
