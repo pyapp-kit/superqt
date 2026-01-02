@@ -84,3 +84,19 @@ def test_editing_float(qtbot):
     slider._label.setValue(0.5)
     slider._label.editingFinished.emit()
     assert slider.value() == 0.5
+
+
+def test_slider_label_decimals_update_text(qtbot):
+    slider = QLabeledDoubleSlider()
+    qtbot.addWidget(slider)
+
+    # Set a value with default 2 decimals
+    slider.setValue(3.14159)
+    assert slider.value() == 3.14159
+    assert slider._label.text() == "3.14"
+
+    slider.setDecimals(0)
+    assert slider._label.text() == "3"
+
+    slider.setDecimals(4)
+    assert slider._label.text() == "3.1416"
