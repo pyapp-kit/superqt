@@ -84,3 +84,18 @@ def test_editing_float(qtbot):
     slider._label.setValue(0.5)
     slider._label.editingFinished.emit()
     assert slider.value() == 0.5
+
+
+def test_slider_label_value(qtbot):
+    slider = QLabeledDoubleSlider()
+    qtbot.addWidget(slider)
+
+    slider.setRange(-180, 180)
+    assert slider._label._min == -180
+    assert slider._label._max == 180
+
+    slider.setValue(150)
+    assert slider.value() == 150 == slider._label.value()
+
+    slider.setValue(-90)
+    assert slider.value() == -90 == slider._label.value()
