@@ -99,3 +99,19 @@ def test_slider_label_value(qtbot):
 
     slider.setValue(-90)
     assert slider.value() == -90 == slider._label.value()
+
+
+def test_slider_label_decimals_update_text(qtbot):
+    slider = QLabeledDoubleSlider()
+    qtbot.addWidget(slider)
+
+    # Set a value with default 2 decimals
+    slider.setValue(3.14159)
+    assert slider.value() == 3.14159
+    assert slider._label.text() == "3.14"
+
+    slider.setDecimals(0)
+    assert slider._label.text() == "3"
+
+    slider.setDecimals(4)
+    assert slider._label.text() == "3.1416"
