@@ -295,6 +295,7 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
     # --------------------- private api --------------------
 
     def _on_slider_range_changed(self, min_: int, max_: int) -> None:
+        self._label.setRange(min_, max_)
         if self._edge_label_mode & EdgeLabelMode.LabelIsRange:
             self._label.setSuffix(f" / {max_}")
         else:
