@@ -295,7 +295,6 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
     # --------------------- private api --------------------
 
     def _on_slider_range_changed(self, min_: int, max_: int) -> None:
-        self._label.setRange(min_, max_)
         if self._edge_label_mode & EdgeLabelMode.LabelIsRange:
             self._label.setSuffix(f" / {max_}")
         else:
@@ -684,6 +683,7 @@ class SliderLabel(QLineEdit):
         validator.setNotation(QDoubleValidator.Notation.ScientificNotation)
         self.setValidator(validator)
 
+        slider.rangeChanged.connect(self.setRange)
         slider.rangeChanged.connect(self._update_size)
         self.setAlignment(alignment)
         self.setStyleSheet("background:transparent; border: 0;")
