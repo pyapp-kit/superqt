@@ -677,8 +677,7 @@ class SliderLabel(QLineEdit):
         self._decimals = -1
         self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
         self.setMode(EdgeLabelMode.LabelIsValue)
-        self.setDecimals(0)
-        self.setText(str(self._value))
+        self.setDecimals(0)  # calls updateText
         validator = QDoubleValidator(self)
         validator.setNotation(QDoubleValidator.Notation.ScientificNotation)
         self.setValidator(validator)
@@ -713,6 +712,7 @@ class SliderLabel(QLineEdit):
     def setDecimals(self, prec: int) -> None:
         # super().setDecimals(prec)
         self._decimals = prec
+        self.updateText()
         self._update_size()
 
     def decimals(self) -> int:
