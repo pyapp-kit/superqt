@@ -99,8 +99,8 @@ def test_slider_label_value(qtbot):
 
     slider.setValue(-90)
     assert slider.value() == -90 == slider._label.value()
-    
-    
+
+
 def test_slider_label_decimals_update_text(qtbot):
     slider = QLabeledDoubleSlider()
     qtbot.addWidget(slider)
