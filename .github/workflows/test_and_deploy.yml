@@ -56,7 +56,7 @@ jobs:
             add-extra: pyside6
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           fetch-tags: true
@@ -93,7 +93,7 @@ jobs:
           update_existing: true
 
       - name: Upload coverage
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: covreport-${{ matrix.os }}-py${{ matrix.python-version }}-${{ matrix.add-extra }}-${{ matrix.resolution }}
           path: ./.coverage*
@@ -113,18 +113,17 @@ jobs:
       qt: ${{ matrix.qt }}
       pytest-args: 'src/napari/_qt --import-mode=importlib -k "not async and not qt_dims_2 and not qt_viewer_console_focus and not keybinding_editor and not preferences_dialog_not_dismissed"'
       python-version: "3.10"
-      # napari hasn't pinned pytest-qt, but still requires pyside2 tests
-      post-install-cmd: "pip install lxml_html_clean pytest-qt==4.4.0"
+      post-install-cmd: "pip install lxml_html_clean"
     strategy:
       fail-fast: false
       matrix:
-        qt: ["pyqt5", "pyside2"]
+        qt: ["pyqt5", "pyqt6", "pyside6"]
 
   check-manifest:
     name: Check Manifest
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - run: pipx run check-manifest
 
   build-and-inspect-package:
@@ -132,7 +131,7 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - uses: hynek/build-and-inspect-python-package@v2
@@ -147,7 +146,7 @@ jobs:
       contents: write
     steps:
       - name: Download built artifact to dist/
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: Packages
           path: dist
