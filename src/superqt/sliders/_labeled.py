@@ -682,6 +682,7 @@ class SliderLabel(QLineEdit):
         validator.setNotation(QDoubleValidator.Notation.ScientificNotation)
         self.setValidator(validator)
 
+        slider.rangeChanged.connect(self.setRange)
         slider.rangeChanged.connect(self._update_size)
         self.setAlignment(alignment)
         self.setStyleSheet("background:transparent; border: 0;")
