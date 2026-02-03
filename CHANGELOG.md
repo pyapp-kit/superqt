@@ -1,5 +1,44 @@
 # Changelog
 
+## [v0.7.8](https://github.com/pyapp-kit/superqt/tree/v0.7.8) (2026-02-03)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.7.7...v0.7.8)
+
+**Fixed bugs:**
+
+- fix: Use faint color for disabled on-state toggle switch [\#325](https://github.com/pyapp-kit/superqt/pull/325) ([hanjinliu](https://github.com/hanjinliu))
+- fix: Update text after settings decimals in SliderLabel [\#323](https://github.com/pyapp-kit/superqt/pull/323) ([TimMonko](https://github.com/TimMonko))
+- Fix values of slider label when range/value is set outside default [\#320](https://github.com/pyapp-kit/superqt/pull/320) ([TimMonko](https://github.com/TimMonko))
+
+**Tests & CI:**
+
+- Update qt beckends that superqt is tested against with napari [\#324](https://github.com/pyapp-kit/superqt/pull/324) ([Czaki](https://github.com/Czaki))
+
+**Merged pull requests:**
+
+- ci: \[pre-commit.ci\] autoupdate [\#326](https://github.com/pyapp-kit/superqt/pull/326) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
+- ci\(dependabot\): bump the actions group with 3 updates [\#322](https://github.com/pyapp-kit/superqt/pull/322) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore: Group dependabot updates in a single PR [\#321](https://github.com/pyapp-kit/superqt/pull/321) ([Czaki](https://github.com/Czaki))
+- ci: \[pre-commit.ci\] autoupdate [\#314](https://github.com/pyapp-kit/superqt/pull/314) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
+
+## [v0.7.7](https://github.com/pyapp-kit/superqt/tree/v0.7.7) (2025-12-27)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.7.6...v0.7.7)
+
+**Fixed bugs:**
+
+- fix: fix TypeError on range slider when min equals max  [\#310](https://github.com/pyapp-kit/superqt/pull/310) ([tlambert03](https://github.com/tlambert03))
+
+**Tests & CI:**
+
+- tests: fix pyside6 segfault in cmap combo tests [\#319](https://github.com/pyapp-kit/superqt/pull/319) ([tlambert03](https://github.com/tlambert03))
+
+**Merged pull requests:**
+
+- ci\(dependabot\): bump astral-sh/setup-uv from 6 to 7 [\#309](https://github.com/pyapp-kit/superqt/pull/309) ([dependabot[bot]](https://github.com/apps/dependabot))
+- ci: \[pre-commit.ci\] autoupdate [\#306](https://github.com/pyapp-kit/superqt/pull/306) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
+- ci\(dependabot\): bump actions/checkout from 4 to 5 [\#305](https://github.com/pyapp-kit/superqt/pull/305) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v0.7.6](https://github.com/pyapp-kit/superqt/tree/v0.7.6) (2025-08-12)
 
 [Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.7.5...v0.7.6)
@@ -585,12 +624,20 @@
 
 ## [v0.2.1](https://github.com/pyapp-kit/superqt/tree/v0.2.1) (2021-07-10)
 
-[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.2.0...v0.2.1)
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.2.0rc1...v0.2.1)
 
 **Fixed bugs:**
 
 - Fix QLabeledRangeSlider API \(fix slider proxy\) [\#10](https://github.com/pyapp-kit/superqt/pull/10) ([tlambert03](https://github.com/tlambert03))
 - Fix range slider with negative min range [\#9](https://github.com/pyapp-kit/superqt/pull/9) ([tlambert03](https://github.com/tlambert03))
+
+## [v0.2.0rc1](https://github.com/pyapp-kit/superqt/tree/v0.2.0rc1) (2021-06-26)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.2.0rc0...v0.2.0rc1)
+
+## [v0.2.0rc0](https://github.com/pyapp-kit/superqt/tree/v0.2.0rc0) (2021-06-26)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.2.0...v0.2.0rc0)
 
 
 
