@@ -27,6 +27,10 @@ jobs:
         python-version: ["3.9", "3.13"]
         os: [ubuntu-latest, macos-latest, windows-latest]
         add-extra: [pyqt6, pyside6]
+        exclude:
+          - os: windows-latest
+            python-version: "3.9"
+            add-extra: pyside6
         include:
           - os: windows-latest
             python-version: "3.11"
