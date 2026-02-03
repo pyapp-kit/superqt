@@ -1,9 +1,24 @@
 from unittest.mock import Mock
 
+import pytest
 from qtpy.QtCore import Qt
 from qtpy.QtWidgets import QApplication, QCheckBox, QVBoxLayout, QWidget
 
 from superqt import QToggleSwitch
+
+
+def test_construction(qtbot):
+    wdg = QToggleSwitch("test")
+    qtbot.addWidget(wdg)
+    assert wdg.text() == "test"
+
+    parent = QWidget()
+    qtbot.addWidget(parent)
+    wdg = QToggleSwitch(parent)
+    assert wdg.parent() is parent
+
+    with pytest.raises(TypeError):
+        QToggleSwitch(parent, "test")
 
 
 def test_on_and_off(qtbot):
@@ -28,6 +43,19 @@ def test_on_and_off(qtbot):
     wdg.click()
     assert not wdg.isChecked()
     QApplication.processEvents()
+
+
+def test_disabled(qtbot):
+    wdg = QToggleSwitch()
+    qtbot.addWidget(wdg)
+    wdg.setDisabled(True)
+    assert not wdg.isEnabled()
+    initial_state = wdg.isChecked()
+    qtbot.mouseClick(wdg, Qt.MouseButton.LeftButton)
+    assert wdg.isChecked() == initial_state  # state should not change
+    wdg.setChecked(not initial_state)
+    qtbot.mouseClick(wdg, Qt.MouseButton.LeftButton)
+    assert wdg.isChecked() == (not initial_state)  # state should not change
 
 
 def test_get_set(qtbot):

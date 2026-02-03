@@ -139,12 +139,23 @@ class QToggleSwitch(QtW.QAbstractButton):
         is_checked = option.state & QtW.QStyle.StateFlag.State_On
         is_enabled = option.state & QtW.QStyle.StateFlag.State_Enabled
         # draw the groove
+        on_color = option.on_color
+        off_color = option.off_color
         if is_enabled:
-            painter.setBrush(option.on_color if is_checked else option.off_color)
+            painter.setBrush(on_color if is_checked else off_color)
             painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing, True)
             painter.setOpacity(0.8)
         else:
-            painter.setBrush(option.off_color)
+            if is_checked:
+                ratio = 0.32
+                mixed_color = QtGui.QColor(
+                    int(on_color.red() * ratio + off_color.red() * (1 - ratio)),
+                    int(on_color.green() * ratio + off_color.green() * (1 - ratio)),
+                    int(on_color.blue() * ratio + off_color.blue() * (1 - ratio)),
+                )
+                painter.setBrush(mixed_color)
+            else:
+                painter.setBrush(off_color)
             painter.setOpacity(0.6)
 
         half_height = option.switch_height / 2
