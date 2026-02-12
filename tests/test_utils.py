@@ -11,8 +11,8 @@ from superqt.utils import exceptions_as_dialog, signals_blocked
 from superqt.utils._util import get_max_args
 
 
-def test_signal_blocker(qtbot):
-    """make sure context manager signal blocker works"""
+def test_signal_blocker_single(qtbot):
+    """make sure context manager signal blocker works for one object"""
 
     class Emitter(QObject):
         sig = Signal()
@@ -33,6 +33,39 @@ def test_signal_blocker(qtbot):
         qtbot.wait(10)
 
     receiver.assert_not_called()
+
+
+def test_signal_blocker_multiple(qtbot):
+    """make sure context manager signal blocker works for multiple objects"""
+
+    class Emitter(QObject):
+        sig = Signal()
+
+    obj1 = Emitter()
+    obj2 = Emitter()
+    receiver1 = Mock()
+    receiver2 = Mock()
+    obj1.sig.connect(receiver1)
+    obj2.sig.connect(receiver2)
+
+    # make sure both signals work
+    with qtbot.waitSignal(obj1.sig):
+        obj1.sig.emit()
+    with qtbot.waitSignal(obj2.sig):
+        obj2.sig.emit()
+
+    receiver1.assert_called_once()
+    receiver2.assert_called_once()
+    receiver1.reset_mock()
+    receiver2.reset_mock()
+
+    with signals_blocked(obj1, obj2):
+        obj1.sig.emit()
+        obj2.sig.emit()
+        qtbot.wait(10)
+
+    receiver1.assert_not_called()
+    receiver2.assert_not_called()
 
 
 def test_get_max_args_simple():
