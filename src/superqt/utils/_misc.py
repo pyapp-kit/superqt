@@ -7,13 +7,13 @@ if TYPE_CHECKING:
 
 
 @contextmanager
-def signals_blocked(obj: "QObject") -> Iterator[None]:
-    """Context manager to temporarily block signals emitted by QObject: `obj`.
+def signals_blocked(*obj: "QObject") -> Iterator[None]:
+    """Context manager to temporarily block signals emitted by QObjects.
 
     Parameters
     ----------
-    obj : QObject
-        The QObject whose signals should be blocked.
+    *obj : QObject
+        QObjects whose signals should be blocked.
 
     Examples
     --------
@@ -26,8 +26,9 @@ def signals_blocked(obj: "QObject") -> Iterator[None]:
         spinbox.setValue(10)
     ```
     """
-    previous = obj.blockSignals(True)
+    previous = [o.blockSignals(True) for o in obj]
     try:
         yield
     finally:
-        obj.blockSignals(previous)
+        for o, prev in zip(obj, previous):
+            o.blockSignals(prev)
