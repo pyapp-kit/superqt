@@ -17,7 +17,7 @@ class QStyleOptionToggleSwitch(QtW.QStyleOptionButton):
         self.switch_height = 12
         self.handle_size = 14
 
-        # these aren't yet overrideable in QToggleSwitch
+        # these aren't yet overridable in QToggleSwitch
         self.margin = 2
         self.text_alignment = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
 

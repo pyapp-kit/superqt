@@ -219,3 +219,8 @@ ignore = [
     "codecov.yml",
     ".ruff_cache/**/*",
 ]
+
+[tool.typos.default]
+extend-ignore-identifiers-re = ["(?i)sur", "fo"]
+[tool.typos.files]
+extend-exclude = ["CHANGELOG.md"]

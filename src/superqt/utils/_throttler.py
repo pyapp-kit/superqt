@@ -269,7 +269,7 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
         # even if we were to compile __call__ with a signature matching that of func,
         # PySide wouldn't correctly inspect the signature of the ThrottledCallable
         # instance: https://bugreports.qt.io/browse/PYSIDE-2423
-        # so we do it ourselfs and limit the number of positional arguments
+        # so we do it ourselves and limit the number of positional arguments
         # that we pass to func
         self._max_args: int | None = max_args
 
@@ -385,7 +385,7 @@ def qthrottled(
               desired interval
             - `Qt.VeryCoarseTimer`: Very coarse timers only keep full second accuracy
     parent: QObject or None
-        Parent object for timer. If using qthrottled as function it may be usefull
+        Parent object for timer. If using qthrottled as function it may be useful
         for cleaning data
     """
     return _make_decorator(func, timeout, leading, timer_type, Kind.Throttler, parent)
@@ -449,7 +449,7 @@ def qdebounced(
               desired interval
             - `Qt.VeryCoarseTimer`: Very coarse timers only keep full second accuracy
     parent: QObject or None
-        Parent object for timer. If using qthrottled as function it may be usefull
+        Parent object for timer. If using qthrottled as function it may be useful
         for cleaning data
     """
     return _make_decorator(func, timeout, leading, timer_type, Kind.Debouncer, parent)
