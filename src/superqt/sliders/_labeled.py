@@ -674,6 +674,7 @@ class SliderLabel(QLineEdit):
         index: int = 0,
     ) -> None:
         super().__init__(parent=parent)
+        self._index = index
         self._prefix = ""
         self._suffix = ""
         self._min = slider.minimum()
