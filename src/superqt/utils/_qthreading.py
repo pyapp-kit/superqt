@@ -7,7 +7,6 @@ from functools import partial, wraps
 from typing import (
     TYPE_CHECKING,
     Any,
-    Callable,
     ClassVar,
     Generic,
     TypeVar,
@@ -17,7 +16,7 @@ from typing import (
 from qtpy.QtCore import QObject, QRunnable, QThread, QThreadPool, QTimer, Signal
 
 if TYPE_CHECKING:
-    from collections.abc import Generator, Sequence
+    from collections.abc import Callable, Generator, Sequence
 
     _T = TypeVar("_T")
 
@@ -31,7 +30,9 @@ if TYPE_CHECKING:
         @staticmethod
         def emit(*args: _T) -> None: ...
 
-    from typing_extensions import Literal, ParamSpec
+    from typing import Literal
+
+    from typing_extensions import ParamSpec
 
     _P = ParamSpec("_P")
 # maintain runtime compatibility with older typing_extensions

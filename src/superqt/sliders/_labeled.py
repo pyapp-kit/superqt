@@ -599,7 +599,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
                 s.setValue(val)
                 self._handle_labels.append(s)
         else:
-            for val, label in zip(v, self._handle_labels):
+            for val, label in zip(v, self._handle_labels, strict=False):
                 label.setValue(val)
         self._reposition_labels()
 

@@ -3,7 +3,6 @@ from unittest.mock import patch
 
 import numpy as np
 import pytest
-from qtpy import API_NAME
 
 try:
     from cmap import Colormap

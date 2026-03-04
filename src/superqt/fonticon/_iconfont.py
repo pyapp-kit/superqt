@@ -1,5 +1,4 @@
 from collections.abc import Mapping
-from typing import Union
 
 FONTFILE_ATTR = "__font_file__"
 
@@ -70,7 +69,7 @@ class IconFont(metaclass=IconFontMeta):
     __font_file__ = "..."
 
 
-def namespace2font(namespace: Union[Mapping, type], name: str) -> type[IconFont]:
+def namespace2font(namespace: Mapping | type, name: str) -> type[IconFont]:
     """Convenience to convert a namespace (class, module, dict) into an IconFont."""
     if isinstance(namespace, type):
         if not isinstance(getattr(namespace, FONTFILE_ATTR), str):

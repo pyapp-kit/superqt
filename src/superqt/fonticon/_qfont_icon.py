@@ -5,7 +5,7 @@ from collections import abc, defaultdict
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, ClassVar, Union, cast
+from typing import TYPE_CHECKING, ClassVar, TypeAlias, cast
 
 from qtpy import QT_VERSION
 from qtpy.QtCore import QObject, QPoint, QRect, QSize, Qt
@@ -43,18 +43,18 @@ _Unset = Unset()
 # account for font bearing.
 DEFAULT_SCALING_FACTOR = 0.875
 DEFAULT_OPACITY = 1
-ValidColor = Union[
-    QColor,
-    int,
-    str,
-    Qt.GlobalColor,
-    tuple[int, int, int, int],
-    tuple[int, int, int],
-    None,
-]
+ValidColor: TypeAlias = (
+    QColor
+    | int
+    | str
+    | Qt.GlobalColor
+    | tuple[int, int, int, int]
+    | tuple[int, int, int]
+    | None
+)
 
-StateOrMode = Union[QIcon.State, QIcon.Mode]
-StateModeKey = Union[StateOrMode, str, Sequence[StateOrMode]]
+StateOrMode: TypeAlias = QIcon.State | QIcon.Mode
+StateModeKey: TypeAlias = StateOrMode | str | Sequence[StateOrMode]
 _SM_MAP: dict[str, StateOrMode] = {
     "on": QIcon.State.On,
     "off": QIcon.State.Off,

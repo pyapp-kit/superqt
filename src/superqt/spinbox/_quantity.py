@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, TypeAlias, Union
 
 try:
     from pint import Quantity, Unit, UnitRegistry
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from decimal import Decimal
 
 
-Number = Union[int, float, "Decimal"]
+Number: TypeAlias = Union[int, float, "Decimal"]
 UREG = UnitRegistry()
 NULL_OPTION = "-----"
 QOVERFLOW = 2**30
@@ -69,10 +69,10 @@ class QQuantity(QWidget):
 
     def __init__(
         self,
-        value: Union[str, Quantity, Number] = 0,
-        units: Optional[Union[UnitsContainer, str, Quantity]] = None,
-        ureg: Optional[UnitRegistry] = None,
-        parent: Optional[QWidget] = None,
+        value: str | Quantity | Number = 0,
+        units: UnitsContainer | str | Quantity | None = None,
+        ureg: UnitRegistry | None = None,
+        parent: QWidget | None = None,
     ) -> None:
         super().__init__(parent=parent)
         if ureg is None:
@@ -145,7 +145,7 @@ class QQuantity(QWidget):
     def text(self) -> str:
         return str(self._value)
 
-    def magnitude(self) -> Union[float, int]:
+    def magnitude(self) -> float | int:
         """Return the magnitude of the current value."""
         return self._value.magnitude
 
@@ -165,8 +165,8 @@ class QQuantity(QWidget):
 
     def setValue(
         self,
-        value: Union[str, Quantity, Number],
-        units: Optional[Union[UnitsContainer, str, Quantity]] = None,
+        value: str | Quantity | Number,
+        units: UnitsContainer | str | Quantity | None = None,
     ) -> None:
         """Set the current value (will cast to a pint Quantity)."""
         if isinstance(value, Quantity):
@@ -202,7 +202,7 @@ class QQuantity(QWidget):
         """Set the magnitude of the current value."""
         self.setValue(self._ureg.Quantity(magnitude, self._value.units))
 
-    def setUnits(self, units: Union[str, Unit, Quantity]) -> None:
+    def setUnits(self, units: str | Unit | Quantity) -> None:
         """Set the units of the current value.
 
         If `units` is `None`, will convert to a dimensionless quantity.
@@ -228,7 +228,7 @@ class QQuantity(QWidget):
         """Return the `QCombBox` widget used to edit the units."""
         return self._units_combo
 
-    def _format_units(self, u: Union[Unit, str]) -> str:
+    def _format_units(self, u: Unit | str) -> str:
         if isinstance(u, str):
             return u
         return f"{u:~}" if self._abbreviate_units else f"{u:}"

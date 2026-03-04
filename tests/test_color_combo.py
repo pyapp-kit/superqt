@@ -1,7 +1,6 @@
 from unittest.mock import patch
 
 import pytest
-from qtpy import API_NAME
 from qtpy.QtGui import QColor, QPainter
 from qtpy.QtWidgets import QStyleOptionViewItem
 

@@ -36,7 +36,7 @@ from enum import IntFlag, auto
 from functools import wraps
 from inspect import signature
 from types import MethodType
-from typing import TYPE_CHECKING, Any, Callable, Generic, TypeVar, overload
+from typing import TYPE_CHECKING, Any, Generic, TypeVar, overload
 from weakref import WeakKeyDictionary, WeakMethod
 
 from qtpy.QtCore import QObject, Qt, QTimer, Signal
@@ -44,6 +44,8 @@ from qtpy.QtCore import QObject, Qt, QTimer, Signal
 from ._util import get_max_args
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from typing_extensions import ParamSpec
 
     P = ParamSpec("P")

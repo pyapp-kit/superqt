@@ -93,12 +93,13 @@ dev = [
     { include-group = "test" },
     "ipython>=8.18.1",
     "mypy>=1.17.0",
-    "pre-commit-uv>=4.1.4",
     "pdbpp>=0.11.6; sys_platform != 'win32'",
     "pydocstyle>=6.3.0",
     "rich>=14.0.0",
     "ruff>=0.12.3",
     "types-pygments>=2.19.0.20250715",
+    "pytest-xdist>=3.8.0",
+    "prek>=0.3.4",
 ]
 docs = [
     "mkdocs-macros-plugin ==1.3.7",
