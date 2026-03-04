@@ -1,5 +1,24 @@
 # Changelog
 
+## [v0.8.0](https://github.com/pyapp-kit/superqt/tree/v0.8.0) (2026-03-04)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.7.8...v0.8.0)
+
+**Implemented enhancements:**
+
+- feat: Block signals for mutliple objects [\#328](https://github.com/pyapp-kit/superqt/pull/328) ([gselzer](https://github.com/gselzer))
+
+**Fixed bugs:**
+
+- fix: fix animate=False on QCollapsible [\#331](https://github.com/pyapp-kit/superqt/pull/331) ([tlambert03](https://github.com/tlambert03))
+- fix: fix issues with SliderLabel strong reference [\#248](https://github.com/pyapp-kit/superqt/pull/248) ([tlambert03](https://github.com/tlambert03))
+
+**Merged pull requests:**
+
+- build: drop python 3.9 and pyside2, support python 3.14 [\#332](https://github.com/pyapp-kit/superqt/pull/332) ([tlambert03](https://github.com/tlambert03))
+- ci\(dependabot\): bump the actions group with 2 updates [\#330](https://github.com/pyapp-kit/superqt/pull/330) ([dependabot[bot]](https://github.com/apps/dependabot))
+- ci: \[pre-commit.ci\] autoupdate [\#329](https://github.com/pyapp-kit/superqt/pull/329) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
+
 ## [v0.7.8](https://github.com/pyapp-kit/superqt/tree/v0.7.8) (2026-02-03)
 
 [Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.7.7...v0.7.8)
