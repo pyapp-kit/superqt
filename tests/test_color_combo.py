@@ -70,7 +70,6 @@ def test_q_color_delegate(qtbot):
     delegate.paint(painter, option, index)
 
 
-@pytest.mark.skipif(API_NAME == "PySide2", reason="hangs on CI")
 def test_activated(qtbot):
     wdg = QColorComboBox()
     qtbot.addWidget(wdg)

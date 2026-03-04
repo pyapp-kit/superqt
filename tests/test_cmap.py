@@ -97,9 +97,6 @@ def test_cmap_combo(qtbot, filterable):
     assert wdg.count() == 4  # make sure we didn't duplicate
     assert wdg.currentIndex() == 1
 
-    if API_NAME == "PySide2":
-        return  # the rest fails on CI... but works locally
-
     # click the Add Colormap... item
     # NOTE: We wrap __init__ instead of patching exec directly because
     # PySide6 6.10 crashes when MetaObjectBuilder inspects mocked methods

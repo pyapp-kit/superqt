@@ -28,7 +28,7 @@ All widgets must be well-tested, and should work on:
 
 - Python 3.9 and above
 - PyQt5 (5.11 and above) & PyQt6
-- PySide2 (5.11 and above) & PySide6
+- PySide6
 - macOS, Windows, & Linux
 
 
