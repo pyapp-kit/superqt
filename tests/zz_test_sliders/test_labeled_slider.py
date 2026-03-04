@@ -101,6 +101,23 @@ def test_slider_label_value(qtbot):
     assert slider.value() == -90 == slider._label.value()
 
 
+def test_range_slider_handle_label_editing(qtbot):
+    slider = QLabeledRangeSlider()
+    qtbot.addWidget(slider)
+    slider.show()
+    assert slider.value() == (20, 80)
+
+    # simulate editing the second handle label to 50
+    slider._handle_labels[1].setValue(50)
+    slider._handle_labels[1].editingFinished.emit()
+    assert slider.value() == (20, 50)
+
+    # simulate editing the first handle label to 10
+    slider._handle_labels[0].setValue(10)
+    slider._handle_labels[0].editingFinished.emit()
+    assert slider.value() == (10, 50)
+
+
 def test_slider_label_decimals_update_text(qtbot):
     slider = QLabeledDoubleSlider()
     qtbot.addWidget(slider)
