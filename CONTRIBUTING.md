@@ -26,7 +26,7 @@ pytest
 
 All widgets must be well-tested, and should work on:
 
-- Python 3.9 and above
+- Python 3.10 and above
 - PyQt5 (5.11 and above) & PyQt6
 - PySide6
 - macOS, Windows, & Linux
