@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from enum import IntEnum, IntFlag, auto
-from functools import partial
 from typing import TYPE_CHECKING, Any, overload
 
 from qtpy import QtGui
@@ -181,7 +180,8 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         self.setFocusPolicy(Qt.FocusPolicy(fp))
 
         self._slider = self._slider_class(parent=self)
-        self._label = SliderLabel(self._slider, connect=self._setValue, parent=self)
+        self._label = SliderLabel(self._slider, parent=self)
+        self._label.valueEdited.connect(self._setValue)
         self._edge_label_mode: EdgeLabelMode = EdgeLabelMode.LabelIsValue
         self._edge_label_position: LabelPosition = LabelPosition.LabelsRight
 
@@ -271,6 +271,7 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
             if self.isVisible():
                 self._label.show()
             self._label.setMode(opt)
+            self._label.setRange(self._slider.minimum(), self._slider.maximum())
             self._label.setValue(self._slider.value())
             self.layout().setContentsMargins(0, 0, 0, 0)
 
@@ -383,15 +384,13 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
         self.sliderMoved = self._slider.slidersMoved
 
         self._min_label = SliderLabel(
-            self._slider,
-            alignment=Qt.AlignmentFlag.AlignLeft,
-            connect=self._min_label_edited,
+            self._slider, alignment=Qt.AlignmentFlag.AlignLeft
         )
+        self._min_label.valueEdited.connect(self._min_label_edited)
         self._max_label = SliderLabel(
-            self._slider,
-            alignment=Qt.AlignmentFlag.AlignRight,
-            connect=self._max_label_edited,
+            self._slider, alignment=Qt.AlignmentFlag.AlignRight
         )
+        self._max_label.valueEdited.connect(self._max_label_edited)
         self._min_label.editingFinished.connect(self.editingFinished)
         self._max_label.editingFinished.connect(self.editingFinished)
         self.setEdgeLabelMode(EdgeLabelMode.LabelIsRange)
@@ -434,7 +433,9 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
                 self._min_label.show()
                 self._max_label.show()
             self._min_label.setMode(opt)
+            self._min_label.setRange(self._slider.minimum(), self._slider.maximum())
             self._max_label.setMode(opt)
+            self._max_label.setRange(self._slider.minimum(), self._slider.maximum())
         if opt == EdgeLabelMode.LabelIsValue:
             v0, *_, v1 = self._slider.value()
             self._min_label.setValue(v0)
@@ -593,8 +594,8 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
                 lbl.deleteLater()
             self._handle_labels.clear()
             for n, val in enumerate(self._slider.value()):
-                _cb = partial(self._slider.setSliderPosition, index=n)
-                s = SliderLabel(self._slider, parent=self, connect=_cb)
+                s = SliderLabel(self._slider, parent=self, index=n)
+                s.valueEdited.connect(self._on_slider_label_edited)
                 s.editingFinished.connect(self.editingFinished)
                 s.setValue(val)
                 self._handle_labels.append(s)
@@ -602,6 +603,10 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
             for val, label in zip(v, self._handle_labels, strict=False):
                 label.setValue(val)
         self._reposition_labels()
+
+    def _on_slider_label_edited(self, pos: float) -> None:
+        idx = getattr(self.sender(), "_index", 0)
+        self._slider.setSliderPosition(pos, idx)
 
     def _on_range_changed(self, min: int, max: int) -> None:
         if (min, max) != (self._slider.minimum(), self._slider.maximum()):
@@ -659,21 +664,22 @@ class QLabeledDoubleRangeSlider(QLabeledRangeSlider):
 
 
 class SliderLabel(QLineEdit):
+    valueEdited = Signal(float)
+
     def __init__(
         self,
         slider: QSlider,
-        parent=None,
-        alignment=Qt.AlignmentFlag.AlignCenter,
-        connect=None,
+        parent: QWidget | None = None,
+        alignment: Qt.AlignmentFlag = Qt.AlignmentFlag.AlignCenter,
+        index: int = 0,
     ) -> None:
         super().__init__(parent=parent)
-        self._slider = slider
+        self._index = index
         self._prefix = ""
         self._suffix = ""
         self._min = slider.minimum()
         self._max = slider.maximum()
         self._value = self._min
-        self._callback = connect
         self._decimals = -1
         self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
         self.setMode(EdgeLabelMode.LabelIsValue)
@@ -686,16 +692,14 @@ class SliderLabel(QLineEdit):
         slider.rangeChanged.connect(self._update_size)
         self.setAlignment(alignment)
         self.setStyleSheet("background:transparent; border: 0;")
-        if connect is not None:
-            self.editingFinished.connect(self._editing_finished)
+        self.editingFinished.connect(self._editing_finished)
         self.editingFinished.connect(self._silent_clear_focus)
         self._update_size()
 
     def _editing_finished(self):
         self._silent_clear_focus()
         self.setValue(float(self.text()))
-        if self._callback:
-            self._callback(self.value())
+        self.valueEdited.emit(self.value())
 
     def setRange(self, min_: float, max_: float) -> None:
         if self._mode == EdgeLabelMode.LabelIsRange:
@@ -784,10 +788,7 @@ class SliderLabel(QLineEdit):
         self.setRange(min_, self._max)
 
     def setMode(self, opt: EdgeLabelMode) -> None:
-        # when the edge labels are controlling slider range,
-        # we want them to have a big range, but not have a huge label
         self._mode = opt
-        self.setRange(self._slider.minimum(), self._slider.maximum())
         self._update_size()
 
     def prefix(self) -> str:
