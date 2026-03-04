@@ -4,7 +4,7 @@ from __future__ import annotations
 from concurrent.futures import Future
 from contextlib import suppress
 from functools import wraps
-from typing import TYPE_CHECKING, Any, Callable, ClassVar, overload
+from typing import TYPE_CHECKING, Any, ClassVar, overload
 
 from qtpy.QtCore import (
     QCoreApplication,
@@ -19,9 +19,10 @@ from qtpy.QtCore import (
 from ._util import get_max_args
 
 if TYPE_CHECKING:
-    from typing import TypeVar
+    from collections.abc import Callable
+    from typing import Literal, TypeVar
 
-    from typing_extensions import Literal, ParamSpec
+    from typing_extensions import ParamSpec
 
     P = ParamSpec("P")
     R = TypeVar("R")

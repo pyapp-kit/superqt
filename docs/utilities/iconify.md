@@ -7,7 +7,7 @@ Design, and many more; each available as individual SVGs.  Unlike the
 dependencies or font files to be installed.  Icons are downloaded (and cached)
 on-demand from the Iconify API, using [pyconify](https://github.com/pyapp-kit/pyconify)
 
-Search availble icons at <https://icon-sets.iconify.design>
+Search available icons at <https://icon-sets.iconify.design>
 Once you find one you like, use the key in the format `"prefix:name"` to create an
 icon:  `QIconifyIcon("bi:bell")`.
 

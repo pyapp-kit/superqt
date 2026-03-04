@@ -31,7 +31,7 @@ class QIconifyIcon(QIcon):
     Iconify includes 150,000+ icons from most major icon sets including Bootstrap,
     FontAwesome, Material Design, and many more.
 
-    Search availble icons at https://icon-sets.iconify.design
+    Search available icons at https://icon-sets.iconify.design
     Once you find one you like, use the key in the format `"prefix:name"` to create an
     icon:  `QIconifyIcon("bi:bell")`.
 

@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from typing import Optional, TypeVar, Union
+from typing import TypeVar
 
 from qtpy import QtGui
 from qtpy.QtCore import Property, QEvent, QPoint, QPointF, QRect, QRectF, Qt, Signal
@@ -133,8 +133,8 @@ class _GenericRangeSlider(_GenericSlider):
 
     def setSliderPosition(  # type: ignore
         self,
-        pos: Union[float, Sequence[float]],
-        index: Optional[int] = None,
+        pos: float | Sequence[float],
+        index: int | None = None,
         *,
         reversed: bool = False,
     ) -> None:
@@ -260,7 +260,7 @@ class _GenericRangeSlider(_GenericSlider):
     # SubControl Positions
 
     def _handleRect(
-        self, handle_index: int, opt: Optional[QStyleOptionSlider] = None
+        self, handle_index: int, opt: QStyleOptionSlider | None = None
     ) -> QRect:
         """Return the QRect for all handles."""
         opt = opt or self._styleOption
@@ -338,7 +338,7 @@ class _GenericRangeSlider(_GenericSlider):
 
     # NOTE: this is very much tied to mousepress... not a generic "get control"
     def _getControlAtPos(
-        self, pos: QPoint, opt: Optional[QStyleOptionSlider] = None
+        self, pos: QPoint, opt: QStyleOptionSlider | None = None
     ) -> tuple[QStyle.SubControl, int]:
         """Update self._pressedControl based on ev.pos()."""
         opt = opt or self._styleOption

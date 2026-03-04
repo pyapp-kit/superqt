@@ -25,5 +25,5 @@ Screenshots and GIFS are much appreciated when reporting visual bugs.
 
 **Desktop (please complete the following information):**
  - OS with version [e.g macOS 10.15.7]
- - Qt Backend [e.g PyQt5, PySide2]
+ - Qt Backend [e.g PyQt6, PySide6]
  - Python version
