@@ -9,6 +9,7 @@ from qtpy.QtCore import (
     QObject,
     QPropertyAnimation,
     QRect,
+    QSignalBlocker,
     Qt,
     Signal,
 )
@@ -149,11 +150,13 @@ class QCollapsible(QFrame):
 
     def expand(self, animate: bool = True) -> None:
         """Expand (show) the collapsible section."""
-        self._expand_collapse(QPropertyAnimation.Direction.Forward, animate)
+        with QSignalBlocker(self._toggle_btn):
+            self._expand_collapse(QPropertyAnimation.Direction.Forward, animate)
 
     def collapse(self, animate: bool = True) -> None:
         """Collapse (hide) the collapsible section."""
-        self._expand_collapse(QPropertyAnimation.Direction.Backward, animate)
+        with QSignalBlocker(self._toggle_btn):
+            self._expand_collapse(QPropertyAnimation.Direction.Backward, animate)
 
     def isExpanded(self) -> bool:
         """Return whether the collapsible section is visible."""
