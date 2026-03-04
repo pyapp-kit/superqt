@@ -18,10 +18,7 @@ class FontIconManager:
     def _discover_fonts(self) -> None:
         self._PLUGINS.clear()
         entries = entry_points()
-        if hasattr(entries, "select"):  # python>3.10
-            _entries = entries.select(group=self.ENTRY_POINT)  # type: ignore
-        else:
-            _entries = entries.get(self.ENTRY_POINT, [])
+        _entries = entries.select(group=self.ENTRY_POINT)
         for ep in _entries:
             if ep not in self._BLOCKED:
                 self._PLUGINS[ep.name] = ep

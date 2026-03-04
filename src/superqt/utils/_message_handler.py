@@ -37,7 +37,7 @@ class QMessageHandler:
     ...     ...
 
     >>> logger = logging.getLogger(__name__)
-    >>> with QMessageHandler(logger):  # re-reoute Qt messages to a python logger.
+    >>> with QMessageHandler(logger):  # re-route Qt messages to a python logger.
     ...     ...
     """
 

@@ -10,9 +10,9 @@ QtWidgets module.
 Components are tested on:
 
 - macOS, Windows, & Linux
-- Python 3.9 and above
+- Python 3.10 and above
 - PyQt5 (5.11 and above) & PyQt6
-- PySide2 (5.11 and above) & PySide6
+- PySide6
 
 ## Installation
 

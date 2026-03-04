@@ -30,5 +30,5 @@ def signals_blocked(*obj: "QObject") -> Iterator[None]:
     try:
         yield
     finally:
-        for o, prev in zip(obj, previous):
+        for o, prev in zip(obj, previous, strict=False):
             o.blockSignals(prev)

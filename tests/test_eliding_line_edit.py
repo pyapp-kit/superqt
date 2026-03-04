@@ -50,7 +50,7 @@ def test_set_elide_mode_eliding_line_edit(qtbot):
     assert ELLIPSIS not in wdg._elidedText()
 
 
-def test_set_elipses_width_eliding_line_edit(qtbot):
+def test_set_ellipses_width_eliding_line_edit(qtbot):
     wdg = QElidingLineEdit()
     qtbot.addWidget(wdg)
     wdg.resize(500, 20)

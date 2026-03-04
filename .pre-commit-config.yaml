@@ -7,9 +7,21 @@ repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.4
     hooks:
-      - id: ruff
+      - id: ruff-check
         args: [--fix, --unsafe-fixes]
       - id: ruff-format
+
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.10
+    hooks:
+      - id: actionlint
+        args: ["-ignore", 'label ".+" is unknown']
+
+  - repo: https://github.com/adhtruong/mirrors-typos
+    rev: v1.42.3
+    hooks:
+      - id: typos
+        args: [--force-exclude] # omitting --write-changes
 
   - repo: https://github.com/abravalheri/validate-pyproject
     rev: v0.25
