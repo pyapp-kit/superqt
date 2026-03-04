@@ -1,5 +1,6 @@
 import logging
-from typing import Any, Iterable, Mapping
+from collections.abc import Iterable, Mapping
+from typing import Any
 
 from qtpy.QtCore import QRegularExpression
 from qtpy.QtWidgets import QLineEdit, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget
@@ -16,7 +17,7 @@ class QSearchableTreeWidget(QWidget):
     into the `filter` line edit. An item is only shown if its, any of its ancestors',
     or any of its descendants' keys or values match this pattern.
     The regular expression follows the conventions described by the Qt docs:
-    https://doc.qt.io/qt-5/qregularexpression.html#details
+    https://doc.qt.io/qt-6/qregularexpression.html#details
 
     Attributes
     ----------

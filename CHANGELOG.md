@@ -1,5 +1,157 @@
 # Changelog
 
+## [v0.7.8](https://github.com/pyapp-kit/superqt/tree/v0.7.8) (2026-02-03)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.7.7...v0.7.8)
+
+**Fixed bugs:**
+
+- fix: Use faint color for disabled on-state toggle switch [\#325](https://github.com/pyapp-kit/superqt/pull/325) ([hanjinliu](https://github.com/hanjinliu))
+- fix: Update text after settings decimals in SliderLabel [\#323](https://github.com/pyapp-kit/superqt/pull/323) ([TimMonko](https://github.com/TimMonko))
+- Fix values of slider label when range/value is set outside default [\#320](https://github.com/pyapp-kit/superqt/pull/320) ([TimMonko](https://github.com/TimMonko))
+
+**Tests & CI:**
+
+- Update qt beckends that superqt is tested against with napari [\#324](https://github.com/pyapp-kit/superqt/pull/324) ([Czaki](https://github.com/Czaki))
+
+**Merged pull requests:**
+
+- ci: \[pre-commit.ci\] autoupdate [\#326](https://github.com/pyapp-kit/superqt/pull/326) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
+- ci\(dependabot\): bump the actions group with 3 updates [\#322](https://github.com/pyapp-kit/superqt/pull/322) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore: Group dependabot updates in a single PR [\#321](https://github.com/pyapp-kit/superqt/pull/321) ([Czaki](https://github.com/Czaki))
+- ci: \[pre-commit.ci\] autoupdate [\#314](https://github.com/pyapp-kit/superqt/pull/314) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
+
+## [v0.7.7](https://github.com/pyapp-kit/superqt/tree/v0.7.7) (2025-12-27)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.7.6...v0.7.7)
+
+**Fixed bugs:**
+
+- fix: fix TypeError on range slider when min equals max  [\#310](https://github.com/pyapp-kit/superqt/pull/310) ([tlambert03](https://github.com/tlambert03))
+
+**Tests & CI:**
+
+- tests: fix pyside6 segfault in cmap combo tests [\#319](https://github.com/pyapp-kit/superqt/pull/319) ([tlambert03](https://github.com/tlambert03))
+
+**Merged pull requests:**
+
+- ci\(dependabot\): bump astral-sh/setup-uv from 6 to 7 [\#309](https://github.com/pyapp-kit/superqt/pull/309) ([dependabot[bot]](https://github.com/apps/dependabot))
+- ci: \[pre-commit.ci\] autoupdate [\#306](https://github.com/pyapp-kit/superqt/pull/306) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
+- ci\(dependabot\): bump actions/checkout from 4 to 5 [\#305](https://github.com/pyapp-kit/superqt/pull/305) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [v0.7.6](https://github.com/pyapp-kit/superqt/tree/v0.7.6) (2025-08-12)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.7.5...v0.7.6)
+
+**Fixed bugs:**
+
+- fix: Fix size of Slider label to not ocupy to much space [\#304](https://github.com/pyapp-kit/superqt/pull/304) ([Czaki](https://github.com/Czaki))
+
+**Tests & CI:**
+
+- test: drop old napari test [\#296](https://github.com/pyapp-kit/superqt/pull/296) ([tlambert03](https://github.com/tlambert03))
+
+**Merged pull requests:**
+
+- ci\(dependabot\): bump actions/download-artifact from 4 to 5 [\#303](https://github.com/pyapp-kit/superqt/pull/303) ([dependabot[bot]](https://github.com/apps/dependabot))
+- ci: \[pre-commit.ci\] autoupdate [\#302](https://github.com/pyapp-kit/superqt/pull/302) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
+- build: support uv-based workflows, use on CI [\#301](https://github.com/pyapp-kit/superqt/pull/301) ([tlambert03](https://github.com/tlambert03))
+- ci: \[pre-commit.ci\] autoupdate [\#299](https://github.com/pyapp-kit/superqt/pull/299) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
+
+## [v0.7.5](https://github.com/pyapp-kit/superqt/tree/v0.7.5) (2025-06-18)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.7.4...v0.7.5)
+
+**Implemented enhancements:**
+
+- feat: Use scientific notation for big values in labeled slider [\#226](https://github.com/pyapp-kit/superqt/pull/226) ([Czaki](https://github.com/Czaki))
+
+## [v0.7.4](https://github.com/pyapp-kit/superqt/tree/v0.7.4) (2025-06-10)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.7.3...v0.7.4)
+
+**Implemented enhancements:**
+
+- feat: Allow setting label position on labeled slider [\#294](https://github.com/pyapp-kit/superqt/pull/294) ([brisvag](https://github.com/brisvag))
+
+**Fixed bugs:**
+
+- fix: Set SliderProxy range params to Any [\#290](https://github.com/pyapp-kit/superqt/pull/290) ([gselzer](https://github.com/gselzer))
+- Make qimage\_to\_array\(\) work on big endian [\#288](https://github.com/pyapp-kit/superqt/pull/288) ([penguinpee](https://github.com/penguinpee))
+
+**Documentation updates:**
+
+- docs: document QToggleSwitch [\#286](https://github.com/pyapp-kit/superqt/pull/286) ([tlambert03](https://github.com/tlambert03))
+
+**Tests & CI:**
+
+- Fix napari test [\#295](https://github.com/pyapp-kit/superqt/pull/295) ([brisvag](https://github.com/brisvag))
+
+## [v0.7.3](https://github.com/pyapp-kit/superqt/tree/v0.7.3) (2025-03-28)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.7.2...v0.7.3)
+
+**Implemented enhancements:**
+
+- feat: toggle switch [\#284](https://github.com/pyapp-kit/superqt/pull/284) ([hanjinliu](https://github.com/hanjinliu))
+- Enh: Adds a filterable kwarg to ColormapComboBox enabling filtering \(like Catalog\) [\#278](https://github.com/pyapp-kit/superqt/pull/278) ([psobolewskiPhD](https://github.com/psobolewskiPhD))
+
+## [v0.7.2](https://github.com/pyapp-kit/superqt/tree/v0.7.2) (2025-03-17)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.7.1...v0.7.2)
+
+**Implemented enhancements:**
+
+- fix: less Slider signal renaming, make alternate signal types public [\#283](https://github.com/pyapp-kit/superqt/pull/283) ([tlambert03](https://github.com/tlambert03))
+
+**Merged pull requests:**
+
+- ci: \[pre-commit.ci\] autoupdate [\#282](https://github.com/pyapp-kit/superqt/pull/282) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
+- ci: \[pre-commit.ci\] autoupdate [\#279](https://github.com/pyapp-kit/superqt/pull/279) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
+- Update CONTRIBUTING.md to include \[test\] and mention Qt backend [\#276](https://github.com/pyapp-kit/superqt/pull/276) ([psobolewskiPhD](https://github.com/psobolewskiPhD))
+- Update CONTRIBUTING.md to install .\[dev\] first then pre-commit [\#275](https://github.com/pyapp-kit/superqt/pull/275) ([psobolewskiPhD](https://github.com/psobolewskiPhD))
+- ci: \[pre-commit.ci\] autoupdate [\#272](https://github.com/pyapp-kit/superqt/pull/272) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
+
+## [v0.7.1](https://github.com/pyapp-kit/superqt/tree/v0.7.1) (2025-01-05)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.7.0...v0.7.1)
+
+**Implemented enhancements:**
+
+- feat: add QFlowLayout, for variable width widgets [\#271](https://github.com/pyapp-kit/superqt/pull/271) ([tlambert03](https://github.com/tlambert03))
+- feat: Improve CodeSyntaxHighlight object [\#268](https://github.com/pyapp-kit/superqt/pull/268) ([tlambert03](https://github.com/tlambert03))
+- feat: allow chaining of QIconifyIcon.addKey [\#267](https://github.com/pyapp-kit/superqt/pull/267) ([tlambert03](https://github.com/tlambert03))
+
+**Fixed bugs:**
+
+- fix: better warning for download error [\#266](https://github.com/pyapp-kit/superqt/pull/266) ([tlambert03](https://github.com/tlambert03))
+
+**Merged pull requests:**
+
+- Lazy-import `pyconify` [\#270](https://github.com/pyapp-kit/superqt/pull/270) ([hanjinliu](https://github.com/hanjinliu))
+
+## [v0.7.0](https://github.com/pyapp-kit/superqt/tree/v0.7.0) (2024-12-14)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.6.8...v0.7.0)
+
+**Fixed bugs:**
+
+- fix: End painter when drawing colormap [\#262](https://github.com/pyapp-kit/superqt/pull/262) ([gselzer](https://github.com/gselzer))
+- fix: minimum size hint for QElidingLabel [\#260](https://github.com/pyapp-kit/superqt/pull/260) ([gselzer](https://github.com/gselzer))
+- fix: KeyError in CodeSyntaxHighlight [\#258](https://github.com/pyapp-kit/superqt/pull/258) ([hanjinliu](https://github.com/hanjinliu))
+
+**Refactors:**
+
+- chore: Revert "remove stylesheet on sliderLabel \(\#254\)" [\#265](https://github.com/pyapp-kit/superqt/pull/265) ([tlambert03](https://github.com/tlambert03))
+- refactor: remove stylesheet on sliderLabel [\#254](https://github.com/pyapp-kit/superqt/pull/254) ([tlambert03](https://github.com/tlambert03))
+
+**Merged pull requests:**
+
+- build: support py313 [\#264](https://github.com/pyapp-kit/superqt/pull/264) ([tlambert03](https://github.com/tlambert03))
+- build: drop py38 [\#263](https://github.com/pyapp-kit/superqt/pull/263) ([tlambert03](https://github.com/tlambert03))
+- ci: \[pre-commit.ci\] autoupdate [\#257](https://github.com/pyapp-kit/superqt/pull/257) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
+- ci: \[pre-commit.ci\] autoupdate [\#253](https://github.com/pyapp-kit/superqt/pull/253) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
+
 ## [v0.6.8](https://github.com/pyapp-kit/superqt/tree/v0.6.8) (2024-06-15)
 
 [Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.6.7...v0.6.8)
@@ -472,12 +624,20 @@
 
 ## [v0.2.1](https://github.com/pyapp-kit/superqt/tree/v0.2.1) (2021-07-10)
 
-[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.2.0...v0.2.1)
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.2.0rc1...v0.2.1)
 
 **Fixed bugs:**
 
 - Fix QLabeledRangeSlider API \(fix slider proxy\) [\#10](https://github.com/pyapp-kit/superqt/pull/10) ([tlambert03](https://github.com/tlambert03))
 - Fix range slider with negative min range [\#9](https://github.com/pyapp-kit/superqt/pull/9) ([tlambert03](https://github.com/tlambert03))
+
+## [v0.2.0rc1](https://github.com/pyapp-kit/superqt/tree/v0.2.0rc1) (2021-06-26)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.2.0rc0...v0.2.0rc1)
+
+## [v0.2.0rc0](https://github.com/pyapp-kit/superqt/tree/v0.2.0rc0) (2021-06-26)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.2.0...v0.2.0rc0)
 
 
 

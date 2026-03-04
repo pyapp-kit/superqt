@@ -27,7 +27,7 @@ SOFTWARE.
 
 """
 
-from typing import Deque
+from collections import deque
 
 from qtpy.QtCore import QRect, QSize, Qt, QTimer, Signal
 from qtpy.QtGui import QPainter, QPen
@@ -65,8 +65,8 @@ class DrawSignalsWidget(QWidget):
         self._scrollTimer.timeout.connect(self._scroll)
         self._scrollTimer.start()
 
-        self._signalActivations: Deque[int] = Deque()
-        self._throttledSignalActivations: Deque[int] = Deque()
+        self._signalActivations: deque[int] = deque()
+        self._throttledSignalActivations: deque[int] = deque()
 
     def sizeHint(self):
         return QSize(400, 200)
@@ -84,7 +84,7 @@ class DrawSignalsWidget(QWidget):
 
         self.update()
 
-    def scrollAndCut(self, v: Deque[int], cutoff: int):
+    def scrollAndCut(self, v: deque[int], cutoff: int):
         L = len(v)
         for p in range(L):
             v[p] += 1
@@ -121,7 +121,7 @@ class DrawSignalsWidget(QWidget):
         p.drawLine(0, h2, w, h2)
         p.restore()
 
-    def _drawSignals(self, p: QPainter, v: Deque[int], color, yStart, yEnd):
+    def _drawSignals(self, p: QPainter, v: deque[int], color, yStart, yEnd):
         p.save()
         pen = QPen()
         pen.setWidthF(2.0)

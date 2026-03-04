@@ -24,8 +24,7 @@ def test_debounced(qtbot):
         f1()
         f2()
 
-    qtbot.wait(5)
-    mock1.assert_called_once()
+    qtbot.waitUntil(lambda: mock1.call_count == 1, timeout=1000)
     assert mock2.call_count == 10
 
 
@@ -80,9 +79,7 @@ def test_debouncer_method(qtbot):
     for _ in range(10):
         b()
 
-    qtbot.wait(5)
-
-    assert a.count == 1
+    qtbot.waitUntil(lambda: a.count == 1, timeout=1000)
 
 
 def test_debouncer_method_definition(qtbot):
@@ -117,15 +114,15 @@ def test_debouncer_method_definition(qtbot):
         a.call2(22)
         A.call2(32)
 
-    qtbot.wait(5)
-    assert a.count == 1
-    mock1.assert_called_once()
-    mock2.assert_called_once()
+    qtbot.waitUntil(
+        lambda: a.count == 1 and mock1.call_count == 1 and mock2.call_count == 1,
+        timeout=1000,
+    )
 
 
 def test_class_with_slots(qtbot):
     class A:
-        __slots__ = ("count", "__weakref__")
+        __slots__ = ("__weakref__", "count")
 
         def __init__(self):
             self.count = 0
@@ -138,8 +135,7 @@ def test_class_with_slots(qtbot):
     for _ in range(10):
         a.callback()
 
-    qtbot.wait(5)
-    assert a.count == 1
+    qtbot.waitUntil(lambda: a.count == 1, timeout=1000)
 
 
 @pytest.mark.usefixtures("qapp")
@@ -173,8 +169,7 @@ def test_throttled(qtbot):
         f1()
         f2()
 
-    qtbot.wait(5)
-    assert mock1.call_count == 2
+    qtbot.waitUntil(lambda: mock1.call_count == 2, timeout=1000)
     assert mock2.call_count == 10
 
 

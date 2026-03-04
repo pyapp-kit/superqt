@@ -1,7 +1,6 @@
 from unittest.mock import patch
 
 import pytest
-from qtpy import API_NAME
 from qtpy.QtGui import QColor, QPainter
 from qtpy.QtWidgets import QStyleOptionViewItem
 
@@ -70,7 +69,6 @@ def test_q_color_delegate(qtbot):
     delegate.paint(painter, option, index)
 
 
-@pytest.mark.skipif(API_NAME == "PySide2", reason="hangs on CI")
 def test_activated(qtbot):
     wdg = QColorComboBox()
     qtbot.addWidget(wdg)

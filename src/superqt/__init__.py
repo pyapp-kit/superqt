@@ -11,7 +11,6 @@ except PackageNotFoundError:
 from .collapsible import QCollapsible
 from .combobox import QColorComboBox, QEnumComboBox, QSearchableComboBox
 from .elidable import QElidingLabel, QElidingLineEdit
-from .iconify import QIconifyIcon
 from .selection import QSearchableListWidget, QSearchableTreeWidget
 from .sliders import (
     QDoubleRangeSlider,
@@ -23,11 +22,15 @@ from .sliders import (
     QRangeSlider,
 )
 from .spinbox import QLargeIntSpinBox
-from .utils import QMessageHandler, ensure_main_thread, ensure_object_thread
+from .switch import QToggleSwitch
+from .utils import (
+    QFlowLayout,
+    QMessageHandler,
+    ensure_main_thread,
+    ensure_object_thread,
+)
 
 __all__ = [
-    "ensure_main_thread",
-    "ensure_object_thread",
     "QCollapsible",
     "QColorComboBox",
     "QColormapComboBox",
@@ -36,8 +39,9 @@ __all__ = [
     "QElidingLabel",
     "QElidingLineEdit",
     "QEnumComboBox",
-    "QLabeledDoubleRangeSlider",
+    "QFlowLayout",
     "QIconifyIcon",
+    "QLabeledDoubleRangeSlider",
     "QLabeledDoubleSlider",
     "QLabeledRangeSlider",
     "QLabeledSlider",
@@ -48,20 +52,28 @@ __all__ = [
     "QSearchableComboBox",
     "QSearchableListWidget",
     "QSearchableTreeWidget",
+    "QToggleSwitch",
+    "ensure_main_thread",
+    "ensure_object_thread",
 ]
 
 if TYPE_CHECKING:
-    from .combobox import QColormapComboBox  # noqa: TCH004
-    from .spinbox._quantity import QQuantity  # noqa: TCH004
+    from .combobox import QColormapComboBox
+    from .iconify import QIconifyIcon
+    from .spinbox._quantity import QQuantity
 
 
 def __getattr__(name: str) -> Any:
-    if name == "QQuantity":
-        from .spinbox._quantity import QQuantity
-
-        return QQuantity
     if name == "QColormapComboBox":
         from .cmap import QColormapComboBox
 
         return QColormapComboBox
+    if name == "QIconifyIcon":
+        from .iconify import QIconifyIcon
+
+        return QIconifyIcon
+    if name == "QQuantity":
+        from .spinbox._quantity import QQuantity
+
+        return QQuantity
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

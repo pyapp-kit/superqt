@@ -1,16 +1,16 @@
 from __future__ import annotations
 
 __all__ = [
-    "addFont",
-    "Animation",
     "ENTRY_POINT",
-    "font",
-    "icon",
+    "Animation",
     "IconFont",
     "IconFontMeta",
     "IconOpts",
-    "pulse",
     "QIconifyIcon",
+    "addFont",
+    "font",
+    "icon",
+    "pulse",
     "setTextIcon",
     "spin",
 ]

@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import warnings
 from collections import abc, defaultdict
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, ClassVar, DefaultDict, Sequence, Tuple, Union, cast
+from typing import TYPE_CHECKING, ClassVar, TypeAlias, cast
 
 from qtpy import QT_VERSION
 from qtpy.QtCore import QObject, QPoint, QRect, QSize, Qt
@@ -42,18 +43,18 @@ _Unset = Unset()
 # account for font bearing.
 DEFAULT_SCALING_FACTOR = 0.875
 DEFAULT_OPACITY = 1
-ValidColor = Union[
-    QColor,
-    int,
-    str,
-    Qt.GlobalColor,
-    Tuple[int, int, int, int],
-    Tuple[int, int, int],
-    None,
-]
+ValidColor: TypeAlias = (
+    QColor
+    | int
+    | str
+    | Qt.GlobalColor
+    | tuple[int, int, int, int]
+    | tuple[int, int, int]
+    | None
+)
 
-StateOrMode = Union[QIcon.State, QIcon.Mode]
-StateModeKey = Union[StateOrMode, str, Sequence[StateOrMode]]
+StateOrMode: TypeAlias = QIcon.State | QIcon.Mode
+StateModeKey: TypeAlias = StateOrMode | str | Sequence[StateOrMode]
 _SM_MAP: dict[str, StateOrMode] = {
     "on": QIcon.State.On,
     "off": QIcon.State.Off,
@@ -131,7 +132,7 @@ class IconOpts:
     def dict(self) -> IconOptionDict:
         # not using asdict due to pickle errors on animation
         d = {k: v for k, v in vars(self).items() if v is not _Unset}
-        return cast(IconOptionDict, d)
+        return cast("IconOptionDict", d)
 
 
 @dataclass
@@ -150,7 +151,7 @@ class _IconOptions:
 
     def dict(self) -> IconOptionDict:
         # not using asdict due to pickle errors on animation
-        return cast(IconOptionDict, vars(self))
+        return cast("IconOptionDict", vars(self))
 
 
 class _QFontIconEngine(QIconEngine):
@@ -159,14 +160,14 @@ class _QFontIconEngine(QIconEngine):
     def __init__(self, options: _IconOptions):
         super().__init__()
         self._opts: defaultdict[QIcon.State, dict[QIcon.Mode, _IconOptions | None]] = (
-            DefaultDict(dict)
+            defaultdict(dict)
         )
         self._opts[QIcon.State.Off][QIcon.Mode.Normal] = options
         self.update_hash()
 
     @property
     def _default_opts(self) -> _IconOptions:
-        return cast(_IconOptions, self._opts[QIcon.State.Off][QIcon.Mode.Normal])
+        return cast("_IconOptions", self._opts[QIcon.State.Off][QIcon.Mode.Normal])
 
     def _add_opts(self, state: QIcon.State, mode: QIcon.Mode, opts: IconOpts) -> None:
         self._opts[state][mode] = self._default_opts._update(opts)
@@ -357,7 +358,7 @@ class QFontIconStore(QObject):
 
     def __init__(self, parent: QObject | None = None) -> None:
         super().__init__(parent=parent)
-        if tuple(cast(str, QT_VERSION).split(".")) < ("6", "0"):
+        if tuple(cast("str", QT_VERSION).split(".")) < ("6", "0"):
             # QT6 drops this
             QApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
 
@@ -479,7 +480,7 @@ class QFontIconStore(QObject):
         # in Qt6, everything becomes a static member
         QFd: QFontDatabase | type[QFontDatabase] = (
             QFontDatabase()
-            if tuple(cast(str, QT_VERSION).split(".")) < ("6", "0")
+            if tuple(cast("str", QT_VERSION).split(".")) < ("6", "0")
             else QFontDatabase
         )
 

@@ -13,7 +13,7 @@ __all__ = (
 
 
 if TYPE_CHECKING:
-    from superqt.cmap import QColormapComboBox  # noqa: TCH004
+    from superqt.cmap import QColormapComboBox
 
 
 def __getattr__(name: str) -> Any:  # pragma: no cover

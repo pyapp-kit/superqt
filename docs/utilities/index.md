@@ -12,6 +12,12 @@
 | [`IconOpts`](./fonticon.md#superqt.fonticon.IconOpts) | Options for rendering an icon |
 | [`Animation`](./fonticon.md#superqt.fonticon.Animation) | Base class for adding animations to a font-icon. |
 
+## SVG Icons
+
+| Object                          | Description           |
+| -----------                     | --------------------- |
+| [`QIconifyIcon`](./iconify.md)  | QIcons backed by the [Iconify](https://iconify.design/) icon library. |
+
 ## Threading tools
 
 | Object                          | Description           |

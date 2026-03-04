@@ -1,7 +1,7 @@
 # QEnumComboBox
 
 `QEnumComboBox` is a variant of
-[`QComboBox`](https://doc.qt.io/qt-5/qcombobox.html) that populates the items in
+[`QComboBox`](https://doc.qt.io/qt-6/qcombobox.html) that populates the items in
 the combobox based on a python `Enum` class.  In addition to all the methods
 provided by `QComboBox`, this subclass adds the methods
 `enumClass`/`setEnumClass` to get/set the current `Enum` class represented by

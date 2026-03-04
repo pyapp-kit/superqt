@@ -1,21 +1,20 @@
 from __future__ import annotations
 
-import contextlib
+from collections.abc import Iterable
 from enum import IntEnum, IntFlag, auto
-from typing import Any, Callable, Iterable, overload
+from typing import TYPE_CHECKING, Any, overload
 
 from qtpy import QtGui
 from qtpy.QtCore import Property, QPoint, QSize, Qt, Signal
-from qtpy.QtGui import QFontMetrics, QValidator
+from qtpy.QtGui import QDoubleValidator, QFontMetrics, QValidator
 from qtpy.QtWidgets import (
     QAbstractSlider,
     QBoxLayout,
-    QDoubleSpinBox,
     QHBoxLayout,
+    QLineEdit,
     QSlider,
-    QSpinBox,
     QStyle,
-    QStyleOptionSpinBox,
+    QStyleOption,
     QVBoxLayout,
     QWidget,
 )
@@ -23,6 +22,9 @@ from qtpy.QtWidgets import (
 from superqt.utils import signals_blocked
 
 from ._sliders import QDoubleRangeSlider, QDoubleSlider, QRangeSlider
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable
 
 
 class LabelPosition(IntEnum):
@@ -79,7 +81,7 @@ class _SliderProxy:
     def setPageStep(self, step: int) -> None:
         self._slider.setPageStep(step)
 
-    def setRange(self, min: int, max: int) -> None:
+    def setRange(self, min: float, max: float) -> None:
         self._slider.setRange(min, max)
 
     def tickInterval(self) -> int:
@@ -158,9 +160,6 @@ def _handle_overloaded_slider_sig(
 
 class QLabeledSlider(_SliderProxy, QAbstractSlider):
     editingFinished = Signal()
-    _ivalueChanged = Signal(int)
-    _isliderMoved = Signal(int)
-    _irangeChanged = Signal(int, int)
 
     _slider_class = QSlider
     _slider: QSlider
@@ -184,6 +183,7 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         self._slider = self._slider_class(parent=self)
         self._label = SliderLabel(self._slider, connect=self._setValue, parent=self)
         self._edge_label_mode: EdgeLabelMode = EdgeLabelMode.LabelIsValue
+        self._edge_label_position: LabelPosition = LabelPosition.LabelsRight
 
         self._rename_signals()
         self._slider.actionTriggered.connect(self.actionTriggered.emit)
@@ -204,18 +204,29 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         marg = (0, 0, 0, 0)
         if orientation == Qt.Orientation.Vertical:
             layout = QVBoxLayout()
-            layout.addWidget(self._slider, alignment=Qt.AlignmentFlag.AlignHCenter)
-            layout.addWidget(self._label, alignment=Qt.AlignmentFlag.AlignHCenter)
+            if not self._edge_label_position:
+                layout.addWidget(self._slider, alignment=Qt.AlignmentFlag.AlignHCenter)
+            elif self._edge_label_position == LabelPosition.LabelsBelow:
+                layout.addWidget(self._slider, alignment=Qt.AlignmentFlag.AlignHCenter)
+                layout.addWidget(self._label, alignment=Qt.AlignmentFlag.AlignHCenter)
+            else:
+                layout.addWidget(self._label, alignment=Qt.AlignmentFlag.AlignHCenter)
+                layout.addWidget(self._slider, alignment=Qt.AlignmentFlag.AlignHCenter)
             self._label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             layout.setSpacing(1)
         else:
-            if self._edge_label_mode == EdgeLabelMode.NoLabel:
-                marg = (0, 0, 5, 0)
-
             layout = QHBoxLayout()  # type: ignore
-            layout.addWidget(self._slider)
-            layout.addWidget(self._label)
-            self._label.setAlignment(Qt.AlignmentFlag.AlignRight)
+            if not self._edge_label_position:
+                layout.addWidget(self._slider)
+            elif self._edge_label_position == LabelPosition.LabelsRight:
+                layout.addWidget(self._slider)
+                layout.addWidget(self._label)
+                self._label.setAlignment(Qt.AlignmentFlag.AlignRight)
+            else:
+                layout.addWidget(self._label)
+                layout.addWidget(self._slider)
+                self._label.setAlignment(Qt.AlignmentFlag.AlignLeft)
+                marg = (0, 0, 5, 0)
             layout.setSpacing(6)
 
         old_layout = self.layout()
@@ -248,27 +259,46 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
             )
 
         self._edge_label_mode = opt
+        self._on_slider_range_changed(self.minimum(), self.maximum())
         if not self._edge_label_mode:
             self._label.hide()
             w = 5 if self.orientation() == Qt.Orientation.Horizontal else 0
-            self.layout().setContentsMargins(0, 0, w, 0)
+            if self._edge_label_position == LabelPosition.LabelsRight:
+                self.layout().setContentsMargins(0, 0, w, 0)
+            elif self._edge_label_position == LabelPosition.LabelsLeft:
+                self.layout().setContentsMargins(0, 0, 0, w)
         if opt & EdgeLabelMode.LabelIsValue:
             if self.isVisible():
                 self._label.show()
             self._label.setMode(opt)
             self._label.setValue(self._slider.value())
             self.layout().setContentsMargins(0, 0, 0, 0)
-        self._on_slider_range_changed(self.minimum(), self.maximum())
+
+    def edgeLabelPosition(self) -> LabelPosition:
+        """Return where/whether a label is shown at the edge of the slider."""
+        return self._edge_label_position
+
+    def setEdgeLabelPosition(self, opt: LabelPosition) -> None:
+        """Set where/whether a label is shown at the edge of the slider."""
+        if opt is LabelPosition.LabelsOnHandle:
+            raise ValueError("position cannot be 'LabelPosition.LabelsOnHandle'")
+
+        self._edge_label_position = opt
+        self._label.setVisible(bool(opt))
+        # TODO: make double clickable to edit
+        self.setOrientation(self.orientation())
 
     # putting this after labelMode methods for the sake of mypy
     EdgeLabelMode = EdgeLabelMode
+    LabelPosition = LabelPosition
 
     # --------------------- private api --------------------
 
     def _on_slider_range_changed(self, min_: int, max_: int) -> None:
-        slash = " / " if self._edge_label_mode & EdgeLabelMode.LabelIsValue else ""
         if self._edge_label_mode & EdgeLabelMode.LabelIsRange:
-            self._label.setSuffix(f"{slash}{max_}")
+            self._label.setSuffix(f" / {max_}")
+        else:
+            self._label.setSuffix("")
         self.rangeChanged.emit(min_, max_)
 
     def _on_slider_value_changed(self, v: Any) -> None:
@@ -279,18 +309,15 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
         """Convert the value from float to int before setting the slider value."""
         self._slider.setValue(int(value))
 
-    def _rename_signals(self) -> None:
-        self.valueChanged = self._ivalueChanged
-        self.sliderMoved = self._isliderMoved
-        self.rangeChanged = self._irangeChanged
+    def _rename_signals(self) -> None: ...
 
 
 class QLabeledDoubleSlider(QLabeledSlider):
     _slider_class = QDoubleSlider
     _slider: QDoubleSlider
-    _fvalueChanged = Signal(float)
-    _fsliderMoved = Signal(float)
-    _frangeChanged = Signal(float, float)
+    fvalueChanged = Signal(float)
+    fsliderMoved = Signal(float)
+    frangeChanged = Signal(float, float)
 
     @overload
     def __init__(self, parent: QWidget | None = ...) -> None: ...
@@ -309,9 +336,9 @@ class QLabeledDoubleSlider(QLabeledSlider):
         self._slider.setValue(value)
 
     def _rename_signals(self) -> None:
-        self.valueChanged = self._fvalueChanged
-        self.sliderMoved = self._fsliderMoved
-        self.rangeChanged = self._frangeChanged
+        self.valueChanged = self.fvalueChanged
+        self.sliderMoved = self.fsliderMoved
+        self.rangeChanged = self.frangeChanged
 
     def decimals(self) -> int:
         return self._label.decimals()
@@ -321,9 +348,7 @@ class QLabeledDoubleSlider(QLabeledSlider):
 
 
 class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
-    _valueChanged = Signal(tuple)
-    _sliderPressed = Signal()
-    _sliderReleased = Signal()
+    valuesChanged = Signal(tuple)
     editingFinished = Signal()
 
     _slider_class = QRangeSlider
@@ -355,7 +380,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
         self._slider.sliderPressed.connect(self.sliderPressed.emit)
         self._slider.sliderReleased.connect(self.sliderReleased.emit)
         self._slider.rangeChanged.connect(self.rangeChanged.emit)
-        self.sliderMoved = self._slider._slidersMoved
+        self.sliderMoved = self._slider.slidersMoved
 
         self._min_label = SliderLabel(
             self._slider,
@@ -488,9 +513,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
 
     # ------------- private methods ----------------
     def _rename_signals(self) -> None:
-        self.valueChanged = self._valueChanged
-        self.sliderReleased = self._sliderReleased
-        self.sliderPressed = self._sliderPressed
+        self.valueChanged = self.valuesChanged
 
     def _reposition_labels(self) -> None:
         if (
@@ -581,7 +604,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
                 s.setValue(val)
                 self._handle_labels.append(s)
         else:
-            for val, label in zip(v, self._handle_labels):
+            for val, label in zip(v, self._handle_labels, strict=False):
                 label.setValue(val)
         self._reposition_labels()
 
@@ -607,7 +630,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
 class QLabeledDoubleRangeSlider(QLabeledRangeSlider):
     _slider_class = QDoubleRangeSlider
     _slider: QDoubleRangeSlider
-    _frangeChanged = Signal(float, float)
+    frangeChanged = Signal(float, float)
 
     @overload
     def __init__(self, parent: QWidget | None = ...) -> None: ...
@@ -623,7 +646,7 @@ class QLabeledDoubleRangeSlider(QLabeledRangeSlider):
 
     def _rename_signals(self) -> None:
         super()._rename_signals()
-        self.rangeChanged = self._frangeChanged
+        self.rangeChanged = self.frangeChanged
 
     def decimals(self) -> int:
         return self._min_label.decimals()
@@ -644,7 +667,7 @@ class QLabeledDoubleRangeSlider(QLabeledRangeSlider):
     """The color of the bar between the first and last handle."""
 
 
-class SliderLabel(QDoubleSpinBox):
+class SliderLabel(QLineEdit):
     def __init__(
         self,
         slider: QSlider,
@@ -656,59 +679,140 @@ class SliderLabel(QDoubleSpinBox):
         super().__init__(parent=parent)
         self._slider = slider
         self._index = index
+        self._prefix = ""
+        self._suffix = ""
+        self._min = slider.minimum()
+        self._max = slider.maximum()
+        self._value = self._min
+        self._callback = connect
+        self._decimals = -1
         self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
         self.setMode(EdgeLabelMode.LabelIsValue)
-        self.setDecimals(0)
+        self.setDecimals(0)  # calls updateText
+        validator = QDoubleValidator(self)
+        validator.setNotation(QDoubleValidator.Notation.ScientificNotation)
+        self.setValidator(validator)
 
-        self.setRange(slider.minimum(), slider.maximum())
+        slider.rangeChanged.connect(self.setRange)
         slider.rangeChanged.connect(self._update_size)
         self.setAlignment(alignment)
-        self.setButtonSymbols(QSpinBox.ButtonSymbols.NoButtons)
-
-        le = self.lineEdit()
-        # make the lineedit transparent
-        palette = le.palette()
-        palette.setColor(palette.ColorRole.Base, Qt.GlobalColor.transparent)
-        le.setPalette(palette)
-        le.setFrame(False)  # no border
-
+        self.setStyleSheet("background:transparent; border: 0;")
         if connect is not None:
-            self.editingFinished.connect(lambda: connect(self.value()))
+            self.editingFinished.connect(self._editing_finished)
         self.editingFinished.connect(self._silent_clear_focus)
         self._update_size()
 
+    def _editing_finished(self):
+        self._silent_clear_focus()
+        self.setValue(float(self.text()))
+        if self._callback:
+            self._callback(self.value())
+
+    def setRange(self, min_: float, max_: float) -> None:
+        if self._mode == EdgeLabelMode.LabelIsRange:
+            max_val = max(abs(min_), abs(max_))
+            n_digits = max(len(str(int(max_val))), 7)
+            upper_bound = int("9" * n_digits)
+            self._min = -upper_bound
+            self._max = upper_bound
+            self._update_size()
+        else:
+            max_ = max(max_, min_)
+            self._min = min_
+            self._max = max_
+
     def setDecimals(self, prec: int) -> None:
-        super().setDecimals(prec)
+        # super().setDecimals(prec)
+        self._decimals = prec
+        self.updateText()
         self._update_size()
 
+    def decimals(self) -> int:
+        """Return the number of decimals used in the label."""
+        return self._decimals
+
+    def value(self) -> float:
+        return self._value
+
     def setValue(self, val: Any) -> None:
-        super().setValue(val)
+        if val < self._min:
+            val = self._min
+        elif val > self._max:
+            val = self._max
+        self._value = val
+        self.updateText()
+
+    def updateText(self) -> None:
+        val = float(self._value)
+        use_scientific = (abs(val) < 0.0001 or abs(val) > 9999999.0) and val != 0.0
+        font_metrics = QFontMetrics(self.font())
+        eight_len = _fm_width(font_metrics, "8")
+
+        available_chars = self.width() // eight_len
+
+        total, _fraction = f"{val:.<f}".split(".")
+
+        if len(total) > available_chars:
+            use_scientific = True
+
+        if self._decimals < 0:
+            if use_scientific:
+                mantissa, exponent = f"{val:.{available_chars}e}".split("e")
+                mantissa = mantissa.rstrip("0").rstrip(".")
+                if len(mantissa) + len(exponent) + 1 < available_chars:
+                    text = f"{mantissa}e{exponent}"
+                else:
+                    decimals = max(available_chars - len(exponent) - 3, 2)
+                    text = f"{val:.{decimals}e}"
+
+            else:
+                decimals = max(available_chars - len(total) - 1, 2)
+                text = f"{val:.{decimals}f}"
+                text = text.rstrip("0").rstrip(".")
+        else:
+            if use_scientific:
+                mantissa, exponent = f"{val:.{self._decimals}e}".split("e")
+                mantissa = mantissa.rstrip("0").rstrip(".")
+                text = f"{mantissa}e{exponent}"
+            else:
+                text = f"{val:.{self._decimals}f}"
+        if text == "":
+            text = "0"
+        self.setText(text)
         if self._mode == EdgeLabelMode.LabelIsRange:
             self._update_size()
 
-    def setMaximum(self, max: float) -> None:
-        super().setMaximum(max)
-        if self._mode == EdgeLabelMode.LabelIsValue:
-            self._update_size()
+    def minimum(self):
+        return self._min
 
-    def setMinimum(self, min: float) -> None:
-        super().setMinimum(min)
-        if self._mode == EdgeLabelMode.LabelIsValue:
-            self._update_size()
+    def setMaximum(self, max_: float) -> None:
+        self.setRange(self._min, max_)
+
+    def maximum(self):
+        return self._max
+
+    def setMinimum(self, min_: float) -> None:
+        self.setRange(min_, self._max)
 
     def setMode(self, opt: EdgeLabelMode) -> None:
         # when the edge labels are controlling slider range,
         # we want them to have a big range, but not have a huge label
         self._mode = opt
-        if opt == EdgeLabelMode.LabelIsRange:
-            self.setMinimum(-9999999)
-            self.setMaximum(9999999)
-            with contextlib.suppress(Exception):
-                self._slider.rangeChanged.disconnect(self.setRange)
-        else:
-            self.setMinimum(self._slider.minimum())
-            self.setMaximum(self._slider.maximum())
-            self._slider.rangeChanged.connect(self.setRange)
+        self.setRange(self._slider.minimum(), self._slider.maximum())
+        self._update_size()
+
+    def prefix(self) -> str:
+        return self._prefix
+
+    def setPrefix(self, prefix: str) -> None:
+        self._prefix = prefix
+        self._update_size()
+
+    def suffix(self) -> str:
+        return self._suffix
+
+    def setSuffix(self, suffix: str) -> None:
+        self._suffix = suffix
         self._update_size()
 
     # --------------- private ----------------
@@ -717,7 +821,7 @@ class SliderLabel(QDoubleSpinBox):
         with signals_blocked(self):
             self.clearFocus()
 
-    def _update_size(self, *_: Any) -> None:
+    def _get_size(self):
         # fontmetrics to measure the width of text
         fm = QFontMetrics(self.font())
         h = self.sizeHint().height()
@@ -725,25 +829,25 @@ class SliderLabel(QDoubleSpinBox):
 
         if self._mode & EdgeLabelMode.LabelIsValue:
             # determine width based on min/max/specialValue
-            mintext = self.textFromValue(self.minimum())[:18]
-            maxtext = self.textFromValue(self.maximum())[:18]
+            mintext = str(self.minimum())[:18]
+            maxtext = str(self.maximum())[:18]
             w = max(0, _fm_width(fm, mintext + fixed_content))
             w = max(w, _fm_width(fm, maxtext + fixed_content))
-            if self.specialValueText():
-                w = max(w, _fm_width(fm, self.specialValueText()))
             if self._mode & EdgeLabelMode.LabelIsRange:
                 w += 8  # it seems as thought suffix() is not enough
         else:
-            w = max(0, _fm_width(fm, self.textFromValue(self.value()))) + 3
+            w = max(0, _fm_width(fm, str(self.value()))) + 3
 
         w += 3  # cursor blinking space
         # get the final size hint
-        opt = QStyleOptionSpinBox()
-        self.initStyleOption(opt)
-        size = self.style().sizeFromContents(
-            QStyle.ContentsType.CT_SpinBox, opt, QSize(w, h), self
+        opt = QStyleOption()
+        # self.initStyleOption(opt)
+        return self.style().sizeFromContents(
+            QStyle.ContentsType.CT_LineEdit, opt, QSize(w, h), self
         )
-        self.setFixedSize(size)
+
+    def _update_size(self, *_: Any) -> None:
+        self.setFixedSize(self._get_size())
 
     def validate(
         self, input_: str | None, pos: int
@@ -752,6 +856,12 @@ class SliderLabel(QDoubleSpinBox):
         if input_ and "." in input_ and self.decimals() < 1:
             return QValidator.State.Invalid, input_, len(input_)
         return super().validate(input_, pos)
+
+    def showEvent(self, event: Any) -> None:
+        # need to update size after showing
+        # to handle the qss font size change
+        super().showEvent(event)
+        self._update_size()
 
 
 def _fm_width(fm: QFontMetrics, text: str) -> int:

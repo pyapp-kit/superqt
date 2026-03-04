@@ -7,16 +7,22 @@ from qtpy.QtCore import QSize, Qt
 from qtpy.QtGui import QIcon, QPainter, QPixmap
 from qtpy.QtWidgets import QApplication
 
+try:
+    from pyconify import svg_path
+except ModuleNotFoundError:  # pragma: no cover
+    raise ModuleNotFoundError(
+        "pyconify is required to use QIconifyIcon. "
+        "Please install it with `pip install pyconify` or use the "
+        "`pip install superqt[iconify]` extra."
+    ) from None
+
 if TYPE_CHECKING:
     from typing import Literal
 
     Flip = Literal["horizontal", "vertical", "horizontal,vertical"]
     Rotation = Literal["90", "180", "270", 90, 180, 270, "-90", 1, 2, 3]
 
-try:
-    from pyconify import svg_path
-except ModuleNotFoundError:  # pragma: no cover
-    svg_path = None
+__all__ = ["QIconifyIcon"]
 
 
 class QIconifyIcon(QIcon):
@@ -25,7 +31,7 @@ class QIconifyIcon(QIcon):
     Iconify includes 150,000+ icons from most major icon sets including Bootstrap,
     FontAwesome, Material Design, and many more.
 
-    Search availble icons at https://icon-sets.iconify.design
+    Search available icons at https://icon-sets.iconify.design
     Once you find one you like, use the key in the format `"prefix:name"` to create an
     icon:  `QIconifyIcon("bi:bell")`.
 
@@ -74,14 +80,9 @@ class QIconifyIcon(QIcon):
         rotate: Rotation | None = None,
         dir: str | None = None,
     ):
-        if svg_path is None:  # pragma: no cover
-            raise ModuleNotFoundError(
-                "pyconify is required to use QIconifyIcon. "
-                "Please install it with `pip install pyconify` or use the "
-                "`pip install superqt[iconify]` extra."
-            )
         super().__init__()
-        self.addKey(*key, color=color, flip=flip, rotate=rotate, dir=dir)
+        if key:
+            self.addKey(*key, color=color, flip=flip, rotate=rotate, dir=dir)
 
     def addKey(
         self,
@@ -93,7 +94,7 @@ class QIconifyIcon(QIcon):
         size: QSize | None = None,
         mode: QIcon.Mode = QIcon.Mode.Normal,
         state: QIcon.State = QIcon.State.Off,
-    ) -> None:
+    ) -> QIconifyIcon:
         """Add an icon to this QIcon.
 
         This is a variant of `QIcon.addFile` that uses an iconify icon keys and
@@ -123,17 +124,24 @@ class QIconifyIcon(QIcon):
             Mode specified for the icon, passed to `QIcon.addFile`.
         state : QIcon.State, optional
             State specified for the icon, passed to `QIcon.addFile`.
+
+        Returns
+        -------
+        QIconifyIcon
+            This QIconifyIcon instance, for chaining.
         """
         try:
             path = svg_path(*key, color=color, flip=flip, rotate=rotate, dir=dir)
-        except OSError:
+        except OSError as e:
             warnings.warn(
-                f"Unable to connect to internet, and icon {key} not cached.",
+                f"Error fetching icon: {e}.\nIcon {key} not cached. Using fallback.",
                 stacklevel=2,
             )
             self._draw_text_fallback(key)
         else:
             self.addFile(str(path), size or QSize(), mode, state)
+
+        return self
 
     def _draw_text_fallback(self, key: tuple[str, ...]) -> None:
         if style := QApplication.style():

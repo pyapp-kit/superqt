@@ -3,7 +3,7 @@ from enum import Enum, EnumMeta, Flag
 from functools import reduce
 from itertools import combinations
 from operator import or_
-from typing import Optional, Tuple, TypeVar
+from typing import TypeVar
 
 from qtpy.QtCore import Signal
 from qtpy.QtWidgets import QComboBox
@@ -14,7 +14,7 @@ EnumType = TypeVar("EnumType", bound=Enum)
 NONE_STRING = "----"
 
 
-def _get_name(enum_value: Enum):
+def _get_name(enum_value: Enum) -> str:
     """Create human readable name if user does not implement `__str__`."""
     str_module = getattr(enum_value.__str__, "__module__", "enum")
     if str_module != "enum" and not str_module.startswith("shibokensupport"):
@@ -40,14 +40,14 @@ def _get_name(enum_value: Enum):
 
             from enum import _decompose
 
-            members, not_covered = _decompose(enum_value.__class__, enum_value.value)
+            members, _not_covered = _decompose(enum_value.__class__, enum_value.value)
             name = "|".join(m.name.replace("_", " ") for m in members[::-1])
         else:
             name = enum_value.name.replace("_", " ")
     return name
 
 
-def _get_name_with_value(enum_value: Enum) -> Tuple[str, Enum]:
+def _get_name_with_value(enum_value: Enum) -> tuple[str, Enum]:
     return _get_name(enum_value), enum_value
 
 
@@ -61,7 +61,7 @@ class QEnumComboBox(QComboBox):
     currentEnumChanged = Signal(object)
 
     def __init__(
-        self, parent=None, enum_class: Optional[EnumMeta] = None, allow_none=False
+        self, parent=None, enum_class: EnumMeta | None = None, allow_none=False
     ):
         super().__init__(parent)
         self._enum_class = None
@@ -70,7 +70,7 @@ class QEnumComboBox(QComboBox):
             self.setEnumClass(enum_class, allow_none)
         self.currentIndexChanged.connect(self._emit_signal)
 
-    def setEnumClass(self, enum: Optional[EnumMeta], allow_none=False):
+    def setEnumClass(self, enum: EnumMeta | None, allow_none=False):
         """Set enum class from which members value should be selected."""
         self.clear()
         self._enum_class = enum
@@ -81,7 +81,7 @@ class QEnumComboBox(QComboBox):
         super().addItems(list(names_))
 
     @staticmethod
-    def _get_enum_member_list(enum: Optional[EnumMeta]):
+    def _get_enum_member_list(enum: EnumMeta | None):
         if issubclass(enum, Flag):
             members = list(enum.__members__.values())
             comb_list = []
@@ -92,7 +92,7 @@ class QEnumComboBox(QComboBox):
             comb_list = list(enum.__members__.values())
         return dict(map(_get_name_with_value, comb_list))
 
-    def enumClass(self) -> Optional[EnumMeta]:
+    def enumClass(self) -> EnumMeta | None:
         """Return current Enum class."""
         return self._enum_class
 
@@ -105,7 +105,7 @@ class QEnumComboBox(QComboBox):
         self._allow_none = False
         super().clear()
 
-    def currentEnum(self) -> Optional[EnumType]:
+    def currentEnum(self) -> EnumType | None:
         """Current value as Enum member."""
         if self._enum_class is not None:
             if self._allow_none:
@@ -114,7 +114,7 @@ class QEnumComboBox(QComboBox):
             return self._get_enum_member_list(self._enum_class)[self.currentText()]
         return None
 
-    def setCurrentEnum(self, value: Optional[EnumType]) -> None:
+    def setCurrentEnum(self, value: EnumType | None) -> None:
         """Set value with Enum."""
         if self._enum_class is None:
             raise RuntimeError(

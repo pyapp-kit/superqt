@@ -3,7 +3,6 @@ from unittest.mock import patch
 
 import numpy as np
 import pytest
-from qtpy import API_NAME
 
 try:
     from cmap import Colormap
@@ -76,8 +75,9 @@ def test_catalog_combo(qtbot):
     assert wdg.currentColormap() == Colormap("viridis")
 
 
-def test_cmap_combo(qtbot):
-    wdg = QColormapComboBox(allow_user_colormaps=True)
+@pytest.mark.parametrize("filterable", [False, True])
+def test_cmap_combo(qtbot, filterable):
+    wdg = QColormapComboBox(allow_user_colormaps=True, filterable=filterable)
     qtbot.addWidget(wdg)
     wdg.show()
     assert wdg.userAdditionsAllowed()
@@ -96,12 +96,20 @@ def test_cmap_combo(qtbot):
     assert wdg.count() == 4  # make sure we didn't duplicate
     assert wdg.currentIndex() == 1
 
-    if API_NAME == "PySide2":
-        return  # the rest fails on CI... but works locally
-
     # click the Add Colormap... item
+    # NOTE: We wrap __init__ instead of patching exec directly because
+    # PySide6 6.10 crashes when MetaObjectBuilder inspects mocked methods
+    # during signal connection (parsePythonType segfault)
+    _original_init = _cmap_combo._CmapNameDialog.__init__
+
+    def _init_with_mock_exec(self, *args, **kwargs):
+        _original_init(self, *args, **kwargs)
+        self.exec = lambda: True
+
     with qtbot.waitSignal(wdg.currentColormapChanged):
-        with patch.object(_cmap_combo._CmapNameDialog, "exec", return_value=True):
+        with patch.object(
+            _cmap_combo._CmapNameDialog, "__init__", _init_with_mock_exec
+        ):
             wdg._on_activated(wdg.count() - 1)
 
     assert wdg.count() == 5
@@ -110,7 +118,13 @@ def test_cmap_combo(qtbot):
     assert wdg.itemColormap(3).name.split(":")[-1] == "accent"
 
     # click the Add Colormap... item, but cancel the dialog
-    with patch.object(_cmap_combo._CmapNameDialog, "exec", return_value=False):
+    def _init_with_mock_exec_false(self, *args, **kwargs):
+        _original_init(self, *args, **kwargs)
+        self.exec = lambda: False
+
+    with patch.object(
+        _cmap_combo._CmapNameDialog, "__init__", _init_with_mock_exec_false
+    ):
         wdg._on_activated(wdg.count() - 1)
 
 

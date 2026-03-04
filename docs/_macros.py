@@ -35,7 +35,7 @@ def define_env(env: "MacrosPlugin"):
             src = src.replace(
                 "QApplication([])", "QApplication.instance() or QApplication([])"
             )
-            src = src.replace("app.exec_()", "")
+            src = src.replace("app.exec_()", "app.processEvents()")
 
             exec(src)
             _grab(dest, width)
@@ -127,7 +127,6 @@ def define_env(env: "MacrosPlugin"):
 
 def _grab(dest: str | Path, width) -> list[Path]:
     """Grab the top widgets of the application."""
-    from qtpy.QtCore import QTimer
     from qtpy.QtWidgets import QApplication
 
     w = QApplication.topLevelWidgets()[-1]
@@ -135,12 +134,3 @@ def _grab(dest: str | Path, width) -> list[Path]:
     w.activateWindow()
     w.setMinimumHeight(40)
     w.grab().save(str(dest))
-
-    # hack to make sure the object is truly closed and deleted
-    while True:
-        QTimer.singleShot(10, w.deleteLater)
-        QApplication.processEvents()
-        try:
-            w.parent()
-        except RuntimeError:
-            return

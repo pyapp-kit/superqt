@@ -1,5 +1,3 @@
-from typing import List, Tuple
-
 import pytest
 from pytestqt.qtbot import QtBot
 from qtpy.QtCore import Qt
@@ -30,15 +28,15 @@ def widget(qtbot: QtBot, data: dict) -> QSearchableTreeWidget:
     return widget
 
 
-def columns(item: QTreeWidgetItem) -> Tuple[str, str]:
+def columns(item: QTreeWidgetItem) -> tuple[str, str]:
     return item.text(0), item.text(1)
 
 
-def all_items(tree: QTreeWidget) -> List[QTreeWidgetItem]:
+def all_items(tree: QTreeWidget) -> list[QTreeWidgetItem]:
     return tree.findItems("", Qt.MatchContains | Qt.MatchRecursive)
 
 
-def shown_items(tree: QTreeWidget) -> List[QTreeWidgetItem]:
+def shown_items(tree: QTreeWidget) -> list[QTreeWidgetItem]:
     items = all_items(tree)
     return [item for item in items if not item.isHidden()]
 

@@ -121,6 +121,10 @@ def draw_colormap(
         painter.setBrush(gradient)
         painter.drawRect(rect)
 
+    # If we created a new Painter, free its resources
+    if isinstance(painter_or_device, QPaintDevice):
+        painter.end()
+
 
 def _draw_checkerboard(
     painter: QPainter, rect: QRect | QRectF, checker_size: int
@@ -160,5 +164,5 @@ def pick_font_color(cmap: Colormap, at_stop: float = 0.49, alpha: int = 255) -> 
 def _is_dark(cmap: Colormap, at_stop: float, threshold: float = 110) -> bool:
     """Return True if the color at `at_stop` is dark according to `threshold`."""
     color = cmap(at_stop)
-    r, g, b, a = color.rgba8
+    r, g, b, _a = color.rgba8
     return (r * 0.299 + g * 0.587 + b * 0.114) > threshold

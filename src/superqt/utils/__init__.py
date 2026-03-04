@@ -1,32 +1,34 @@
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from superqt.cmap import draw_colormap  # noqa: TCH004
+    from superqt.cmap import draw_colormap
 
 __all__ = (
     "CodeSyntaxHighlight",
+    "FunctionWorker",
+    "GeneratorWorker",
+    "QFlowLayout",
+    "QMessageHandler",
+    "QSignalDebouncer",
+    "QSignalThrottler",
+    "WorkerBase",
     "create_worker",
-    "qimage_to_array",
     "draw_colormap",
     "ensure_main_thread",
     "ensure_object_thread",
     "exceptions_as_dialog",
-    "FunctionWorker",
-    "GeneratorWorker",
     "new_worker_qthread",
     "qdebounced",
-    "QMessageHandler",
-    "QSignalDebouncer",
-    "QSignalThrottler",
+    "qimage_to_array",
     "qthrottled",
     "signals_blocked",
     "thread_worker",
-    "WorkerBase",
 )
 
 from ._code_syntax_highlight import CodeSyntaxHighlight
 from ._ensure_thread import ensure_main_thread, ensure_object_thread
 from ._errormsg_context import exceptions_as_dialog
+from ._flow_layout import QFlowLayout
 from ._img_utils import qimage_to_array
 from ._message_handler import QMessageHandler
 from ._misc import signals_blocked

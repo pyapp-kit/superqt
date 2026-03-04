@@ -1,4 +1,5 @@
-from typing import List, Optional, Sequence, Tuple, TypeVar, Union
+from collections.abc import Sequence
+from typing import TypeVar
 
 from qtpy import QtGui
 from qtpy.QtCore import Property, QEvent, QPoint, QPointF, QRect, QRectF, Qt, Signal
@@ -28,25 +29,27 @@ class _GenericRangeSlider(_GenericSlider):
     """
 
     # Emitted when the slider value has changed, with the new slider values
-    _valuesChanged = Signal(tuple)
+    valuesChanged = Signal(tuple)
+    # this is just a hack to allow napari v0.4.19 tests to pass)
+    # since it used the presence of this private signal as a duck-typing check.
+    _valuesChanged = valuesChanged
 
     # Emitted when sliderDown is true and the slider moves
     # This usually happens when the user is dragging the slider
     # The value is the positions of *all* handles.
-    _slidersMoved = Signal(tuple)
+    slidersMoved = Signal(tuple)
 
     def __init__(self, *args, **kwargs):
         self._style = RangeSliderStyle()
 
         super().__init__(*args, **kwargs)
-        self.valueChanged = self._valuesChanged
-        self.sliderMoved = self._slidersMoved
+
         # list of values
-        self._value: List[_T] = [20, 80]
+        self._value: list[_T] = [20, 80]
 
         # list of current positions of each handle. same length as _value
         # If tracking is enabled (the default) this will be identical to _value
-        self._position: List[_T] = [20, 80]
+        self._position: list[_T] = [20, 80]
 
         # which handle is being pressed/hovered
         self._pressedIndex = 0
@@ -62,6 +65,10 @@ class _GenericRangeSlider(_GenericSlider):
         # color
 
         self.setStyleSheet("")
+
+    def _rename_signals(self) -> None:
+        self.valueChanged = self.valuesChanged
+        self.sliderMoved = self.slidersMoved
 
     # ###############  New Public API  #######################
 
@@ -113,7 +120,7 @@ class _GenericRangeSlider(_GenericSlider):
 
     # ###############  QtOverrides  #######################
 
-    def value(self) -> Tuple[_T, ...]:
+    def value(self) -> tuple[_T, ...]:
         """Get current value of the widget as a tuple of integers."""
         return tuple(self._value)
 
@@ -126,8 +133,8 @@ class _GenericRangeSlider(_GenericSlider):
 
     def setSliderPosition(  # type: ignore
         self,
-        pos: Union[float, Sequence[float]],
-        index: Optional[int] = None,
+        pos: float | Sequence[float],
+        index: int | None = None,
         *,
         reversed: bool = False,
     ) -> None:
@@ -253,7 +260,7 @@ class _GenericRangeSlider(_GenericSlider):
     # SubControl Positions
 
     def _handleRect(
-        self, handle_index: int, opt: Optional[QStyleOptionSlider] = None
+        self, handle_index: int, opt: QStyleOptionSlider | None = None
     ) -> QRect:
         """Return the QRect for all handles."""
         opt = opt or self._styleOption
@@ -331,8 +338,8 @@ class _GenericRangeSlider(_GenericSlider):
 
     # NOTE: this is very much tied to mousepress... not a generic "get control"
     def _getControlAtPos(
-        self, pos: QPoint, opt: Optional[QStyleOptionSlider] = None
-    ) -> Tuple[QStyle.SubControl, int]:
+        self, pos: QPoint, opt: QStyleOptionSlider | None = None
+    ) -> tuple[QStyle.SubControl, int]:
         """Update self._pressedControl based on ev.pos()."""
         opt = opt or self._styleOption
 

@@ -15,7 +15,7 @@ skip_on_ci = pytest.mark.skipif(bool(os.getenv("CI")), reason="github hangs")
 
 
 class SampleObject(QObject):
-    assigment_done = Signal()
+    assignment_done = Signal()
 
     def __init__(self):
         super().__init__()
@@ -37,7 +37,7 @@ class SampleObject(QObject):
         if QThread.currentThread() is not QCoreApplication.instance().thread():
             raise RuntimeError("Wrong thread")
         self.main_thread_prop_val = value
-        self.assigment_done.emit()
+        self.assignment_done.emit()
 
     @property
     def sample_object_thread_property(self):
@@ -49,21 +49,21 @@ class SampleObject(QObject):
         if QThread.currentThread() is not self.thread():
             raise RuntimeError("Wrong thread")
         self.sample_thread_prop_val = value
-        self.assigment_done.emit()
+        self.assignment_done.emit()
 
     @ensure_main_thread
     def check_main_thread(self, a, *, b=1):
         if QThread.currentThread() is not QCoreApplication.instance().thread():
             raise RuntimeError("Wrong thread")
         self.main_thread_res = {"a": a, "b": b}
-        self.assigment_done.emit()
+        self.assignment_done.emit()
 
     @ensure_object_thread
     def check_object_thread(self, a, *, b=1):
         if QThread.currentThread() is not self.thread():
             raise RuntimeError("Wrong thread")
         self.object_thread_res = {"a": a, "b": b}
-        self.assigment_done.emit()
+        self.assignment_done.emit()
 
     @ensure_object_thread(await_return=True)
     def check_object_thread_return(self, a):
@@ -209,11 +209,11 @@ def test_object_thread(qtbot):
     thread = QThread()
     thread.start()
     ob.moveToThread(thread)
-    with qtbot.waitSignal(ob.assigment_done):
+    with qtbot.waitSignal(ob.assignment_done):
         ob.check_object_thread(2, b=4)
     assert ob.object_thread_res == {"a": 2, "b": 4}
 
-    with qtbot.waitSignal(ob.assigment_done):
+    with qtbot.waitSignal(ob.assignment_done):
         ob.sample_object_thread_property = "text"
 
     assert ob.sample_object_thread_property == "text"

@@ -11,7 +11,7 @@ running in the desired thread:
 
 `ensure_object_thread` ensures that a decorated bound method of a `QObject` runs
 in the thread in which the instance lives ([see qt documentation for
-details](https://doc.qt.io/qt-5/threads-qobject.html#accessing-qobject-subclasses-from-other-threads)).
+details](https://doc.qt.io/qt-6/threads-qobject.html#accessing-qobject-subclasses-from-other-threads)).
 
 ## Usage
 
