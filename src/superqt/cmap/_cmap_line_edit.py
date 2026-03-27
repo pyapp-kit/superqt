@@ -4,7 +4,13 @@ from typing import TYPE_CHECKING, Any
 
 from qtpy.QtCore import QRect, Qt
 from qtpy.QtGui import QIcon, QPainter, QPaintEvent, QPalette
-from qtpy.QtWidgets import QApplication, QLineEdit, QStyle, QWidget
+from qtpy.QtWidgets import (
+    QApplication,
+    QLineEdit,
+    QStyle,
+    QStyleOptionFrame,
+    QWidget,
+)
 
 from ._cmap_utils import draw_colormap, pick_font_color, try_cast_colormap
 
@@ -56,7 +62,7 @@ class QColormapLineEdit(QLineEdit):
         self,
         parent: QWidget | None = None,
         *,
-        fractional_colormap_width: float = 0.33,
+        fractional_colormap_width: float = 0.35,
         fallback_cmap: Colormap | str | None = "gray",
         missing_icon: QIcon | QStyle.StandardPixmap = MISSING,
         checkerboard_size: int = 4,
@@ -150,27 +156,35 @@ class QColormapLineEdit(QLineEdit):
     def _cmap_is_full_width(self):
         return self._colormap_fraction >= 0.75
 
+    def _content_rect(self) -> QRect:
+        """Return the style-aware content rect for this line edit."""
+        opt = QStyleOptionFrame()
+        self.initStyleOption(opt)
+        return self.style().subElementRect(
+            QStyle.SubElement.SE_LineEditContents, opt, self
+        )
+
     def _cmap_rect(self) -> QRect:
-        cmap_rect = self.rect().adjusted(2, 0, 0, 0)
-        cmap_rect.setWidth(int(cmap_rect.width() * self._colormap_fraction))
-        return cmap_rect
+        cr = self._content_rect()
+        # Apply the horizontal content inset as vertical padding too,
+        # so the swatch sits inside the style's painted background.
+        v_pad = cr.x() - self.rect().x()
+        return QRect(
+            max(cr.x(), 2),
+            v_pad,
+            int(cr.width() * self._colormap_fraction),
+            self.rect().height() - 2 * v_pad,
+        )
 
     def resizeEvent(self, e: Any) -> None:
         left_margin = 6
         if not self._cmap_is_full_width():
-            # leave room for the colormap
-            left_margin += self._cmap_rect().width()
+            left_margin = self._cmap_rect().right() + 4 - self.rect().x()
         self.setTextMargins(left_margin, 2, 0, 0)
         super().resizeEvent(e)
 
     def paintEvent(self, e: QPaintEvent) -> None:
-        # don't draw the background
-        # otherwise it will cover the colormap during super().paintEvent
-        # FIXME: this appears to need to be reset during every paint event...
-        # otherwise something is resetting it
-        palette = self.palette()
-        palette.setColor(palette.ColorRole.Base, Qt.GlobalColor.transparent)
-        self.setPalette(palette)
+        super().paintEvent(e)  # let the style paint background + text first
 
         cmap_rect = self._cmap_rect()
         if self._cmap:
@@ -181,5 +195,3 @@ class QColormapLineEdit(QLineEdit):
             if self._missing_cmap:
                 draw_colormap(self, self._missing_cmap, cmap_rect)
             self._missing_icon.paint(QPainter(self), cmap_rect.adjusted(4, 4, 0, -4))
-
-        super().paintEvent(e)  # draw text (must come after draw_colormap)
