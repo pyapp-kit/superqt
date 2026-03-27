@@ -220,12 +220,16 @@ class QColormapComboBox(QComboBox):
                 self.setCurrentIndex(idx)
                 return
 
-        # cmap_ not in the combo box - add it!
+        # cmap not in the combo box yet — add it, then select it
         self.addColormap(cmap)
-        # then, select it
-        idx = self.count() - (2 if self._allow_user_colors else 1)
-        self.setCurrentIndex(idx)
-        self._on_index_changed(idx)
+        idx = self.findData(cmap, CMAP_ROLE)
+        if idx >= 0:
+            old_idx = self.currentIndex()
+            self.setCurrentIndex(idx)
+            if idx == old_idx:
+                # setCurrentIndex won't emit if the index didn't actually change
+                # (e.g. first item added at index 0 when current index is already 0)
+                self._on_index_changed(idx)
 
     def _on_activated(self, index: int) -> None:
         if self.itemText(index) != self._add_color_text:
@@ -279,14 +283,15 @@ class QColormapComboBox(QComboBox):
 
     def eventFilter(self, obj: QObject | None, event: QEvent | None) -> bool:
         if event and event.type() == QEvent.Type.MouseButtonRelease:
-            if cast("QMouseEvent", event).button() == Qt.MouseButton.RightButton:
+            mouse_event = cast("QMouseEvent", event)
+            if mouse_event.button() == Qt.MouseButton.RightButton:
                 view = self.view()
                 if view and obj is view.viewport():
-                    index = view.indexAt(event.pos())
+                    index = view.indexAt(mouse_event.pos())
                     if index.isValid():
                         text = self.itemText(index.row())
                         if text != self._add_color_text:
-                            self._show_remove_menu(view, event.pos(), index.row())
+                            self._show_remove_menu(view, mouse_event.pos(), index.row())
                     return True  # consume the right-click
         return super().eventFilter(obj, event)
 
@@ -297,8 +302,12 @@ class QColormapComboBox(QComboBox):
             was_current = row == self.currentIndex()
             self.removeItem(row)
             self._update_completer_model()
-            if was_current and self.count() > 0:
-                self.setCurrentIndex(0)
+            if was_current:
+                # select the first actual colormap, skipping "Add Colormap..."
+                for i in range(self.count()):
+                    if self.itemColormap(i) is not None:
+                        self.setCurrentIndex(i)
+                        return
 
     def keyPressEvent(self, e: QKeyEvent | None) -> None:
         if e and e.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):
