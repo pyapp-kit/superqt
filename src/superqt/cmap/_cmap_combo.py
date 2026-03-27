@@ -3,7 +3,15 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from cmap import Colormap
-from qtpy.QtCore import QSortFilterProxyModel, QStringListModel, Qt, Signal
+from qtpy.QtCore import (
+    QEvent,
+    QObject,
+    QSortFilterProxyModel,
+    QStringListModel,
+    Qt,
+    Signal,
+)
+from qtpy.QtGui import QMouseEvent
 from qtpy.QtWidgets import (
     QButtonGroup,
     QCheckBox,
@@ -11,6 +19,7 @@ from qtpy.QtWidgets import (
     QCompleter,
     QDialog,
     QDialogButtonBox,
+    QMenu,
     QSizePolicy,
     QVBoxLayout,
     QWidget,
@@ -108,6 +117,10 @@ class QColormapComboBox(QComboBox):
 
         self.currentIndexChanged.connect(self._on_index_changed)
         line_edit.editingFinished.connect(self._on_editing_finished)
+
+        # Enable right-click "Remove" on dropdown items
+        if (view := self.view()) and (viewport := view.viewport()):
+            viewport.installEventFilter(self)
 
     def userAdditionsAllowed(self) -> bool:
         """Returns whether the user can add custom colors."""
@@ -218,7 +231,7 @@ class QColormapComboBox(QComboBox):
                     self.setCurrentIndex(i)
                     return
             self.addColormap(cmap)
-            self.currentIndexChanged.emit(self.currentIndex())
+            self.setCurrentColormap(cmap)
         elif self._last_cmap is not None:
             # user canceled, restore previous color without emitting signal
             idx = self.findData(self._last_cmap, CMAP_ROLE)
@@ -256,6 +269,29 @@ class QColormapComboBox(QComboBox):
             # if the cmap is not in the list, add it
             if self.findData(cmap, CMAP_ROLE) < 0:
                 self.addColormap(cmap)
+
+    def eventFilter(self, obj: QObject | None, event: QEvent | None) -> bool:
+        if event and isinstance(event, QMouseEvent):
+            if event.button() == Qt.MouseButton.RightButton:
+                view = self.view()
+                if view and obj is view.viewport():
+                    index = view.indexAt(event.pos())
+                    if index.isValid():
+                        text = self.itemText(index.row())
+                        if text != self._add_color_text:
+                            self._show_remove_menu(view, event.pos(), index.row())
+                    return True  # consume the right-click
+        return super().eventFilter(obj, event)
+
+    def _show_remove_menu(self, view: Any, pos: Any, row: int) -> None:
+        menu = QMenu(view)
+        remove_action = menu.addAction("Remove")
+        if menu.exec(view.viewport().mapToGlobal(pos)) == remove_action:
+            was_current = row == self.currentIndex()
+            self.removeItem(row)
+            self._update_completer_model()
+            if was_current and self.count() > 0:
+                self.setCurrentIndex(0)
 
     def keyPressEvent(self, e: QKeyEvent | None) -> None:
         if e and e.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):
