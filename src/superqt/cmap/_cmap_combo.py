@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from cmap import Colormap
 from qtpy.QtCore import (
@@ -11,7 +11,6 @@ from qtpy.QtCore import (
     Qt,
     Signal,
 )
-from qtpy.QtGui import QMouseEvent
 from qtpy.QtWidgets import (
     QButtonGroup,
     QCheckBox,
@@ -36,7 +35,7 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
 
     from cmap._colormap import ColorStopsLike
-    from qtpy.QtGui import QKeyEvent
+    from qtpy.QtGui import QKeyEvent, QMouseEvent
 
 
 CMAP_ROLE = Qt.ItemDataRole.UserRole + 1
@@ -217,7 +216,16 @@ class QColormapComboBox(QComboBox):
 
         for idx in range(self.count()):
             if (item := self.itemColormap(idx)) and item.name == cmap.name:
+                # cmap_ is already here - just select it
                 self.setCurrentIndex(idx)
+                return
+
+        # cmap_ not in the combo box - add it!
+        self.addColormap(cmap)
+        # then, select it
+        idx = self.count() - (2 if self._allow_user_colors else 1)
+        self.setCurrentIndex(idx)
+        self._on_index_changed(idx)
 
     def _on_activated(self, index: int) -> None:
         if self.itemText(index) != self._add_color_text:
@@ -230,7 +238,6 @@ class QColormapComboBox(QComboBox):
                 if (item := self.itemColormap(i)) and cmap.name == item.name:
                     self.setCurrentIndex(i)
                     return
-            self.addColormap(cmap)
             self.setCurrentColormap(cmap)
         elif self._last_cmap is not None:
             # user canceled, restore previous color without emitting signal
@@ -271,8 +278,8 @@ class QColormapComboBox(QComboBox):
                 self.addColormap(cmap)
 
     def eventFilter(self, obj: QObject | None, event: QEvent | None) -> bool:
-        if event and isinstance(event, QMouseEvent):
-            if event.button() == Qt.MouseButton.RightButton:
+        if event and event.type() == QEvent.Type.MouseButtonRelease:
+            if cast("QMouseEvent", event).button() == Qt.MouseButton.RightButton:
                 view = self.view()
                 if view and obj is view.viewport():
                     index = view.indexAt(event.pos())

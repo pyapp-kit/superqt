@@ -62,7 +62,7 @@ class QColormapLineEdit(QLineEdit):
         self,
         parent: QWidget | None = None,
         *,
-        fractional_colormap_width: float = 0.4,
+        fractional_colormap_width: float = 0.35,
         fallback_cmap: Colormap | str | None = "gray",
         missing_icon: QIcon | QStyle.StandardPixmap = MISSING,
         checkerboard_size: int = 4,
@@ -170,7 +170,7 @@ class QColormapLineEdit(QLineEdit):
         # so the swatch sits inside the style's painted background.
         v_pad = cr.x() - self.rect().x()
         return QRect(
-            cr.x(),
+            max(cr.x(), 2),
             v_pad,
             int(cr.width() * self._colormap_fraction),
             self.rect().height() - 2 * v_pad,
