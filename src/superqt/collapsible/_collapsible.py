@@ -36,7 +36,6 @@ class _GhostToolButton(QToolButton):
         self.setCheckable(True)
         self.setAutoRaise(True)
         self.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
-        self.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
 
     def paintEvent(self, a0: QPaintEvent | None) -> None:
         if not a0:
