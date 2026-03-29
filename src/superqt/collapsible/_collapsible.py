@@ -13,8 +13,39 @@ from qtpy.QtCore import (
     Qt,
     Signal,
 )
-from qtpy.QtGui import QIcon, QPainter, QPalette, QPixmap
-from qtpy.QtWidgets import QFrame, QPushButton, QSizePolicy, QVBoxLayout, QWidget
+from qtpy.QtGui import QIcon, QPainter, QPaintEvent, QPalette, QPixmap
+from qtpy.QtWidgets import (
+    QFrame,
+    QSizePolicy,
+    QStyle,
+    QStyleOptionToolButton,
+    QStylePainter,
+    QToolButton,
+    QVBoxLayout,
+    QWidget,
+)
+
+
+class _GhostToolButton(QToolButton):
+    """Tool button that keeps a ghost appearance while checked."""
+
+    def __init__(self, parent: QWidget | None = None, *, title: str = "") -> None:
+        super().__init__(parent)
+        if title:
+            self.setText(title)
+        self.setCheckable(True)
+        self.setAutoRaise(True)
+        self.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
+        self.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+
+    def paintEvent(self, a0: QPaintEvent | None) -> None:
+        if not a0:
+            return super().paintEvent(a0)
+        option = QStyleOptionToolButton()
+        self.initStyleOption(option)
+        option.state &= ~QStyle.StateFlag.State_On
+        painter = QStylePainter(self)
+        painter.drawControl(QStyle.ControlElement.CE_ToolButtonLabel, option)
 
 
 class QCollapsible(QFrame):
@@ -39,13 +70,11 @@ class QCollapsible(QFrame):
         self._is_animating = False
         self._text = title
 
-        self._toggle_btn = QPushButton(title)
-        self._toggle_btn.setCheckable(True)
+        self._toggle_btn = _GhostToolButton(self, title=title)
         self.setCollapsedIcon(icon=collapsedIcon)
         self.setExpandedIcon(icon=expandedIcon)
         self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
 
-        self._toggle_btn.setStyleSheet("text-align: left; border: none; outline: none;")
         self._toggle_btn.toggled.connect(self._toggle)
 
         # frame layout
@@ -68,7 +97,7 @@ class QCollapsible(QFrame):
         _content.layout().setContentsMargins(QMargins(5, 0, 0, 0))
         self.setContent(_content)
 
-    def toggleButton(self) -> QPushButton:
+    def toggleButton(self) -> QToolButton:
         """Return the toggle button."""
         return self._toggle_btn
 
