@@ -15,6 +15,7 @@ from qtpy.QtCore import (
 )
 from qtpy.QtGui import QIcon, QPainter, QPaintEvent, QPalette, QPixmap
 from qtpy.QtWidgets import (
+    QApplication,
     QFrame,
     QSizePolicy,
     QStyle,
@@ -33,6 +34,8 @@ class _GhostToolButton(QToolButton):
         super().__init__(parent)
         if title:
             self.setText(title)
+        # Match QPushButton typography from main for consistent header text size.
+        self.setFont(QApplication.font("QPushButton"))
         self.setCheckable(True)
         self.setAutoRaise(True)
         self.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
