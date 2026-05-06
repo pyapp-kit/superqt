@@ -51,7 +51,6 @@ class QToggleSwitch(QtW.QAbstractButton):
         super().__init__(parent)
         self.setCheckable(True)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.toggled.connect(self._animate_handle)
 
         self._anim = QtCore.QPropertyAnimation(self, b"_offset", self)
         self._anim.setDuration(120)
@@ -115,14 +114,15 @@ class QToggleSwitch(QtW.QAbstractButton):
         width = opt.switch_width + text_size.width() + opt.margin * 2 + 8
         return QtCore.QSize(width, height)
 
-    # This keeps the handle state in sync when setChecked() is called
-    # within a signal blocker
     def checkStateSet(self) -> None:
-        """Sync the handle position when checked state changes under blocked signals."""
+        """Update the handle when the checked state changes programmatically."""
         super().checkStateSet()
-        if self.signalsBlocked():
-            self._anim.stop()
-            self._animate_handle(self.isChecked())
+        self._sync_handle_position()
+
+    def nextCheckState(self) -> None:
+        """Update the handle when the user toggles the button."""
+        super().nextCheckState()
+        self._sync_handle_position()
 
     ### Re-implementable methods for drawing the switch ###
 
@@ -283,10 +283,14 @@ class QToggleSwitch(QtW.QAbstractButton):
 
     ### Other private methods ###
 
+    def _sync_handle_position(self) -> None:
+        self._anim.stop()
+        self._animate_handle(self.isChecked())
+
     def _animate_handle(self, val: bool) -> None:
         end = self._offset_for_checkstate(val)
         if self._anim.duration():
-            self._anim.setStartValue(self._offset_for_checkstate(not val))
+            self._anim.setStartValue(self._offset_value)
             self._anim.setEndValue(end)
             self._anim.start()
         else:
