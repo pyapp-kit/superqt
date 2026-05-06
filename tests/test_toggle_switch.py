@@ -148,6 +148,7 @@ def test_qsignalblocker_updates_handle_position(qtbot):
     wdg = QToggleSwitch()
     qtbot.addWidget(wdg)
     wdg.show()
+    wdg.setAnimationDuration(0)
 
     off = wdg._offset_for_checkstate(False)
     on = wdg._offset_for_checkstate(True)
