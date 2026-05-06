@@ -115,7 +115,7 @@ class QToggleSwitch(QtW.QAbstractButton):
         width = opt.switch_width + text_size.width() + opt.margin * 2 + 8
         return QtCore.QSize(width, height)
 
-    # This fixes the animation when QSignalBlocker is used. It is hacky.
+    # This fixes the animation when QSignalBlocker is used.
     def checkStateSet(self) -> None:
         """Do animation if signals are blocked."""
         super().checkStateSet()
