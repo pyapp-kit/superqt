@@ -30,8 +30,8 @@ app.exec()
 
 !!! note
 
-    `QQuantity` currently support simple units with exponents, e.g., `meters^2` or
-    `1/second`. However, non-simple units, e.g. `meter/second`, `Newton`, etc.,
+    `QQuantity` currently supports simple units with exponents, e.g., `meters^2` or
+    `1/second`. However, compound units, e.g. `meter/second`, `Newton`, etc.,
     are not currently supported.
 
 {{ show_widget(150) }}
