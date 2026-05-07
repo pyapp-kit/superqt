@@ -110,6 +110,19 @@ class QQuantity(QWidget):
         """Return the pint UnitRegistry used by this widget."""
         return self._ureg
 
+    def _get_unit_options(self, units: Unit) -> list[Unit]:
+        if len(units.dimensionality) > 1:
+            raise NotImplementedError(
+                "QQuantity does not currently support quantities with non-simple units,"
+                " e.g. `meter/second` or `Newton`."
+            )
+        dims, exp = next(iter(units.dimensionality.items()))
+
+        options = DEFAULT_OPTIONS.get(dims, [])
+        if exp != 1:
+            options = [f"({u})^{exp}" for u in options]
+        return [Unit(u) for u in options]
+
     def _update_units_combo_choices(self):
         if self._value.dimensionless:
             with signals_blocked(self._units_combo):
@@ -122,13 +135,7 @@ class QQuantity(QWidget):
             return
 
         units = self._value.units
-        dims, exp = next(iter(units.dimensionality.items()))
-        if exp != 1:
-            raise NotImplementedError("Inverse units not yet implemented")
-        options = [
-            self._format_units(self._ureg.Unit(u))
-            for u in DEFAULT_OPTIONS.get(dims, [])
-        ]
+        options = [self._format_units(u) for u in self._get_unit_options(units)]
         current = self._format_units(units)
         with signals_blocked(self._units_combo):
             self._units_combo.clear()
@@ -202,7 +209,7 @@ class QQuantity(QWidget):
         """Set the magnitude of the current value."""
         self.setValue(self._ureg.Quantity(magnitude, self._value.units))
 
-    def setUnits(self, units: str | Unit | Quantity) -> None:
+    def setUnits(self, units: str | Unit | Quantity | None) -> None:
         """Set the units of the current value.
 
         If `units` is `None`, will convert to a dimensionless quantity.
@@ -231,4 +238,4 @@ class QQuantity(QWidget):
     def _format_units(self, u: Unit | str) -> str:
         if isinstance(u, str):
             return u
-        return f"{u:~}" if self._abbreviate_units else f"{u:}"
+        return f"{u:~P}" if self._abbreviate_units else f"{u:}"

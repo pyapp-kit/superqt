@@ -1,3 +1,4 @@
+import pytest
 from pint import Quantity
 
 from superqt import QQuantity
@@ -31,6 +32,29 @@ def test_qquantity(qtbot):
     assert w.isDimensionless()
     assert w.unitsComboBox().currentText() == "-----"
     assert w.magnitude() == 1
+
+
+def test_qquantity_exponents(qtbot):
+    w = QQuantity(1, "m^2")
+    qtbot.addWidget(w)
+
+    assert w.value() == 1 * w.unitRegistry().meter ** 2
+    assert w.magnitude() == 1
+    assert w.units() == w.unitRegistry().meter ** 2
+    assert w.text() == "1 meter ** 2"
+    w.setUnits("cm^2")
+    assert w.value() == 10000 * w.unitRegistry().centimeter ** 2
+    assert w.magnitude() == 10000
+    assert w.units() == w.unitRegistry().centimeter ** 2
+    assert w.text() == "10000.0 centimeter ** 2"
+
+
+def test_qquantity_non_simple_units(qtbot):
+    with pytest.raises(NotImplementedError):
+        qtbot.addWidget(QQuantity(1, "m/s"))
+
+    with pytest.raises(NotImplementedError):
+        qtbot.addWidget(QQuantity(1, "N"))
 
 
 def test_change_qquantity_value(qtbot):
