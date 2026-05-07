@@ -113,7 +113,7 @@ class QQuantity(QWidget):
     def _get_unit_options(self, units: Unit) -> list[Unit]:
         if len(units.dimensionality) > 1:
             raise NotImplementedError(
-                "QQuantity does not currently support quantities with non-simple units,"
+                "QQuantity does not currently support quantities with compound units,"
                 " e.g. `meter/second` or `Newton`."
             )
         dims, exp = next(iter(units.dimensionality.items()))
