@@ -231,4 +231,4 @@ class QQuantity(QWidget):
     def _format_units(self, u: Unit | str) -> str:
         if isinstance(u, str):
             return u
-        return f"{u:~}" if self._abbreviate_units else f"{u:}"
+        return f"{u:~P}" if self._abbreviate_units else f"{u:}"
