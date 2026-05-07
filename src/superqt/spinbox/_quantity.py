@@ -111,10 +111,16 @@ class QQuantity(QWidget):
         return self._ureg
 
     def _get_unit_options(self, units: Unit) -> list[Unit]:
+        if len(units.dimensionality) > 1:
+            raise NotImplementedError(
+                "QQuantity does not currently support quantities with derived units."
+            )
         dims, exp = next(iter(units.dimensionality.items()))
+
+        options = DEFAULT_OPTIONS.get(dims, [])
         if exp != 1:
-            raise NotImplementedError("Inverse units not yet implemented")
-        return [self._ureg.Unit(u) for u in DEFAULT_OPTIONS.get(dims, [])]
+            options = [f"({u})^{exp}" for u in options]
+        return [Unit(u) for u in options]
 
     def _update_units_combo_choices(self):
         if self._value.dimensionless:
