@@ -202,7 +202,7 @@ class QQuantity(QWidget):
         """Set the magnitude of the current value."""
         self.setValue(self._ureg.Quantity(magnitude, self._value.units))
 
-    def setUnits(self, units: str | Unit | Quantity) -> None:
+    def setUnits(self, units: str | Unit | Quantity | None) -> None:
         """Set the units of the current value.
 
         If `units` is `None`, will convert to a dimensionless quantity.
