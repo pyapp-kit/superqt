@@ -110,6 +110,12 @@ class QQuantity(QWidget):
         """Return the pint UnitRegistry used by this widget."""
         return self._ureg
 
+    def _get_unit_options(self, units: Unit) -> list[Unit]:
+        dims, exp = next(iter(units.dimensionality.items()))
+        if exp != 1:
+            raise NotImplementedError("Inverse units not yet implemented")
+        return [self._ureg.Unit(u) for u in DEFAULT_OPTIONS.get(dims, [])]
+
     def _update_units_combo_choices(self):
         if self._value.dimensionless:
             with signals_blocked(self._units_combo):
@@ -122,13 +128,7 @@ class QQuantity(QWidget):
             return
 
         units = self._value.units
-        dims, exp = next(iter(units.dimensionality.items()))
-        if exp != 1:
-            raise NotImplementedError("Inverse units not yet implemented")
-        options = [
-            self._format_units(self._ureg.Unit(u))
-            for u in DEFAULT_OPTIONS.get(dims, [])
-        ]
+        options = [self._format_units(u) for u in self._get_unit_options(units)]
         current = self._format_units(units)
         with signals_blocked(self._units_combo):
             self._units_combo.clear()
