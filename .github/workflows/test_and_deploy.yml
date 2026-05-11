@@ -103,7 +103,7 @@ jobs:
     secrets: inherit
 
   test_napari:
-    uses: pyapp-kit/workflows/.github/workflows/test-dependents.yml@v2
+    uses: pyapp-kit/workflows/.github/workflows/test-dependents.yml@65abcc0b091a0d45dbe3c589266160cc9b62f8dc
     with:
       dependency-repo: napari/napari
       dependency-group: "testing"
