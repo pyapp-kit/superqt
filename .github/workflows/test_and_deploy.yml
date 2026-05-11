@@ -106,10 +106,10 @@ jobs:
     uses: pyapp-kit/workflows/.github/workflows/test-dependents.yml@v2
     with:
       dependency-repo: napari/napari
-      dependency-extras: "testing"
+      dependency-group: "testing"
       qt: ${{ matrix.qt }}
       pytest-args: 'src/napari/_qt --import-mode=importlib -k "not async and not qt_dims_2 and not qt_viewer_console_focus and not keybinding_editor and not preferences_dialog_not_dismissed"'
-      python-version: "3.10"
+      python-version: "3.13"
       post-install-cmd: "pip install lxml_html_clean"
     strategy:
       fail-fast: false
