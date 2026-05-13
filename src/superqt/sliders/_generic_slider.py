@@ -327,7 +327,6 @@ class _GenericSlider(QSlider):
                     y = self.rect().center().y()
                     painter.drawRect(x, y - half_height, 1, 6)
 
-
         self._draw_handle(painter, opt)
 
     # ###############  Implementation Details  #######################
