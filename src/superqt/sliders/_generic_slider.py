@@ -301,9 +301,7 @@ class _GenericSlider(QSlider):
         opt = self._styleOption
 
         # draw groove and ticks
-        # having SC_HANDLE here ensures stuff sub-page and add-page are
-        # handled correctly from the stylesheet
-        opt.subControls = SC_GROOVE | SC_HANDLE
+        opt.subControls = SC_GROOVE
         if opt.tickPosition != QSlider.TickPosition.NoTicks:
             opt.subControls |= SC_TICKMARKS
         painter.drawComplexControl(CC_SLIDER, opt)
@@ -328,6 +326,7 @@ class _GenericSlider(QSlider):
                     x = int((self.width() - 3) * i / (nticks - 1)) + 1
                     y = self.rect().center().y()
                     painter.drawRect(x, y - half_height, 1, 6)
+
 
         self._draw_handle(painter, opt)
 
@@ -416,7 +415,7 @@ class _GenericSlider(QSlider):
         self._pressedControl = SC_HANDLE
 
     def _draw_handle(self, painter, opt):
-        opt.subControls = SC_HANDLE
+        opt.subControls = SC_HANDLE | SC_GROOVE
         if self._pressedControl:
             opt.activeSubControls = self._pressedControl
             opt.state |= QStyle.StateFlag.State_Sunken
