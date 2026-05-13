@@ -415,6 +415,8 @@ class _GenericSlider(QSlider):
         self._pressedControl = SC_HANDLE
 
     def _draw_handle(self, painter, opt):
+        # note that SC_GROOVE here is necessary for add-page and -sub-page to
+        # be styled correctly, otherwise they are ignored
         opt.subControls = SC_HANDLE | SC_GROOVE
         if self._pressedControl:
             opt.activeSubControls = self._pressedControl
