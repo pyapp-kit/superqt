@@ -206,6 +206,13 @@ class _GenericRangeSlider(_GenericSlider):
         # API changes between PyQt5 (.pos()) and PyQt6 (.position())
         return event.pos() if hasattr(event, "pos") else event.position()
 
+    def paintEvent(self, ev: QtGui.QPaintEvent) -> None:
+        painter = QStylePainter(self)
+        opt = self._styleOption
+
+        self._draw_groove_and_ticks(painter, opt, handle=False)
+        self._draw_handle(painter, opt)
+
     # ###############  Implementation Details  #######################
 
     def _setPosition(self, val):
