@@ -1,7 +1,7 @@
 from unittest.mock import Mock
 
 import pytest
-from qtpy.QtCore import Qt
+from qtpy.QtCore import QSignalBlocker, Qt
 from qtpy.QtWidgets import QApplication, QCheckBox, QVBoxLayout, QWidget
 
 from superqt import QToggleSwitch
@@ -142,3 +142,59 @@ def test_multiple_lines(qtbot):
     assert wdg1.sizeHint().height() > checkbox.sizeHint().height()
     assert wdg0.height() > wdg1.height()
     assert wdg1.height() > checkbox.height()
+
+
+def test_programmatic_state_changes_update_handle_position(qtbot):
+    wdg = QToggleSwitch()
+    qtbot.addWidget(wdg)
+    wdg.show()
+    wdg.setAnimationDuration(0)
+
+    off = wdg._offset_for_checkstate(False)
+    on = wdg._offset_for_checkstate(True)
+
+    assert wdg._offset == off
+    assert not wdg.isChecked()
+
+    wdg.setChecked(True)
+    assert wdg.isChecked()
+    assert wdg._offset == on
+
+    wdg.setChecked(False)
+    assert not wdg.isChecked()
+    assert wdg._offset == off
+
+    with QSignalBlocker(wdg):
+        wdg.setChecked(True)
+
+    assert wdg.isChecked()
+    assert wdg._offset == on
+
+    with QSignalBlocker(wdg):
+        wdg.setChecked(False)
+
+    assert not wdg.isChecked()
+    assert wdg._offset == off
+
+
+def test_mouse_click_updates_handle_position(qtbot):
+    wdg = QToggleSwitch()
+    qtbot.addWidget(wdg)
+    wdg.show()
+    wdg.setAnimationDuration(0)
+
+    off = wdg._offset_for_checkstate(False)
+    on = wdg._offset_for_checkstate(True)
+
+    assert wdg._offset == off
+    assert not wdg.isChecked()
+
+    qtbot.mouseClick(wdg, Qt.MouseButton.LeftButton)
+
+    assert wdg.isChecked()
+    assert wdg._offset == on
+
+    qtbot.mouseClick(wdg, Qt.MouseButton.LeftButton)
+
+    assert not wdg.isChecked()
+    assert wdg._offset == off
