@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, TypeAlias, Union
 
 try:
@@ -61,6 +62,10 @@ class QQuantity(QWidget):
         The unit registry to use.  If not provided, the registry will be extracted
         from `value` if it is a `pint.Quantity`, otherwise the default registry will
         be used.
+    units_options : Sequence[str | pint.Unit | pint.UnitsContainer], optional
+        A list of units to show in the units combo box.  If not provided, a default list
+        of units will be shown based on the dimensionality of `value`. Only necessary
+        for compound units.
     parent : QWidget, optional
         The parent widget, by default None
     """
@@ -74,6 +79,7 @@ class QQuantity(QWidget):
         value: str | Quantity | Number = 0,
         units: UnitsContainer | str | Quantity | None = None,
         ureg: UnitRegistry | None = None,
+        units_options: Sequence[UnitLike] | None = None,
         parent: QWidget | None = None,
     ) -> None:
         super().__init__(parent=parent)
@@ -87,6 +93,21 @@ class QQuantity(QWidget):
 
         self._ureg = ureg
         self._value: Quantity = self._ureg.Quantity(value, units=units)
+        if units_options is not None:
+            self._units_options = [self._ureg.Unit(u) for u in units_options]
+            # check that all options are compatible with the value's dimensionality
+            invalid_units = [
+                u
+                for u in self._units_options
+                if u.dimensionality != self._value.dimensionality
+            ]
+            if invalid_units:
+                raise ValueError(
+                    f"Units {invalid_units} are not compatible with value"
+                    f" dimensionality {self._value.dimensionality}."
+                )
+        else:
+            self._units_options = None
 
         # whether to preserve quantity equality when changing units or magnitude
         self._preserve_quantity: bool = False
@@ -116,15 +137,13 @@ class QQuantity(QWidget):
     def _get_unit_options(self, units: Unit | PlainUnit) -> list[Unit]:
         if len(units.dimensionality) > 1:
             raise NotImplementedError(
-                "QQuantity does not currently support quantities with compound units,"
-                " e.g. `meter/second` or `Newton`."
+                "To use compound units with QQuantity (e.g., `meter/second` or `Newton`"
+                "), please specify the `units_options` argument."
             )
         dims, exp = next(iter(units.dimensionality.items()))
 
         options = DEFAULT_OPTIONS.get(dims, [])
-        if exp != 1:
-            options = [f"({u})^{exp}" for u in options]
-        return [Unit(u) for u in options]
+        return [Unit(u) * exp for u in options]
 
     def _update_units_combo_choices(self):
         if self._value.dimensionless:
@@ -138,7 +157,10 @@ class QQuantity(QWidget):
             return
 
         units = self._value.units
-        options = [self._format_units(u) for u in self._get_unit_options(units)]
+        options = [
+            self._format_units(u)
+            for u in self._units_options or self._get_unit_options(units)
+        ]
         current = self._format_units(units)
         with signals_blocked(self._units_combo):
             self._units_combo.clear()
