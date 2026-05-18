@@ -64,7 +64,7 @@ def test_qquantity_compound_units(qtbot):
     assert w.units() == w.unitRegistry().meter / w.unitRegistry().second
     assert w.text() == "1 meter / second"
     w.setUnits("km/h")
-    assert w.value() == 3.6 * w.unitRegistry().kilometer / w.unitRegistry().hour
+    assert w.value() == w.unitRegistry().Quantity(3.6, "km/h")
     assert w.magnitude() == 3.6
     assert w.units() == w.unitRegistry().kilometer / w.unitRegistry().hour
 
