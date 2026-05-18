@@ -79,7 +79,9 @@ class RangeSliderStyle:
             QPalette.ColorGroup.Disabled: "pen_disabled",  # 1
             QPalette.ColorGroup.Inactive: "pen_inactive",  # 2
         }[cg]
-        val = getattr(self, attr) or getattr(SYSTEM_STYLE, attr)
+        val = getattr(self, attr)
+        if not val and not self.has_stylesheet:
+            val = getattr(SYSTEM_STYLE, attr)
         if not val:
             return Qt.PenStyle.NoPen
         if isinstance(val, str):
