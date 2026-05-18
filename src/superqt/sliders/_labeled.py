@@ -735,8 +735,8 @@ class SliderLabel(QLineEdit):
         self._value = val
         self.updateText()
 
-    def updateText(self) -> None:
-        val = float(self._value)
+    def _format_value(self, value):
+        val = float(value)
         use_scientific = (abs(val) < 0.0001 or abs(val) > 9999999.0) and val != 0.0
         font_metrics = QFontMetrics(self.font())
         eight_len = _fm_width(font_metrics, "8")
@@ -771,6 +771,10 @@ class SliderLabel(QLineEdit):
                 text = f"{val:.{self._decimals}f}"
         if text == "":
             text = "0"
+        return text
+
+    def updateText(self) -> None:
+        text = self._format_value(self._value)
         self.setText(text)
         if self._mode == EdgeLabelMode.LabelIsRange:
             self._update_size()
@@ -818,15 +822,16 @@ class SliderLabel(QLineEdit):
         fixed_content = self.prefix() + self.suffix() + " "
 
         if self._mode & EdgeLabelMode.LabelIsValue:
-            # determine width based on min/max/specialValue
-            mintext = str(self.minimum())[:18]
-            maxtext = str(self.maximum())[:18]
+            # determine width based on min/max/specialValue, formatted
+            # with current settings to ensure spacing is correct
+            mintext = self._format_value(self.minimum())[:18]
+            maxtext = self._format_value(self.maximum())[:18]
             w = max(0, _fm_width(fm, mintext + fixed_content))
             w = max(w, _fm_width(fm, maxtext + fixed_content))
             if self._mode & EdgeLabelMode.LabelIsRange:
                 w += 8  # it seems as thought suffix() is not enough
         else:
-            w = max(0, _fm_width(fm, str(self.value()))) + 3
+            w = max(0, _fm_width(fm, self._format_value(self.value()))) + 3
 
         w += 3  # cursor blinking space
         # get the final size hint

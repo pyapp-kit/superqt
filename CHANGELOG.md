@@ -1,5 +1,32 @@
 # Changelog
 
+## [v0.8.2](https://github.com/pyapp-kit/superqt/tree/v0.8.2) (2026-05-18)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.8.1...v0.8.2)
+
+**Fixed bugs:**
+
+- Fix extra border around range slider bar [\#347](https://github.com/pyapp-kit/superqt/pull/347) ([brisvag](https://github.com/brisvag))
+- Reuse value format logic for label width determination in sliders [\#346](https://github.com/pyapp-kit/superqt/pull/346) ([brisvag](https://github.com/brisvag))
+- Fix slider sub/add-page rendering [\#345](https://github.com/pyapp-kit/superqt/pull/345) ([brisvag](https://github.com/brisvag))
+- fix: disallow QQuantity with derived units [\#342](https://github.com/pyapp-kit/superqt/pull/342) ([Antyos](https://github.com/Antyos))
+- fix: Sync the toggle switch state when `setChecked()` is run inside a `QSignalBlocker`  [\#341](https://github.com/pyapp-kit/superqt/pull/341) ([carlosmariorr](https://github.com/carlosmariorr))
+
+**Merged pull requests:**
+
+- chore: Update napari test workflows [\#344](https://github.com/pyapp-kit/superqt/pull/344) ([TimMonko](https://github.com/TimMonko))
+- chore: Update compound unit error message [\#343](https://github.com/pyapp-kit/superqt/pull/343) ([Antyos](https://github.com/Antyos))
+- ci\(dependabot\): bump softprops/action-gh-release from 2 to 3 in the actions group across 1 directory [\#337](https://github.com/pyapp-kit/superqt/pull/337) ([dependabot[bot]](https://github.com/apps/dependabot))
+- ci: \[pre-commit.ci\] autoupdate [\#336](https://github.com/pyapp-kit/superqt/pull/336) ([pre-commit-ci[bot]](https://github.com/apps/pre-commit-ci))
+
+## [v0.8.1](https://github.com/pyapp-kit/superqt/tree/v0.8.1) (2026-03-27)
+
+[Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.8.0...v0.8.1)
+
+**Implemented enhancements:**
+
+- feat: improve cmap combobox generalization and add right-click-to remove [\#333](https://github.com/pyapp-kit/superqt/pull/333) ([tlambert03](https://github.com/tlambert03))
+
 ## [v0.8.0](https://github.com/pyapp-kit/superqt/tree/v0.8.0) (2026-03-04)
 
 [Full Changelog](https://github.com/pyapp-kit/superqt/compare/v0.7.8...v0.8.0)

@@ -300,34 +300,7 @@ class _GenericSlider(QSlider):
         painter = QStylePainter(self)
         opt = self._styleOption
 
-        # draw groove and ticks
-        opt.subControls = SC_GROOVE
-        if opt.tickPosition != QSlider.TickPosition.NoTicks:
-            opt.subControls |= SC_TICKMARKS
-        painter.drawComplexControl(CC_SLIDER, opt)
-
-        if (
-            opt.tickPosition != QSlider.TickPosition.NoTicks
-            and "MONTEREY_SLIDER_STYLES_FIX" in self.styleSheet()
-        ):
-            # draw tick marks manually because they are badly behaved with style sheets
-            interval = opt.tickInterval or int(self._pageStep)
-            _range = self._maximum - self._minimum
-            nticks = (_range + interval) // interval
-
-            painter.setPen(QtGui.QColor("#C7C7C7"))
-            half_height = 3
-            for i in range(int(nticks)):
-                if self.orientation() == Qt.Orientation.Vertical:
-                    y = int((self.height() - 8) * i / (nticks - 1)) + 1
-                    x = self.rect().center().x()
-                    painter.drawRect(x - half_height, y, 6, 1)
-                else:
-                    x = int((self.width() - 3) * i / (nticks - 1)) + 1
-                    y = self.rect().center().y()
-                    painter.drawRect(x, y - half_height, 1, 6)
-
-        self._draw_handle(painter, opt)
+        self._draw_groove_and_ticks(painter, opt, handle=True)
 
     # ###############  Implementation Details  #######################
 
@@ -413,15 +386,39 @@ class _GenericSlider(QSlider):
     def _updatePressedControl(self, pos: QPoint):
         self._pressedControl = SC_HANDLE
 
-    def _draw_handle(self, painter, opt):
-        opt.subControls = SC_HANDLE
-        if self._pressedControl:
-            opt.activeSubControls = self._pressedControl
-            opt.state |= QStyle.StateFlag.State_Sunken
+    def _draw_groove_and_ticks(self, painter, opt, handle=True):
+        if handle:
+            # draw handle in one pass if possible, which preserves native
+            # styles in more cases
+            opt.subControls = SC_GROOVE | SC_HANDLE
         else:
-            opt.activeSubControls = self._hoverControl
+            # some cases will draw the handle separately with _draw_handle()
+            opt.subControls = SC_GROOVE
 
+        if opt.tickPosition != QSlider.TickPosition.NoTicks:
+            opt.subControls |= SC_TICKMARKS
         painter.drawComplexControl(CC_SLIDER, opt)
+
+        if (
+            opt.tickPosition != QSlider.TickPosition.NoTicks
+            and "MONTEREY_SLIDER_STYLES_FIX" in self.styleSheet()
+        ):
+            # draw tick marks manually because they are badly behaved with style sheets
+            interval = opt.tickInterval or int(self._pageStep)
+            _range = self._maximum - self._minimum
+            nticks = (_range + interval) // interval
+
+            painter.setPen(QtGui.QColor("#C7C7C7"))
+            half_height = 3
+            for i in range(int(nticks)):
+                if self.orientation() == Qt.Orientation.Vertical:
+                    y = int((self.height() - 8) * i / (nticks - 1)) + 1
+                    x = self.rect().center().x()
+                    painter.drawRect(x - half_height, y, 6, 1)
+                else:
+                    x = int((self.width() - 3) * i / (nticks - 1)) + 1
+                    y = self.rect().center().y()
+                    painter.drawRect(x, y - half_height, 1, 6)
 
     # from QSliderPrivate.pixelPosToRangeValue
     def _pixelPosToRangeValue(self, pos: int) -> float:
