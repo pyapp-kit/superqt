@@ -2,6 +2,8 @@ from typing import TYPE_CHECKING, TypeAlias, Union
 
 try:
     from pint import Quantity, Unit, UnitRegistry
+    from pint._typing import UnitLike
+    from pint.facets.plain.unit import PlainUnit
     from pint.util import UnitsContainer
 except ImportError as e:
     raise ImportError(
@@ -102,15 +104,16 @@ class QQuantity(QWidget):
         self._update_units_combo_choices()
 
         self.setLayout(QHBoxLayout())
-        self.layout().addWidget(self._mag_spinbox)
-        self.layout().addWidget(self._units_combo)
-        self.layout().setContentsMargins(6, 0, 0, 0)
+        if layout := self.layout():
+            layout.addWidget(self._mag_spinbox)
+            layout.addWidget(self._units_combo)
+            layout.setContentsMargins(6, 0, 0, 0)
 
     def unitRegistry(self) -> UnitRegistry:
         """Return the pint UnitRegistry used by this widget."""
         return self._ureg
 
-    def _get_unit_options(self, units: Unit) -> list[Unit]:
+    def _get_unit_options(self, units: Unit | PlainUnit) -> list[Unit]:
         if len(units.dimensionality) > 1:
             raise NotImplementedError(
                 "QQuantity does not currently support quantities with compound units,"
@@ -158,7 +161,7 @@ class QQuantity(QWidget):
 
     def units(self) -> Unit:
         """Return the current units."""
-        return self._value.units
+        return self._ureg.Unit(self._value.units)
 
     def dimensionality(self) -> UnitsContainer:
         """Return the current dimensionality (cast to `str` for nice repr)."""
@@ -173,15 +176,20 @@ class QQuantity(QWidget):
     def setValue(
         self,
         value: str | Quantity | Number,
-        units: UnitsContainer | str | Quantity | None = None,
+        units: UnitLike | str | Quantity | None = None,
     ) -> None:
         """Set the current value (will cast to a pint Quantity)."""
         if isinstance(value, Quantity):
             if units is not None:
                 raise ValueError("Cannot specify units if value is a Quantity")
             new_val = self._ureg.Quantity(value.magnitude, units=value.units)
+        elif units is None:
+            new_val = self._ureg.Quantity(value, units=self._value.units)
+        elif isinstance(units, Quantity):
+            new_val = self._ureg.Quantity(value, units=units.units)
         else:
-            new_val = self._ureg.Quantity(value, units=units)
+            unit_spec = units.units if isinstance(units, Quantity) else units
+            new_val = self._ureg.Quantity(value, units=unit_spec)
 
         mag_change = new_val.magnitude != self._value.magnitude
         units_change = new_val.units != self._value.units
@@ -235,7 +243,7 @@ class QQuantity(QWidget):
         """Return the `QCombBox` widget used to edit the units."""
         return self._units_combo
 
-    def _format_units(self, u: Unit | str) -> str:
+    def _format_units(self, u: Unit | PlainUnit | str) -> str:
         if isinstance(u, str):
             return u
         return f"{u:~P}" if self._abbreviate_units else f"{u:}"
