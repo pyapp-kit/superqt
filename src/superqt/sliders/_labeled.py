@@ -300,7 +300,9 @@ class QLabeledSlider(_SliderProxy, QAbstractSlider):
             self._label.setSuffix(f" / {max_}")
         else:
             self._label.setSuffix("")
-        self.rangeChanged.emit(min_, max_)
+        # float() so large integer ranges work when rangeChanged is rebound to
+        # frangeChanged (QLabeledDoubleSlider / #308 on Windows + PySide6).
+        self.rangeChanged.emit(float(min_), float(max_))
 
     def _on_slider_value_changed(self, v: Any) -> None:
         self._label.setValue(v)
