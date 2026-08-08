@@ -411,7 +411,7 @@ class GeneratorWorker(WorkerBase, Generic[_Y, _S, _R]):
         self._pause_interval = 0.01
         self.pbar = None
 
-    def work(self) -> _R | None | Exception:
+    def work(self) -> _R | Exception | None:
         """Core event loop that calls the original function.
 
         Enters a continual loop, yielding and returning from the original
