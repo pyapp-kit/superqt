@@ -236,24 +236,27 @@ def test_rangeslider_signals(cls, orientation, qtbot):
     _assert_types(mock.call_args.args, tuple)
     _assert_types(mock.call_args.args[0], type_)
 
+    # rangeChanged is rebound to frangeChanged (float, float) so values outside
+    # the signed 32-bit range work (see #308). Signal args are therefore float
+    # for all range slider variants, including the integer ones.
     mock = Mock()
     sld.rangeChanged.connect(mock)
     with qtbot.waitSignal(sld.rangeChanged):
         sld.setMinimum(3)
     mock.assert_called_once_with(3, 99)
-    _assert_types(mock.call_args.args, type_)
+    _assert_types(mock.call_args.args, float)
 
     mock.reset_mock()
     with qtbot.waitSignal(sld.rangeChanged):
         sld.setMaximum(15)
     mock.assert_called_once_with(3, 15)
-    _assert_types(mock.call_args.args, type_)
+    _assert_types(mock.call_args.args, float)
 
     mock.reset_mock()
     with qtbot.waitSignal(sld.rangeChanged):
         sld.setRange(1, 2)
     mock.assert_called_once_with(1, 2)
-    _assert_types(mock.call_args.args, type_)
+    _assert_types(mock.call_args.args, float)
 
 
 @pytest.mark.parametrize("cls, orientation", ALL_SLIDER_COMBOS)
@@ -290,3 +293,14 @@ def test_range_slider_with_equal_min_max(cls, orientation, qtbot):
     assert sld2.minimum() == 0
     assert sld2.maximum() == 0
     assert sld2.value() == (0, 0)
+
+
+def test_qrange_slider_large_range_does_not_typeerror(qtbot):
+    """Large integer ranges must not explode on rangeChanged emit (#308)."""
+    sld = QRangeSlider()
+    qtbot.addWidget(sld)
+    big = 10**11
+    with qtbot.waitSignal(sld.rangeChanged):
+        sld.setRange(0, big)
+    assert sld.minimum() == 0
+    assert sld.maximum() == big

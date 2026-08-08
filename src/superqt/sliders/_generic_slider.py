@@ -168,7 +168,11 @@ class _GenericSlider(QSlider):
 
         if oldMin != self._minimum or oldMax != self._maximum:
             self.sliderChange(self.SliderChange.SliderRangeChange)
-            self.rangeChanged.emit(self._minimum, self._maximum)
+            # Cast to float: rangeChanged is rebound to frangeChanged
+            # (Signal(float, float)). On Windows + older PySide6, emitting a
+            # Python int larger than C long (e.g. 10**11) raises OverflowError
+            # even though the signal is typed as double. See #308.
+            self.rangeChanged.emit(float(self._minimum), float(self._maximum))
             self.setValue(self._value)  # re-bound
 
     def tickInterval(self) -> float:  # type: ignore

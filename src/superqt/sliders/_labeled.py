@@ -351,6 +351,7 @@ class QLabeledDoubleSlider(QLabeledSlider):
 class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
     valuesChanged = Signal(tuple)
     editingFinished = Signal()
+    frangeChanged = Signal(float, float)
 
     _slider_class = QRangeSlider
     _slider: QRangeSlider
@@ -515,6 +516,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
     # ------------- private methods ----------------
     def _rename_signals(self) -> None:
         self.valueChanged = self.valuesChanged
+        self.rangeChanged = self.frangeChanged
 
     def _reposition_labels(self) -> None:
         if (

@@ -132,3 +132,19 @@ def test_slider_label_decimals_update_text(qtbot):
 
     slider.setDecimals(4)
     assert slider._label.text() == "3.1416"
+
+
+def test_qlabeled_range_slider_large_range_does_not_typeerror(qtbot):
+    """Regression for examples/labeled_sliders.py on Windows/PyQt6 (#308)."""
+    sld = QLabeledRangeSlider()
+    qtbot.addWidget(sld)
+    big = 10**11
+    # setRange should not raise TypeError from rangeChanged.emit
+    sld.setRange(0, big)
+    assert sld.minimum() == 0
+    assert sld.maximum() == big
+    # example also sets a large value tuple
+    sld.setValue((20, 60 * 10**9))
+    v = sld.value()
+    assert v[0] == 20
+    assert v[1] == 60 * 10**9
