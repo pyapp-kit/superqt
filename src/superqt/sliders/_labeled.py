@@ -721,7 +721,7 @@ class SliderLabel(QLineEdit):
     def _editing_finished(self):
         self._silent_clear_focus()
         value = float(self.text())
-        self.setValue(value, clamp_values=False)
+        self.setValue(value)
         self.valueEdited.emit(value)
 
     def setRange(self, min_: float, max_: float) -> None:
@@ -750,12 +750,11 @@ class SliderLabel(QLineEdit):
     def value(self) -> float:
         return self._value
 
-    def setValue(self, val: Any, clamp_values: bool = True) -> None:
-        if clamp_values:
-            if val < self._min:
-                val = self._min
-            elif val > self._max:
-                val = self._max
+    def setValue(self, val: Any) -> None:
+        if val < self._min:
+            val = self._min
+        elif val > self._max:
+            val = self._max
         self._value = val
         self.updateText()
 
