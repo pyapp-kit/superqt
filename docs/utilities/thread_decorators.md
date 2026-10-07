@@ -25,6 +25,7 @@ To block and wait for the result, see [Synchronous mode](#synchronous-mode)
 from qtpy.QtCore import QObject
 from superqt import ensure_main_thread, ensure_object_thread
 
+
 @ensure_main_thread
 def sample_function():
     print("This function will run in main thread")
@@ -42,6 +43,7 @@ class SampleObject(QObject):
     @ensure_object_thread
     def sample_method3(self):
         import time
+
         print("sleeping")
         time.sleep(1)
         print("This method will run in object thread")
@@ -75,20 +77,23 @@ call, use the `await_return=True` parameter, and optionally specify a timeout.
 ```python
 from superqt import ensure_main_thread
 
+
 @ensure_main_thread
 def sample_function1():
     return 1
+
 
 @ensure_main_thread(await_return=True)
 def sample_function2():
     return 2
 
+
 assert sample_function1() is None
 assert sample_function2() == 2
+
 
 # optionally, specify a timeout
 @ensure_main_thread(await_return=True, timeout=10000)
 def sample_function():
     return 1
-
 ```
