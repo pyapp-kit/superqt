@@ -52,6 +52,7 @@ To make the CombBox label colormap fill the entire width of the widget:
 
 ```python
 from superqt.cmap import QColormapLineEdit
+
 cmap_combo.setLineEdit(QColormapLineEdit())
 ```
 
@@ -60,6 +61,7 @@ less than the entire width of the widget:
 
 ```python
 from superqt.cmap import QColormapItemDelegate
+
 delegate = QColormapItemDelegate(fractional_colormap_width=0.33)
 cmap_combo.setItemDelegate(delegate)
 ```

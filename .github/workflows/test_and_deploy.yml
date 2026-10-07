@@ -24,31 +24,33 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.13"]
+        python-version: ["3.11", "3.14"]
         os: [ubuntu-latest, macos-latest, windows-latest]
         add-extra: [pyqt6, pyside6]
         include:
+          # matches a main-matrix job, so this turns windows-latest (3.11) pyside6
+          # into a lowest-direct run rather than adding a new job
           - os: windows-latest
             python-version: "3.11"
             resolution: "lowest-direct"
             add-extra: pyside6
           - os: macos-latest
-            python-version: "3.12"
+            python-version: "3.13"
             resolution: "lowest-direct"
             add-extra: pyqt6
-          - python-version: "3.10"
+          - python-version: "3.11"
             os: ubuntu-latest
             add-extra: pyqt5
-          - python-version: "3.11"
+          - python-version: "3.12"
             os: windows-latest
             add-extra: pyqt5
-          - python-version: "3.12"
+          - python-version: "3.13"
             os: ubuntu-latest
             add-extra: pyqt6
-          - python-version: "3.12"
+          - python-version: "3.13"
             os: ubuntu-latest
             add-extra: pyside6
-          - python-version: "3.14"
+          - python-version: "3.15"
             os: ubuntu-latest
             add-extra: pyqt6
 
@@ -59,13 +61,13 @@ jobs:
           fetch-tags: true
 
       - name: 🐍 Set up Python ${{ matrix.python-version }}
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7  # v10.2.0
         with:
           python-version: ${{ matrix.python-version }}
           enable-cache: true
           cache-dependency-glob: "**/pyproject.toml"
 
-      - uses: pyvista/setup-headless-display-action@v4
+      - uses: pyvista/setup-headless-display-action@v5
         with:
           qt: true
 
@@ -131,7 +133,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: hynek/build-and-inspect-python-package@v2
+      - uses: hynek/build-and-inspect-python-package@2abe76da66d0a6a4a227101f9348ee855797cfa5  # v3.0.1
 
   upload-to-pypi:
     if: success() && startsWith(github.ref, 'refs/tags/') && github.event_name != 'schedule' && github.repository == 'pyapp-kit/superqt'

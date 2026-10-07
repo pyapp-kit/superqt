@@ -10,7 +10,7 @@ from superqt import QColorComboBox
 app = QApplication([])
 
 colors = QColorComboBox()
-colors.addColors(['red', 'green', 'blue'])
+colors.addColors(["red", "green", "blue"])
 
 # show an "Add Color" item that opens a QColorDialog when clicked
 colors.setUserColorsAllowed(True)

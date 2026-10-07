@@ -159,7 +159,6 @@ These options are in addition to the Qt QSlider API, and control the behavior of
 
 
     if __name__ == "__main__":
-
         import sys
         from pathlib import Path
 
