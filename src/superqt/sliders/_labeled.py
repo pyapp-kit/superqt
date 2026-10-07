@@ -368,6 +368,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
         parent, orientation = _handle_overloaded_slider_sig(args, kwargs)
         super().__init__(parent)
         self._rename_signals()
+        self._expand_range_on_handle_edit = False
 
         self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating)
         self._handle_labels: list[SliderLabel] = []
@@ -496,6 +497,19 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
         self._slider.setInvertedAppearance(a0)
         self.setOrientation(self._slider.orientation())
 
+    def expandRangeOnHandleEdit(self) -> bool:
+        """Return whether out-of-range handle edits expand the slider range."""
+        return self._expand_range_on_handle_edit
+
+    def setExpandRangeOnHandleEdit(self, expand: bool) -> None:
+        """Set whether out-of-range handle edits expand the slider range.
+
+        When enabled, typing a value above a handle that is outside the current
+        slider range will expand the corresponding range edge and then set the
+        handle to the entered value.
+        """
+        self._expand_range_on_handle_edit = bool(expand)
+
     def resizeEvent(self, a0: Any) -> None:
         super().resizeEvent(a0)
         self._reposition_labels()
@@ -608,6 +622,12 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
 
     def _on_slider_label_edited(self, pos: float) -> None:
         idx = getattr(self.sender(), "_index", 0)
+        if self._expand_range_on_handle_edit:
+            min_, max_ = self._slider.minimum(), self._slider.maximum()
+            new_min = min(min_, pos)
+            new_max = max(max_, pos)
+            if (new_min, new_max) != (min_, max_):
+                self._slider.setRange(new_min, new_max)
         self._slider.setSliderPosition(pos, idx)
 
     def _on_range_changed(self, min: int, max: int) -> None:
@@ -700,8 +720,9 @@ class SliderLabel(QLineEdit):
 
     def _editing_finished(self):
         self._silent_clear_focus()
-        self.setValue(float(self.text()))
-        self.valueEdited.emit(self.value())
+        value = float(self.text())
+        self.setValue(value)
+        self.valueEdited.emit(value)
 
     def setRange(self, min_: float, max_: float) -> None:
         if self._mode == EdgeLabelMode.LabelIsRange:
