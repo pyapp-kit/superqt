@@ -624,10 +624,10 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
         idx = getattr(self.sender(), "_index", 0)
         if self._expand_range_on_handle_edit:
             min_, max_ = self._slider.minimum(), self._slider.maximum()
-            new_min = min(min_, pos)
-            new_max = max(max_, pos)
-            if (new_min, new_max) != (min_, max_):
-                self._slider.setRange(new_min, new_max)
+            if idx == 0 and pos < min_:
+                self._slider.setRange(pos, max_)
+            elif idx == len(self._slider.value()) - 1 and pos > max_:
+                self._slider.setRange(min_, pos)
         self._slider.setSliderPosition(pos, idx)
 
     def _on_range_changed(self, min: int, max: int) -> None:
