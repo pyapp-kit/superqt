@@ -509,6 +509,8 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
         handle to the entered value.
         """
         self._expand_range_on_handle_edit = bool(expand)
+        for label in self._handle_labels:
+            label._clamp_values = not self._expand_range_on_handle_edit
 
     def resizeEvent(self, a0: Any) -> None:
         super().resizeEvent(a0)
@@ -611,6 +613,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
             self._handle_labels.clear()
             for n, val in enumerate(self._slider.value()):
                 s = SliderLabel(self._slider, parent=self, index=n)
+                s._clamp_values = not self._expand_range_on_handle_edit
                 s.valueEdited.connect(self._on_slider_label_edited)
                 s.editingFinished.connect(self.editingFinished)
                 s.setValue(val)
@@ -697,6 +700,7 @@ class SliderLabel(QLineEdit):
     ) -> None:
         super().__init__(parent=parent)
         self._index = index
+        self._clamp_values = True
         self._prefix = ""
         self._suffix = ""
         self._min = slider.minimum()
@@ -720,9 +724,8 @@ class SliderLabel(QLineEdit):
 
     def _editing_finished(self):
         self._silent_clear_focus()
-        value = float(self.text())
-        self.setValue(value)
-        self.valueEdited.emit(value)
+        self.setValue(float(self.text()))
+        self.valueEdited.emit(self.value())
 
     def setRange(self, min_: float, max_: float) -> None:
         if self._mode == EdgeLabelMode.LabelIsRange:
@@ -751,10 +754,11 @@ class SliderLabel(QLineEdit):
         return self._value
 
     def setValue(self, val: Any) -> None:
-        if val < self._min:
-            val = self._min
-        elif val > self._max:
-            val = self._max
+        if self._clamp_values:
+            if val < self._min:
+                val = self._min
+            elif val > self._max:
+                val = self._max
         self._value = val
         self.updateText()
 
