@@ -4,7 +4,12 @@ from unittest.mock import Mock
 
 import pytest
 
-from superqt import QLabeledDoubleSlider, QLabeledRangeSlider, QLabeledSlider
+from superqt import (
+    QLabeledDoubleRangeSlider,
+    QLabeledDoubleSlider,
+    QLabeledRangeSlider,
+    QLabeledSlider,
+)
 
 
 def test_labeled_slider_api(qtbot):
@@ -133,6 +138,57 @@ def test_range_slider_handle_label_resyncs_when_blocked(qtbot):
         assert slider.value() == (20, 79, 80)
         assert label.value() == 79
         assert label.text() == "79"
+
+
+def _type_into(label, text: str) -> None:
+    label.setText(text)
+    label.editingFinished.emit()
+
+
+@pytest.mark.parametrize("cls", [QLabeledRangeSlider, QLabeledDoubleRangeSlider])
+def test_expand_range_on_handle_edit(cls, qtbot):
+    slider = cls()
+    qtbot.addWidget(slider)
+    slider.setRange(0, 100)
+    slider.setValue((20, 80))
+    lo, hi = slider._handle_labels
+
+    # off by default: typed values are clamped
+    assert not slider.expandRangeOnHandleEdit()
+    with qtbot.waitSignal(hi.valueEdited) as blocker:
+        _type_into(hi, "150")
+    assert blocker.args == [100.0]
+    _type_into(lo, "-50")
+    assert (slider.minimum(), slider.maximum()) == (0, 100)
+
+    slider.setExpandRangeOnHandleEdit(True)
+    _type_into(hi, "150")
+    _type_into(lo, "-50")
+    assert (slider.minimum(), slider.maximum()) == (-50, 150)
+    assert slider.value() == (-50, 150)
+
+    # range only grows on the side a handle can actually move toward
+    _type_into(lo, "500")
+    _type_into(hi, "-500")
+    assert (slider.minimum(), slider.maximum()) == (-50, 150)
+    assert [lo.value(), hi.value()] == list(slider.value())
+
+    slider.setExpandRangeOnHandleEdit(False)
+    _type_into(hi, "500")
+    assert slider.maximum() == 150
+
+
+def test_expand_range_on_handle_edit_middle_handle(qtbot):
+    slider = QLabeledRangeSlider()
+    qtbot.addWidget(slider)
+    slider.setRange(0, 100)
+    slider.setExpandRangeOnHandleEdit(True)
+    slider.setValue((20, 50, 80))  # recreates handle labels
+
+    _type_into(slider._handle_labels[1], "500")
+    assert slider.maximum() == 100
+    _type_into(slider._handle_labels[2], "500")
+    assert slider.maximum() == 500
 
 
 def test_slider_label_decimals_update_text(qtbot):
