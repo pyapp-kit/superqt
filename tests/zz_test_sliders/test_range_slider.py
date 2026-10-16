@@ -304,3 +304,52 @@ def test_qrange_slider_large_range_does_not_typeerror(qtbot):
         sld.setRange(0, big)
     assert sld.minimum() == 0
     assert sld.maximum() == big
+
+
+@pytest.mark.parametrize("cls", [QRangeSlider, QDoubleRangeSlider])
+@pytest.mark.parametrize(
+    "orientation", [Qt.Orientation.Horizontal, Qt.Orientation.Vertical]
+)
+@pytest.mark.parametrize("inverted", [False, True])
+@pytest.mark.parametrize("values", [(0, 0), (0, 1), (0, 0, 0), (100, 100), (50, 50)])
+def test_drag_overlapping_handles(qtbot, cls, orientation, inverted, values):
+    slider = cls(orientation)
+    qtbot.addWidget(slider)
+    slider.setRange(0, 100)
+    slider.setValue(values)
+    slider.setInvertedAppearance(inverted)
+    if orientation == Qt.Orientation.Horizontal:
+        slider.resize(300, 60)
+    else:
+        slider.resize(60, 300)
+    slider.show()
+
+    # Click where all handles overlap, as a user would on a collapsed range.
+    overlap = slider._handleRect(0)
+    for index in range(1, len(values)):
+        overlap = overlap.intersected(slider._handleRect(index))
+    assert not overlap.isEmpty()
+    pos = overlap.center()
+    direction = -1 if slider._styleOption.upsideDown else 1
+    if values[0] == slider.minimum():
+        moving_index = len(values) - 1
+    else:
+        moving_index = 0
+        direction *= -1
+    shift = (
+        QPoint(40 * direction, 0)
+        if orientation == Qt.Orientation.Horizontal
+        else QPoint(0, 40 * direction)
+    )
+
+    qtbot.mousePress(slider, Qt.MouseButton.LeftButton, pos=pos)
+    slider.mouseMoveEvent(_mouse_event(pos + shift))
+    qtbot.mouseRelease(slider, Qt.MouseButton.LeftButton, pos=pos + shift)
+
+    result = slider.value()
+    if moving_index:
+        assert result[-1] > values[-1]
+        assert result[:-1] == values[:-1]
+    else:
+        assert result[0] < values[0]
+        assert result[1:] == values[1:]
