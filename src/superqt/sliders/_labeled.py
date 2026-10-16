@@ -609,6 +609,8 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
     def _on_slider_label_edited(self, pos: float) -> None:
         idx = getattr(self.sender(), "_index", 0)
         self._slider.setSliderPosition(pos, idx)
+        # resync label in case the handle couldn't move to `pos`
+        self.sender().setValue(self._slider.value()[idx])
 
     def _on_range_changed(self, min: int, max: int) -> None:
         if (min, max) != (self._slider.minimum(), self._slider.maximum()):

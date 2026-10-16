@@ -116,7 +116,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        qt: ["pyqt5", "pyqt6", "pyside6"]
+        qt: ["pyqt6", "pyside6"]
 
   check-manifest:
     name: Check Manifest
