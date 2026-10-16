@@ -286,7 +286,8 @@ class ThrottledCallable(GenericSignalThrottler, Generic[P, R]):
 
     def _set_future_result(self):
         result = self._func(*self._args[: self._max_args], **self._kwargs)
-        self._future.set_result(result)
+        if not self._future.done():
+            self._future.set_result(result)
 
     def __set_name__(self, owner, name):
         if not self._is_static_method:

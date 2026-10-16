@@ -1,4 +1,3 @@
-import sys
 from enum import Enum, EnumMeta, Flag
 from functools import reduce
 from itertools import combinations
@@ -22,26 +21,14 @@ def _get_name(enum_value: Enum) -> str:
         name = str(enum_value)
     else:
         if enum_value.name is None:
-            # This is hack for python bellow 3.11
             if not isinstance(enum_value, Flag):
                 raise TypeError(
                     f"Expected Flag instance, got {enum_value}"
                 )  # pragma: no cover
-            if sys.version_info >= (3, 11):
-                # There is a bug in some releases of Python 3.11 (for example 3.11.3)
-                # that leads to wrong evaluation of or operation on Flag members
-                # and produces numeric value without proper set name property.
-                return f"{enum_value.value}"
-
-            # Before python 3.11 there is no smart name set during
-            # the creation of Flag members.
-            # We needs to decompose the value to get the name.
-            # It is under if condition because it uses private API.
-
-            from enum import _decompose
-
-            members, _not_covered = _decompose(enum_value.__class__, enum_value.value)
-            name = "|".join(m.name.replace("_", " ") for m in members[::-1])
+            # There is a bug in some releases of Python 3.11 (for example 3.11.3)
+            # that leads to wrong evaluation of or operation on Flag members
+            # and produces numeric value without proper set name property.
+            return f"{enum_value.value}"
         else:
             name = enum_value.name.replace("_", " ")
     return name
