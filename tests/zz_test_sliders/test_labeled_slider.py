@@ -118,6 +118,23 @@ def test_range_slider_handle_label_editing(qtbot):
     assert slider.value() == (10, 50)
 
 
+def test_range_slider_handle_label_resyncs_when_blocked(qtbot):
+    slider = QLabeledRangeSlider()
+    qtbot.addWidget(slider)
+    slider.setRange(0, 100)
+    slider.setValue((20, 50, 80))
+    label = slider._handle_labels[1]
+
+    # the middle handle can't pass the upper handle, so typing 500 twice
+    # leaves the value unchanged on the second edit
+    for _ in range(2):
+        label.setText("500")
+        label.editingFinished.emit()
+        assert slider.value() == (20, 79, 80)
+        assert label.value() == 79
+        assert label.text() == "79"
+
+
 def test_slider_label_decimals_update_text(qtbot):
     slider = QLabeledDoubleSlider()
     qtbot.addWidget(slider)
