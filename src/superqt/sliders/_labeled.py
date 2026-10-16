@@ -368,6 +368,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
         parent, orientation = _handle_overloaded_slider_sig(args, kwargs)
         super().__init__(parent)
         self._rename_signals()
+        self._expand_range_on_handle_edit = False
 
         self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating)
         self._handle_labels: list[SliderLabel] = []
@@ -496,6 +497,21 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
         self._slider.setInvertedAppearance(a0)
         self.setOrientation(self._slider.orientation())
 
+    def expandRangeOnHandleEdit(self) -> bool:
+        """Return whether out-of-range handle edits expand the slider range."""
+        return self._expand_range_on_handle_edit
+
+    def setExpandRangeOnHandleEdit(self, expand: bool) -> None:
+        """Set whether out-of-range handle edits expand the slider range.
+
+        When enabled, typing a value above a handle that is outside the current
+        slider range will expand the corresponding range edge and then set the
+        handle to the entered value.
+        """
+        self._expand_range_on_handle_edit = bool(expand)
+        for label in self._handle_labels:
+            label._clamp_values = not self._expand_range_on_handle_edit
+
     def resizeEvent(self, a0: Any) -> None:
         super().resizeEvent(a0)
         self._reposition_labels()
@@ -597,6 +613,7 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
             self._handle_labels.clear()
             for n, val in enumerate(self._slider.value()):
                 s = SliderLabel(self._slider, parent=self, index=n)
+                s._clamp_values = not self._expand_range_on_handle_edit
                 s.valueEdited.connect(self._on_slider_label_edited)
                 s.editingFinished.connect(self.editingFinished)
                 s.setValue(val)
@@ -608,6 +625,12 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
 
     def _on_slider_label_edited(self, pos: float) -> None:
         idx = getattr(self.sender(), "_index", 0)
+        if self._expand_range_on_handle_edit:
+            min_, max_ = self._slider.minimum(), self._slider.maximum()
+            if idx == 0 and pos < min_:
+                self._slider.setRange(pos, max_)
+            elif idx == len(self._slider.value()) - 1 and pos > max_:
+                self._slider.setRange(min_, pos)
         self._slider.setSliderPosition(pos, idx)
         # resync label in case the handle couldn't move to `pos`
         self.sender().setValue(self._slider.value()[idx])
@@ -679,6 +702,7 @@ class SliderLabel(QLineEdit):
     ) -> None:
         super().__init__(parent=parent)
         self._index = index
+        self._clamp_values = True
         self._prefix = ""
         self._suffix = ""
         self._min = slider.minimum()
@@ -732,10 +756,11 @@ class SliderLabel(QLineEdit):
         return self._value
 
     def setValue(self, val: Any) -> None:
-        if val < self._min:
-            val = self._min
-        elif val > self._max:
-            val = self._max
+        if self._clamp_values:
+            if val < self._min:
+                val = self._min
+            elif val > self._max:
+                val = self._max
         self._value = val
         self.updateText()
 
