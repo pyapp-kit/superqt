@@ -1,7 +1,9 @@
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, TypeAlias, Union
 
 try:
     from pint import Quantity, Unit, UnitRegistry
+    from pint.facets.plain import PlainQuantity
     from pint.util import UnitsContainer
 except ImportError as e:
     raise ImportError(
@@ -16,7 +18,10 @@ from superqt.utils import signals_blocked
 if TYPE_CHECKING:
     from decimal import Decimal
 
+    from pint.facets.plain import PlainUnit
 
+UnitLike: TypeAlias = Union[str, UnitsContainer, Unit, "PlainUnit"]
+QuantityLike: TypeAlias = Quantity | PlainQuantity
 Number: TypeAlias = Union[int, float, "Decimal"]
 UREG = UnitRegistry()
 NULL_OPTION = "-----"
@@ -59,6 +64,10 @@ class QQuantity(QWidget):
         The unit registry to use.  If not provided, the registry will be extracted
         from `value` if it is a `pint.Quantity`, otherwise the default registry will
         be used.
+    units_options : Sequence[str | pint.Unit | pint.UnitsContainer], optional
+        A list of units to show in the units combo box.  If not provided, a default list
+        of units will be shown based on the dimensionality of `value`. Only necessary
+        for compound units.
     parent : QWidget, optional
         The parent widget, by default None
     """
@@ -69,9 +78,10 @@ class QQuantity(QWidget):
 
     def __init__(
         self,
-        value: str | Quantity | Number = 0,
-        units: UnitsContainer | str | Quantity | None = None,
+        value: str | QuantityLike | Number = 0,
+        units: UnitsContainer | UnitLike | str | PlainQuantity | None = None,
         ureg: UnitRegistry | None = None,
+        units_options: Sequence[UnitLike] | None = None,
         parent: QWidget | None = None,
     ) -> None:
         super().__init__(parent=parent)
@@ -84,7 +94,24 @@ class QQuantity(QWidget):
                 )
 
         self._ureg = ureg
-        self._value: Quantity = self._ureg.Quantity(value, units=units)
+        if isinstance(units, (Quantity, PlainQuantity)):
+            units = units.units
+        self._value: PlainQuantity = self._ureg.Quantity(value, units=units)
+        if units_options is not None:
+            self._units_options = [self._ureg.Unit(u) for u in units_options]
+            # check that all options are compatible with the value's dimensionality
+            invalid_units = [
+                u
+                for u in self._units_options
+                if u.dimensionality != self._value.dimensionality
+            ]
+            if invalid_units:
+                raise ValueError(
+                    f"Units {invalid_units} are not compatible with value"
+                    f" dimensionality {self._value.dimensionality}."
+                )
+        else:
+            self._units_options = None
 
         # whether to preserve quantity equality when changing units or magnitude
         self._preserve_quantity: bool = False
@@ -102,26 +129,25 @@ class QQuantity(QWidget):
         self._update_units_combo_choices()
 
         self.setLayout(QHBoxLayout())
-        self.layout().addWidget(self._mag_spinbox)
-        self.layout().addWidget(self._units_combo)
-        self.layout().setContentsMargins(6, 0, 0, 0)
+        if layout := self.layout():
+            layout.addWidget(self._mag_spinbox)
+            layout.addWidget(self._units_combo)
+            layout.setContentsMargins(6, 0, 0, 0)
 
     def unitRegistry(self) -> UnitRegistry:
         """Return the pint UnitRegistry used by this widget."""
         return self._ureg
 
-    def _get_unit_options(self, units: Unit) -> list[Unit]:
+    def _get_unit_options(self, units: Union[Unit, "PlainUnit"]) -> list[Unit]:
         if len(units.dimensionality) > 1:
             raise NotImplementedError(
-                "QQuantity does not currently support quantities with compound units,"
-                " e.g. `meter/second` or `Newton`."
+                "To use compound units with QQuantity (e.g., `meter/second` or `Newton`"
+                "), please specify the `units_options` argument."
             )
         dims, exp = next(iter(units.dimensionality.items()))
 
         options = DEFAULT_OPTIONS.get(dims, [])
-        if exp != 1:
-            options = [f"({u})^{exp}" for u in options]
-        return [Unit(u) for u in options]
+        return [Unit(u) * exp for u in options]
 
     def _update_units_combo_choices(self):
         if self._value.dimensionless:
@@ -135,7 +161,10 @@ class QQuantity(QWidget):
             return
 
         units = self._value.units
-        options = [self._format_units(u) for u in self._get_unit_options(units)]
+        options = [
+            self._format_units(u)
+            for u in self._units_options or self._get_unit_options(units)
+        ]
         current = self._format_units(units)
         with signals_blocked(self._units_combo):
             self._units_combo.clear()
@@ -145,7 +174,7 @@ class QQuantity(QWidget):
 
         self._units_combo.setCurrentText(current)
 
-    def value(self) -> Quantity:
+    def value(self) -> PlainQuantity:
         """Return the current value as a `pint.Quantity`."""
         return self._value
 
@@ -158,7 +187,7 @@ class QQuantity(QWidget):
 
     def units(self) -> Unit:
         """Return the current units."""
-        return self._value.units
+        return self._ureg.Unit(self._value.units)
 
     def dimensionality(self) -> UnitsContainer:
         """Return the current dimensionality (cast to `str` for nice repr)."""
@@ -172,14 +201,18 @@ class QQuantity(QWidget):
 
     def setValue(
         self,
-        value: str | Quantity | Number,
-        units: UnitsContainer | str | Quantity | None = None,
+        value: str | QuantityLike | Number,
+        units: UnitLike | str | PlainQuantity | None = None,
     ) -> None:
         """Set the current value (will cast to a pint Quantity)."""
         if isinstance(value, Quantity):
             if units is not None:
                 raise ValueError("Cannot specify units if value is a Quantity")
             new_val = self._ureg.Quantity(value.magnitude, units=value.units)
+        elif units is None:
+            new_val = self._ureg.Quantity(value, units=self._value.units)
+        elif isinstance(units, (Quantity, PlainQuantity)):
+            new_val = self._ureg.Quantity(value, units=units.units)
         else:
             new_val = self._ureg.Quantity(value, units=units)
 
@@ -209,7 +242,7 @@ class QQuantity(QWidget):
         """Set the magnitude of the current value."""
         self.setValue(self._ureg.Quantity(magnitude, self._value.units))
 
-    def setUnits(self, units: str | Unit | Quantity | None) -> None:
+    def setUnits(self, units: str | UnitLike | PlainQuantity | None) -> None:
         """Set the units of the current value.
 
         If `units` is `None`, will convert to a dimensionless quantity.
@@ -218,6 +251,8 @@ class QQuantity(QWidget):
         if units is None:
             new_val = self._ureg.Quantity(self._value.magnitude)
         elif self.isDimensionless():
+            if isinstance(units, (Quantity, PlainQuantity)):
+                units = units.units
             new_val = self._ureg.Quantity(self._value.magnitude, units)
         else:
             new_val = self._value.to(units)
@@ -235,7 +270,7 @@ class QQuantity(QWidget):
         """Return the `QCombBox` widget used to edit the units."""
         return self._units_combo
 
-    def _format_units(self, u: Unit | str) -> str:
+    def _format_units(self, u: UnitLike) -> str:
         if isinstance(u, str):
             return u
         return f"{u:~P}" if self._abbreviate_units else f"{u:}"
