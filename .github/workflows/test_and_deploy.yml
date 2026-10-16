@@ -116,7 +116,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        qt: ["pyqt5", "pyqt6", "pyside6"]
+        # napari dropped PyQt5 support in napari/napari#9650
+        qt: ["pyqt6", "pyside6"]
 
   check-manifest:
     name: Check Manifest

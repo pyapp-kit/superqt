@@ -74,6 +74,9 @@ pyqt6 = [ # 6.6 has segfaults with QElidingLabel
 pyside6 = [
     "pyside6>=6.4.0,!=6.5.0,!=6.5.1,!=6.6.2",
     "pyside6>=6.7.0; python_version >= '3.12'",
+    # 6.12.0 over-decrements refcount of True on emit, aborting python <=3.11
+    # https://qt-project.atlassian.net/browse/PYSIDE-3474
+    "pyside6!=6.12.0; python_version < '3.12'",
 ]
 quantity = ["pint>=0.21"]
 
