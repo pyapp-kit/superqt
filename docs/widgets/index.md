@@ -10,6 +10,7 @@ The following are QWidget subclasses:
 | [`QDoubleSlider`](./qdoubleslider.md) | Slider for float values |
 | [`QLabeledDoubleRangeSlider`](./qlabeleddoublerangeslider.md) | `QDoubleRangeSlider` variant with editable labels for each handle |
 | [`QLabeledDoubleSlider`](./qlabeleddoubleslider.md) | `QSlider` for float values with editable `QSpinBox` with the current value |
+| [`QLabeledMappedSlider`](./qlabeledmappedslider.md) | `QLabeledDoubleSlider` variant with a log or power curve from slider position to value |
 | [`QLabeledRangeSlider`](./qlabeledrangeslider.md) | `QRangeSlider` variant, with editable labels for each handle |
 | [`QLabeledSlider`](./qlabeledslider.md) | `QSlider` with editable `QSpinBox` that shows the current value |
 | [`QLargeIntSpinBox`](./qlargeintspinbox.md) | `QSpinbox` that accepts arbitrarily large integers |
