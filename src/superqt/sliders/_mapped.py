@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Any, Literal
-
-from qtpy.QtCore import Qt
+from typing import TYPE_CHECKING, Any, Literal, overload
 
 from ._labeled import QLabeledDoubleSlider
 
 if TYPE_CHECKING:
+    from qtpy.QtCore import Qt
     from qtpy.QtWidgets import QWidget
 
 # A string representing the slider position to value transfer function.
@@ -52,25 +51,20 @@ class QLabeledMappedSlider(QLabeledDoubleSlider):
     _mapped_maximum: float = 1.0
     _mapped_value: float = 0.01
 
+    @overload
+    def __init__(self, parent: QWidget | None = ...) -> None: ...
+
+    @overload
     def __init__(
-        self,
-        orientation: Qt.Orientation = Qt.Orientation.Horizontal,
-        parent: QWidget | None = None,
-        mapping: Mapping = "log",
-        exponent: float = 3.0,
-    ) -> None:
-        super().__init__(orientation, parent)
+        self, orientation: Qt.Orientation, parent: QWidget | None = ...
+    ) -> None: ...
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
         self._slider.setRange(0, 1)
         self._slider.setSingleStep(0.01)
         self._slider.setPageStep(0.1)
-        _check_mapping(mapping)
-        _check_exponent(exponent)
-        self._mapping = mapping
-        self._exponent = float(exponent)
-        if mapping == "log":
-            self.setRange(0.01, 1.0)
-        else:
-            self.setRange(0.0, 1.0)
+        self.setRange(0.01, 1.0)
 
     def mapping(self) -> Mapping:
         return self._mapping
@@ -80,7 +74,7 @@ class QLabeledMappedSlider(QLabeledDoubleSlider):
         if mapping == "log" and self._mapped_minimum <= 0:
             raise ValueError("with 'log' mapping the minimum must be greater than 0")
         self._mapping = mapping
-        self._move_handle_to_value()
+        self._moveHandleToValue()
 
     def exponent(self) -> float:
         return self._exponent
@@ -88,12 +82,12 @@ class QLabeledMappedSlider(QLabeledDoubleSlider):
     def setExponent(self, exponent: float) -> None:
         _check_exponent(exponent)
         self._exponent = float(exponent)
-        self._move_handle_to_value()
+        self._moveHandleToValue()
 
-    def minimum(self) -> float:
+    def minimum(self) -> float:  # type: ignore[override]
         return self._mapped_minimum
 
-    def maximum(self) -> float:
+    def maximum(self) -> float:  # type: ignore[override]
         return self._mapped_maximum
 
     def setMinimum(self, minimum: float) -> None:
@@ -110,7 +104,7 @@ class QLabeledMappedSlider(QLabeledDoubleSlider):
         self._label.setRange(self._mapped_minimum, self._mapped_maximum)
         old_value = self._mapped_value
         self._mapped_value = self._clamp(old_value)
-        self._move_handle_to_value()
+        self._moveHandleToValue()
         self.rangeChanged.emit(self._mapped_minimum, self._mapped_maximum)
         if self._mapped_value != old_value:
             self.valueChanged.emit(self._mapped_value)
@@ -123,37 +117,37 @@ class QLabeledMappedSlider(QLabeledDoubleSlider):
         if value == self._mapped_value:
             return
         self._mapped_value = value
-        self._move_handle_to_value()
+        self._moveHandleToValue()
         self.valueChanged.emit(value)
 
     def _clamp(self, value: float) -> float:
         return min(max(float(value), self._mapped_minimum), self._mapped_maximum)
 
-    def _to_value(self, position: float) -> float:
+    def _toValue(self, position: float) -> float:
         lo, hi = self._mapped_minimum, self._mapped_maximum
         if self._mapping == "log":
-            return lo * (hi / lo) ** position
-        return lo + (hi - lo) * position**self._exponent
+            return float(lo * (hi / lo) ** position)
+        return float(lo + (hi - lo) * position**self._exponent)
 
-    def _to_position(self, value: float) -> float:
+    def _toPosition(self, value: float) -> float:
         lo, hi = self._mapped_minimum, self._mapped_maximum
         if hi == lo:
             return 0.0
         if self._mapping == "log":
             return math.log(value / lo) / math.log(hi / lo)
-        return ((value - lo) / (hi - lo)) ** (1 / self._exponent)
+        return float(((value - lo) / (hi - lo)) ** (1 / self._exponent))
 
-    def _move_handle_to_value(self) -> None:
+    def _moveHandleToValue(self) -> None:
         self._label.setValue(self._mapped_value)
         # Move the handle without triggering _on_slider_value_changed, which
         # would replace the exact value with one recomputed from the position.
         blocked = self._slider.blockSignals(True)
-        self._slider.setValue(self._to_position(self._mapped_value))
+        self._slider.setValue(self._toPosition(self._mapped_value))
         self._slider.blockSignals(blocked)
         self._slider.update()
 
     def _on_slider_value_changed(self, position: Any) -> None:
-        self._mapped_value = self._to_value(position)
+        self._mapped_value = self._toValue(position)
         self._label.setValue(self._mapped_value)
         self.valueChanged.emit(self._mapped_value)
 

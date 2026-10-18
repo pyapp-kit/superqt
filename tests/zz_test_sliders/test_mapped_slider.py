@@ -1,10 +1,20 @@
 import pytest
+from qtpy.QtCore import Qt
+from qtpy.QtWidgets import QWidget
 
 from superqt import QLabeledMappedSlider
 
 
+def test_constructor_overloads(qtbot):
+    parent = QWidget()
+    qtbot.addWidget(parent)
+    assert QLabeledMappedSlider(parent).parent() is parent
+    slider = QLabeledMappedSlider(Qt.Orientation.Vertical, parent)
+    assert slider.orientation() == Qt.Orientation.Vertical
+
+
 def test_log_mapping(qtbot):
-    slider = QLabeledMappedSlider(mapping="log")
+    slider = QLabeledMappedSlider()
     qtbot.addWidget(slider)
     slider.setRange(1, 100)
 
@@ -17,8 +27,10 @@ def test_log_mapping(qtbot):
 
 
 def test_power_mapping(qtbot):
-    slider = QLabeledMappedSlider(mapping="power", exponent=1)
+    slider = QLabeledMappedSlider()
     qtbot.addWidget(slider)
+    slider.setMapping("power")
+    slider.setExponent(1)
     slider.setRange(0, 1000)
 
     slider._slider.setValue(0.5)
@@ -34,8 +46,9 @@ def test_power_mapping(qtbot):
 
 
 def test_set_value_is_exact_and_clamped(qtbot):
-    slider = QLabeledMappedSlider(mapping="power")
+    slider = QLabeledMappedSlider()
     qtbot.addWidget(slider)
+    slider.setMapping("power")
     slider.setRange(0, 0.5)
     values = []
     slider.valueChanged.connect(values.append)
@@ -51,8 +64,9 @@ def test_set_value_is_exact_and_clamped(qtbot):
 
 
 def test_typing_in_label(qtbot):
-    slider = QLabeledMappedSlider(mapping="power")
+    slider = QLabeledMappedSlider()
     qtbot.addWidget(slider)
+    slider.setMapping("power")
     slider.setRange(0, 1000)
 
     slider._label.setText("250")
@@ -62,7 +76,7 @@ def test_typing_in_label(qtbot):
 
 
 def test_bad_input_is_refused(qtbot):
-    slider = QLabeledMappedSlider(mapping="log")
+    slider = QLabeledMappedSlider()
     qtbot.addWidget(slider)
 
     with pytest.raises(ValueError):

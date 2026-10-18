@@ -10,7 +10,8 @@ from superqt import QLabeledMappedSlider
 
 app = QApplication([])
 
-slider = QLabeledMappedSlider(Qt.Orientation.Horizontal, mapping="log")
+slider = QLabeledMappedSlider(Qt.Orientation.Horizontal)
+slider.setMapping("log")
 slider.setRange(1, 100)
 slider.setValue(10)
 slider.show()
