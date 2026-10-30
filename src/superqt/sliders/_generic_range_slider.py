@@ -220,7 +220,7 @@ class _GenericRangeSlider(_GenericSlider):
 
     def _bound(self, value, index=None):
         if isinstance(value, (list, tuple)):
-            return type(value)(self._bound(v) for v in value)
+            return [self._bound(v) for v in value]
         pos = super()._bound(value)
         if index is not None:
             pos = self._neighbor_bound(pos, index)

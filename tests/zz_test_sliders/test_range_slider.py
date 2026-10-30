@@ -304,3 +304,24 @@ def test_qrange_slider_large_range_does_not_typeerror(qtbot):
         sld.setRange(0, big)
     assert sld.minimum() == 0
     assert sld.maximum() == big
+
+
+def test_set_range_with_nonlist_value_does_not_emit_valuechanged(qtbot):
+    sld = QRangeSlider()
+    sld.setRange(0, 25)
+    qtbot.addWidget(sld)
+
+    mock = Mock()
+    sld.valueChanged.connect(mock)
+
+    with qtbot.waitSignal(sld.valueChanged):
+        sld.setValue((0.0, 25.0))  # tuple, not list!
+
+    mock.assert_called_once()
+    mock.reset_mock()
+
+    with qtbot.waitSignal(sld.rangeChanged):
+        sld.setRange(0, 255)
+
+    mock.assert_not_called()
+    mock.reset_mock()
