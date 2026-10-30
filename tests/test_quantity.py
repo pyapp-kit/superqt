@@ -49,12 +49,28 @@ def test_qquantity_exponents(qtbot):
     assert w.text() == "10000.0 centimeter ** 2"
 
 
-def test_qquantity_non_simple_units(qtbot):
+def test_qquantity_compound_units(qtbot):
     with pytest.raises(NotImplementedError):
         qtbot.addWidget(QQuantity(1, "m/s"))
 
     with pytest.raises(NotImplementedError):
         qtbot.addWidget(QQuantity(1, "N"))
+
+    # Manually specify units
+    w = QQuantity(1, "m/s", units_options=["m/s", "km/h", "miles/h"])
+    qtbot.addWidget(w)
+    assert w.value() == 1 * w.unitRegistry().meter / w.unitRegistry().second
+    assert w.magnitude() == 1
+    assert w.units() == w.unitRegistry().meter / w.unitRegistry().second
+    assert w.text() == "1 meter / second"
+    w.setUnits("km/h")
+    assert w.value() == w.unitRegistry().Quantity(3.6, "km/h")
+    assert w.magnitude() == 3.6
+    assert w.units() == w.unitRegistry().kilometer / w.unitRegistry().hour
+
+    # Incompatible units
+    with pytest.raises(ValueError):
+        qtbot.addWidget(QQuantity(1, "m/s", units_options=["kg", "s"]))
 
 
 def test_change_qquantity_value(qtbot):
