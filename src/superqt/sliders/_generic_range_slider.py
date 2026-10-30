@@ -124,9 +124,6 @@ class _GenericRangeSlider(_GenericSlider):
         """Get current value of the widget as a tuple of integers."""
         return tuple(self._value)
 
-    def setValue(self, value: _T) -> None:
-        super().setValue(list(value))
-
     def sliderPosition(self):
         """Get current value of the widget as a tuple of integers.
 
@@ -223,7 +220,7 @@ class _GenericRangeSlider(_GenericSlider):
 
     def _bound(self, value, index=None):
         if isinstance(value, (list, tuple)):
-            return type(value)(self._bound(v) for v in value)
+            return [self._bound(v) for v in value]
         pos = super()._bound(value)
         if index is not None:
             pos = self._neighbor_bound(pos, index)
