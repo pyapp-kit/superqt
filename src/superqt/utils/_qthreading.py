@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import inspect
+import threading
 import time
 import warnings
 from functools import partial, wraps
@@ -60,6 +61,61 @@ def as_generator_function(
         return func(*args, **kwargs)
 
     return genwrapper
+
+
+_warnings_lock = threading.Lock()
+_running_workers = 0
+_saved_warnings_state: tuple[list, Callable] | None = None
+_thread_worker = threading.local()
+
+
+def _showwarning(*args: Any) -> None:
+    """Send a warning to the worker running in this thread, if any."""
+    worker = getattr(_thread_worker, "worker", None)
+    if worker is not None:
+        worker.warned.emit(args)
+    elif _saved_warnings_state is not None:
+        _saved_warnings_state[1](*args)
+
+
+class _capture_warnings:
+    """Send warnings raised in this thread to `worker.warned`.
+
+    `warnings.catch_warnings` saves and restores process-wide state, so it
+    isn't safe to use from several worker threads at once: the worker that
+    finishes last restores the hook installed by another worker. Instead,
+    the first running worker installs a single `showwarning` hook and the
+    last one to finish removes it. The hook looks up the worker running in
+    the current thread, so warnings from other threads are shown as usual.
+    """
+
+    def __init__(self, worker: WorkerBase) -> None:
+        self._worker = worker
+
+    def __enter__(self) -> None:
+        global _running_workers, _saved_warnings_state
+        with _warnings_lock:
+            if _running_workers == 0:
+                _saved_warnings_state = (
+                    warnings.filters[:],
+                    warnings.showwarning,
+                )
+                warnings.filterwarnings("always")
+                warnings.showwarning = _showwarning
+            _running_workers += 1
+        _thread_worker.worker = self._worker
+
+    def __exit__(self, *exc_info: Any) -> None:
+        global _running_workers, _saved_warnings_state
+        _thread_worker.worker = None
+        with _warnings_lock:
+            _running_workers -= 1
+            if _running_workers == 0 and _saved_warnings_state is not None:
+                filters, showwarning = _saved_warnings_state
+                warnings.filters[:] = filters
+                warnings._filters_mutated()  # type: ignore[attr-defined]
+                warnings.showwarning = showwarning
+                _saved_warnings_state = None
 
 
 class WorkerBaseSignals(QObject):
@@ -170,9 +226,7 @@ class WorkerBase(QRunnable, Generic[_R]):
         self.started.emit()
         self._running = True
         try:
-            with warnings.catch_warnings():
-                warnings.filterwarnings("always")
-                warnings.showwarning = lambda *w: self.warned.emit(w)
+            with _capture_warnings(self):
                 result = self.work()
             if isinstance(result, Exception):
                 if isinstance(result, RuntimeError):

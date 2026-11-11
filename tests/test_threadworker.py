@@ -298,3 +298,53 @@ def test_nested_threads_start(qtbot):
     event.wait(timeout=2)
     mock1.assert_called_once()
     mock2.assert_called_once()
+
+
+def test_overlapping_workers_restore_showwarning(qtbot):
+    """`warnings.showwarning` is restored once overlapping workers finish."""
+    original = warnings.showwarning
+
+    @qthreading.thread_worker(start_thread=False)
+    def wait(event: threading.Event):
+        event.wait(5)
+
+    first_done, second_done = threading.Event(), threading.Event()
+    first, second = wait(first_done), wait(second_done)
+    with qtbot.waitSignal(first.started):
+        first.start()
+    with qtbot.waitSignal(second.started):
+        second.start()
+    with qtbot.waitSignal(first.finished):
+        first_done.set()
+    with qtbot.waitSignal(second.finished):
+        second_done.set()
+    assert warnings.showwarning is original
+
+
+def test_warnings_go_to_the_worker_in_their_thread(qtbot):
+    """A running worker doesn't capture warnings from other threads."""
+    worker_warnings = []
+    main_warnings = []
+    original = warnings.showwarning
+    warnings.showwarning = lambda *w: main_warnings.append(str(w[0]))
+
+    @qthreading.thread_worker(
+        connect={"warned": lambda w: worker_warnings.append(str(w[0]))},
+        start_thread=False,
+    )
+    def func(event: threading.Event):
+        warnings.warn("from worker", stacklevel=1)
+        event.wait(5)
+
+    done = threading.Event()
+    worker = func(done)
+    try:
+        with qtbot.waitSignal(worker.started):
+            worker.start()
+        qtbot.waitUntil(lambda: worker_warnings == ["from worker"])
+        warnings.warn("from main", stacklevel=1)
+        with qtbot.waitSignal(worker.finished):
+            done.set()
+    finally:
+        warnings.showwarning = original
+    assert main_warnings == ["from main"]
