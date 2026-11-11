@@ -65,11 +65,9 @@ def as_generator_function(
 
 _warnings_lock = threading.Lock()
 _running_workers = 0
-_saved_filters: list | None = None
-# The `showwarning` installed before any worker hooked it. Kept after the last
-# worker finishes so `_showwarning` always has a fallback, even if something
-# (e.g. a `catch_warnings` block) reinstalls `_showwarning` later.
-_original_showwarning: Callable[..., Any] | None = None
+_saved_filters: list = []
+# never reset, so `_showwarning` always has somewhere to send warnings
+_original_showwarning = warnings.showwarning
 _thread_worker = threading.local()
 
 
@@ -78,7 +76,7 @@ def _showwarning(*args: Any) -> None:
     worker = getattr(_thread_worker, "worker", None)
     if worker is not None:
         worker.warned.emit(args)
-    elif _original_showwarning is not None:
+    else:
         _original_showwarning(*args)
 
 
@@ -102,7 +100,7 @@ class _capture_warnings:
         with _warnings_lock:
             if _running_workers == 0:
                 _saved_filters = warnings.filters[:]
-                # never save our own hook as the original, or it calls itself
+                # saving our own hook would make it call itself
                 if warnings.showwarning is not _showwarning:
                     _original_showwarning = warnings.showwarning
                 warnings.filterwarnings("always")
@@ -113,20 +111,15 @@ class _capture_warnings:
         _thread_worker.worker = self._worker
 
     def __exit__(self, *exc_info: Any) -> None:
-        global _running_workers, _saved_filters
+        global _running_workers
         _thread_worker.worker = self._previous_worker
         with _warnings_lock:
             _running_workers -= 1
             if _running_workers == 0:
-                if _saved_filters is not None:
-                    warnings.filters[:] = _saved_filters
-                    warnings._filters_mutated()  # type: ignore[attr-defined]
-                    _saved_filters = None
+                warnings.filters[:] = _saved_filters
+                warnings._filters_mutated()  # type: ignore[attr-defined]
                 # don't clobber a hook someone else installed while we ran
-                if (
-                    warnings.showwarning is _showwarning
-                    and _original_showwarning is not None
-                ):
+                if warnings.showwarning is _showwarning:
                     warnings.showwarning = _original_showwarning
 
 
