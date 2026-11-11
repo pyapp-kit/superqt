@@ -348,3 +348,37 @@ def test_warnings_go_to_the_worker_in_their_thread(qtbot):
     finally:
         warnings.showwarning = original
     assert main_warnings == ["from main"]
+
+
+def test_worker_exit_inside_catch_warnings(monkeypatch):
+    """A `catch_warnings` block that outlives a worker can't break later workers."""
+    shown = []
+    monkeypatch.setattr(warnings, "showwarning", lambda *a: shown.append(a))
+    warnings.simplefilter("always")  # don't depend on filter state
+    cw = warnings.catch_warnings()
+    # worker finishes while `cw` is open, then `cw` puts the worker's hook back
+    qthreading.create_worker(cw.__enter__, _start_thread=False).run()
+    cw.__exit__(None, None, None)
+    qthreading.create_worker(lambda: None, _start_thread=False).run()
+    warnings.warn("hi", stacklevel=1)
+    assert len(shown) == 1
+
+
+def test_nested_worker_run_restores_outer_worker():
+    """Warnings after a nested worker's `run()` still go to the outer worker."""
+    outer_warnings, inner_warnings = [], []
+
+    def inner_func():
+        warnings.warn("inner", stacklevel=1)
+
+    def outer_func():
+        inner = qthreading.create_worker(inner_func, _start_thread=False)
+        inner.warned.connect(lambda w: inner_warnings.append(str(w[0])))
+        inner.run()
+        warnings.warn("outer", stacklevel=1)
+
+    outer = qthreading.create_worker(outer_func, _start_thread=False)
+    outer.warned.connect(lambda w: outer_warnings.append(str(w[0])))
+    outer.run()
+    assert inner_warnings == ["inner"]
+    assert outer_warnings == ["outer"]

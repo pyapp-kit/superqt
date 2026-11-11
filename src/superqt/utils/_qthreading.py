@@ -65,7 +65,11 @@ def as_generator_function(
 
 _warnings_lock = threading.Lock()
 _running_workers = 0
-_saved_warnings_state: tuple[list, Callable] | None = None
+_saved_filters: list | None = None
+# The `showwarning` installed before any worker hooked it. Kept after the last
+# worker finishes so `_showwarning` always has a fallback, even if something
+# (e.g. a `catch_warnings` block) reinstalls `_showwarning` later.
+_original_showwarning: Callable[..., Any] | None = None
 _thread_worker = threading.local()
 
 
@@ -74,8 +78,8 @@ def _showwarning(*args: Any) -> None:
     worker = getattr(_thread_worker, "worker", None)
     if worker is not None:
         worker.warned.emit(args)
-    elif _saved_warnings_state is not None:
-        _saved_warnings_state[1](*args)
+    elif _original_showwarning is not None:
+        _original_showwarning(*args)
 
 
 class _capture_warnings:
@@ -91,31 +95,39 @@ class _capture_warnings:
 
     def __init__(self, worker: WorkerBase) -> None:
         self._worker = worker
+        self._previous_worker: WorkerBase | None = None
 
     def __enter__(self) -> None:
-        global _running_workers, _saved_warnings_state
+        global _running_workers, _saved_filters, _original_showwarning
         with _warnings_lock:
             if _running_workers == 0:
-                _saved_warnings_state = (
-                    warnings.filters[:],
-                    warnings.showwarning,
-                )
+                _saved_filters = warnings.filters[:]
+                # never save our own hook as the original, or it calls itself
+                if warnings.showwarning is not _showwarning:
+                    _original_showwarning = warnings.showwarning
                 warnings.filterwarnings("always")
                 warnings.showwarning = _showwarning
             _running_workers += 1
+        # a worker's `run()` may be called directly inside another worker
+        self._previous_worker = getattr(_thread_worker, "worker", None)
         _thread_worker.worker = self._worker
 
     def __exit__(self, *exc_info: Any) -> None:
-        global _running_workers, _saved_warnings_state
-        _thread_worker.worker = None
+        global _running_workers, _saved_filters
+        _thread_worker.worker = self._previous_worker
         with _warnings_lock:
             _running_workers -= 1
-            if _running_workers == 0 and _saved_warnings_state is not None:
-                filters, showwarning = _saved_warnings_state
-                warnings.filters[:] = filters
-                warnings._filters_mutated()  # type: ignore[attr-defined]
-                warnings.showwarning = showwarning
-                _saved_warnings_state = None
+            if _running_workers == 0:
+                if _saved_filters is not None:
+                    warnings.filters[:] = _saved_filters
+                    warnings._filters_mutated()  # type: ignore[attr-defined]
+                    _saved_filters = None
+                # don't clobber a hook someone else installed while we ran
+                if (
+                    warnings.showwarning is _showwarning
+                    and _original_showwarning is not None
+                ):
+                    warnings.showwarning = _original_showwarning
 
 
 class WorkerBaseSignals(QObject):
