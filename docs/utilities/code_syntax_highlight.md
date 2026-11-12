@@ -1,13 +1,11 @@
 # CodeSyntaxHighlight
 
-A code highlighter subclass of `QSyntaxHighlighter`
-that can be used to highlight code in a QTextEdit.
-
-Code lexer and available styles are from [`pygments`](https://pygments.org/) python library
-
-List of available languages are available [here](https://pygments.org/languages/).
-
-List of available styles are available [here](https://pygments.org/styles/).
+A [`QSyntaxHighlighter`](https://doc.qt.io/qt-6/qsyntaxhighlighter.html) that
+highlights code in a `QTextEdit` (or any `QTextDocument`), using
+[Pygments](https://pygments.org/). It takes the name of a
+[language](https://pygments.org/languages/) and of a
+[style](https://pygments.org/styles/), which can be changed later with
+`setLanguage` and `setTheme`.
 
 ## Example
 

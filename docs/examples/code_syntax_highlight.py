@@ -1,4 +1,3 @@
-from qtpy.QtGui import QColor, QPalette
 from qtpy.QtWidgets import QApplication, QTextEdit
 
 from superqt.utils import CodeSyntaxHighlight
@@ -6,13 +5,9 @@ from superqt.utils import CodeSyntaxHighlight
 app = QApplication([])
 
 text_area = QTextEdit()
-
-highlight = CodeSyntaxHighlight(text_area.document(), "python", "monokai")
-
-palette = text_area.palette()
-palette.setColor(QPalette.Base, QColor(highlight.background_color))
-text_area.setPalette(palette)
-text_area.setText(
+# (given the QTextEdit, rather than its document, it also sets the background)
+highlight = CodeSyntaxHighlight(text_area, "python", "monokai")
+text_area.setPlainText(
     """from argparse import ArgumentParser
 
 def main():
@@ -26,8 +21,7 @@ if __name__ == "__main__":
     main()
 """
 )
-
-text_area.show()
 text_area.resize(400, 200)
+text_area.show()
 
 app.exec()

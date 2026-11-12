@@ -56,6 +56,7 @@ nav = [
     ] },
     { "Text and buttons" = [
       "widgets/qelidinglabel.md",
+      "widgets/qelidinglineedit.md",
       "widgets/qtoggleswitch.md",
     ] },
     { "Containers and layouts" = [
@@ -73,15 +74,18 @@ nav = [
       "utilities/threading.md",
       "utilities/thread_decorators.md",
     ] },
-    { "Signals and events" = [
+    { "Signals" = [
       "utilities/throttling.md",
       "utilities/signal_utils.md",
+    ] },
+    { "Messages and errors" = [
       "utilities/qmessagehandler.md",
       "utilities/error_dialog_contexts.md",
     ] },
-    { "Drawing" = [
+    { "Miscellaneous" = [
       "utilities/code_syntax_highlight.md",
       "utilities/cmap.md",
+      "utilities/images.md",
     ] },
   ] },
   { "FAQ" = "faq.md" },

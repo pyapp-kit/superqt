@@ -80,7 +80,7 @@ for name in ("qdoubleslider", "qlabeledslider", "qlabeleddoubleslider"):
 # Buttons, containers and layouts
 
 
-@scene("qtoggleswitch")
+@scene("qtoggleswitch", width=170)
 def _(r: Recorder, window: QWidget) -> None:
     r.click(window, QPoint(22, window.height() // 2))
     r.wait(0.8)
@@ -96,6 +96,21 @@ def _(r: Recorder, window: QWidget) -> None:
     r.click(button, QPoint(60, button.height() // 2), duration=0.2)
     r.wait(0.6)
     r.leave()
+
+
+@scene("qelidinglineedit", width=300)
+def _(r: Recorder, window: QWidget) -> None:
+    r.click(window, QPoint(150, window.height() // 2))
+    r.key(window, Qt.Key.Key_End)
+    r.leave(duration=0.3)
+    r.wait(1.2)
+    window.clearFocus()
+    r.wait(0.3)
+
+
+@scene("fonticon_animation")
+def _(r: Recorder, window: QWidget) -> None:
+    r.wait(2.4)
 
 
 @scene("qelidinglabel", width=300)

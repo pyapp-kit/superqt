@@ -1,6 +1,8 @@
 # QLabeledDoubleRangeSlider
 
-Labeled Float variant of [`QRangeSlider`](qrangeslider.md). (see that page for more details).
+A [`QDoubleRangeSlider`](qdoublerangeslider.md) with labels for its handles and
+range. It works like a [`QLabeledRangeSlider`](qlabeledrangeslider.md);
+`setDecimals` sets the number of decimals shown.
 
 {{ show_widget() }}
 

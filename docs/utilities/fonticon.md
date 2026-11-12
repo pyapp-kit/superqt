@@ -1,10 +1,16 @@
 # Font icons
 
-The `superqt.fonticon` module provides a set of utilities for working with font
-icons such as [Font Awesome](https://fontawesome.com/) or [Material Design
-Icons](https://materialdesignicons.com/).
+`superqt.fonticon` creates `QIcon`s from the glyphs of icon fonts, such as
+[Font Awesome](https://fontawesome.com/) or
+[Material Design Icons](https://pictogrammers.com/library/mdi/). Unlike images,
+glyphs can be drawn at any size and in any color.
 
-## Basic Example
+Icon fonts are installed as plugins (see [below](#font-icon-plugins)), and glyphs
+are referred to by a key in the form `"prefix.name"`, such as `"fa5s.smile"`. The
+plugins also provide classes with a constant for each glyph, such as
+`FA5S.smile`, which IDEs can autocomplete.
+
+## Basic example
 
 {{ show_widget() }}
 
@@ -14,62 +20,54 @@ examples/fonticon.py
 --8<--
 ```
 
-## Font Icon plugins
+`icon` takes options for the color, scale, and animation of the glyph, and
+different options for each state and mode of the icon (as in
+`QIcon.State` and `QIcon.Mode`); see [`icon`](#superqt.fonticon.icon) below.
 
-Ready-made fonticon packs are available as plugins.
+## Animations
 
-A great way to search across most available icons libraries from a single
-search interface is to use glyphsearch: <https://glyphsearch.com/>
+The `animation` argument of `icon()` takes an
+[`Animation`](#superqt.fonticon.Animation), such as `spin` or `pulse`, created
+with the widget that shows the icon:
 
-If a font library you'd like to use is unavailable as a superqt plugin,
-please [open a feature request](https://github.com/pyapp-kit/superqt/issues/new/choose)
+{{ show_widget("fonticon_animation") }}
 
-### Font Awesome 6
-
-Browse available icons at <https://fontawesome.com/v6/search>
-
-```bash
-pip install fonticon-fontawesome6
+```python
+--8<--
+examples/fonticon_animation.py
+--8<--
 ```
 
-### Font Awesome 5
+## Font icon plugins
 
-Browse available icons at <https://fontawesome.com/v5/search>
+These icon fonts are available as plugins, and as extras of superqt:
 
-```bash
-pip install fonticon-fontawesome5
-```
+| Font | Install | Browse the icons |
+| --- | --- | --- |
+| Font Awesome 6 | `pip install "superqt[font-fa6]"` | <https://fontawesome.com/v6/search> |
+| Font Awesome 5 | `pip install "superqt[font-fa5]"` | <https://fontawesome.com/v5/search> |
+| Material Design Icons 7 | `pip install "superqt[font-mi7]"` | <https://pictogrammers.com/library/mdi/> |
+| Material Design Icons 6 | `pip install "superqt[font-mi6]"` | <https://pictogrammers.com/library/mdi/> (shows version 7: see the [changes from version 6](https://pictogrammers.com/docs/library/mdi/releases/changelog/)) |
 
-### Material Design Icons 7
+Other fonts are available as separate packages:
 
-Browse available icons at <https://materialdesignicons.com/>
+- [fonticon-bootstrapicons](https://github.com/tlambert03/fonticon-bootstrapicons)
+- [fonticon-linearicons](https://github.com/tlambert03/fonticon-linearicons)
+- [fonticon-feather](https://github.com/tlambert03/fonticon-feather)
 
-```bash
-pip install fonticon-materialdesignicons7
-```
+[GlyphSearch](https://glyphsearch.com/) searches several icon libraries at once.
+If you'd like to use a font that isn't available as a plugin, please
+[open a feature request](https://github.com/pyapp-kit/superqt/issues/new/choose).
 
-### Material Design Icons 6
+### Writing a plugin
 
-Browse available icons at <https://materialdesignicons.com/>
-(note that the search defaults to v7, see changes from v6 in [the
-changelog](https://pictogrammers.com/docs/library/mdi/releases/changelog/))
-
-```bash
-pip install fonticon-materialdesignicons6
-```
-
-### See also
-
-- <https://github.com/tlambert03/fonticon-bootstrapicons>
-- <https://github.com/tlambert03/fonticon-linearicons>
-- <https://github.com/tlambert03/fonticon-feather>
-
-`superqt.fonticon` is a pluggable system, and font icon packs may use the `"superqt.fonticon"`
-entry point to register themselves with superqt. See [`fonticon-cookiecutter`](https://github.com/tlambert03/fonticon-cookiecutter) for a template, or look through the following repos for examples:
-
-- <https://github.com/tlambert03/fonticon-fontawesome6>
-- <https://github.com/tlambert03/fonticon-fontawesome5>
-- <https://github.com/tlambert03/fonticon-materialdesignicons6>
+Font packages register themselves with the `"superqt.fonticon"`
+[entry point](https://packaging.python.org/en/latest/specifications/entry-points/).
+[fonticon-cookiecutter](https://github.com/tlambert03/fonticon-cookiecutter) is
+a template for a new one, and the packages above are examples, such as
+[fonticon-fontawesome6](https://github.com/tlambert03/fonticon-fontawesome6).
+To use a font file without writing a package, see
+[`addFont`](#superqt.fonticon.addFont).
 
 ## API
 
@@ -96,11 +94,6 @@ entry point to register themselves with superqt. See [`fonticon-cookiecutter`](h
 ::: superqt.fonticon.IconFont
     options:
       heading_level: 3
-
-## Animations
-
-the `animation` parameter to `icon()` accepts a subclass of
-`Animation` that will be
 
 ::: superqt.fonticon.Animation
     options:

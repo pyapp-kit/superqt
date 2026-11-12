@@ -4,7 +4,8 @@ from superqt import QToggleSwitch
 
 app = QApplication([])
 
-switch = QToggleSwitch()
+switch = QToggleSwitch("Notifications")
+switch.toggled.connect(print)
 switch.show()
 
 app.exec()

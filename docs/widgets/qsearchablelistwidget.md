@@ -1,13 +1,14 @@
 # QSearchableListWidget
 
-`QSearchableListWidget` is a variant of
-[`QListWidget`](https://doc.qt.io/qt-6/qlistwidget.html) that add text entry
-above list widget that allow to filter list of available options.
+A [`QListWidget`](https://doc.qt.io/qt-6/qlistwidget.html) with a text field
+above it. Typing in the field hides the items that don't contain the text
+(ignoring case).
 
-Due to implementation details, this widget it does not inherit directly from
-[`QListWidget`](https://doc.qt.io/qt-6/qlistwidget.html) but it does fully
-satisfy its api. The only limitation is that it cannot be used as argument of
-[`QListWidgetItem`](https://doc.qt.io/qt-6/qlistwidgetitem.html) constructor.
+`QSearchableListWidget` is a `QWidget` that contains a `QListWidget`
+(`list_widget`) and a `QLineEdit` (`filter_widget`), and forwards the methods of
+`QListWidget` to the list, so it can be used like one. The difference is that it
+isn't a `QListWidget`: it can't be passed as the parent of a `QListWidgetItem`
+(use `list_widget` instead), and `isinstance` checks for `QListWidget` fail.
 
 {{ show_widget() }}
 

@@ -4,9 +4,9 @@ from superqt import QLargeIntSpinBox
 
 app = QApplication([])
 
-slider = QLargeIntSpinBox()
-slider.setRange(0, 4.53e8)
-slider.setValue(4.53e8)
-slider.show()
+spin = QLargeIntSpinBox()
+spin.setRange(0, 10**15)
+spin.setValue(2**40)  # a QSpinBox can't go above 2**31 - 1
+spin.show()
 
 app.exec()

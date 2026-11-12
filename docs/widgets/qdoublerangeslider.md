@@ -1,6 +1,7 @@
 # QDoubleRangeSlider
 
-Float variant of [`QRangeSlider`](qrangeslider.md). (see that page for more details).
+A [`QRangeSlider`](qrangeslider.md) for `float` values: its range, values, and
+steps are floats. See the `QRangeSlider` page for how range sliders work.
 
 {{ show_widget() }}
 

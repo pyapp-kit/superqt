@@ -6,9 +6,9 @@ from superqt.fonticon import icon
 
 app = QApplication([])
 
-btn2 = QPushButton()
-btn2.setIcon(icon(FA5S.smile, color="blue"))
-btn2.setIconSize(QSize(225, 225))
-btn2.show()
+button = QPushButton()
+button.setIcon(icon(FA5S.smile, color="royalblue"))
+button.setIconSize(QSize(96, 96))
+button.show()
 
 app.exec()

@@ -1,19 +1,16 @@
 # QQuantity
 
-A widget that allows the user to edit a quantity (a magnitude associated with a unit).
+A widget for editing a quantity: a magnitude, in a spin box, and a unit, in a
+combo box with the units of the same dimension (for meters: millimeters,
+kilometers, and so on). The value is a
+[`pint.Quantity`](https://pint.readthedocs.io/).
 
-!!! note
+!!! note "Requires pint"
 
-    This widget requires [`pint`](https://pint.readthedocs.io):
+    Install [pint](https://pint.readthedocs.io) with the `quantity` extra:
 
-    ```
-    pip install pint
-    ```
-
-    or
-
-    ```
-    pip install superqt[quantity]
+    ```bash
+    pip install "superqt[quantity]"
     ```
 
 {{ show_widget() }}
@@ -24,10 +21,10 @@ examples/qquantity.py
 --8<--
 ```
 
-!!! note
+!!! warning "Only one dimension"
 
-    `QQuantity` currently supports simple units with exponents, e.g., `meters^2` or
-    `1/second`. However, compound units, e.g. `meter/second`, `Newton`, etc.,
-    are not currently supported.
+    `QQuantity` supports units of a single dimension, with an exponent, such as
+    `meter ** 2` or `1 / second`. Units that combine dimensions, such as
+    `meter / second` or `newton`, raise a `NotImplementedError`.
 
 {{ show_members('superqt.QQuantity') }}

@@ -4,12 +4,11 @@ from superqt import QElidingLabel
 
 app = QApplication([])
 
-widget = QElidingLabel(
-    "a skj skjfskfj sdlf sdfl sdlfk jsdf sdlkf jdsf dslfksdl sdlfk sdf sdl "
-    "fjsdlf kjsdlfk laskdfsal as lsdfjdsl kfjdslf asfd dslkjfldskf sdlkfj"
+label = QElidingLabel(
+    "This text is too long for the label, so the end of it is replaced with an "
+    "ellipsis. Make the window wider to see more of it."
 )
-widget.setWordWrap(True)
-widget.resize(300, 20)
-widget.show()
+label.resize(300, 20)
+label.show()
 
 app.exec()

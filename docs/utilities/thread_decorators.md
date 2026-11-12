@@ -1,99 +1,95 @@
 # Threading decorators
 
-`superqt` provides two decorators that help to ensure that given function is
-running in the desired thread:
+Qt objects must generally be used from the thread they live in, and widgets
+from the main (GUI) thread. These two decorators make a function run in the
+right thread, whichever thread calls it:
 
-## `ensure_main_thread`
+`ensure_main_thread`
+:   Runs the decorated function, or method, in the main thread.
 
-`ensure_main_thread` ensures that the decorated function/method runs in the main thread
+`ensure_object_thread`
+:   Runs the decorated method of a `QObject` in the thread that the object lives
+    in (see Qt's [threads and QObjects](https://doc.qt.io/qt-6/threads-qobject.html#accessing-qobject-subclasses-from-other-threads)).
 
-## `ensure_object_thread`
-
-`ensure_object_thread` ensures that a decorated bound method of a `QObject` runs
-in the thread in which the instance lives ([see qt documentation for
-details](https://doc.qt.io/qt-6/threads-qobject.html#accessing-qobject-subclasses-from-other-threads)).
+They're meant for calling Qt code from code that doesn't use Qt (such as a
+callback from another library's thread). Between Qt objects, signals and slots
+already do this.
 
 ## Usage
 
-By default, functions are executed asynchronously (they return immediately with
-an instance of
-[`concurrent.futures.Future`](https://docs.python.org/3/library/concurrent.futures.html#concurrent.futures.Future)).
-
-To block and wait for the result, see [Synchronous mode](#synchronous-mode)
+When called from another thread, the decorated function is queued to run in
+its target thread, and the call returns a
+[`concurrent.futures.Future`](https://docs.python.org/3/library/concurrent.futures.html#concurrent.futures.Future)
+at once. (When called from the target thread, the function runs right away, and
+the `Future` it returns is already done.)
 
 ```python
 from qtpy.QtCore import QObject
+
 from superqt import ensure_main_thread, ensure_object_thread
 
 
 @ensure_main_thread
-def sample_function():
-    print("This function will run in main thread")
+def update_label(text):
+    print("this runs in the main thread")
 
 
-class SampleObject(QObject):
+class Counter(QObject):
     def __init__(self):
         super().__init__()
         self._value = 1
 
     @ensure_main_thread
-    def sample_method1(self):
-        print("This method will run in main thread")
+    def show(self):
+        print("this runs in the main thread")
 
     @ensure_object_thread
-    def sample_method3(self):
-        import time
-
-        print("sleeping")
-        time.sleep(1)
-        print("This method will run in object thread")
+    def reset(self):
+        print("this runs in the thread that the Counter lives in")
 
     @property
     def value(self):
-        print("return value")
         return self._value
 
     @value.setter
     @ensure_object_thread
     def value(self, value):
-        print("this setter will run in object thread")
+        print("setters work too")
         self._value = value
 ```
 
-As can be seen in this example these decorators can also be used for setters.
+## Waiting for the result
 
-These decorators should not be used as replacement of Qt Signals but rather to
-interact with Qt objects from non Qt code.
+To wait for the function to finish, and get its return value, pass
+`await_return=True`. It waits for at most `timeout` milliseconds (1000 by
+default), and then raises a `TimeoutError`.
 
-## Synchronous mode
+!!! warning
 
-If you'd like for the program to block and wait for the result of your function
-call, use the `await_return=True` parameter, and optionally specify a timeout.
-
-!!! important
-
-    Using synchronous mode may significantly impact performance.
+    The calling thread is blocked while it waits.
 
 ```python
+from concurrent.futures import Future
+
 from superqt import ensure_main_thread
 
 
 @ensure_main_thread
-def sample_function1():
+def get_one():
     return 1
 
 
 @ensure_main_thread(await_return=True)
-def sample_function2():
+def get_two():
     return 2
 
 
-assert sample_function1() is None
-assert sample_function2() == 2
-
-
-# optionally, specify a timeout
 @ensure_main_thread(await_return=True, timeout=10000)
-def sample_function():
-    return 1
+def get_three():
+    return 3
+
+
+assert isinstance(get_one(), Future)
+assert get_two() == 2
+assert get_three() == 3
 ```

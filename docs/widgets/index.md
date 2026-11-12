@@ -5,54 +5,58 @@ hide:
 
 # Widgets
 
-The following are QWidget subclasses:
+Most of these widgets subclass the Qt widget they're most similar to, and follow
+Qt's API conventions (`camelCase` names, `value()`/`setValue()` pairs, and
+signals named like `valueChanged`), so they can be used wherever that widget
+is. Each page lists the Qt class and what superqt adds to it.
 
 ## Sliders
 
 <div class="sq-gallery" markdown>
-{{ card("qrangeslider.md", "QRangeSlider", "Multi-handle slider") }}
-{{ card("qlabeledslider.md", "QLabeledSlider", "`QSlider` with editable `QSpinBox` that shows the current value") }}
-{{ card("qlabeledrangeslider.md", "QLabeledRangeSlider", "`QRangeSlider` variant, with editable labels for each handle") }}
-{{ card("qdoubleslider.md", "QDoubleSlider", "Slider for float values") }}
-{{ card("qdoublerangeslider.md", "QDoubleRangeSlider", "Multi-handle slider for float values") }}
-{{ card("qlabeleddoubleslider.md", "QLabeledDoubleSlider", "`QSlider` for float values with editable `QSpinBox` with the current value") }}
-{{ card("qlabeleddoublerangeslider.md", "QLabeledDoubleRangeSlider", "`QDoubleRangeSlider` variant with editable labels for each handle") }}
+{{ card("qrangeslider.md", "QRangeSlider", "A slider with two or more handles, to select a range.") }}
+{{ card("qlabeledslider.md", "QLabeledSlider", "A slider with an editable label for its value.") }}
+{{ card("qlabeledrangeslider.md", "QLabeledRangeSlider", "A range slider with editable labels for its handles and range.") }}
+{{ card("qdoubleslider.md", "QDoubleSlider", "A slider for floats.") }}
+{{ card("qdoublerangeslider.md", "QDoubleRangeSlider", "A range slider for floats.") }}
+{{ card("qlabeleddoubleslider.md", "QLabeledDoubleSlider", "A slider for floats, with an editable label for its value.") }}
+{{ card("qlabeleddoublerangeslider.md", "QLabeledDoubleRangeSlider", "A range slider for floats, with editable labels.") }}
 </div>
 
 ## Numeric inputs
 
 <div class="sq-gallery" markdown>
-{{ card("qlargeintspinbox.md", "QLargeIntSpinBox", "`QSpinbox` that accepts arbitrarily large integers") }}
-{{ card("qquantity.md", "QQuantity", "Pint-backed quantity widget (magnitude combined with unit dropdown)") }}
+{{ card("qlargeintspinbox.md", "QLargeIntSpinBox", "A spin box for integers of any size.") }}
+{{ card("qquantity.md", "QQuantity", "A magnitude and a unit, backed by pint.") }}
 </div>
 
 ## Combo boxes
 
 <div class="sq-gallery" markdown>
-{{ card("qenumcombobox.md", "QEnumComboBox", "`QComboBox` that populates the combobox from a python `Enum`") }}
-{{ card("qsearchablecombobox.md", "QSearchableComboBox", "`QComboBox` variant that filters available options based on text input") }}
-{{ card("qcolorcombobox.md", "QColorComboBox", "`QComboBox` to select from a specified set of colors") }}
-{{ card("qcolormap.md", "QColormapComboBox", "`QComboBox` to select from a specified set of colormaps.") }}
-{{ card("colormap_catalog.md", "CmapCatalogComboBox", "Searchable `QComboBox` with the entire cmap colormap catalog") }}
+{{ card("qenumcombobox.md", "QEnumComboBox", "A combo box with the members of an `Enum`.") }}
+{{ card("qsearchablecombobox.md", "QSearchableComboBox", "A combo box that filters its items as you type.") }}
+{{ card("qcolorcombobox.md", "QColorComboBox", "A combo box for choosing a color.") }}
+{{ card("qcolormap.md", "QColormapComboBox", "A combo box for choosing a colormap.") }}
+{{ card("colormap_catalog.md", "CmapCatalogComboBox", "A searchable combo box with every colormap in the cmap catalog.") }}
 </div>
 
 ## Lists and trees
 
 <div class="sq-gallery" markdown>
-{{ card("qsearchablelistwidget.md", "QSearchableListWidget", "`QListWidget` variant with search field that filters available options") }}
-{{ card("qsearchabletreewidget.md", "QSearchableTreeWidget", "`QTreeWidget` variant with search field that filters available options") }}
+{{ card("qsearchablelistwidget.md", "QSearchableListWidget", "A list with a text field that filters its items.") }}
+{{ card("qsearchabletreewidget.md", "QSearchableTreeWidget", "A tree view of a mapping, filtered by a regular expression.") }}
 </div>
 
 ## Text and buttons
 
 <div class="sq-gallery" markdown>
-{{ card("qelidinglabel.md", "QElidingLabel", "A `QLabel` variant that will elide text (add `…`) to fit width.") }}
-{{ card("qtoggleswitch.md", "QToggleSwitch", "`QAbstractButton` that represents a boolean value with a toggle switch.") }}
+{{ card("qelidinglabel.md", "QElidingLabel", "A label that shortens its text with an ellipsis to fit.") }}
+{{ card("qelidinglineedit.md", "QElidingLineEdit", "A line edit that shortens its text with an ellipsis while it isn't being edited.") }}
+{{ card("qtoggleswitch.md", "QToggleSwitch", "A checkable button drawn as a toggle switch.") }}
 </div>
 
 ## Containers and layouts
 
 <div class="sq-gallery" markdown>
-{{ card("qcollapsible.md", "QCollapsible", "A collapsible widget to hide and unhide child widgets.") }}
-{{ card("qflowlayout.md", "QFlowLayout", "A layout that rearranges items based on parent width.") }}
+{{ card("qcollapsible.md", "QCollapsible", "A frame that hides or shows its contents when its header is clicked.") }}
+{{ card("qflowlayout.md", "QFlowLayout", "A layout that wraps its items onto new rows to fit the width.") }}
 </div>

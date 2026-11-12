@@ -1,16 +1,16 @@
 # QEnumComboBox
 
-`QEnumComboBox` is a variant of
-[`QComboBox`](https://doc.qt.io/qt-6/qcombobox.html) that populates the items in
-the combobox based on a python `Enum` class.  In addition to all the methods
-provided by `QComboBox`, this subclass adds the methods
-`enumClass`/`setEnumClass` to get/set the current `Enum` class represented by
-the combobox, and `currentEnum`/`setCurrentEnum` to get/set the current `Enum`
-member in the combobox. There is also a new signal `currentEnumChanged(enum)`
-analogous to `currentIndexChanged` and `currentTextChanged`.
+A [`QComboBox`](https://doc.qt.io/qt-6/qcombobox.html) with the members of a
+Python `Enum` as its items. In addition to the `QComboBox` API, it has:
 
-Method like `insertItem` and `addItem` are blocked and try of its usage will end
-with `RuntimeError`
+- `enumClass()` and `setEnumClass()`, to get and set the `Enum`;
+- `currentEnum()` and `setCurrentEnum()`, to get and set the current member;
+- a `currentEnumChanged` signal, which emits the new member.
+
+Items are shown as `str(member)` if the `Enum` defines `__str__`, and otherwise
+as the member's name, with underscores replaced by spaces. The items can only
+come from the `Enum`: `addItem`, `addItems`, `insertItem`, and `insertItems`
+raise a `RuntimeError`.
 
 {{ show_widget() }}
 
@@ -20,7 +20,7 @@ examples/qenumcombobox.py
 --8<--
 ```
 
-Another option is to use optional `enum_class` argument of constructor and change
+The `Enum` can also be passed to the constructor:
 
 ```python
 # option A:
@@ -32,7 +32,8 @@ combo = QEnumComboBox(enum_class=SampleEnum)
 
 ## Allow `None`
 
-`QEnumComboBox` also allows using `Optional` type annotation:
+With `allow_none=True`, the combo box has an extra item, `----`, for no
+member:
 
 ```python
 from enum import Enum
@@ -46,14 +47,12 @@ class SampleEnum(Enum):
     third = 3
 
 
-# as usual:
-# you must create a QApplication before create a widget.
-
+# (a QApplication must exist before creating a widget)
 combo = QEnumComboBox()
 combo.setEnumClass(SampleEnum, allow_none=True)
 ```
 
-In this case there is added option `----` and the `currentEnum()` method will
-return `None` when it is selected.
+When it's selected, `currentEnum()` returns `None` (and `setCurrentEnum(None)`
+selects it).
 
 {{ show_members('superqt.QEnumComboBox') }}

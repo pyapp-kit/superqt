@@ -16,7 +16,7 @@ Components are tested on:
 
 - macOS, Windows, & Linux
 - Python 3.11 and above
-- PyQt5 (5.11 and above) & PyQt6
+- PyQt5 (5.15) & PyQt6
 - PySide6
 
 ## Documentation

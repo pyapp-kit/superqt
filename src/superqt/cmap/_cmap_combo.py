@@ -42,7 +42,7 @@ CMAP_ROLE = Qt.ItemDataRole.UserRole + 1
 
 
 class QColormapComboBox(QComboBox):
-    """A drop down menu for selecting colors.
+    """A drop down menu for selecting colormaps.
 
     Parameters
     ----------

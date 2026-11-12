@@ -1,46 +1,56 @@
-# Throttling & Debouncing
+# Throttling and debouncing
 
-These utilities allow you to throttle or debounce a function. This is useful
-when you have a function that is called multiple times in a short period of
-time, and you want to make sure it is only "actually" called once (or at least
-no more than a certain frequency).
+When a function is called many times in quick succession (for example, by a
+slider's `valueChanged` signal while it's dragged), throttling and debouncing
+limit how often it actually runs:
 
-For background on throttling and debouncing, see:
+- **Throttling** runs it at most once per timeout. With the default (leading)
+  policy, the first call runs at once, and further calls during the timeout are
+  combined into one call at its end.
+- **Debouncing** waits until the calls have stopped for the timeout, and then
+  runs it once.
 
-- <https://blog.openreplay.com/forever-functional-debouncing-and-throttling-for-performance>
-- <https://css-tricks.com/debouncing-throttling-explained-examples/>
+For more background, see
+[Debouncing and throttling explained](https://css-tricks.com/debouncing-throttling-explained-examples/).
 
-::: superqt.utils.qdebounced
-    options:
-        show_source: false
-        docstring_style: numpy
-        show_root_toc_entry: True
-        show_root_heading: True
+The `qthrottled` and `qdebounced` decorators wrap a function:
+
+```python
+from superqt.utils import qdebounced, qthrottled
+
+
+@qthrottled(timeout=100)  # milliseconds
+def update_preview(value): ...
+
+
+@qdebounced(timeout=300)
+def save_settings(value): ...
+
+
+slider.valueChanged.connect(update_preview)
+slider.valueChanged.connect(save_settings)
+```
+
+The decorated function is called with the arguments of the last call that it
+combined. The `QSignalThrottler` and `QSignalDebouncer` objects do the same for
+signals: connect a signal to their `throttle()` slot, and their `triggered`
+signal is emitted at the throttled (or debounced) rate:
+
+```python
+from superqt.utils import QSignalThrottler
+
+throttler = QSignalThrottler()
+throttler.setTimeout(100)
+slider.valueChanged.connect(throttler.throttle)
+throttler.triggered.connect(update_view)
+```
 
 ::: superqt.utils.qthrottled
-    options:
-        show_source: false
-        docstring_style: numpy
-        show_root_toc_entry: True
-        show_root_heading: True
 
-::: superqt.utils.QSignalDebouncer
-    options:
-        show_source: false
-        docstring_style: numpy
-        show_root_toc_entry: True
-        show_root_heading: True
+::: superqt.utils.qdebounced
 
 ::: superqt.utils.QSignalThrottler
-    options:
-        show_source: false
-        docstring_style: numpy
-        show_root_toc_entry: True
-        show_root_heading: True
+
+::: superqt.utils.QSignalDebouncer
 
 ::: superqt.utils._throttler.GenericSignalThrottler
-    options:
-        show_source: false
-        docstring_style: numpy
-        show_root_toc_entry: True
-        show_root_heading: True

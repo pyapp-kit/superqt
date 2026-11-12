@@ -11,10 +11,12 @@ hide:
 
 <p class="sq-lead">"Missing" widgets and components for PyQt and PySide.</p>
 
-This repository aims to provide high-quality community-contributed Qt widgets
-and components for [PyQt](https://riverbankcomputing.com/software/pyqt/) &
-[PySide](https://www.qt.io/qt-for-python) that are not provided in the native
-QtWidgets module.
+superqt is a collection of Qt widgets and utilities that the `QtWidgets` module
+doesn't provide: range sliders, sliders for floats, searchable combo boxes and
+lists, collapsible sections, font and SVG icons, tools for threading and for
+throttling signals, and more. It is built on
+[qtpy](https://github.com/spyder-ide/qtpy), so the same code works with PyQt5,
+PyQt6, and PySide6.
 
 [Widgets](widgets/index.md){ .md-button .md-button--primary }
 [Utilities](utilities/index.md){ .md-button }
@@ -45,27 +47,43 @@ QtWidgets module.
     conda install -c conda-forge superqt
     ```
 
-Components are tested on:
+superqt doesn't install a Qt binding. If your environment doesn't have one yet,
+install one with an extra:
 
-- macOS, Windows, & Linux
-- Python 3.11 and above
-- PyQt5 (5.11 and above) & PyQt6
-- PySide6
+```bash
+pip install "superqt[pyqt6]"  # or [pyqt5], or [pyside6]
+```
+
+Some features need extra dependencies, which can also be installed as extras:
+
+| Extra | Installs | Needed for |
+| --- | --- | --- |
+| `cmap` | [cmap](https://cmap-docs.readthedocs.io/) | [`QColormapComboBox`](widgets/qcolormap.md), [`CmapCatalogComboBox`](widgets/colormap_catalog.md), [colormap utilities](utilities/cmap.md) |
+| `quantity` | [pint](https://pint.readthedocs.io/) | [`QQuantity`](widgets/qquantity.md) |
+| `iconify` | [pyconify](https://github.com/pyapp-kit/pyconify) | [`QIconifyIcon`](utilities/iconify.md) |
+| `font-fa5`, `font-fa6` | Font Awesome 5 or 6 | [font icons](utilities/fonticon.md) |
+| `font-mi6`, `font-mi7` | Material Design Icons 6 or 7 | [font icons](utilities/fonticon.md) |
+
+superqt is tested on macOS, Windows, and Linux, with Python 3.11 and later, and
+with PyQt5 (5.15), PyQt6, and PySide6.
 
 ## Widgets
 
 <div class="sq-gallery" markdown>
-{{ card("widgets/qrangeslider.md", "QRangeSlider", "Multi-handle slider") }}
-{{ card("widgets/qlabeledrangeslider.md", "QLabeledRangeSlider", "`QRangeSlider` variant, with editable labels for each handle") }}
-{{ card("widgets/qsearchablecombobox.md", "QSearchableComboBox", "`QComboBox` variant that filters available options based on text input") }}
-{{ card("widgets/qcolormap.md", "QColormapComboBox", "`QComboBox` to select from a specified set of colormaps.") }}
-{{ card("widgets/qcollapsible.md", "QCollapsible", "A collapsible widget to hide and unhide child widgets.") }}
-{{ card("widgets/qtoggleswitch.md", "QToggleSwitch", "`QAbstractButton` that represents a boolean value with a toggle switch.") }}
+{{ card("widgets/qrangeslider.md", "QRangeSlider", "A slider with two or more handles, to select a range.") }}
+{{ card("widgets/qlabeledrangeslider.md", "QLabeledRangeSlider", "A range slider with editable labels for its handles and range.") }}
+{{ card("widgets/qsearchablecombobox.md", "QSearchableComboBox", "A combo box that filters its items as you type.") }}
+{{ card("widgets/qcolormap.md", "QColormapComboBox", "A combo box for choosing a colormap.") }}
+{{ card("widgets/qcollapsible.md", "QCollapsible", "A frame that hides or shows its contents when its header is clicked.") }}
+{{ card("widgets/qtoggleswitch.md", "QToggleSwitch", "A checkable button drawn as a toggle switch.") }}
 </div>
 
 [All widgets](widgets/index.md){ .md-button }
 
 ## Utilities
 
-See the [Utilities](utilities/index.md) page for font icons, threading tools,
-throttling and debouncing, and more.
+The [utilities](utilities/index.md) include icons from icon fonts and from
+Iconify, decorators and workers for running code in other threads, throttling and
+debouncing of functions and signals, syntax highlighting, and context managers
+for blocking signals, capturing Qt's log messages, and showing exceptions in a
+dialog.
