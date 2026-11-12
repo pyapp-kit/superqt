@@ -1,0 +1,55 @@
+name: Docs
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2  # v10.3.3
+        with:
+          python-version: "3.13"
+          enable-cache: true
+          cache-dependency-glob: "**/pyproject.toml"
+
+      # system libraries for Qt (screenshots are rendered offscreen)
+      - uses: pyvista/setup-headless-display-action@v5
+        with:
+          qt: true
+
+      # screenshots use Inter, the same font as the site
+      - name: Install fonts
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fonts-inter
+
+      - name: Render screenshots and animations
+        run: uv run --group docs python docs/_gen_media.py
+
+      - name: Build
+        run: uv run --group docs zensical build --clean --strict
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: site
+          path: site
+
+      # zensical has no gh-deploy; push the built site to the gh-pages branch
+      - name: Deploy
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          uvx ghp-import --no-jekyll --push --force site
