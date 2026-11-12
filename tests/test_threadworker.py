@@ -382,3 +382,28 @@ def test_nested_worker_run_restores_outer_worker():
     outer.run()
     assert inner_warnings == ["inner"]
     assert outer_warnings == ["outer"]
+
+
+def test_filters_added_while_worker_runs_are_kept(qtbot):
+    """Finishing a worker doesn't drop filters added while it was running."""
+
+    class MarkerWarning(UserWarning):
+        """Not in the default filters, unlike e.g. DeprecationWarning."""
+
+    user_filter = ("ignore", None, MarkerWarning, None, 0)
+
+    @qthreading.thread_worker(start_thread=False)
+    def wait(running: threading.Event, done: threading.Event):
+        running.set()  # `started` fires before warnings are captured
+        done.wait(5)
+
+    running, done = threading.Event(), threading.Event()
+    worker = wait(running, done)
+    with warnings.catch_warnings():
+        worker.start()
+        assert running.wait(5)
+        warnings.filterwarnings("ignore", category=MarkerWarning)
+        with qtbot.waitSignal(worker.finished):
+            done.set()
+        assert user_filter in warnings.filters
+        assert ("always", None, Warning, None, 0) not in warnings.filters

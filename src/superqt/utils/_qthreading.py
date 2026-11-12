@@ -4,6 +4,7 @@ import inspect
 import threading
 import time
 import warnings
+from contextlib import suppress
 from functools import partial, wraps
 from typing import (
     TYPE_CHECKING,
@@ -65,7 +66,8 @@ def as_generator_function(
 
 _warnings_lock = threading.Lock()
 _running_workers = 0
-_saved_filters: list = []
+# the entry `warnings.filterwarnings("always")` would add
+_ALWAYS_FILTER = ("always", None, Warning, None, 0)
 # never reset, so `_showwarning` always has somewhere to send warnings
 _original_showwarning = warnings.showwarning
 _thread_worker = threading.local()
@@ -96,14 +98,16 @@ class _capture_warnings:
         self._previous_worker: WorkerBase | None = None
 
     def __enter__(self) -> None:
-        global _running_workers, _saved_filters, _original_showwarning
+        global _running_workers, _original_showwarning
         with _warnings_lock:
             if _running_workers == 0:
-                _saved_filters = warnings.filters[:]
                 # saving our own hook would make it call itself
                 if warnings.showwarning is not _showwarning:
                     _original_showwarning = warnings.showwarning
-                warnings.filterwarnings("always")
+                # insert directly: `filterwarnings` would drop an identical
+                # user filter, which we'd then fail to put back
+                warnings.filters.insert(0, _ALWAYS_FILTER)
+                warnings._filters_mutated()  # type: ignore[attr-defined]
                 warnings.showwarning = _showwarning
             _running_workers += 1
         # a worker's `run()` may be called directly inside another worker
@@ -116,7 +120,9 @@ class _capture_warnings:
         with _warnings_lock:
             _running_workers -= 1
             if _running_workers == 0:
-                warnings.filters[:] = _saved_filters
+                # remove only our filter, keeping any added while we ran
+                with suppress(ValueError):  # e.g. `resetwarnings()` removed it
+                    warnings.filters.remove(_ALWAYS_FILTER)
                 warnings._filters_mutated()  # type: ignore[attr-defined]
                 # don't clobber a hook someone else installed while we ran
                 if warnings.showwarning is _showwarning:
