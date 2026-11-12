@@ -1,0 +1,185 @@
+/* ---------------------------------------------------------------------------
+   Colors. Keep --sq-accent in sync with `Highlight` in docs/_media.py, so the
+   widgets in screenshots match the site.
+--------------------------------------------------------------------------- */
+
+:root,
+[data-md-color-scheme="default"] {
+  --sq-accent: #4d5bd8;
+  --md-primary-fg-color: #4d5bd8;
+  --md-primary-fg-color--light: #7782e8;
+  --md-primary-fg-color--dark: #3a46b0;
+  --md-accent-fg-color: #3a46b0;
+  --md-accent-fg-color--transparent: #4d5bd81a;
+  --sq-figure-bg: #f3f4f7; /* `Window` in light screenshots */
+  --sq-figure-border: #e1e4ea;
+  --sq-figure-shadow: 0 1px 2px #0000000d, 0 4px 16px #0000000a;
+}
+
+[data-md-color-scheme="slate"] {
+  --sq-accent: #6f7cf2;
+  --md-primary-fg-color: #8f9aff;
+  --md-primary-fg-color--light: #b3baff;
+  --md-primary-fg-color--dark: #6f7cf2;
+  --md-accent-fg-color: #b3baff;
+  --md-accent-fg-color--transparent: #8f9aff1a;
+  --md-typeset-a-color: #8f9aff;
+  --sq-figure-bg: #1b1e25; /* `Window` in dark screenshots */
+  --sq-figure-border: #2b2f38;
+  --sq-figure-shadow: 0 1px 2px #00000040, 0 6px 20px #00000033;
+}
+
+/* ---------------------------------------------------------------------------
+   Widget screenshots: {{ show_widget() }}
+--------------------------------------------------------------------------- */
+
+.md-typeset figure.sq-demo {
+  margin: 1.6em auto;
+}
+
+.md-typeset figure.sq-demo img {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--sq-figure-border);
+  border-radius: 10px;
+  background: var(--sq-figure-bg);
+  box-shadow: var(--sq-figure-shadow);
+}
+
+/* ---------------------------------------------------------------------------
+   Gallery (home page and section index pages)
+--------------------------------------------------------------------------- */
+
+.md-typeset .sq-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 0.8rem;
+  margin: 1em 0 2em;
+}
+
+.md-typeset .sq-gallery > p {
+  display: contents; /* the cards are the grid items */
+}
+
+.md-typeset .sq-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--sq-figure-border);
+  border-radius: 10px;
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color 150ms,
+    box-shadow 150ms,
+    transform 150ms;
+}
+
+.md-typeset .sq-card:hover,
+.md-typeset .sq-card:focus-visible {
+  color: inherit;
+  border-color: var(--md-primary-fg-color);
+  box-shadow: var(--sq-figure-shadow);
+  transform: translateY(-1px);
+}
+
+.md-typeset .sq-card__thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 6.5rem;
+  padding: 0.4rem;
+  background: var(--sq-figure-bg);
+  border-bottom: 1px solid var(--sq-figure-border);
+}
+
+.md-typeset .sq-card__thumb img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.md-typeset .sq-card__body {
+  padding: 0.55rem 0.75rem 0.7rem;
+}
+
+.md-typeset .sq-card__body strong {
+  display: block;
+  font-family: var(--md-code-font-family);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--md-typeset-a-color);
+}
+
+.md-typeset .sq-card * {
+  text-decoration: none;
+}
+
+.md-typeset .sq-card__body code {
+  color: inherit;
+}
+
+.md-typeset .sq-card__body span {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.66rem;
+  line-height: 1.45;
+  color: var(--md-default-fg-color--light);
+}
+
+/* ---------------------------------------------------------------------------
+   Home page
+--------------------------------------------------------------------------- */
+
+.md-typeset .sq-hero {
+  margin: 0.5rem 0 2rem;
+}
+
+@media screen and (min-width: 60em) {
+  .md-typeset .sq-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 2.5rem;
+    align-items: center;
+  }
+
+  .md-typeset .sq-hero figure.sq-demo {
+    margin: 0;
+  }
+}
+
+.md-typeset .sq-hero h1 {
+  margin-bottom: 0.4rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.md-typeset .sq-hero .sq-lead {
+  margin-top: 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--md-default-fg-color--light);
+}
+
+.md-typeset .sq-hero .md-button {
+  margin: 0.2rem 0.4rem 0.2rem 0;
+}
+
+/* ---------------------------------------------------------------------------
+   API reference (mkdocstrings)
+--------------------------------------------------------------------------- */
+
+.md-typeset .doc-heading code {
+  font-weight: 600;
+}
+
+.md-typeset .doc-contents:not(.first) {
+  padding-left: 0.9rem;
+  border-left: 0.05rem solid var(--md-typeset-table-color);
+}
+
+.md-typeset .doc-section-title {
+  font-weight: 600;
+}

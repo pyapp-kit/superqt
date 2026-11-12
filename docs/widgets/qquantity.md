@@ -16,16 +16,12 @@ A widget that allows the user to edit a quantity (a magnitude associated with a 
     pip install superqt[quantity]
     ```
 
+{{ show_widget() }}
+
 ```python
-from qtpy.QtWidgets import QApplication
-
-from superqt import QQuantity
-
-app = QApplication([])
-w = QQuantity("1m")
-w.show()
-
-app.exec()
+--8<--
+examples/qquantity.py
+--8<--
 ```
 
 !!! note
@@ -33,7 +29,5 @@ app.exec()
     `QQuantity` currently supports simple units with exponents, e.g., `meters^2` or
     `1/second`. However, compound units, e.g. `meter/second`, `Newton`, etc.,
     are not currently supported.
-
-{{ show_widget(150) }}
 
 {{ show_members('superqt.QQuantity') }}

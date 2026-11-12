@@ -7,31 +7,12 @@ This is intended to be used with a read-only mapping and be conveniently created
 using `QSearchableTreeWidget.fromData(data)`. If the mapping changes, the
 easiest way to update this is by calling `setData`.
 
+{{ show_widget() }}
 
 ```python
-from qtpy.QtWidgets import QApplication
-
-from superqt import QSearchableTreeWidget
-
-app = QApplication([])
-
-data = {
-    "none": None,
-    "str": "test",
-    "int": 42,
-    "list": [2, 3, 5],
-    "dict": {
-        "float": 0.5,
-        "tuple": (22, 99),
-        "bool": False,
-    },
-}
-tree = QSearchableTreeWidget.fromData(data)
-tree.show()
-
-app.exec_()
+--8<--
+examples/qsearchabletreewidget.py
+--8<--
 ```
-
-{{ show_widget() }}
 
 {{ show_members('superqt.QSearchableTreeWidget') }}

@@ -104,11 +104,10 @@ dev = [
     "prek>=0.3.4",
 ]
 docs = [
-    "mkdocs-macros-plugin ==1.3.7",
-    "mkdocs-material ==9.5.49",
-    "mkdocstrings ==0.27.0",
-    "mkdocstrings-python ==1.13.0",
-    "superqt[font-fa5, cmap, quantity]",
+    "mkdocstrings-python>=2.0.11",
+    "pillow>=11.0",
+    "superqt[cmap, font-fa5, iconify, pyqt6, quantity]",
+    "zensical>=0.1.1",
 ]
 
 
@@ -154,6 +153,7 @@ ignore = [
 "tests/*.py" = ["D", "S101"]
 "examples/demo_widget.py" = ["E501"]
 "examples/*.py" = ["B", "D"]
+"docs/examples/*.py" = ["D"]
 
 # https://docs.astral.sh/ruff/formatter/
 [tool.ruff.format]
@@ -213,7 +213,7 @@ ignore = [
     ".pre-commit-config.yaml",
     "tests/**/*",
     "src/superqt/_version.py",
-    "mkdocs.yml",
+    "zensical.toml",
     "docs/**/*",
     "examples/**/*",
     "CHANGELOG.md",

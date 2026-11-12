@@ -12,29 +12,13 @@ analogous to `currentIndexChanged` and `currentTextChanged`.
 Method like `insertItem` and `addItem` are blocked and try of its usage will end
 with `RuntimeError`
 
-```python
-from enum import Enum
-
-from qtpy.QtWidgets import QApplication
-from superqt import QEnumComboBox
-
-
-class SampleEnum(Enum):
-    first = 1
-    second = 2
-    third = 3
-
-
-app = QApplication([])
-
-combo = QEnumComboBox()
-combo.setEnumClass(SampleEnum)
-combo.show()
-
-app.exec_()
-```
-
 {{ show_widget() }}
+
+```python
+--8<--
+examples/qenumcombobox.py
+--8<--
+```
 
 Another option is to use optional `enum_class` argument of constructor and change
 

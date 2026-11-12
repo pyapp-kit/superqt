@@ -5,21 +5,12 @@
 of options by enter part of text. It could be drop in replacement for
 `QComboBox`.
 
+{{ show_widget() }}
 
 ```python
-from qtpy.QtWidgets import QApplication
-
-from superqt import QSearchableComboBox
-
-app = QApplication([])
-
-combo = QSearchableComboBox()
-combo.addItems(["foo", "bar", "baz", "foobar", "foobaz", "barbaz"])
-combo.show()
-
-app.exec_()
+--8<--
+examples/qsearchablecombobox.py
+--8<--
 ```
-
-{{ show_widget() }}
 
 {{ show_members('superqt.QSearchableComboBox') }}

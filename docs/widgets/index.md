@@ -1,37 +1,58 @@
+---
+hide:
+  - toc
+---
+
 # Widgets
 
 The following are QWidget subclasses:
 
-## Sliders and Numerical Inputs
+## Sliders
 
-| Widget                          | Description           |
-| -----------                     | --------------------- |
-| [`QDoubleRangeSlider`](./qdoublerangeslider.md) | Multi-handle slider for float values   |
-| [`QDoubleSlider`](./qdoubleslider.md) | Slider for float values |
-| [`QLabeledDoubleRangeSlider`](./qlabeleddoublerangeslider.md) | `QDoubleRangeSlider` variant with editable labels for each handle |
-| [`QLabeledDoubleSlider`](./qlabeleddoubleslider.md) | `QSlider` for float values with editable `QSpinBox` with the current value |
-| [`QLabeledRangeSlider`](./qlabeledrangeslider.md) | `QRangeSlider` variant, with editable labels for each handle |
-| [`QLabeledSlider`](./qlabeledslider.md) | `QSlider` with editable `QSpinBox` that shows the current value |
-| [`QLargeIntSpinBox`](./qlargeintspinbox.md) | `QSpinbox` that accepts arbitrarily large integers |
-| [`QRangeSlider`](./qrangeslider.md) | Multi-handle slider   |
-| [`QQuantity`](./qquantity.md) | Pint-backed quantity widget (magnitude combined with unit dropdown)   |
+<div class="sq-gallery" markdown>
+{{ card("qrangeslider.md", "QRangeSlider", "Multi-handle slider") }}
+{{ card("qlabeledslider.md", "QLabeledSlider", "`QSlider` with editable `QSpinBox` that shows the current value") }}
+{{ card("qlabeledrangeslider.md", "QLabeledRangeSlider", "`QRangeSlider` variant, with editable labels for each handle") }}
+{{ card("qdoubleslider.md", "QDoubleSlider", "Slider for float values") }}
+{{ card("qdoublerangeslider.md", "QDoubleRangeSlider", "Multi-handle slider for float values") }}
+{{ card("qlabeleddoubleslider.md", "QLabeledDoubleSlider", "`QSlider` for float values with editable `QSpinBox` with the current value") }}
+{{ card("qlabeleddoublerangeslider.md", "QLabeledDoubleRangeSlider", "`QDoubleRangeSlider` variant with editable labels for each handle") }}
+</div>
 
-## Labels and categorical inputs
+## Numeric inputs
 
-| Widget                          | Description           |
-| -----------                     | --------------------- |
-| [`QElidingLabel`](./qelidinglabel.md)             | A `QLabel` variant that will elide text (add `…`) to fit width. |
-| [`QEnumComboBox`](./qenumcombobox.md)             | `QComboBox` that populates the combobox from a python `Enum` |
-| [`QSearchableComboBox`](./qsearchablecombobox.md)       | `QComboBox` variant that filters available options based on text input |
-| [`QSearchableListWidget`](./qsearchablelistwidget.md)     | `QListWidget` variant with search field that filters available options |
-| [`QSearchableTreeWidget`](./qsearchabletreewidget.md)     | `QTreeWidget` variant with search field that filters available options |
-| [`QColorComboBox`](./qcolorcombobox.md)            | `QComboBox` to select from a specified set of colors |
-| [`QColormapComboBox`](./qcolormap.md)            | `QComboBox` to select from a specified set of colormaps. |
-| [`QToggleSwitch`](./qtoggleswitch.md)            | `QAbstractButton` that represents a boolean value with a toggle switch. |
+<div class="sq-gallery" markdown>
+{{ card("qlargeintspinbox.md", "QLargeIntSpinBox", "`QSpinbox` that accepts arbitrarily large integers") }}
+{{ card("qquantity.md", "QQuantity", "Pint-backed quantity widget (magnitude combined with unit dropdown)") }}
+</div>
 
-## Frames and containers
+## Combo boxes
 
-| Widget                          | Description           |
-| -----------                     | --------------------- |
-| [`QCollapsible`](./qcollapsible.md)              | A collapsible widget to hide and unhide child widgets. |
-| [`QFlowLayout`](./qflowlayout.md)                | A layout that rearranges items based on parent width. |
+<div class="sq-gallery" markdown>
+{{ card("qenumcombobox.md", "QEnumComboBox", "`QComboBox` that populates the combobox from a python `Enum`") }}
+{{ card("qsearchablecombobox.md", "QSearchableComboBox", "`QComboBox` variant that filters available options based on text input") }}
+{{ card("qcolorcombobox.md", "QColorComboBox", "`QComboBox` to select from a specified set of colors") }}
+{{ card("qcolormap.md", "QColormapComboBox", "`QComboBox` to select from a specified set of colormaps.") }}
+{{ card("colormap_catalog.md", "CmapCatalogComboBox", "Searchable `QComboBox` with the entire cmap colormap catalog") }}
+</div>
+
+## Lists and trees
+
+<div class="sq-gallery" markdown>
+{{ card("qsearchablelistwidget.md", "QSearchableListWidget", "`QListWidget` variant with search field that filters available options") }}
+{{ card("qsearchabletreewidget.md", "QSearchableTreeWidget", "`QTreeWidget` variant with search field that filters available options") }}
+</div>
+
+## Text and buttons
+
+<div class="sq-gallery" markdown>
+{{ card("qelidinglabel.md", "QElidingLabel", "A `QLabel` variant that will elide text (add `…`) to fit width.") }}
+{{ card("qtoggleswitch.md", "QToggleSwitch", "`QAbstractButton` that represents a boolean value with a toggle switch.") }}
+</div>
+
+## Containers and layouts
+
+<div class="sq-gallery" markdown>
+{{ card("qcollapsible.md", "QCollapsible", "A collapsible widget to hide and unhide child widgets.") }}
+{{ card("qflowlayout.md", "QFlowLayout", "A layout that rearranges items based on parent width.") }}
+</div>

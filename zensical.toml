@@ -1,0 +1,229 @@
+# https://zensical.org/docs/setup/basics/
+#
+# Widget screenshots and animations are rendered before building:
+#
+#   uv run --group docs python docs/_gen_media.py
+#   uv run --group docs zensical serve
+
+[project]
+site_name = "superqt"
+site_description = "Missing widgets and components for PyQt and PySide"
+site_url = "https://pyapp-kit.github.io/superqt/"
+repo_name = "pyapp-kit/superqt"
+repo_url = "https://github.com/pyapp-kit/superqt"
+edit_uri = "edit/main/docs/"
+copyright = "Copyright &copy; 2021 - 2026 superqt contributors"
+
+extra_css = ["stylesheets/extra.css"]
+
+exclude_docs = """
+_*.py
+__pycache__/
+examples/
+_generated/manifest.json
+"""
+
+# rebuild when docstrings change
+watch = ["src"]
+
+nav = [
+  { "Home" = "index.md" },
+  { "Widgets" = [
+    "widgets/index.md",
+    { "Sliders" = [
+      "widgets/qrangeslider.md",
+      "widgets/qlabeledslider.md",
+      "widgets/qlabeledrangeslider.md",
+      "widgets/qdoubleslider.md",
+      "widgets/qdoublerangeslider.md",
+      "widgets/qlabeleddoubleslider.md",
+      "widgets/qlabeleddoublerangeslider.md",
+    ] },
+    { "Numeric inputs" = [
+      "widgets/qlargeintspinbox.md",
+      "widgets/qquantity.md",
+    ] },
+    { "Combo boxes" = [
+      "widgets/qenumcombobox.md",
+      "widgets/qsearchablecombobox.md",
+      "widgets/qcolorcombobox.md",
+      "widgets/qcolormap.md",
+      "widgets/colormap_catalog.md",
+    ] },
+    { "Lists and trees" = [
+      "widgets/qsearchablelistwidget.md",
+      "widgets/qsearchabletreewidget.md",
+    ] },
+    { "Text and buttons" = [
+      "widgets/qelidinglabel.md",
+      "widgets/qtoggleswitch.md",
+    ] },
+    { "Containers and layouts" = [
+      "widgets/qcollapsible.md",
+      "widgets/qflowlayout.md",
+    ] },
+  ] },
+  { "Utilities" = [
+    "utilities/index.md",
+    { "Icons" = [
+      "utilities/fonticon.md",
+      "utilities/iconify.md",
+    ] },
+    { "Threading" = [
+      "utilities/threading.md",
+      "utilities/thread_decorators.md",
+    ] },
+    { "Signals and events" = [
+      "utilities/throttling.md",
+      "utilities/signal_utils.md",
+      "utilities/qmessagehandler.md",
+      "utilities/error_dialog_contexts.md",
+    ] },
+    { "Drawing" = [
+      "utilities/code_syntax_highlight.md",
+      "utilities/cmap.md",
+    ] },
+  ] },
+  { "FAQ" = "faq.md" },
+]
+
+[project.extra]
+generator = false
+
+[[project.extra.social]]
+icon = "fontawesome/brands/github"
+link = "https://github.com/pyapp-kit/superqt"
+
+[[project.extra.social]]
+icon = "fontawesome/brands/python"
+link = "https://pypi.org/project/superqt/"
+
+# ----------------------------------------------------------------------------
+# Theme
+
+[project.theme]
+variant = "modern"
+language = "en"
+favicon = "images/favicon.svg"
+font.text = "Inter"
+font.code = "JetBrains Mono"
+features = [
+  "content.action.edit",
+  "content.code.annotate",
+  "content.code.copy",
+  "content.code.select",
+  "content.tabs.link",
+  "content.tooltips",
+  "navigation.footer",
+  "navigation.indexes",
+  "navigation.instant",
+  "navigation.instant.prefetch",
+  "navigation.instant.progress",
+  "navigation.path",
+  "navigation.sections",
+  "navigation.tabs",
+  "navigation.top",
+  "navigation.tracking",
+  "search.highlight",
+  "toc.follow",
+]
+
+[project.theme.icon]
+logo = "lucide/sliders-horizontal"
+repo = "fontawesome/brands/github"
+edit = "lucide/pencil"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme)"
+toggle.icon = "lucide/sun-moon"
+toggle.name = "Switch to light mode"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
+scheme = "default"
+primary = "custom"
+accent = "custom"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to dark mode"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+scheme = "slate"
+primary = "custom"
+accent = "custom"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to system preference"
+
+# ----------------------------------------------------------------------------
+# Markdown
+
+[project.markdown_extensions]
+abbr = {}
+admonition = {}
+attr_list = {}
+def_list = {}
+md_in_html = {}
+tables = {}
+toc.permalink = true
+toc.toc_depth = 4
+pymdownx.betterem = {}
+pymdownx.blocks.caption = {}
+pymdownx.details = {}
+pymdownx.emoji.emoji_generator = "zensical.extensions.emoji.to_svg"
+pymdownx.emoji.emoji_index = "zensical.extensions.emoji.twemoji"
+pymdownx.highlight.anchor_linenums = true
+pymdownx.highlight.line_spans = "__span"
+pymdownx.highlight.pygments_lang_class = true
+pymdownx.inlinehilite = {}
+pymdownx.keys = {}
+pymdownx.magiclink = { repo_url_shorthand = true, user = "pyapp-kit", repo = "superqt" }
+pymdownx.smartsymbols = {}
+pymdownx.snippets = { base_path = ["docs"], check_paths = true }
+pymdownx.superfences = {}
+pymdownx.tabbed.alternate_style = true
+pymdownx.tabbed.combine_header_slug = true
+
+# link previews in prose, but not on the cards and buttons of index pages
+[[project.markdown_extensions."zensical.extensions.preview".configurations]]
+sources.exclude = ["index.md", "widgets/index.md", "utilities/index.md"]
+targets.include = ["widgets/*", "utilities/*"]
+
+# ----------------------------------------------------------------------------
+# Plugins
+
+[project.plugins.search]
+
+[project.plugins.autorefs]
+resolve_closest = true
+
+[project.plugins.macros]
+module_name = "docs/_macros"
+include_dir = "docs/_includes"
+render_by_default = true
+on_error_fail = true
+on_undefined = "strict"
+
+[project.plugins.mkdocstrings.handlers.python]
+paths = ["src"]
+inventories = [
+  "https://docs.python.org/3/objects.inv",
+  "https://cmap-docs.readthedocs.io/en/latest/objects.inv",
+]
+
+[project.plugins.mkdocstrings.handlers.python.options]
+docstring_style = "numpy"
+docstring_section_style = "list"
+heading_level = 2
+show_root_heading = true
+show_root_full_path = false
+show_bases = false
+show_source = false
+show_symbol_type_heading = true
+show_symbol_type_toc = true
+show_signature_annotations = true
+separate_signature = true
+signature_crossrefs = true
+merge_init_into_class = true
+members_order = "source"
+filters = ["!^_"]
+show_labels = false

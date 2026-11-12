@@ -6,25 +6,13 @@ Icons](https://materialdesignicons.com/).
 
 ## Basic Example
 
+{{ show_widget() }}
+
 ```python
-from fonticon_fa5 import FA5S
-
-from qtpy.QtCore import QSize
-from qtpy.QtWidgets import QApplication, QPushButton
-
-from superqt.fonticon import icon, pulse
-
-app = QApplication([])
-
-btn2 = QPushButton()
-btn2.setIcon(icon(FA5S.smile, color="blue"))
-btn2.setIconSize(QSize(225, 225))
-btn2.show()
-
-app.exec()
+--8<--
+examples/fonticon.py
+--8<--
 ```
-
-{{ show_widget(225) }}
 
 ## Font Icon plugins
 
@@ -35,7 +23,6 @@ search interface is to use glyphsearch: <https://glyphsearch.com/>
 
 If a font library you'd like to use is unavailable as a superqt plugin,
 please [open a feature request](https://github.com/pyapp-kit/superqt/issues/new/choose)
-
 
 ### Font Awesome 6
 
@@ -87,24 +74,28 @@ entry point to register themselves with superqt. See [`fonticon-cookiecutter`](h
 ## API
 
 ::: superqt.fonticon.icon
-options:
-heading_level: 3
+    options:
+      heading_level: 3
 
 ::: superqt.fonticon.setTextIcon
-options:
-heading_level: 3
+    options:
+      heading_level: 3
 
 ::: superqt.fonticon.font
-options:
-heading_level: 3
+    options:
+      heading_level: 3
 
 ::: superqt.fonticon.IconOpts
-options:
-heading_level: 3
+    options:
+      heading_level: 3
 
 ::: superqt.fonticon.addFont
-options:
-heading_level: 3
+    options:
+      heading_level: 3
+
+::: superqt.fonticon.IconFont
+    options:
+      heading_level: 3
 
 ## Animations
 
@@ -112,13 +103,13 @@ the `animation` parameter to `icon()` accepts a subclass of
 `Animation` that will be
 
 ::: superqt.fonticon.Animation
-options:
-heading_level: 3
+    options:
+      heading_level: 3
 
 ::: superqt.fonticon.pulse
-options:
-heading_level: 3
+    options:
+      heading_level: 3
 
 ::: superqt.fonticon.spin
-options:
-heading_level: 3
+    options:
+      heading_level: 3

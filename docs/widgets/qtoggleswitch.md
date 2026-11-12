@@ -6,19 +6,12 @@ that represents a boolean value as a toggle switch. The API is similar to
 [`QCheckBox`](https://doc.qt.io/qt-6/qcheckbox.html) but with a different
 visual representation.
 
+{{ show_widget() }}
+
 ```python
-from qtpy.QtWidgets import QApplication
-
-from superqt import QToggleSwitch
-
-app = QApplication([])
-
-switch = QToggleSwitch()
-switch.show()
-
-app.exec_()
+--8<--
+examples/qtoggleswitch.py
+--8<--
 ```
-
-{{ show_widget(80) }}
 
 {{ show_members('superqt.QToggleSwitch') }}

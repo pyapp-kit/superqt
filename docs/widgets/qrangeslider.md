@@ -3,22 +3,13 @@
 A multi-handle slider widget than can be used to
 select a range of values.
 
-```python
-from qtpy.QtCore import Qt
-from qtpy.QtWidgets import QApplication
-
-from superqt import QRangeSlider
-
-app = QApplication([])
-
-slider = QRangeSlider(Qt.Orientation.Horizontal)
-slider.setValue((20, 80))
-slider.show()
-
-app.exec_()
-```
-
 {{ show_widget() }}
+
+```python
+--8<--
+examples/qrangeslider.py
+--8<--
+```
 
 - `QRangeSlider` inherits from [`QSlider`](https://doc.qt.io/qt-6/qslider.html)
   and attempts to match the Qt API as closely as possible
@@ -177,26 +168,23 @@ These options are in addition to the Qt QSlider API, and control the behavior of
             app.exec_()
     ```
 
-#### macOS
+=== "macOS (Big Sur)"
 
-##### Catalina
+    ![QRangeSlider on macOS Big Sur](../images/demo_darwin11.png){ width=580 }
 
-![mac10](../images/demo_darwin10.png){ width=580; }
+=== "macOS (Catalina)"
 
-##### Big Sur
+    ![QRangeSlider on macOS Catalina](../images/demo_darwin10.png){ width=580 }
 
-![mac11](../images/demo_darwin11.png){ width=580; }
+=== "Windows"
 
-#### Windows
+    ![QRangeSlider on Windows](../images/demo_windows.png){ width=580 }
 
-![window](../images/demo_windows.png)
+=== "Linux"
 
-#### Linux
+    ![QRangeSlider on Linux](../images/demo_linux.png){ width=580 }
 
-![linux](../images/demo_linux.png)
-
-
-{{ show_members('superqt.sliders._sliders._GenericRangeSlider') }}
+{{ show_members('superqt.QRangeSlider') }}
 
 ## Type changes
 

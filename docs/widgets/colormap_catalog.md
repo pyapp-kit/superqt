@@ -16,20 +16,12 @@ Searchable `QComboBox` variant that contains the
 You can limit the colormaps shown by setting the `categories` or
 `interpolation` keyword arguments.
 
+{{ show_widget() }}
+
 ```python
-from qtpy.QtWidgets import QApplication
-
-from superqt.cmap import CmapCatalogComboBox
-
-app = QApplication([])
-
-catalog_combo = CmapCatalogComboBox(interpolation="linear")
-catalog_combo.setCurrentText("viridis")
-catalog_combo.show()
-
-app.exec()
+--8<--
+examples/colormap_catalog.py
+--8<--
 ```
-
-{{ show_widget(130) }}
 
 {{ show_members('superqt.cmap.CmapCatalogComboBox') }}

@@ -9,20 +9,12 @@ Due to implementation details, this widget it does not inherit directly from
 satisfy its api. The only limitation is that it cannot be used as argument of
 [`QListWidgetItem`](https://doc.qt.io/qt-6/qlistwidgetitem.html) constructor.
 
-```python
-from qtpy.QtWidgets import QApplication
-
-from superqt import QSearchableListWidget
-
-app = QApplication([])
-
-slider = QSearchableListWidget()
-slider.addItems(["foo", "bar", "baz", "foobar", "foobaz", "barbaz"])
-slider.show()
-
-app.exec_()
-```
-
 {{ show_widget() }}
+
+```python
+--8<--
+examples/qsearchablelistwidget.py
+--8<--
+```
 
 {{ show_members('superqt.QSearchableListWidget') }}

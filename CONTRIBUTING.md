@@ -49,3 +49,25 @@ All widgets should try to match the native Qt API as much as possible:
 ## Testing
 
 Tests can be run in the current environment with `pytest`.
+
+## Documentation
+
+The documentation is built with [Zensical](https://zensical.org). Widget
+screenshots and animations are rendered from the runnable scripts in
+`docs/examples/` in a separate step, before building (outputs are cached, so
+reruns only render what changed):
+
+```bash
+uv run --group docs python docs/_gen_media.py  # renders into docs/_generated/
+uv run --group docs zensical serve             # preview at http://localhost:8000
+```
+
+To document a new widget:
+
+1. Add a runnable example, `docs/examples/<name>.py`, that shows one window.
+2. Add a page, `docs/widgets/<name>.md`, that shows the example with
+   `{{ show_widget() }}`, includes its code with a (block-style) snippet in a
+   `python` code block, and lists its API with
+   `{{ show_members("superqt.<Class>") }}` (see the other pages). Add the page
+   to `nav` in `zensical.toml`, and a `card` for it in `docs/widgets/index.md`.
+3. Optionally, set the window size or record an animation in `docs/_scenes.py`.
