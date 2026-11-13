@@ -1,23 +1,19 @@
 # QLargeIntSpinBox
 
-`QSpinBox` variant that allows to enter large integers, without overflow.
+A spin box for integers of any size. `QSpinBox` stores its value in a 32-bit
+integer, so it can't go beyond ±2,147,483,647; `QLargeIntSpinBox` stores a
+Python `int`, and its default maximum is `2**64 - 1`.
+
+It doesn't support the prefix, suffix, or special value text of `QSpinBox`.
+Its `valueChanged` signal emits an `object` (a Python `int`), because a Qt
+`int` couldn't carry large values.
+
+{{ show_widget() }}
 
 ```python
-from qtpy.QtCore import Qt
-from qtpy.QtWidgets import QApplication
-
-from superqt import QLargeIntSpinBox
-
-app = QApplication([])
-
-slider = QLargeIntSpinBox()
-slider.setRange(0, 4.53e8)
-slider.setValue(4.53e8)
-slider.show()
-
-app.exec_()
+--8<--
+examples/qlargeintspinbox.py
+--8<--
 ```
-
-{{ show_widget(150) }}
 
 {{ show_members('superqt.QLargeIntSpinBox') }}

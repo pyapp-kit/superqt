@@ -12,14 +12,14 @@ To get started fork this repository, and clone your fork:
 git clone https://github.com/<your_organization>/superqt
 cd superqt
 
-# install in editable mode (this will install PyQt6 as the Qt backend)
-pip install -e .[dev]
+# create an environment with the dev dependencies, and PyQt6 as the Qt backend
+uv sync --extra pyqt6
 
-# install pre-commit hooks
-pre-commit install
+# install the pre-commit hooks
+uv run prek install
 
 # run tests & make sure everything is working!
-pytest
+uv run pytest
 ```
 
 ## Targeted platforms
@@ -27,7 +27,7 @@ pytest
 All widgets must be well-tested, and should work on:
 
 - Python 3.11 and above
-- PyQt5 (5.11 and above) & PyQt6
+- PyQt5 (5.15) & PyQt6
 - PySide6
 - macOS, Windows, & Linux
 
@@ -48,4 +48,32 @@ All widgets should try to match the native Qt API as much as possible:
 
 ## Testing
 
-Tests can be run in the current environment with `pytest`.
+Tests can be run in the current environment with `uv run pytest`.
+
+## Documentation
+
+The documentation is built with [Zensical](https://zensical.org). Widget
+screenshots and animations are rendered from the runnable scripts in
+`docs/examples/` in a separate step, before building (outputs are cached, so
+reruns only render what changed):
+
+```bash
+uv run --group docs python docs/_gen_media.py  # renders into docs/_generated/
+uv run --group docs zensical serve             # preview at http://localhost:8000
+```
+
+By default, widgets are drawn offscreen with Qt's Fusion style. On macOS,
+`--style macos` draws them with the native macOS style instead; this opens the
+windows on screen while they're rendered, one at a time (so it takes a few
+minutes), and they shouldn't be clicked or typed into until it's done. The
+published docs are rendered this way, on a macOS runner in CI.
+
+To document a new widget:
+
+1. Add a runnable example, `docs/examples/<name>.py`, that shows one window.
+2. Add a page, `docs/widgets/<name>.md`, that shows the example with
+   `{{ show_widget() }}`, includes its code with a (block-style) snippet in a
+   `python` code block, and lists its API with
+   `{{ show_members("superqt.<Class>") }}` (see the other pages). Add the page
+   to `nav` in `zensical.toml`, and a `card` for it in `docs/widgets/index.md`.
+3. Optionally, set the window size or record an animation in `docs/_scenes.py`.

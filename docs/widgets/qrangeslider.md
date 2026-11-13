@@ -1,50 +1,43 @@
 # QRangeSlider
 
-A multi-handle slider widget than can be used to
-select a range of values.
-
-```python
-from qtpy.QtCore import Qt
-from qtpy.QtWidgets import QApplication
-
-from superqt import QRangeSlider
-
-app = QApplication([])
-
-slider = QRangeSlider(Qt.Orientation.Horizontal)
-slider.setValue((20, 80))
-slider.show()
-
-app.exec_()
-```
+A slider with two or more handles, to select a range of values.
 
 {{ show_widget() }}
 
-- `QRangeSlider` inherits from [`QSlider`](https://doc.qt.io/qt-6/qslider.html)
-  and attempts to match the Qt API as closely as possible
-- It uses platform-specific styles (for handle, groove, & ticks) but also supports
-  QSS style sheets.
-- Supports mouse wheel events
-- Supports more than 2 handles (e.g. `slider.setValue([0, 10, 60, 80])`)
+```python
+--8<--
+examples/qrangeslider.py
+--8<--
+```
 
-As `QRangeSlider` inherits from
-[`QtWidgets.QSlider`](https://doc.qt.io/qt-6/qslider.html), you can use all of
-the same methods available in the [QSlider
-API](https://doc.qt.io/qt-6/qslider.html). The major difference is that `value()`
-and `sliderPosition()` are reimplemented as `tuples` of `int` (where the length of
-the tuple is equal to the number of handles in the slider.)
+`QRangeSlider` is a [`QSlider`](https://doc.qt.io/qt-6/qslider.html), and
+has the same API, except that `value()` and `sliderPosition()` are tuples with
+one `int` for each handle (see [type changes](#type-changes)):
 
-These options are in addition to the Qt QSlider API, and control the behavior of the bar between handles.
+- The number of handles is the length of the value:
+  `slider.setValue([0, 10, 60, 80])` makes four.
+- Handles can be dragged, and so can the bar between the outer handles, which
+  moves all of them. The mouse wheel also moves all of them (with ++alt++ held,
+  it spreads them apart or brings them together).
+- The handles, groove, and ticks are drawn with the platform's style, and can be
+  styled with Qt style sheets (QSS). The color of the bar is the `barColor`
+  property (`qproperty-barColor` in QSS).
 
-| getter               | setter                                      | type   | default | description                                                                                      |
-| -------------------- | ------------------------------------------- | ------ | ------- | ------------------------------------------------------------------------------------------------ |
-| `barIsVisible`       | `setBarIsVisible` <br>`hideBar` / `showBar` | `bool` | `True`  | <small>Whether the bar between handles is visible.</small>                                       |
-| `barMovesAllHandles` | `setBarMovesAllHandles`                     | `bool` | `True`  | <small>Whether clicking on the bar moves all handles or just the nearest</small>                 |
-| `barIsRigid`         | `setBarIsRigid`                             | `bool` | `True`  | <small>Whether bar length is constant or "elastic" when dragging the bar beyond min/max.</small> |
+These methods, in addition to those of `QSlider`, control the bar between the
+handles:
 
-###  Screenshots
+| Getter               | Setter                                     | Default | Description                                                                         |
+| -------------------- | ------------------------------------------ | ------- | ----------------------------------------------------------------------------------- |
+| `barIsVisible`       | `setBarVisible` <br>`hideBar` / `showBar` | `True`  | Whether the bar between the handles is shown.                                       |
+| `barMovesAllHandles` | `setBarMovesAllHandles`                    | `True`  | Whether clicking on the bar moves all handles, or only the nearest one.             |
+| `barIsRigid`         | `setBarIsRigid`                            | `True`  | Whether the bar keeps its length when it's dragged against the minimum or maximum. |
 
-??? title "code that generates the images below"
+### Native styles
+
+`QRangeSlider` and `QSlider`, unstyled and with the same style sheet, on each
+platform:
+
+??? example "Code for these screenshots"
 
     ```python
     import os
@@ -177,52 +170,36 @@ These options are in addition to the Qt QSlider API, and control the behavior of
             app.exec_()
     ```
 
-#### macOS
+=== "macOS (Big Sur)"
 
-##### Catalina
+    ![QRangeSlider on macOS Big Sur](../images/demo_darwin11.png){ width=580 }
 
-![mac10](../images/demo_darwin10.png){ width=580; }
+=== "macOS (Catalina)"
 
-##### Big Sur
+    ![QRangeSlider on macOS Catalina](../images/demo_darwin10.png){ width=580 }
 
-![mac11](../images/demo_darwin11.png){ width=580; }
+=== "Windows"
 
-#### Windows
+    ![QRangeSlider on Windows](../images/demo_windows.png){ width=580 }
 
-![window](../images/demo_windows.png)
+=== "Linux"
 
-#### Linux
+    ![QRangeSlider on Linux](../images/demo_linux.png){ width=580 }
 
-![linux](../images/demo_linux.png)
-
-
-{{ show_members('superqt.sliders._sliders._GenericRangeSlider') }}
+{{ show_members('superqt.QRangeSlider') }}
 
 ## Type changes
 
-Note the following changes in types compared to the `QSlider` API:
+Compared with `QSlider`, these methods and signals take or return one value
+for each handle:
 
 ```python
-value() -> Tuple[int, ...]
-```
-
-```python
+value() -> tuple[int, ...]
 setValue(val: Sequence[int]) -> None
-```
-
-```python
-# Signal
-valueChanged(Tuple[int, ...])
-```
-
-```python
-sliderPosition() -> Tuple[int, ...]
-```
-
-```python
+sliderPosition() -> tuple[int, ...]
 setSliderPosition(val: Sequence[int]) -> None
-```
 
-```python
-sliderMoved(Tuple[int, ...])
+# signals
+valueChanged(tuple[int, ...])  # (also available as `valuesChanged`)
+sliderMoved(tuple[int, ...])  # (also available as `slidersMoved`)
 ```

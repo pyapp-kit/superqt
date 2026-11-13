@@ -24,7 +24,7 @@ class QSearchableTreeWidget(QWidget):
     tree : QTreeWidget
         Shows the mapping as a tree of items.
     filter : QLineEdit
-        Used to filter items in the tree by matching their key against a
+        Used to filter items in the tree by matching their key or value against a
         regular expression.
     """
 

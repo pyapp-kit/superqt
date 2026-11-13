@@ -5,7 +5,10 @@ from superqt.fonticon._plugins import loaded
 
 P = loaded(load_all=True)
 if not P:
-    print("you have no font packs loaded!")
+    raise ModuleNotFoundError(
+        "This example requires a font pack, such as fontawesome:\n\n"
+        "pip install fonticon-fontawesome6"
+    )
 
 
 class GlyphDelegate(QtWidgets.QItemDelegate):

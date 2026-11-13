@@ -1,63 +1,53 @@
 # QColormapComboBox
 
-`QComboBox` variant to select from a specific set of colormaps.
+A [`QComboBox`](https://doc.qt.io/qt-6/qcombobox.html) for choosing a colormap
+from a list. Each item shows the colormap, and `currentColormap()` returns a
+[`cmap.Colormap`][].
 
-!!! note "requires cmap"
+!!! note "Requires cmap"
 
-    This widget uses the [cmap](https://cmap-docs.readthedocs.io/) library
-    to provide colormaps.  You can install it with:
+    Colormaps come from the [cmap](https://cmap-docs.readthedocs.io/) library,
+    which you can install with the `cmap` extra:
 
-    ```shell
-    # use the `cmap` extra to include colormap support
-    pip install superqt[cmap]
+    ```bash
+    pip install "superqt[cmap]"
     ```
 
-### ColorMapLike objects
+Colormaps can be added in any of the forms that cmap accepts: the name of a
+colormap in its catalog, a sequence of colors (which are interpolated), a
+`cmap.Colormap`, and [others](https://cmap-docs.readthedocs.io/en/latest/colormaps/#colormaplike-objects).
 
-Colormaps may be specified in a variety of ways, such as by name (string), an iterable of a color/color-like objects, or as
-a [`cmap.Colormap`][] instance. See [cmap documentation for details on
-all ColormapLike types](https://cmap-docs.readthedocs.io/en/latest/colormaps/#colormaplike-objects)
+- Typing in the combo box filters the colormaps (turn this off with
+  `setFilterable(False)`).
+- With `setUserAdditionsAllowed(True)` (or `allow_user_colormaps=True`), an
+  "Add Colormap..." item at the end of the list opens a dialog for choosing any
+  colormap in the [cmap catalog](https://cmap-docs.readthedocs.io/en/latest/catalog/).
+- Right-clicking an item in the list shows a menu for removing it.
 
-### Example
+## Example
 
-```python
-from cmap import Colormap
-from qtpy.QtWidgets import QApplication
-
-from superqt import QColormapComboBox
-
-app = QApplication([])
-
-cmap_combo = QColormapComboBox()
-# see note above about colormap-like objects
-# as names from the cmap catalog
-cmap_combo.addColormaps(["viridis", "plasma", "magma", "gray"])
-# as a sequence of colors, linearly interpolated
-cmap_combo.addColormap(("#0f0", "slateblue", "#F3A003A0"))
-# as a `cmap.Colormap` instance with custom name:
-cmap_combo.addColormap(Colormap(("green", "white", "orange"), name="MyMap"))
-
-cmap_combo.show()
-app.exec()
-```
-
-{{ show_widget(200) }}
-
-### Style Customization
-
-Note that both the LineEdit and the dropdown can be styled to have the colormap
-on the left, or fill the entire width of the widget.
-
-To make the CombBox label colormap fill the entire width of the widget:
+{{ show_widget() }}
 
 ```python
-from superqt.cmap import QColormapLineEdit
-
-cmap_combo.setLineEdit(QColormapLineEdit())
+--8<--
+examples/qcolormap.py
+--8<--
 ```
 
-To make the CombBox dropdown colormaps fill
-less than the entire width of the widget:
+## Customizing the appearance
+
+By default, the colormap fills about a third of the combo box, next to its name,
+and all of the width of the items in the list. Both can be changed.
+
+To make the colormap fill the whole width of the combo box:
+
+```python
+cmap_combo.lineEdit().setFractionalColormapWidth(1)
+```
+
+(The line edit is a [`QColormapLineEdit`](qcolormaplineedit.md).)
+
+To make the colormaps in the list fill a third of their width:
 
 ```python
 from superqt.cmap import QColormapItemDelegate

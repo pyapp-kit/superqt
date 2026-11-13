@@ -28,8 +28,8 @@ __all__ = ["QIconifyIcon"]
 class QIconifyIcon(QIcon):
     """QIcon backed by an iconify icon.
 
-    Iconify includes 150,000+ icons from most major icon sets including Bootstrap,
-    FontAwesome, Material Design, and many more.
+    Iconify includes over 450,000 icons from 260+ icon sets, including Bootstrap,
+    Font Awesome, Material Design, and many more.
 
     Search available icons at https://icon-sets.iconify.design
     Once you find one you like, use the key in the format `"prefix:name"` to create an

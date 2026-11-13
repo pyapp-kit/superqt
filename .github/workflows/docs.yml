@@ -1,0 +1,67 @@
+name: Docs
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    # screenshots are rendered with the native macOS style (in real windows)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2  # v10.3.3
+        with:
+          python-version: "3.13"
+          enable-cache: true
+          cache-dependency-glob: "**/pyproject.toml"
+
+      - name: Render screenshots and animations
+        run: uv run --group docs python docs/_gen_media.py --style macos
+
+      - name: Build
+        run: |
+          uv run --group docs zensical build --clean --strict
+          touch site/.nojekyll
+
+      # for docs-preview.yml, which deploys PR builds (it can't see the PR number)
+      - if: github.event_name == 'pull_request'
+        run: echo "${{ github.event.number }}" > pr-number
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: site
+          path: |
+            site
+            pr-number
+          include-hidden-files: true  # (.nojekyll)
+
+  # zensical has no gh-deploy; push the built site to the gh-pages branch
+  # (keeping the PR previews, which docs-preview.yml puts in pr-preview/)
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: site
+      - uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: site
+          clean-exclude: pr-preview/

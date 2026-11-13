@@ -1,29 +1,15 @@
 # QFlowLayout
 
-QLayout that rearranges items based on parent width.
+A [`QLayout`](https://doc.qt.io/qt-6/qlayout.html) that places its items in a
+row, left to right, and wraps them onto a new row when there's no more room,
+like words in a paragraph. Resizing the widget rearranges them.
+
+{{ show_widget() }}
 
 ```python
-from qtpy.QtWidgets import QApplication, QPushButton, QWidget
-
-from superqt import QFlowLayout
-
-app = QApplication([])
-
-wdg = QWidget()
-
-layout = QFlowLayout(wdg)
-layout.addWidget(QPushButton("Short"))
-layout.addWidget(QPushButton("Longer"))
-layout.addWidget(QPushButton("Different text"))
-layout.addWidget(QPushButton("More text"))
-layout.addWidget(QPushButton("Even longer button text"))
-
-wdg.setWindowTitle("Flow Layout")
-wdg.show()
-
-app.exec()
+--8<--
+examples/qflowlayout.py
+--8<--
 ```
-
-{{ show_widget(350) }}
 
 {{ show_members('superqt.QFlowLayout') }}
