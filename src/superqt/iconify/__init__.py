@@ -4,7 +4,7 @@ import warnings
 from typing import TYPE_CHECKING
 
 from qtpy.QtCore import QSize, Qt
-from qtpy.QtGui import QIcon, QPainter, QPixmap
+from qtpy.QtGui import QColor, QIcon, QPainter, QPixmap
 from qtpy.QtWidgets import QApplication
 
 try:
@@ -49,7 +49,7 @@ class QIconifyIcon(QIcon):
     *key: str
         Icon set prefix and name. May be passed as a single string in the format
         `"prefix:name"` or as two separate strings: `'prefix', 'name'`.
-    color : str, optional
+    color : str | QColor, optional
         Icon color. If not provided, the icon will appear black (the icon fill color
         will be set to the string "currentColor").
     flip : str, optional
@@ -75,7 +75,7 @@ class QIconifyIcon(QIcon):
     def __init__(
         self,
         *key: str,
-        color: str | None = None,
+        color: str | QColor | None = None,
         flip: Flip | None = None,
         rotate: Rotation | None = None,
         dir: str | None = None,
@@ -87,7 +87,7 @@ class QIconifyIcon(QIcon):
     def addKey(
         self,
         *key: str,
-        color: str | None = None,
+        color: str | QColor | None = None,
         flip: Flip | None = None,
         rotate: Rotation | None = None,
         dir: str | None = None,
@@ -105,7 +105,7 @@ class QIconifyIcon(QIcon):
         *key: str
             Icon set prefix and name. May be passed as a single string in the format
             `"prefix:name"` or as two separate strings: `'prefix', 'name'`.
-        color : str, optional
+        color : str | QColor, optional
             Icon color. If not provided, the icon will appear black (the icon fill color
             will be set to the string "currentColor").
         flip : str, optional
@@ -130,6 +130,8 @@ class QIconifyIcon(QIcon):
         QIconifyIcon
             This QIconifyIcon instance, for chaining.
         """
+        if isinstance(color, QColor):
+            color = color.name()
         try:
             path = svg_path(*key, color=color, flip=flip, rotate=rotate, dir=dir)
         except OSError as e:

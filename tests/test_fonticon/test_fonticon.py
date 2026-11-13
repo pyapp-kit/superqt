@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import pytest
-from qtpy.QtGui import QIcon, QPixmap
+from qtpy.QtGui import QColor, QIcon, QPixmap
 from qtpy.QtWidgets import QPushButton
 
 from superqt.fonticon import icon, pulse, setTextIcon, spin
@@ -48,6 +48,8 @@ def test_font_icon_works(full_store):
     icn = icon(f"{TEST_PREFIX}.{TEST_CHAR}")  # also works with unicode key
     assert isinstance(icn, QIcon)
     assert isinstance(icn.pixmap(40, 40), QPixmap)
+
+    assert isinstance(icon(TEST_GLYPHKEY, color=QColor("red")), QIcon)
 
     with pytest.raises(ValueError) as err:
         icon(f"{TEST_PREFIX}.smelly")  # bad name
