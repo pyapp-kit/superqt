@@ -23,9 +23,6 @@ examples/
 _generated/manifest.json
 """
 
-# rebuild when docstrings change
-watch = ["src"]
-
 nav = [
   { "Home" = "index.md" },
   { "Widgets" = [
@@ -108,11 +105,7 @@ link = "https://pypi.org/project/superqt/"
 # Theme
 
 [project.theme]
-variant = "modern"
-language = "en"
 favicon = "images/favicon.svg"
-font.text = "Inter"
-font.code = "JetBrains Mono"
 features = [
   "content.code.annotate",
   "content.code.copy",
@@ -167,7 +160,6 @@ admonition = {}
 attr_list = {}
 def_list = {}
 md_in_html = {}
-tables = {}
 toc.permalink = true
 toc.toc_depth = 4
 pymdownx.betterem = {}
@@ -195,8 +187,6 @@ targets.include = ["widgets/*", "utilities/*"]
 # ----------------------------------------------------------------------------
 # Plugins
 
-[project.plugins.search]
-
 # pages that moved
 [project.plugins.redirects.redirect_maps]
 "utilities/fonticon.md" = "utilities/icons/fonticon.md"
@@ -207,8 +197,9 @@ resolve_closest = true
 
 [project.plugins.macros]
 module_name = "docs/_macros"
-include_dir = "docs/_includes"
-render_by_default = true
+# (no includes: zensical watches the files in `include_dir`, so that pages are
+# rebuilt with the screenshots' sizes, from `manifest.json`, when they change)
+include_dir = "docs/_generated"
 on_error_fail = true
 on_undefined = "strict"
 

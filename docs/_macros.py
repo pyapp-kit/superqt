@@ -5,6 +5,7 @@ from __future__ import annotations
 import ast
 import inspect
 import json
+import os
 import sys
 from enum import EnumMeta
 from importlib import import_module
@@ -32,9 +33,8 @@ def define_env(env: Any) -> None:
         page = env.variables["page"]
         name = name or Path(page.path).stem
         info = _manifest().get(name)
-        if info is None:  # (a warning, so that `zensical serve` keeps running)
-            msg = f"No screenshot of `{name}` yet: run `docs/_gen_media.py`."
-            print(f"warning: {msg}", file=sys.stderr)
+        if info is None:
+            msg = _missing(name)
             return f'!!! warning "Missing screenshot"\n\n    {msg}\n'
 
         root = "../" * Path(page.path).as_posix().count("/") + "_generated/"
@@ -53,7 +53,9 @@ def define_env(env: Any) -> None:
         page = env.variables["page"]
         name = Path(page_ref).stem
         thumb = style = ""
-        if info := _manifest().get(name):
+        if (info := _manifest().get(name)) is None:
+            _missing(name)
+        else:
             root = "../" * Path(page.path).as_posix().count("/") + "_generated/"
             # the still, and the animation (if any), which plays on hover
             images = [("png", info, ".sq-card__still" if "animation" in info else "")]
@@ -164,6 +166,15 @@ def _documented_overrides(cls: type, names: set[str]) -> set[str]:
         if owner.__module__.startswith("superqt") and inspect.getdoc(vars(owner)[name]):
             out.add(name)
     return out
+
+
+def _missing(name: str) -> str:
+    """Raise in CI, else warn (so that `zensical serve` keeps running)."""
+    msg = f"No screenshot of `{name}` yet: run `docs/_gen_media.py`."
+    if os.environ.get("CI"):  # (`--strict` ignores the warnings of macros)
+        raise RuntimeError(msg)
+    print(f"warning: {msg}", file=sys.stderr)
+    return msg
 
 
 def _manifest() -> dict[str, dict]:  # (not cached: `zensical serve` may run long)
