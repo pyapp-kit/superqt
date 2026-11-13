@@ -10,11 +10,13 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
-  docs:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
+  build:
+    # screenshots are rendered with the native macOS style (in real windows)
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v7
         with:
@@ -26,17 +28,8 @@ jobs:
           enable-cache: true
           cache-dependency-glob: "**/pyproject.toml"
 
-      # system libraries for Qt (screenshots are rendered offscreen)
-      - uses: pyvista/setup-headless-display-action@v5
-        with:
-          qt: true
-
-      # screenshots use Inter, the same font as the site
-      - name: Install fonts
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fonts-inter
-
       - name: Render screenshots and animations
-        run: uv run --group docs python docs/_gen_media.py
+        run: uv run --group docs python docs/_gen_media.py --style macos
 
       - name: Build
         run: |
@@ -53,12 +46,22 @@ jobs:
           path: |
             site
             pr-number
+          include-hidden-files: true  # (.nojekyll)
 
-      # zensical has no gh-deploy; push the built site to the gh-pages branch
-      # (keeping the PR previews, which docs-preview.yml puts in pr-preview/)
-      - name: Deploy
-        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-        uses: JamesIves/github-pages-deploy-action@v4
+  # zensical has no gh-deploy; push the built site to the gh-pages branch
+  # (keeping the PR previews, which docs-preview.yml puts in pr-preview/)
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: site
+      - uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: site
           clean-exclude: pr-preview/

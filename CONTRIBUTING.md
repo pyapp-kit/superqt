@@ -65,7 +65,8 @@ uv run --group docs zensical serve             # preview at http://localhost:800
 By default, widgets are drawn offscreen with Qt's Fusion style. On macOS,
 `--style macos` draws them with the native macOS style instead; this opens the
 windows on screen while they're rendered, one at a time (so it takes a few
-minutes), and they shouldn't be clicked or typed into until it's done.
+minutes), and they shouldn't be clicked or typed into until it's done. The
+published docs are rendered this way, on a macOS runner in CI.
 
 To document a new widget:
 
