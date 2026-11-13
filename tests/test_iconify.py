@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
 import pytest
-from qtpy.QtGui import QIcon
+from qtpy.QtGui import QColor, QIcon
 from qtpy.QtWidgets import QPushButton
 
 from superqt import QIconifyIcon
@@ -16,6 +16,7 @@ def test_qiconify(qtbot: "QtBot", monkeypatch: "pytest.MonkeyPatch") -> None:
 
     icon = QIconifyIcon("bi:alarm-fill", color="red", flip="vertical")
     icon.addKey("bi:alarm", color="blue", rotate=90, state=QIcon.State.On)
+    icon.addKey("bi:alarm", color=QColor("green"), mode=QIcon.Mode.Disabled)
 
     btn = QPushButton()
     qtbot.addWidget(btn)
