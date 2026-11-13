@@ -39,17 +39,26 @@ jobs:
         run: uv run --group docs python docs/_gen_media.py
 
       - name: Build
-        run: uv run --group docs zensical build --clean --strict
+        run: |
+          uv run --group docs zensical build --clean --strict
+          touch site/.nojekyll
+
+      # for docs-preview.yml, which deploys PR builds (it can't see the PR number)
+      - if: github.event_name == 'pull_request'
+        run: echo "${{ github.event.number }}" > pr-number
 
       - uses: actions/upload-artifact@v7
         with:
           name: site
-          path: site
+          path: |
+            site
+            pr-number
 
       # zensical has no gh-deploy; push the built site to the gh-pages branch
+      # (keeping the PR previews, which docs-preview.yml puts in pr-preview/)
       - name: Deploy
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          uvx ghp-import --no-jekyll --push --force site
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: site
+          clean-exclude: pr-preview/
