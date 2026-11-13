@@ -16,6 +16,7 @@ data = {
     },
 }
 tree = QSearchableTreeWidget.fromData(data)
+tree.tree.expandAll()
 tree.show()
 
 app.exec()

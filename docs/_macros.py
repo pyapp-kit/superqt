@@ -5,8 +5,8 @@ from __future__ import annotations
 import ast
 import inspect
 import json
+import sys
 from enum import EnumMeta
-from functools import cache
 from importlib import import_module
 from pathlib import Path
 from textwrap import dedent, indent
@@ -32,11 +32,11 @@ def define_env(env: Any) -> None:
         page = env.variables["page"]
         name = name or Path(page.path).stem
         info = _manifest().get(name)
-        if info is None:
-            raise ValueError(
-                f"No screenshot for {name!r}: add docs/examples/{name}.py, and run "
-                "`uv run --group docs python docs/_gen_media.py`"
-            )
+        if info is None:  # (a warning, so that `zensical serve` keeps running)
+            msg = f"No screenshot of `{name}` yet: run `docs/_gen_media.py`."
+            print(f"warning: {msg}", file=sys.stderr)
+            return f'!!! warning "Missing screenshot"\n\n    {msg}\n'
+
         root = "../" * Path(page.path).as_posix().count("/") + "_generated/"
         animated = "animation" in info
         ext, size = ("webp", info["animation"]) if animated else ("png", info)
@@ -52,30 +52,41 @@ def define_env(env: Any) -> None:
         """Gallery card linking to `page_ref`, with its widget's screenshot."""
         page = env.variables["page"]
         name = Path(page_ref).stem
-        thumb = ""
+        thumb = style = ""
         if info := _manifest().get(name):
             root = "../" * Path(page.path).as_posix().count("/") + "_generated/"
-            attrs = f'width="{info["width"]}" loading=lazy'
+            # the still, and the animation (if any), which plays on hover
+            images = [("png", info, ".sq-card__still" if "animation" in info else "")]
+            if anim := info.get("animation"):
+                images.append(("webp", anim, ".sq-card__anim"))
             thumb = "".join(
-                f"![]({root}{name}-{theme}.png#only-{theme}){{ {attrs} }}"
+                f"![]({root}{name}-{theme}.{ext}#only-{theme})"
+                f'{{ {cls} width="{size["width"]}" loading=lazy }}'
+                for ext, size, cls in images
                 for theme in ("light", "dark")
             )
+            # match the window color of the screenshots
+            bg = info.get("background", {})
+            style = "".join(f"--sq-thumb-{t}: {c}; " for t, c in bg.items())
         return (
-            f'[<span class="sq-card__thumb">{thumb}</span>'
+            f'[<span class="sq-card__thumb" style="{style.strip()}">{thumb}</span>'
             f'<span class="sq-card__body"><strong>{title}</strong>'
             f"<span>{description}</span></span>]({page_ref}){{ .sq-card }}"
         )
 
     @env.macro
     def show_members(cls_path: str) -> str:
-        """API sections for a widget: its Qt base class, signals, enums and methods."""
+        """API of a widget: its class, Qt base class, signals, enums, and methods.
+
+        The class's heading (anchored, and in `objects.inv`) heads the section.
+        """
         module, name = cls_path.rsplit(".", 1)
         cls = getattr(import_module(module), name)
         qt_base = next((b for b in cls.__mro__ if _is_qt(b)), None)
         qt_members = {m for b in cls.__mro__ if _is_qt(b) for m in dir(b)}
         signals = dict(_signals(cls))
 
-        out = ["## API\n"]
+        out = [_mkdocstrings_class(cls_path)]
         if qt_base is not None:
             link = f"[`{qt_base.__name__}`]({QT_DOCS.format(qt_base.__name__.lower())})"
             out.append(
@@ -111,6 +122,19 @@ def define_env(env: Any) -> None:
         return "\n".join(out)
 
 
+def _mkdocstrings_class(cls_path: str) -> str:
+    """The class's heading (level 2), signature, and docstring, without members."""
+    options = """
+    options:
+      heading_level: 2
+      show_root_heading: true
+      show_root_toc_entry: true
+      members: false
+      overloads_only: true
+    """
+    return f"::: {cls_path}\n{indent(dedent(options), '    ')}\n"
+
+
 def _mkdocstrings(cls_path: str, members: list[str]) -> str:
     options = f"""
     options:
@@ -142,8 +166,7 @@ def _documented_overrides(cls: type, names: set[str]) -> set[str]:
     return out
 
 
-@cache
-def _manifest() -> dict[str, dict]:
+def _manifest() -> dict[str, dict]:  # (not cached: `zensical serve` may run long)
     return json.loads(MANIFEST.read_text()) if MANIFEST.exists() else {}
 
 

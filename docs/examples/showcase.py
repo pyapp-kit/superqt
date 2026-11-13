@@ -13,6 +13,7 @@ app = QApplication([])
 
 panel = QWidget()
 form = QFormLayout(panel)
+form.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.AllNonFixedFieldsGrow)
 
 channel = QSearchableComboBox()
 channel.addItems(["DAPI", "GFP", "mCherry", "Cy5", "Brightfield"])

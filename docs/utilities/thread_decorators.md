@@ -93,3 +93,13 @@ assert isinstance(get_one(), Future)
 assert get_two() == 2
 assert get_three() == 3
 ```
+
+## API
+
+::: superqt.utils.ensure_main_thread
+    options:
+      heading_level: 3
+
+::: superqt.utils.ensure_object_thread
+    options:
+      heading_level: 3

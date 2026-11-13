@@ -14,11 +14,11 @@ is. Each page lists the Qt class and what superqt adds to it.
 
 <div class="sq-gallery" markdown>
 {{ card("qrangeslider.md", "QRangeSlider", "A slider with two or more handles, to select a range.") }}
-{{ card("qlabeledslider.md", "QLabeledSlider", "A slider with an editable label for its value.") }}
-{{ card("qlabeledrangeslider.md", "QLabeledRangeSlider", "A range slider with editable labels for its handles and range.") }}
 {{ card("qdoubleslider.md", "QDoubleSlider", "A slider for floats.") }}
 {{ card("qdoublerangeslider.md", "QDoubleRangeSlider", "A range slider for floats.") }}
+{{ card("qlabeledslider.md", "QLabeledSlider", "A slider with an editable label for its value.") }}
 {{ card("qlabeleddoubleslider.md", "QLabeledDoubleSlider", "A slider for floats, with an editable label for its value.") }}
+{{ card("qlabeledrangeslider.md", "QLabeledRangeSlider", "A range slider with editable labels for its handles and range.") }}
 {{ card("qlabeleddoublerangeslider.md", "QLabeledDoubleRangeSlider", "A range slider for floats, with editable labels.") }}
 </div>
 
@@ -51,6 +51,7 @@ is. Each page lists the Qt class and what superqt adds to it.
 <div class="sq-gallery" markdown>
 {{ card("qelidinglabel.md", "QElidingLabel", "A label that shortens its text with an ellipsis to fit.") }}
 {{ card("qelidinglineedit.md", "QElidingLineEdit", "A line edit that shortens its text with an ellipsis while it isn't being edited.") }}
+{{ card("qcolormaplineedit.md", "QColormapLineEdit", "A line edit that shows the colormap that its text names.") }}
 {{ card("qtoggleswitch.md", "QToggleSwitch", "A checkable button drawn as a toggle switch.") }}
 </div>
 

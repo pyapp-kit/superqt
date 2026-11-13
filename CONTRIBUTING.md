@@ -62,6 +62,11 @@ uv run --group docs python docs/_gen_media.py  # renders into docs/_generated/
 uv run --group docs zensical serve             # preview at http://localhost:8000
 ```
 
+By default, widgets are drawn offscreen with Qt's Fusion style. On macOS,
+`--style macos` draws them with the native macOS style instead; this opens the
+windows on screen while they're rendered, one at a time (so it takes a few
+minutes), and they shouldn't be clicked or typed into until it's done.
+
 To document a new widget:
 
 1. Add a runnable example, `docs/examples/<name>.py`, that shows one window.

@@ -7,6 +7,7 @@ with a scene in `docs/_scenes.py` are also recorded as `<name>-<theme>.webp`
 
     uv run --group docs python docs/_gen_media.py             # everything
     uv run --group docs python docs/_gen_media.py qcollapsible --force
+    uv run --group docs python docs/_gen_media.py --style macos  # native, on macOS
 """
 
 import sys

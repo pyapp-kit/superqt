@@ -1,7 +1,16 @@
-"""Offscreen renderer for the docs' widget screenshots and animations.
+"""Renderer for the docs' widget screenshots and animations.
 
 Run it with `docs/_gen_media.py`; animations and capture options live in
 `docs/_scenes.py`.
+
+Widgets are drawn with one of two styles (`--style`):
+
+- `fusion` (default): Qt's Fusion style, with palettes that match the site,
+  rendered offscreen. Works anywhere, needs no display, and runs in parallel.
+- `macos`: Qt's native macOS style, with the system's light and dark appearance.
+  Only on macOS, and with real windows: Qt's offscreen platform can't draw this
+  style, and windows that aren't shown are drawn as inactive. So the windows
+  appear on screen while they're rendered, one at a time.
 """
 
 from __future__ import annotations
@@ -21,8 +30,12 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 SCALE = 2  # device pixel ratio of the rendered images
-os.environ["QT_QPA_PLATFORM"] = "offscreen"  # deterministic, and headless
-os.environ["QT_SCALE_FACTOR"] = str(SCALE)
+STYLES = ("fusion", "macos")
+STYLE = os.environ.get("SUPERQT_DOCS_STYLE", "fusion")  # (set by `main` for workers)
+_ENVIRON = dict(os.environ)  # (for the workers, before it's changed here)
+if STYLE == "fusion":
+    os.environ["QT_QPA_PLATFORM"] = "offscreen"  # deterministic, and headless
+    os.environ["QT_SCALE_FACTOR"] = str(SCALE)
 
 from PIL import Image  # noqa: E402
 from qtpy import API_NAME, QT_VERSION, QtWidgets  # noqa: E402
@@ -33,6 +46,7 @@ from qtpy.QtCore import (  # noqa: E402
     QRectF,
     QSize,
     Qt,
+    QTimer,
     qInstallMessageHandler,
 )
 from qtpy.QtGui import (  # noqa: E402
@@ -45,6 +59,7 @@ from qtpy.QtGui import (  # noqa: E402
     QPainterPath,
     QPalette,
     QPen,
+    QPixmap,
 )
 from qtpy.QtTest import QTest  # noqa: E402
 from qtpy.QtWidgets import QApplication, QWidget  # noqa: E402
@@ -62,7 +77,8 @@ MARGIN = 14  # logical px of window background around each capture
 FPS = 30
 FONTS = ("Inter", "Inter Variable", "Helvetica Neue", "Segoe UI", "Noto Sans")
 
-# Fusion palettes, tuned to sit on the light and dark zensical "modern" theme.
+# Fusion palettes, tuned to sit on the light and dark zensical "modern" theme
+# (the macOS style uses the system's colors instead).
 # Keep `Highlight` in sync with `--sq-accent` in docs/stylesheets/extra.css.
 THEMES: dict[str, dict[str, str]] = {
     "light": {
@@ -112,12 +128,16 @@ class Spec:
 
     width: int | None = None  # resize the window to this width (logical px)
     height: int | None = None  # ... and/or this height
+    # for continuous motion: no pause at the start or end, and frames at exact
+    # intervals, so that the last frame leads straight back into the first
+    seamless: bool = False
     setup: Callable[[QWidget], Any] | None = None  # called before capturing
     scene: Callable[[Recorder, QWidget], Any] | None = None  # records an animation
 
     def source(self) -> str:
         funcs = [f for f in (self.setup, self.scene) if f is not None]
-        return repr((self.width, self.height)) + "".join(map(inspect.getsource, funcs))
+        sizes = (self.width, self.height, self.seamless)
+        return repr(sizes) + "".join(map(inspect.getsource, funcs))
 
 
 SPECS: dict[str, Spec] = {}
@@ -159,11 +179,24 @@ def _capture(main: QWidget, cursor: QPointF | None = None, pressed=False) -> Fra
         w for w in QApplication.topLevelWidgets() if w is not main and w.isVisible()
     ]
     windows = [
-        (QRect(w.mapToGlobal(QPoint(0, 0)), w.size()), w.grab().toImage())
+        (QRect(w.mapToGlobal(QPoint(0, 0)), w.size()), _grab(w))
         for w in tops
         if w.isVisible()
     ]
     return Frame(windows, cursor, pressed, time.perf_counter())
+
+
+def _grab(widget: QWidget) -> QImage:
+    """Render a window at `SCALE`, whatever the pixel ratio of its screen."""
+    pixmap = QPixmap(widget.size() * SCALE)
+    pixmap.setDevicePixelRatio(SCALE)
+    pixmap.fill(Qt.GlobalColor.transparent)
+    widget.render(pixmap)
+    return pixmap.toImage()
+
+
+def _window_color() -> QColor:
+    return QApplication.palette().window().color()
 
 
 def _compose(frames: list[Frame], theme: str) -> list[QImage]:
@@ -184,13 +217,13 @@ def _compose(frames: list[Frame], theme: str) -> list[QImage]:
             )
     bounds.adjust(-MARGIN, -MARGIN, MARGIN, MARGIN)
 
-    colors = THEMES[theme]
+    window_color = _window_color()
     backdrop, outline = (QColor(c) for c in BACKDROPS[theme])
     images = []
     for frame in frames:
         img = QImage(bounds.size() * SCALE, QImage.Format.Format_ARGB32_Premultiplied)
         img.setDevicePixelRatio(SCALE)
-        img.fill(QColor(colors["Window"]) if flat else backdrop)
+        img.fill(window_color if flat else backdrop)
         painter = QPainter(img)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         for i, (rect, win_img) in enumerate(frame.windows):
@@ -198,7 +231,7 @@ def _compose(frames: list[Frame], theme: str) -> list[QImage]:
             if not flat:
                 panel = rect.adjusted(-pad, -pad, pad, pad) if i == 0 else rect
                 painter.fillRect(panel.translated(0, 2), QColor(0, 0, 0, 28))  # shadow
-                painter.fillRect(panel, QColor(colors["Window"]))
+                painter.fillRect(panel, window_color)
                 painter.setPen(QPen(outline, 1))
                 painter.setBrush(Qt.BrushStyle.NoBrush)
                 painter.drawRect(QRectF(panel).adjusted(-0.5, -0.5, 0.5, 0.5))
@@ -238,10 +271,14 @@ class Recorder:
     def __init__(self, window: QWidget, fps: int = FPS) -> None:
         self.window = window
         self.frames: list[Frame] = []
+        self.inactive_frames = 0
+        self.moved = False
+        self._origin = QPoint()
         self._interval = 1 / fps
         self._next = time.perf_counter()
         self._cursor: QPointF | None = None
         self._pressed = False
+        self._grab: QWidget | None = None  # (the window that the button was pressed on)
 
     # -- primitives --
 
@@ -251,7 +288,13 @@ class Recorder:
         self._next = max(self._next + self._interval, time.perf_counter())
         while (remaining := self._next - time.perf_counter()) > 0:
             QTest.qWait(max(1, int(remaining * 1000)))
-        self.frames.append(_capture(self.window, self._cursor, self._pressed))
+        if not _ensure_active(self.window):
+            self.inactive_frames += 1
+        frame = _capture(self.window, self._cursor, self._pressed)
+        if self.frames and frame.windows[0][0].topLeft() != self._origin:
+            self.moved = True  # (by something else: real input, with the macos style)
+        self._origin = frame.windows[0][0].topLeft()
+        self.frames.append(frame)
 
     def wait(self, seconds: float) -> None:
         for _ in range(max(1, round(seconds / self._interval))):
@@ -263,15 +306,35 @@ class Recorder:
             pos = widget.rect().center()
         return QPointF(widget.mapToGlobal(QPointF(pos)))
 
-    def _send(self, kind: str) -> None:
+    def _window_at_cursor(self) -> QWidget | None:
+        """The window under the cursor: an open popup or modal dialog, or the window."""
         assert self._cursor is not None
-        win = self.window.windowHandle()
-        origin = QPointF(self.window.mapToGlobal(QPoint(0, 0)))
+        pos = self._cursor.toPoint()
+        modal = QApplication.activeModalWidget()
+        windows = [QApplication.activePopupWidget(), modal, self.window]
+        for window in filter(None, windows):
+            if QRect(window.mapToGlobal(QPoint(0, 0)), window.size()).contains(pos):
+                return window
+        return None
+
+    def _send(self, kind: str) -> None:
+        """Send a mouse event to the window under the cursor (in its coordinates).
+
+        While the button is pressed, events go to the window that it was pressed on.
+        """
+        assert self._cursor is not None
+        under = self._window_at_cursor()
+        if kind == "press":
+            self._grab = under or self.window
+        target = self._grab if self._pressed or kind == "release" else under
+        if target is None:  # (a move outside of the windows)
+            return
+        origin = QPointF(target.mapToGlobal(QPoint(0, 0)))
         local = (self._cursor - origin).toPoint()
+        win = target.windowHandle()
         btn, mod = Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier
         if kind == "move":
-            if self._pressed or self.window.rect().contains(local):
-                QTest.mouseMove(win, local)
+            QTest.mouseMove(win, local)
         elif kind == "press":
             QTest.mousePress(win, btn, mod, local)
         else:
@@ -302,10 +365,11 @@ class Recorder:
         self._send("press")
         self.wait(0.12)
 
-    def release(self) -> None:
+    def release(self, wait: float = 0.12) -> None:
         self._pressed = False
         self._send("release")
-        self.wait(0.12)
+        if wait:
+            self.wait(wait)
 
     def click(self, widget: QWidget | None = None, pos=None, **kwargs: Any) -> None:
         self.move(widget, pos, **kwargs)
@@ -316,6 +380,30 @@ class Recorder:
         self.move(widget, start)
         self.press()
         self.move(widget, end, duration)
+        self.release()
+
+    def click_into_modal(
+        self,
+        widget: QWidget,
+        pos: QPoint | QPointF | None,
+        then: Callable[[QWidget], Any],
+    ) -> None:
+        """Click something that opens a modal dialog, and record `then(dialog)`.
+
+        A modal dialog runs its own event loop (`exec()`) inside the click, so `then`
+        runs (and records) inside that loop. It should close the dialog.
+        """
+
+        def _in_dialog() -> None:
+            if (dialog := QApplication.activeModalWidget()) is None:
+                QTimer.singleShot(10, _in_dialog)  # (not open yet)
+                return
+            QTest.qWaitForWindowExposed(dialog)
+            then(dialog)
+
+        self.move(widget, pos)
+        self.press()
+        QTimer.singleShot(0, _in_dialog)
         self.release()
 
     def type(self, widget: QWidget, text: str, interval: float = 0.09) -> None:
@@ -418,6 +506,17 @@ def _run_example(name: str) -> tuple[QWidget, dict]:
     return shown[0], namespace
 
 
+def _ensure_active(window: QWidget, timeout: int = 1000) -> bool:
+    """With the macos style, make `window` active (inactive windows are gray)."""
+    if STYLE != "macos" or window.isActiveWindow():
+        return True
+    if QApplication.activePopupWidget() or QApplication.activeModalWidget():
+        return True  # (a popup, or a dialog, of the window has the focus)
+    window.raise_()
+    window.activateWindow()
+    return QTest.qWaitForWindowActive(window, timeout)
+
+
 def _clear_focus() -> None:
     if widget := QApplication.focusWidget():
         widget.clearFocus()
@@ -438,6 +537,9 @@ def _qt_message_handler(mode: Any, context: Any, message: str) -> None:
 def _make_app() -> QApplication:
     qInstallMessageHandler(_qt_message_handler)
     app = QApplication([])
+    if STYLE == "macos":
+        app.setStyle("macos")  # (with the system font)
+        return app
     app.setStyle("Fusion")
     families = set(QFontDatabase.families())
     if family := next((f for f in FONTS if f in families), None):
@@ -446,6 +548,15 @@ def _make_app() -> QApplication:
 
 
 def _set_theme(theme: str) -> None:
+    hints = QGuiApplication.styleHints()
+    if hasattr(hints, "setColorScheme"):  # Qt >= 6.8
+        scheme = Qt.ColorScheme.Dark if theme == "dark" else Qt.ColorScheme.Light
+        hints.setColorScheme(scheme)
+    elif STYLE == "macos":
+        raise RuntimeError("the macos style needs Qt >= 6.8, to switch themes")
+    if STYLE == "macos":
+        return  # (the style uses the system's colors for the scheme)
+
     colors = THEMES[theme]
     palette = QPalette(QColor(colors["Button"]), QColor(colors["Window"]))
     for role, color in colors.items():
@@ -468,9 +579,6 @@ def _set_theme(theme: str) -> None:
         pen_inactive=accent.darker(125).name(),
         pen_disabled=colors["PlaceholderText"],
     )
-    if hasattr(hints := QGuiApplication.styleHints(), "setColorScheme"):
-        scheme = Qt.ColorScheme.Dark if theme == "dark" else Qt.ColorScheme.Light
-        hints.setColorScheme(scheme)
 
 
 def _to_pil(img: QImage) -> Image.Image:
@@ -482,19 +590,25 @@ def _to_pil(img: QImage) -> Image.Image:
     return Image.frombuffer("RGBA", size, bytes(ptr), "raw", "RGBA", 0, 1)
 
 
-def _save_animation(frames: list[Frame], images: list[QImage], dest: Path) -> None:
+def _save_animation(
+    frames: list[Frame], images: list[QImage], dest: Path, seamless: bool = False
+) -> None:
     pils: list[Image.Image] = []
     durations: list[int] = []
-    times = [f.t for f in frames] + [frames[-1].t + 1 / FPS]
+    if seamless:
+        times = [i / FPS for i in range(len(frames) + 1)]
+    else:
+        times = [f.t for f in frames] + [frames[-1].t + 1 / FPS]
     for i, img in enumerate(images):
         pil = _to_pil(img).convert("RGB")
-        ms = round((times[i + 1] - times[i]) * 1000)
+        ms = round(times[i + 1] * 1000) - round(times[i] * 1000)  # (no drift)
         if pils and pil.tobytes() == pils[-1].tobytes():
             durations[-1] += ms  # merge repeated frames
         else:
             pils.append(pil)
             durations.append(ms)
-    durations[-1] += 1200  # rest on the last frame before looping
+    if not seamless:
+        durations[-1] += 1200  # rest on the last frame before looping
     pils[0].save(
         dest,
         save_all=True,
@@ -506,35 +620,54 @@ def _save_animation(frames: list[Frame], images: list[QImage], dest: Path) -> No
     )
 
 
+def _resize(window: QWidget, width: int | None, height: int | None) -> None:
+    """Resize to `width` and/or `height` (if only width: the height that fits)."""
+    if not (width or height):
+        return
+    width = width or window.width()
+    height = height or window.heightForWidth(width)
+    if height <= 0:
+        height = window.sizeHint().height()
+    window.resize(width, height)
+
+
 def _render(name: str, theme: str) -> dict[str, Any]:
     """Render one example in one theme (in a fresh process: see `_work`)."""
     _set_theme(theme)
     spec = SPECS.get(name, Spec())
     window, _namespace = _run_example(name)  # (keeps the example's objects alive)
     if spec.width or spec.height:
-        width = spec.width or window.width()
-        height = spec.height or window.heightForWidth(width)
-        if height <= 0:
-            height = window.sizeHint().height()
-        window.resize(width, height)
+        _resize(window, spec.width, spec.height)
     if spec.setup is not None:
         spec.setup(window)
     _clear_focus()  # no text cursor or focus ring in stills
     QTest.qWait(50)
+    if not _ensure_active(window, 3000):
+        print(f"warning: {name}'s window wasn't active", file=sys.stderr)
 
     still = _compose([_capture(window)], theme)[0]
     _to_pil(still).save(OUT / f"{name}-{theme}.png", optimize=True)
     info: dict[str, Any] = {
         "width": still.width() // SCALE,
         "height": still.height() // SCALE,
+        "background": _window_color().name(),
     }
     if spec.scene is not None:
         rec = Recorder(window)
-        rec.wait(0.8)
+        if not spec.seamless:
+            rec.wait(0.5)
         spec.scene(rec, window)
-        rec.wait(0.3)
+        if not spec.seamless:
+            rec.wait(0.6)
+        if rec.moved:
+            print(f"warning: {name}'s window moved while recording", file=sys.stderr)
+        if rec.inactive_frames:
+            n = rec.inactive_frames
+            print(
+                f"warning: {name}'s window was inactive in {n} frames", file=sys.stderr
+            )
         images = _compose(rec.frames, theme)
-        _save_animation(rec.frames, images, OUT / f"{name}-{theme}.webp")
+        _save_animation(rec.frames, images, OUT / f"{name}-{theme}.webp", spec.seamless)
         info["animation"] = {
             "width": images[0].width() // SCALE,
             "height": images[0].height() // SCALE,
@@ -558,21 +691,22 @@ def _work(name: str, theme: str) -> None:
 _RESULT = "@@result "
 
 
-def _run_job(name: str, theme: str) -> tuple[dict | None, str]:
+def _run_job(name: str, theme: str, style: str) -> tuple[dict | None, str]:
     cmd = [sys.executable, str(DOCS / "_gen_media.py"), "--worker", name, theme]
-    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
+    env = {**_ENVIRON, "SUPERQT_DOCS_STYLE": style}
+    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=180, env=env)
     for line in proc.stdout.splitlines():
         if line.startswith(_RESULT):
             return json.loads(line[len(_RESULT) :]), proc.stderr
     return None, proc.stderr or f"exited with {proc.returncode}"
 
 
-def _hash(name: str) -> str:
+def _hash(name: str, style: str) -> str:
     src = [
         (EXAMPLES / f"{name}.py").read_text(),
         Path(__file__).read_text(),
         SPECS.get(name, Spec()).source(),
-        f"{API_NAME} {QT_VERSION}",
+        f"{API_NAME} {QT_VERSION} {style}",
     ]
     return hashlib.sha256("\0".join(src).encode()).hexdigest()[:16]
 
@@ -587,10 +721,25 @@ def main(argv: list[str] | None = None, description: str = "") -> int:
     parser.add_argument("names", nargs="*", help="examples to render (default: all)")
     parser.add_argument("-f", "--force", action="store_true", help="ignore the cache")
     parser.add_argument("-j", "--jobs", type=int, default=os.cpu_count())
+    parser.add_argument(
+        "-s",
+        "--style",
+        choices=STYLES,
+        default="fusion",
+        help="Qt style to draw the widgets with (default: fusion; see _media.py)",
+    )
     parser.add_argument("--worker", nargs=2, help=argparse.SUPPRESS)
     args = parser.parse_args(argv)
     if args.worker:
         _work(*args.worker)
+    if args.style == "macos":
+        if sys.platform != "darwin":
+            parser.error("the macos style is only available on macOS")
+        args.jobs = 1  # (only one window can be active at a time)
+        print(
+            "Rendering with the macos style: windows will appear on screen.\n"
+            "Don't move the mouse over them, or type, until it's done."
+        )
 
     import _scenes  # noqa: F401  (registers specs)
 
@@ -605,16 +754,17 @@ def main(argv: list[str] | None = None, description: str = "") -> int:
         name
         for name in args.names or available
         if args.force
-        or manifest.get(name, {}).get("hash") != _hash(name)
+        or manifest.get(name, {}).get("hash") != _hash(name, args.style)
         or not _outputs_exist(name, manifest[name])
     ]
     print(f"rendering {len(todo)} of {len(args.names or available)} examples")
 
     t0 = time.perf_counter()
     failed: set[str] = set()
-    jobs = {(name, theme) for name in todo for theme in THEMES}
+    results: dict[str, dict[str, dict]] = {}
+    jobs = [(name, theme) for name in todo for theme in THEMES]
     with ThreadPoolExecutor(max_workers=args.jobs) as pool:
-        futures = {pool.submit(_run_job, *job): job for job in jobs}
+        futures = {pool.submit(_run_job, *job, args.style): job for job in jobs}
         for future in as_completed(futures):
             (name, theme), (info, stderr) = futures[future], future.result()
             if info is None:
@@ -622,9 +772,23 @@ def main(argv: list[str] | None = None, description: str = "") -> int:
                 print(f"  ✗ {name} ({theme})\n{stderr}", file=sys.stderr)
                 continue
             print(f"  ✓ {name} ({theme})")
-            if theme == "light":
-                manifest[name] = {"hash": _hash(name), **info}
+            for line in stderr.splitlines():
+                if line.startswith("warning:"):
+                    print(f"    {line}")
+            results.setdefault(name, {})[theme] = info
 
+    for name, infos in results.items():
+        if name in failed:
+            manifest.pop(name, None)
+            continue
+        # sizes are the same in both themes; the window color isn't
+        backgrounds = {theme: info.pop("background") for theme, info in infos.items()}
+        manifest[name] = {
+            "hash": _hash(name, args.style),
+            "style": args.style,
+            **infos["light"],
+            "background": backgrounds,
+        }
     for name in failed:
         manifest.pop(name, None)
     MANIFEST.write_text(json.dumps(dict(sorted(manifest.items())), indent=2) + "\n")

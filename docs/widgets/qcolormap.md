@@ -45,6 +45,8 @@ To make the colormap fill the whole width of the combo box:
 cmap_combo.lineEdit().setFractionalColormapWidth(1)
 ```
 
+(The line edit is a [`QColormapLineEdit`](qcolormaplineedit.md).)
+
 To make the colormaps in the list fill a third of their width:
 
 ```python

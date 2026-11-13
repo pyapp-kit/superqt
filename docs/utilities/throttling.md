@@ -10,6 +10,20 @@ limit how often it actually runs:
 - **Debouncing** waits until the calls have stopped for the timeout, and then
   runs it once.
 
+Below, a slider's `valueChanged` signal is connected to a function directly, and
+to the same function decorated with `qthrottled` and with `qdebounced`. Each
+tick is a call, and the value is what the last call received:
+
+{{ show_widget("throttling") }}
+
+??? example "The code for this demo"
+
+    ```python
+    --8<--
+    examples/throttling.py
+    --8<--
+    ```
+
 For more background, see
 [Debouncing and throttling explained](https://css-tricks.com/debouncing-throttling-explained-examples/).
 

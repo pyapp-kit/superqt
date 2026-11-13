@@ -57,6 +57,29 @@
   margin: 1em 0 2em;
 }
 
+/* cards of a fixed width, in centered rows (so a short last row is centered) */
+.md-typeset .sq-gallery--center {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.md-typeset .sq-gallery--center .sq-card {
+  flex: 0 0 100%;
+}
+
+@media screen and (min-width: 45em) {
+  .md-typeset .sq-gallery--center .sq-card {
+    flex-basis: calc((100% - 0.8rem) / 2);
+  }
+}
+
+@media screen and (min-width: 60em) {
+  .md-typeset .sq-gallery--center .sq-card {
+    flex-basis: calc((100% - 1.6rem) / 3);
+  }
+}
+
 .md-typeset .sq-gallery > p {
   display: contents; /* the cards are the grid items */
 }
@@ -89,16 +112,35 @@
   justify-content: center;
   height: 6.5rem;
   padding: 0.4rem;
-  background: var(--sq-figure-bg);
+  background: var(--sq-thumb-light, var(--sq-figure-bg));
   border-bottom: 1px solid var(--sq-figure-border);
+}
+
+[data-md-color-scheme="slate"] .md-typeset .sq-card__thumb {
+  background: var(--sq-thumb-dark, var(--sq-figure-bg));
 }
 
 .md-typeset .sq-card__thumb img {
   max-width: 100%;
   max-height: 100%;
-  width: auto;
   height: auto;
   object-fit: contain;
+}
+
+/* a card with an animation plays it, instead of its still, while hovered */
+.md-typeset .sq-card__anim {
+  display: none;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .md-typeset .sq-card:hover .sq-card__still {
+    display: none;
+  }
+
+  [data-md-color-scheme="default"] .md-typeset .sq-card:hover .sq-card__anim[src$="#only-light"],
+  [data-md-color-scheme="slate"] .md-typeset .sq-card:hover .sq-card__anim[src$="#only-dark"] {
+    display: inline;
+  }
 }
 
 .md-typeset .sq-card__body {
@@ -154,6 +196,12 @@
   margin-bottom: 0.4rem;
   font-weight: 700;
   letter-spacing: -0.02em;
+}
+
+.md-typeset .sq-hero h1 .sq-logo {
+  height: 2.2em;
+  margin-right: 0.3em;
+  vertical-align: -0.72em;
 }
 
 .md-typeset .sq-hero .sq-lead {

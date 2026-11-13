@@ -27,3 +27,9 @@ the following:
 
     slider.setStyleSheet(MONTEREY_SLIDER_STYLES_FIX)
     ```
+
+::: superqt.sliders.MONTEREY_SLIDER_STYLES_FIX
+    options:
+      heading_level: 3
+      show_if_no_docstring: true
+      show_attribute_values: false

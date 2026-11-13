@@ -5,16 +5,21 @@ Functions, classes, and decorators for working with Qt, in `superqt.utils`,
 
 ## Icons
 
+superqt has two ways to create icons from icon libraries: see
+[Icons](icons/index.md) for how they compare.
+
 | Object | Description |
 | --- | --- |
-| [`icon`](fonticon.md#superqt.fonticon.icon) | Create a `QIcon` from a glyph in an icon font. |
-| [`setTextIcon`](fonticon.md#superqt.fonticon.setTextIcon) | Show a glyph from an icon font as the text of a widget. |
-| [`font`](fonticon.md#superqt.fonticon.font) | Create the `QFont` of an icon font. |
-| [`addFont`](fonticon.md#superqt.fonticon.addFont) | Add an OTF or TTF font file to the icon font registry. |
-| [`IconFont`](fonticon.md#superqt.fonticon.IconFont) | Base class for defining the glyphs of an icon font. |
-| [`IconOpts`](fonticon.md#superqt.fonticon.IconOpts) | Options for drawing an icon in a given state (color, scale, and so on). |
-| [`Animation`](fonticon.md#superqt.fonticon.Animation), [`spin`](fonticon.md#superqt.fonticon.spin), [`pulse`](fonticon.md#superqt.fonticon.pulse) | Animations for font icons. |
-| [`QIconifyIcon`](iconify.md) | A `QIcon` with any of the SVG icons from [Iconify](https://iconify.design/). |
+| [`QIconifyIcon`](icons/iconify.md) | A `QIcon` with any of the SVG icons from [Iconify](https://iconify.design/). |
+| [`icon`](icons/fonticon.md#superqt.fonticon.icon) | Create a `QIcon` from a glyph in an icon font. |
+| [`setTextIcon`](icons/fonticon.md#superqt.fonticon.setTextIcon) | Show a glyph from an icon font as the text of a widget. |
+| [`font`](icons/fonticon.md#superqt.fonticon.font) | Create the `QFont` of an icon font. |
+| [`addFont`](icons/fonticon.md#superqt.fonticon.addFont) | Add an OTF or TTF font file to the icon font registry. |
+| [`IconFont`](icons/fonticon.md#superqt.fonticon.IconFont) | Base class for defining the glyphs of an icon font. |
+| [`IconFontMeta`](icons/fonticon.md#superqt.fonticon.IconFontMeta) | Metaclass of `IconFont`, which turns its attributes into glyph keys. |
+| [`ENTRY_POINT`](icons/fonticon.md#superqt.fonticon.ENTRY_POINT) | The entry point group that font plugins register with. |
+| [`IconOpts`](icons/fonticon.md#superqt.fonticon.IconOpts) | Options for drawing an icon in a given state (color, scale, and so on). |
+| [`Animation`](icons/fonticon.md#superqt.fonticon.Animation), [`spin`](icons/fonticon.md#superqt.fonticon.spin), [`pulse`](icons/fonticon.md#superqt.fonticon.pulse) | Animations for font icons. |
 
 ## Threading
 
@@ -26,8 +31,8 @@ Functions, classes, and decorators for working with Qt, in `superqt.utils`,
 | [`GeneratorWorker`](threading.md#superqt.utils.GeneratorWorker) | `QRunnable` with signals, that runs a generator (and can be paused, resumed, and sent values). |
 | [`WorkerBase`](threading.md#superqt.utils.WorkerBase) | Base class of the workers. |
 | [`new_worker_qthread`](threading.md#superqt.utils.new_worker_qthread) | Run a `QObject` worker in a new `QThread`. |
-| [`ensure_main_thread`](thread_decorators.md) | Decorator that makes a function run in the main thread. |
-| [`ensure_object_thread`](thread_decorators.md) | Decorator that makes a `QObject` method run in the object's thread. |
+| [`ensure_main_thread`](thread_decorators.md#superqt.utils.ensure_main_thread) | Decorator that makes a function run in the main thread. |
+| [`ensure_object_thread`](thread_decorators.md#superqt.utils.ensure_object_thread) | Decorator that makes a `QObject` method run in the object's thread. |
 
 ## Signals
 
@@ -52,6 +57,7 @@ Functions, classes, and decorators for working with Qt, in `superqt.utils`,
 | --- | --- |
 | [`CodeSyntaxHighlight`](code_syntax_highlight.md) | A `QSyntaxHighlighter` that highlights code with Pygments. |
 | [`draw_colormap`](cmap.md#superqt.cmap.draw_colormap) | Draw a colormap onto a `QPainter` or `QPaintDevice`. |
-| [`QColormapLineEdit`](cmap.md#superqt.cmap.QColormapLineEdit) | A `QLineEdit` that shows the colormap named by its text. |
 | [`QColormapItemDelegate`](cmap.md#superqt.cmap.QColormapItemDelegate) | An item delegate that draws colormaps in item views. |
 | [`qimage_to_array`](images.md) | Convert a `QImage` to a NumPy array. |
+| [`QStyleOptionToggleSwitch`](../widgets/qtoggleswitch.md#superqt.switch.QStyleOptionToggleSwitch) | The style option that `QToggleSwitch` draws itself with (for subclasses). |
+| [`MONTEREY_SLIDER_STYLES_FIX`](../faq.md#superqt.sliders.MONTEREY_SLIDER_STYLES_FIX) | A style sheet that works around a slider bug of Qt 5 on macOS 12+. |

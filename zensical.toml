@@ -11,10 +11,10 @@ site_description = "Missing widgets and components for PyQt and PySide"
 site_url = "https://pyapp-kit.github.io/superqt/"
 repo_name = "pyapp-kit/superqt"
 repo_url = "https://github.com/pyapp-kit/superqt"
-edit_uri = "edit/main/docs/"
 copyright = "Copyright &copy; 2021 - 2026 superqt contributors"
 
 extra_css = ["stylesheets/extra.css"]
+extra_javascript = ["javascripts/cards.js"]
 
 exclude_docs = """
 _*.py
@@ -32,11 +32,11 @@ nav = [
     "widgets/index.md",
     { "Sliders" = [
       "widgets/qrangeslider.md",
-      "widgets/qlabeledslider.md",
-      "widgets/qlabeledrangeslider.md",
       "widgets/qdoubleslider.md",
       "widgets/qdoublerangeslider.md",
+      "widgets/qlabeledslider.md",
       "widgets/qlabeleddoubleslider.md",
+      "widgets/qlabeledrangeslider.md",
       "widgets/qlabeleddoublerangeslider.md",
     ] },
     { "Numeric inputs" = [
@@ -57,6 +57,7 @@ nav = [
     { "Text and buttons" = [
       "widgets/qelidinglabel.md",
       "widgets/qelidinglineedit.md",
+      "widgets/qcolormaplineedit.md",
       "widgets/qtoggleswitch.md",
     ] },
     { "Containers and layouts" = [
@@ -67,8 +68,9 @@ nav = [
   { "Utilities" = [
     "utilities/index.md",
     { "Icons" = [
-      "utilities/fonticon.md",
-      "utilities/iconify.md",
+      "utilities/icons/index.md",
+      "utilities/icons/iconify.md",
+      "utilities/icons/fonticon.md",
     ] },
     { "Threading" = [
       "utilities/threading.md",
@@ -112,7 +114,6 @@ favicon = "images/favicon.svg"
 font.text = "Inter"
 font.code = "JetBrains Mono"
 features = [
-  "content.action.edit",
   "content.code.annotate",
   "content.code.copy",
   "content.code.select",
@@ -135,7 +136,6 @@ features = [
 [project.theme.icon]
 logo = "lucide/sliders-horizontal"
 repo = "fontawesome/brands/github"
-edit = "lucide/pencil"
 
 [[project.theme.palette]]
 media = "(prefers-color-scheme)"
@@ -189,13 +189,18 @@ pymdownx.tabbed.combine_header_slug = true
 
 # link previews in prose, but not on the cards and buttons of index pages
 [[project.markdown_extensions."zensical.extensions.preview".configurations]]
-sources.exclude = ["index.md", "widgets/index.md", "utilities/index.md"]
+sources.exclude = ["index.md", "widgets/index.md", "utilities/index.md", "utilities/icons/index.md"]
 targets.include = ["widgets/*", "utilities/*"]
 
 # ----------------------------------------------------------------------------
 # Plugins
 
 [project.plugins.search]
+
+# pages that moved
+[project.plugins.redirects.redirect_maps]
+"utilities/fonticon.md" = "utilities/icons/fonticon.md"
+"utilities/iconify.md" = "utilities/icons/iconify.md"
 
 [project.plugins.autorefs]
 resolve_closest = true

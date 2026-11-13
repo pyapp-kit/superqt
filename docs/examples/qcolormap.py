@@ -5,7 +5,8 @@ from superqt import QColormapComboBox
 
 app = QApplication([])
 
-cmap_combo = QColormapComboBox()
+# (allow_user_colormaps adds an "Add Colormap..." item, to choose from the catalog)
+cmap_combo = QColormapComboBox(allow_user_colormaps=True)
 # see note above about colormap-like objects
 # as names from the cmap catalog
 cmap_combo.addColormaps(["viridis", "plasma", "magma", "gray"])
