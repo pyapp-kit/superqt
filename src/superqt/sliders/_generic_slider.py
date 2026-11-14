@@ -22,6 +22,7 @@ QRangeSlider.
 
 import os
 import platform
+import warnings
 from typing import Any, TypeVar
 
 from qtpy import QT_VERSION, QtGui
@@ -45,6 +46,20 @@ SC_TICKMARKS = QStyle.SubControl.SC_SliderTickmarks
 
 CC_SLIDER = QStyle.ComplexControl.CC_Slider
 QOVERFLOW = 2**31 - 1
+
+
+def _mac_patch_unneeded() -> bool:
+    """Whether Qt is 6, which fixed QTBUG-98093 (in 6.2.3): if so, warn."""
+    if not QT_VERSION or int(QT_VERSION.split(".")[0]) < 6:
+        return False
+    warnings.warn(
+        "applyMacStylePatch() does nothing with Qt 6, which fixed the bug that it "
+        "works around (QTBUG-98093). It will be removed with support for Qt 5.",
+        DeprecationWarning,
+        stacklevel=3,
+    )
+    return True
+
 
 # whether to use the MONTEREY_SLIDER_STYLES_FIX QSS hack
 # for fixing sliders on macos>=12 with QT < 6
@@ -106,7 +121,10 @@ class _GenericSlider(QSlider):
         """Apply a QSS patch to fix sliders on macos>=12 with QT < 6.
 
         see [FAQ](../faq.md#sliders-not-dragging-properly-on-macos-12) for more details.
+        With Qt 6, which fixed that bug, it does nothing (and is deprecated).
         """
+        if _mac_patch_unneeded():
+            return
         self.setStyleSheet(MONTEREY_SLIDER_STYLES_FIX)
 
     # ###############  QtOverrides  #######################
