@@ -7,10 +7,13 @@ from typing import TYPE_CHECKING
 import pytest
 from qtpy.QtCore import QPoint, QRect, Qt
 from qtpy.QtGui import QBrush, QColor, QGradient, QImage, QPainter, QPalette
-from qtpy.QtWidgets import QProxyStyle, QSlider, QStyle, QStyleFactory
+from qtpy.QtWidgets import QProxyStyle, QSlider, QStyle, QStyleFactory, QWidget
 
 from superqt import QLabeledDoubleRangeSlider, QLabeledRangeSlider, QRangeSlider
-from superqt.sliders._generic_range_slider import _PAGES_WITH_EACH_HANDLE
+from superqt.sliders._generic_range_slider import (
+    _FILLS_UP_EITHER_WAY,
+    _PAGES_WITH_EACH_HANDLE,
+)
 from superqt.sliders._generic_slider import CC_SLIDER, SC_GROOVE, SC_HANDLE
 
 if TYPE_CHECKING:
@@ -59,6 +62,44 @@ def test_bar_is_visible(
 
     slider.barColor = "red"
     assert _bar_visible(slider)
+
+
+@pytest.mark.parametrize("style", QStyleFactory.keys())
+@pytest.mark.parametrize("orientation", [H, V])
+@pytest.mark.parametrize("ticks", TICKS)
+@pytest.mark.parametrize("value", [(0, 99), (30, 99), (0, 70)])
+def test_bar_is_visible_with_handles_at_the_ends(
+    qtbot: QtBot,
+    style: str,
+    orientation: Qt.Orientation,
+    ticks: QSlider.TickPosition,
+    value: tuple[int, int],
+) -> None:
+    slider = QRangeSlider(orientation)
+    qtbot.addWidget(slider)
+    qstyle = QStyleFactory.create(style)  # (the widget doesn't own it)
+    slider.setStyle(qstyle)
+    slider.setTickPosition(ticks)
+    slider.resize(200, 30) if orientation == H else slider.resize(30, 200)
+    slider.setValue(value)
+    for inverted in (False, True):
+        slider.setInvertedAppearance(inverted)
+        with_bar = _bar_center_line(slider)
+        slider.hideBar()
+        assert _bar_center_line(slider) != with_bar
+        slider.showBar()
+
+
+def _bar_center_line(slider: QRangeSlider) -> list[int]:
+    """The pixels across the slider in the middle of the bar."""
+    image = slider.grab().toImage()
+    ratio = image.width() / slider.width()
+    centers = [slider._handleRect(i).center() for i in (0, -1)]
+    if slider.orientation() == H:
+        x = round((centers[0].x() + centers[1].x()) / 2 * ratio)
+        return [image.pixel(x, y) for y in range(image.height())]
+    y = round((centers[0].y() + centers[1].y()) / 2 * ratio)
+    return [image.pixel(x, y) for x in range(image.width())]
 
 
 def test_bar_with_style_sheet(qtbot: QtBot) -> None:
@@ -149,9 +190,9 @@ class _FillsFromMinimum(QProxyStyle):
 def test_no_fill_outside_the_bar(
     qtbot: QtBot, follows: bool, orientation: Qt.Orientation, inverted: bool
 ) -> None:
-    if not follows and orientation == V and not _PAGES_WITH_EACH_HANDLE:
+    if not follows and orientation == V and not _FILLS_UP_EITHER_WAY:
         # (then it's drawn like a style sheet: the bar is the part before a handle)
-        pytest.skip("only Windows 11 up to Qt 6.10.0 fills from the bottom either way")
+        pytest.skip("only up to Qt 6.10.0 (as Windows 11) is it filled up either way")
     slider = QRangeSlider(orientation)
     qtbot.addWidget(slider)
     style = _FillsFromMinimum(follows)  # (the widget doesn't own it)
@@ -181,6 +222,12 @@ class _Glow(QProxyStyle):
     [
         (None, (False, False)),  # (the glow, which moves with the handle)
         (PAGES, (True, True)),
+        (  # (with a background, which Qt draws all over the slider each time)
+            "QRangeSlider { background: #303030; }"
+            "QSlider::groove:horizontal { height: 6px; background: gray; }"
+            "QSlider::add-page:horizontal { background: #0000ff; }",
+            (False, True),
+        ),
         (  # (without a groove or handle rule, Qt leaves it all to the base style)
             "QSlider::groove:horizontal { height: 6px; background: gray; }"
             "QSlider::sub-page:horizontal { background: #00ff00; }",
@@ -198,12 +245,7 @@ def test_pages_drawn_with_handles(
     if sheet:
         slider.setStyleSheet(sheet)
     slider.resize(200, 30)
-    image = QImage(slider.size(), QImage.Format.Format_ARGB32)
-    painter = QPainter(image)
-    try:
-        assert slider._pagesWithHandles(painter, slider._styleOption) == pages
-    finally:
-        painter.end()
+    assert slider._partsFor(slider._styleOption, 1.0).pages == pages
 
 
 def test_round_handles_show_the_bar_and_groove_around_them(qtbot: QtBot) -> None:
@@ -371,3 +413,150 @@ def test_bar_colors_by_state(qtbot: QtBot) -> None:
     qtbot.addWidget(slider)
     slider._slider._style.brush_active = "red"
     assert slider.barColor.color() == QColor("red")
+
+
+def test_tiny_and_scaled_down(qtbot: QtBot) -> None:
+    # (too small for images of the slider)
+    slider = QRangeSlider(H)
+    qtbot.addWidget(slider)
+    slider.resize(0, 0)
+    assert isinstance(slider.barColor, QBrush)
+    slider.resize(200, 30)
+    image = QImage(2, 1, QImage.Format.Format_ARGB32_Premultiplied)
+    painter = QPainter(image)
+    painter.scale(0.01, 0.01)
+    slider.render(painter, QPoint())
+    painter.end()
+
+
+def test_disabled_bar_from_the_style_sheet(qtbot: QtBot) -> None:
+    # (as a disabled QSlider's sub-page: a `barColor` is for enabled sliders)
+    slider = QRangeSlider(H)
+    qtbot.addWidget(slider)
+    slider.setStyleSheet(
+        "QSlider::groove:horizontal { height: 6px; background: gray; }"
+        "QSlider::sub-page:horizontal { background: seagreen; }"
+        "QSlider::sub-page:horizontal:disabled { background: #9a9a9a; }"
+        "QRangeSlider { qproperty-barColor: #ff8800; }"
+    )
+    slider.resize(200, 30)
+    slider.setValue((30, 70))
+    assert _bar_center(slider) == QColor("#ff8800")
+    slider.setEnabled(False)
+    assert _bar_center(slider) == QColor("#9a9a9a")
+
+
+def test_bar_not_thicker_than_the_groove_with_a_background(qtbot: QtBot) -> None:
+    # (a style sheet's background, which Qt draws all over the slider each time)
+    slider = QRangeSlider(H)
+    qtbot.addWidget(slider)
+    slider.setStyleSheet(
+        "QRangeSlider { background: #303030; qproperty-barColor: #ff0000; }"
+        "QSlider::groove:horizontal { height: 6px; background: gray; }"
+    )
+    slider.resize(200, 30)
+    slider.setValue((30, 70))
+    image = slider.grab().toImage()
+    ratio = image.width() / slider.width()
+    groove = slider.style().subControlRect(
+        CC_SLIDER, slider._styleOption, SC_GROOVE, slider
+    )
+    x = round(slider.width() / 2 * ratio)
+    above = image.pixelColor(x, round((groove.top() - 3) * ratio))
+    assert above != QColor("#ff0000")
+
+
+def test_translucent_sub_page_as_in_a_slider(qtbot: QtBot) -> None:
+    # (the bar is the groove filled, in place of the groove: not over it)
+    sheet = (
+        "QSlider::groove:horizontal { height: 10px; background: rgba(0, 0, 0, 60); }"
+        "QSlider::handle:horizontal { width: 10px; background: white; }"
+        "QSlider::sub-page:horizontal { background: rgba(255, 0, 0, 60); }"
+    )
+    parent = QWidget()
+    qtbot.addWidget(parent)
+    single, double = QSlider(H, parent), QRangeSlider(H, parent)
+    for slider, value in ((single, 80), (double, (20, 80))):
+        slider.setStyleSheet(sheet)
+        slider.resize(200, 30)
+        slider.setValue(value)
+    middle = single.rect().center()
+    image = single.grab().toImage()
+    ratio = image.width() / single.width()
+    expected = image.pixelColor(round(middle.x() * ratio), round(middle.y() * ratio))
+    # (but for rounding, through an image, in older Qt: drawn over it, it's ~35 off)
+    pairs = zip(_bar_center(double).getRgb(), expected.getRgb(), strict=True)
+    assert max(abs(a - b) for a, b in pairs) <= 2
+
+
+SUB_PAGE = """
+QSlider::groove:horizontal {{ height: 6px; background: gray; }}
+QSlider::sub-page:horizontal {{ background: {}; }}
+"""
+
+
+def _restyled_slider(qtbot: QtBot, parent: QWidget | None = None) -> QRangeSlider:
+    slider = QRangeSlider(H, parent)
+    if parent is None:
+        qtbot.addWidget(slider)
+    slider.resize(200, 30)
+    slider.setValue((30, 70))
+    return slider
+
+
+def test_restyled_by_its_style_sheet(qtbot: QtBot) -> None:
+    # (what's drawn of the slider but its handles is kept: until it's restyled)
+    slider = _restyled_slider(qtbot)
+    slider.setStyleSheet(SUB_PAGE.format("#00ff00"))
+    assert _bar_center(slider) == QColor("#00ff00")
+    slider.setStyleSheet(SUB_PAGE.format("#ff0000"))
+    assert _bar_center(slider) == QColor("#ff0000")
+
+
+def test_restyled_by_its_parent_style_sheet(qtbot: QtBot) -> None:
+    parent = QWidget()
+    qtbot.addWidget(parent)
+    slider = _restyled_slider(qtbot, parent)
+    parent.setStyleSheet(SUB_PAGE.format("#00ff00"))
+    assert _bar_center(slider) == QColor("#00ff00")
+    parent.setStyleSheet(SUB_PAGE.format("#ff0000"))
+    assert _bar_center(slider) == QColor("#ff0000")
+
+
+@pytest.mark.parametrize("selector", ['[hot="true"]', "#hot"])
+def test_restyled_when_repolished(qtbot: QtBot, selector: str) -> None:
+    slider = _restyled_slider(qtbot)
+    slider.setStyleSheet(
+        SUB_PAGE.format("#00ff00")
+        + f"QSlider{selector}::sub-page:horizontal {{ background: #ff0000; }}"
+    )
+    assert _bar_center(slider) == QColor("#00ff00")
+    slider.setProperty("hot", True)
+    slider.setObjectName("hot")
+    slider.style().unpolish(slider)
+    slider.style().polish(slider)
+    assert _bar_center(slider) == QColor("#ff0000")
+
+
+def test_restyled_by_its_palette(qtbot: QtBot) -> None:
+    slider = _restyled_slider(qtbot)
+    style = QStyleFactory.create("Fusion")  # (the widget doesn't own it)
+    slider.setStyle(style)
+    before = _bar_center(slider)
+    palette = slider.palette()
+    for role in ("Highlight", "Accent"):  # (`Accent` is new in Qt 6.6)
+        if hasattr(QPalette.ColorRole, role):
+            palette.setColor(getattr(QPalette.ColorRole, role), QColor("#ff00ff"))
+    slider.setPalette(palette)
+    assert _bar_center(slider) != before
+
+
+def test_restyled_by_its_style(qtbot: QtBot) -> None:
+    slider = _restyled_slider(qtbot)
+    fusion = QStyleFactory.create("Fusion")  # (the widget doesn't own it)
+    slider.setStyle(fusion)
+    slider.barColor = "#ff0000"
+    before = slider.grab().toImage()
+    windows = QStyleFactory.create("Windows")
+    slider.setStyle(windows)
+    assert slider.grab().toImage() != before
