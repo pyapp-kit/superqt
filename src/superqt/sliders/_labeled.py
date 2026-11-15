@@ -521,10 +521,10 @@ class QLabeledRangeSlider(_SliderProxy, QAbstractSlider):
     EdgeLabelMode = EdgeLabelMode
 
     def _getBarColor(self) -> QtGui.QBrush:
-        return self._slider._style.brush(self._slider._styleOption)
+        return self._slider.barColor
 
     def _setBarColor(self, color: str) -> None:
-        self._slider._style.brush_active = color
+        self._slider.barColor = color
 
     barColor = Property(QtGui.QBrush, _getBarColor, _setBarColor)
     """The color of the bar between the first and last handle."""
@@ -681,10 +681,10 @@ class QLabeledDoubleRangeSlider(QLabeledRangeSlider):
             lbl.setDecimals(prec)
 
     def _getBarColor(self) -> QtGui.QBrush:
-        return self._slider._style.brush(self._slider._styleOption)
+        return self._slider.barColor
 
     def _setBarColor(self, color: str) -> None:
-        self._slider._style.brush_active = color
+        self._slider.barColor = color
 
     barColor = Property(QtGui.QBrush, _getBarColor, _setBarColor)
     """The color of the bar between the first and last handle."""
