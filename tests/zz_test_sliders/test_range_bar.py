@@ -6,7 +6,15 @@ from typing import TYPE_CHECKING
 
 import pytest
 from qtpy.QtCore import QPoint, QRect, Qt
-from qtpy.QtGui import QBrush, QColor, QGradient, QImage, QPainter, QPalette
+from qtpy.QtGui import (
+    QBrush,
+    QColor,
+    QGradient,
+    QGuiApplication,
+    QImage,
+    QPainter,
+    QPalette,
+)
 from qtpy.QtWidgets import QProxyStyle, QSlider, QStyle, QStyleFactory, QWidget
 
 from superqt import QLabeledDoubleRangeSlider, QLabeledRangeSlider, QRangeSlider
@@ -100,6 +108,64 @@ def _bar_center_line(slider: QRangeSlider) -> list[int]:
         return [image.pixel(x, y) for y in range(image.height())]
     y = round((centers[0].y() + centers[1].y()) / 2 * ratio)
     return [image.pixel(x, y) for x in range(image.width())]
+
+
+@pytest.mark.parametrize("style", QStyleFactory.keys())
+@pytest.mark.parametrize("orientation", [H, V])
+@pytest.mark.parametrize("inverted", [False, True])
+def test_bar_reaches_a_handle_at_the_maximum(
+    qtbot: QtBot, style: str, orientation: Qt.Orientation, inverted: bool
+) -> None:
+    # (no groove shows between them: e.g. by macOS's knob, which is smaller than its
+    # rect, as by a slider's at its maximum)
+    qstyle = QStyleFactory.create(style)  # (the widgets don't own it)
+    slider, empty, full = (QRangeSlider(orientation), *map(QSlider, [orientation] * 2))
+    for widget in (slider, empty, full):
+        qtbot.addWidget(widget)
+        widget.setStyle(qstyle)
+        widget.resize(200, 30) if orientation == H else widget.resize(30, 200)
+        widget.setInvertedAppearance(inverted)
+        widget.setRange(0, 99)
+    slider.setValue((30, 99))
+    empty.setValue(0)
+    full.setValue(99)
+    images = [w.grab().toImage() for w in (slider, empty, full)]
+    ratio = images[0].width() / slider.width()
+    line = slider.style().subControlRect(
+        CC_SLIDER, slider._styleOption, SC_GROOVE, slider
+    )
+    centers = [slider._handleRect(i).center() for i in (0, -1)]
+    if orientation == H:
+        middle, end = (centers[0].x() + centers[1].x()) / 2, centers[1].x()
+    else:
+        middle, end = (centers[0].y() + centers[1].y()) / 2, centers[1].y()
+    lo, hi = sorted((round(middle * ratio), round(end * ratio)))
+    for at in range(lo, hi + 1):
+        if orientation == H:
+            x, y = at, round(line.center().y() * ratio)
+        else:
+            x, y = round(line.center().x() * ratio), at
+        bar, groove, knob = (image.pixel(x, y) for image in images)
+        assert bar != groove or bar == knob, (x, y)
+
+
+@pytest.mark.parametrize("value", [(50,), (50, 50)])
+def test_no_bar_between_handles_in_one_place(
+    qtbot: QtBot, value: tuple[int, ...]
+) -> None:
+    # (which would show through a translucent handle)
+    slider = QRangeSlider(H)
+    qtbot.addWidget(slider)
+    slider.setStyleSheet(
+        "QSlider::groove:horizontal { height: 10px; background: gray; }"
+        "QSlider::handle:horizontal { width: 20px; background: rgba(0, 0, 255, 60); }"
+    )
+    slider.barColor = "red"
+    slider.resize(200, 30)
+    slider.setValue(value)
+    with_bar = slider.grab().toImage()
+    slider.hideBar()
+    assert slider.grab().toImage() == with_bar
 
 
 def test_bar_with_style_sheet(qtbot: QtBot) -> None:
@@ -429,6 +495,14 @@ def test_tiny_and_scaled_down(qtbot: QtBot) -> None:
     painter.end()
 
 
+def test_style_sheet_without_a_handle(qtbot: QtBot, qtlog) -> None:
+    # (Qt then gives the handle an empty rect)
+    slider = _restyled_slider(qtbot)
+    slider.setStyleSheet(SUB_PAGE.format("#00ff00"))
+    slider.grab()
+    assert not [r.message for r in qtlog.records if "QPainter" in r.message]
+
+
 def test_disabled_bar_from_the_style_sheet(qtbot: QtBot) -> None:
     # (as a disabled QSlider's sub-page: a `barColor` is for enabled sliders)
     slider = QRangeSlider(H)
@@ -560,3 +634,57 @@ def test_restyled_by_its_style(qtbot: QtBot) -> None:
     windows = QStyleFactory.create("Windows")
     slider.setStyle(windows)
     assert slider.grab().toImage() != before
+
+
+class _Animated(QProxyStyle):
+    """A style that sets a property on what it draws (as Windows 11 does)."""
+
+    def drawComplexControl(self, control, option, painter, widget=None) -> None:
+        if widget is not None:
+            widget.setProperty("_frame", (widget.property("_frame") or 0) + 1)
+        super().drawComplexControl(control, option, painter, widget)
+
+
+def test_kept_while_the_style_sets_properties(qtbot: QtBot) -> None:
+    slider = _restyled_slider(qtbot)
+    style = _Animated("Fusion")  # (the widget doesn't own it)
+    slider.setStyle(style)
+    slider.grab()
+    parts = slider._parts
+    slider.grab()
+    assert parts is not None
+    assert slider._parts is parts
+
+
+class _Schemed(QProxyStyle):
+    """A style that draws the groove in a color by the app's color scheme."""
+
+    def drawComplexControl(self, control, option, painter, widget=None) -> None:
+        if option.subControls & SC_GROOVE:
+            dark = QGuiApplication.styleHints().colorScheme() == Qt.ColorScheme.Dark
+            painter.fillRect(option.rect, QColor("#ff0000" if dark else "#00ff00"))
+
+
+def test_restyled_by_the_color_scheme(qtbot: QtBot) -> None:
+    # (even with a palette of its own, all of it, which the scheme doesn't change)
+    hints = QGuiApplication.styleHints()
+    if not hasattr(hints, "setColorScheme"):  # (new in Qt 6.8)
+        pytest.skip("can't set the color scheme")
+    slider = _restyled_slider(qtbot)
+    style = _Schemed("Fusion")  # (the widget doesn't own it)
+    slider.setStyle(style)
+    palette = QPalette()
+    for group in (QPalette.ColorGroup.Active, QPalette.ColorGroup.Inactive):
+        for role in QPalette.ColorRole:
+            if role not in (QPalette.ColorRole.NoRole, QPalette.ColorRole.NColorRoles):
+                palette.setColor(group, role, palette.color(group, role))
+    slider.setPalette(palette)
+    try:
+        hints.setColorScheme(Qt.ColorScheme.Dark)
+        if hints.colorScheme() != Qt.ColorScheme.Dark:
+            pytest.skip("the platform doesn't set the color scheme")
+        before = _before_first_handle(slider)
+        hints.setColorScheme(Qt.ColorScheme.Light)
+        assert _before_first_handle(slider) != before
+    finally:
+        hints.unsetColorScheme()

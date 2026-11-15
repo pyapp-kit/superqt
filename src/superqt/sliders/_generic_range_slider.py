@@ -21,6 +21,7 @@ from qtpy.QtGui import (
     QBrush,
     QColor,
     QGradient,
+    QGuiApplication,
     QImage,
     QLinearGradient,
     QPainter,
@@ -87,6 +88,7 @@ class _GenericRangeSlider(_GenericSlider):
         self._style = _BarColors()
         self._macpatch = False  # (whether `applyMacStylePatch` was called)
         self._parts: _Parts | None = None  # (see `_partsFor`)
+        self._painting = False
 
         super().__init__(*args, **kwargs)
 
@@ -224,7 +226,9 @@ class _GenericRangeSlider(_GenericSlider):
         return style
 
     def event(self, ev: QEvent) -> bool:
-        if ev.type() in _RESTYLED:
+        # (not as it's painted: styles may set properties on the slider as they draw
+        # it, e.g. Windows 11, for its animations)
+        if ev.type() in _RESTYLED and not self._painting:
             self._parts = None
         return super().event(ev)
 
@@ -247,9 +251,13 @@ class _GenericRangeSlider(_GenericSlider):
         if (self.size() * _ratio(painter)).isEmpty():  # (too small to draw anything)
             return
         opt = self._styleOption
-        self._drawBar(painter, opt)
-        self._drawTicks(painter, opt)  # (after the bar, which could cover them)
-        self._draw_handle(painter, opt)
+        self._painting = True
+        try:
+            self._drawBar(painter, opt)
+            self._drawTicks(painter, opt)  # (after the bar, which could cover them)
+            self._draw_handle(painter, opt)
+        finally:
+            self._painting = False
 
     # ###############  Implementation Details  #######################
 
@@ -323,15 +331,14 @@ class _GenericRangeSlider(_GenericSlider):
         or the style may draw the slider differently (see `_RESTYLED`), as the style
         draws each part off screen, often more than once.
         """
-        # (and the name, which style sheets' selectors may use)
-        key = (*_key(opt, ratio), self.objectName())
+        # (and the name, which style sheets' selectors may use, and the color scheme,
+        # which styles may draw in, whatever the palette: e.g. on macOS)
+        key = (*_key(opt, ratio), self.objectName(), _colorScheme())
         if self._parts is not None and self._parts.key == key:
             return self._parts
         bar = self._barOption(opt, ratio)
         horizontal = bar.orientation == Qt.Orientation.Horizontal
         option = QStyleOptionSlider(bar)
-        option.subControls = SC_NONE
-        background = self._sliderImage(option, ratio)  # (e.g. a style sheet's)
         option.sliderPosition = option.minimum
         start = self.style().subControlRect(CC_SLIDER, option, SC_HANDLE, self)
         option.sliderPosition = option.maximum
@@ -352,18 +359,22 @@ class _GenericRangeSlider(_GenericSlider):
             between.setTop(start.bottom() + 1)
             between.setBottom(end.top() - 1)
         groove = self._groove(bar, ratio, under, between)
-        # (with the handle: up to 6.12.0, style sheets only draw pages with one)
-        filled = self._grooveImage(bar, bar.maximum, ratio, handle=True)
         # (in the middle: away from the ends, and from what handles there draw)
         middle = QRect(between)
         if horizontal:
             middle.adjust(between.width() // 4, 0, -(between.width() // 4), 0)
         else:
             middle.adjust(0, between.height() // 4, 0, -(between.height() // 4))
+        filled, drawn = self._grooveImage(bar, bar.maximum, ratio), QRect()
         fills = _crop(filled, middle) != _crop(groove, middle)
-        pages = self._pagesWithHandles(opt, ratio, background)
+        if not fills:  # (up to 6.12.0, style sheets only draw pages with a handle)
+            handled = self._grooveImage(bar, bar.maximum, ratio, handle=True)
+            if _crop(handled, middle) != _crop(groove, middle):
+                # (with one at the maximum, which isn't part of the bar)
+                filled, drawn, fills = handled, end, True
+        pages = self._pagesWithHandles(opt, ratio)
         self._parts = _Parts(
-            key, ratio, bar, background, groove, end, between, filled, fills, pages
+            key, ratio, bar, groove, between, filled, drawn, fills, pages
         )
         return self._parts
 
@@ -429,17 +440,18 @@ class _GenericRangeSlider(_GenericSlider):
         parts = self._partsFor(opt, _ratio(painter))
         horizontal = opt.orientation == Qt.Orientation.Horizontal
         span, inner = QRect(), QRect()
-        if self._should_draw_bar:
-            ends = [self._handleRect(i, opt).center() for i in (0, -1)]
+        ends = [self._handleRect(i, opt).center() for i in (0, -1)]
+        start, stop = sorted(p.x() if horizontal else p.y() for p in ends)
+        if self._should_draw_bar and start < stop:
             span = QRect(self.rect())  # (the part between the outer handles)
             if horizontal:
-                span.setLeft(min(p.x() for p in ends))
-                span.setRight(max(p.x() for p in ends))
+                span.setLeft(start)
+                span.setRight(stop)
             else:
-                span.setTop(min(p.y() for p in ends))
-                span.setBottom(max(p.y() for p in ends))
-            # (the filled groove's handle, at the maximum, isn't part of the bar)
-            inner = _apart(span, parts.end, horizontal)
+                span.setTop(start)
+                span.setBottom(stop)
+            # (any handle drawn with the filled groove isn't part of the bar)
+            inner = _apart(span, parts.drawn, horizontal)
         brush = self._barBrush(opt)
         if inner.isEmpty() or brush is not None or not parts.fills:
             painter.drawImage(0, 0, parts.groove)
@@ -473,10 +485,14 @@ class _GenericRangeSlider(_GenericSlider):
     def _grooveBounds(self, parts: _Parts) -> QRectF:
         """Where the style draws the groove, filled all along, between the ends."""
         if parts.bounds is None:
-            bar, between = parts.bar, parts.between
-            # (without the handle, which may reach past its rect)
-            filled = self._grooveImage(bar, bar.maximum, parts.ratio)
-            bounds = _bounds(_crop(filled, between), _crop(parts.background, between))
+            bar, between, filled = parts.bar, parts.between, parts.filled
+            if not parts.drawn.isEmpty():  # (without the handle: it may reach past it)
+                filled = self._grooveImage(bar, bar.maximum, parts.ratio)
+            option = QStyleOptionSlider(bar)
+            option.subControls = SC_NONE
+            # (e.g. a style sheet's background, which is drawn all over the slider)
+            background = self._sliderImage(option, parts.ratio)
+            bounds = _bounds(_crop(filled, between), _crop(background, between))
             parts.bounds = bounds.translated(QPointF(between.topLeft()))
         return parts.bounds
 
@@ -636,10 +652,7 @@ class _GenericRangeSlider(_GenericSlider):
             self._drawHandle(painter, opt, pages, first=idx == first)
 
     def _pagesWithHandles(
-        self,
-        opt: QStyleOptionSlider,
-        ratio: float,
-        background: QImage | None = None,
+        self, opt: QStyleOptionSlider, ratio: float
     ) -> tuple[bool, bool]:
         """Whether the style draws a page before each handle, and one after it.
 
@@ -647,13 +660,15 @@ class _GenericRangeSlider(_GenericSlider):
         6.10.0: https://bugreports.qt.io/browse/QTBUG-141157.) With a handle at two
         places, off screen: a page runs from an end of the groove to the handle, so
         that end of what's drawn stays put as the handle moves, while a handle, and
-        its shadow or glow, moves with it. (`background`: what the style draws with
-        no sub-controls, e.g. a style sheet's background, which is neither.)
+        its shadow or glow, moves with it. (Apart from what the style draws with no
+        sub-controls, e.g. a style sheet's background, which is neither.)
         """
         if not _PAGES_WITH_EACH_HANDLE:
             return False, False
         horizontal = opt.orientation == Qt.Orientation.Horizontal
         option = QStyleOptionSlider(opt)
+        option.subControls = SC_NONE
+        background = self._sliderImage(option, ratio)
         option.subControls = SC_HANDLE
         quarter = (opt.maximum - opt.minimum) // 4
         starts, ends = [], []  # (of the handle, and of what's drawn with it)
@@ -693,6 +708,8 @@ class _GenericRangeSlider(_GenericSlider):
         if any(pages):  # (style sheet handles, which don't blend with what's behind)
             ratio = _ratio(painter)
             rect = self.style().subControlRect(CC_SLIDER, opt, SC_HANDLE, self)
+            if rect.isEmpty():  # (e.g. a style sheet with no rule for it)
+                return
             if all(pages) and first:
                 image = _crop(self._mirroredHandle(opt, rect, ratio), rect)
             else:
@@ -813,11 +830,10 @@ class _Parts:
     key: tuple  # (what it depends on: see `_key`)
     ratio: float  # (the images' pixel ratio)
     bar: QStyleOptionSlider  # (the slider as the bar is drawn: see `_barOption`)
-    background: QImage  # (what the style draws with no sub-controls)
     groove: QImage  # (without any fill: see `_groove`)
-    end: QRect  # (a handle at the maximum, in `bar`)
     between: QRect  # (the slider between handles at its ends)
-    filled: QImage  # (the groove filled all along, with that handle)
+    filled: QImage  # (the groove filled all along, maybe with a handle: see `drawn`)
+    drawn: QRect  # (that handle, at the maximum, in `bar`: if any)
     fills: bool  # (whether the style fills the groove)
     pages: tuple[bool, bool]  # (see `_pagesWithHandles`)
     bounds: QRectF | None = None  # (see `_grooveBounds`)
@@ -854,6 +870,12 @@ def _key(opt: QStyleOptionSlider, ratio: float) -> tuple:
         opt.minimum,
         opt.maximum,
     )
+
+
+def _colorScheme() -> Any:
+    """The app's color scheme (in Qt 6.5+)."""
+    hints = QGuiApplication.styleHints()
+    return hints.colorScheme() if hasattr(hints, "colorScheme") else None
 
 
 def _ratio(painter: QPainter) -> float:
