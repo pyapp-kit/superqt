@@ -285,7 +285,15 @@ class _GenericRangeSlider(_GenericSlider):
 
     def _getBarColor(self) -> QBrush:
         opt = self._styleOption
-        return self._barBrush(opt) or self._fillBrush(opt)
+        if (brush := self._barBrush(opt)) is not None:
+            return brush
+        parts = self._partsFor(opt, self.devicePixelRatioF())
+        if parts.fills:  # (the color drawn: e.g. a style sheet's sub-page)
+            center = self._grooveBounds(parts).center() * parts.ratio
+            x, y = int(center.x()), int(center.y())
+            if parts.filled.valid(x, y):
+                return QBrush(parts.filled.pixelColor(x, y))
+        return self._fillBrush(opt)
 
     def _setBarColor(self, color: Any) -> None:
         self._style.brush_active = color

@@ -193,6 +193,7 @@ def test_bar_from_style_sheet_sub_page(qtbot: QtBot) -> None:
     middle = slider.rect().center()
     color = image.pixelColor(round(middle.x() * ratio), round(middle.y() * ratio))
     assert color == QColor("#00ff00")
+    assert slider.barColor.color() == QColor("#00ff00")
 
 
 PAGES = """
