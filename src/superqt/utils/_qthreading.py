@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 import inspect
-import threading
 import time
 import warnings
-from contextlib import suppress
 from functools import partial, wraps
 from typing import (
     TYPE_CHECKING,
@@ -64,78 +62,13 @@ def as_generator_function(
     return genwrapper
 
 
-_warnings_lock = threading.Lock()
-_running_workers = 0
-# the entry `warnings.filterwarnings("always")` would add
-_ALWAYS_FILTER = ("always", None, Warning, None, 0)
-# never reset, so `_showwarning` always has somewhere to send warnings
-_original_showwarning = warnings.showwarning
-_thread_worker = threading.local()
-
-
-def _showwarning(*args: Any) -> None:
-    """Send a warning to the worker running in this thread, if any."""
-    worker = getattr(_thread_worker, "worker", None)
-    if worker is not None:
-        worker.warned.emit(args)
-    else:
-        _original_showwarning(*args)
-
-
-class _capture_warnings:
-    """Send warnings raised in this thread to `worker.warned`.
-
-    `warnings.catch_warnings` saves and restores process-wide state, so it
-    isn't safe to use from several worker threads at once: the worker that
-    finishes last restores the hook installed by another worker. Instead,
-    the first running worker installs a single `showwarning` hook and the
-    last one to finish removes it. The hook looks up the worker running in
-    the current thread, so warnings from other threads are shown as usual.
-    """
-
-    def __init__(self, worker: WorkerBase) -> None:
-        self._worker = worker
-        self._previous_worker: WorkerBase | None = None
-
-    def __enter__(self) -> None:
-        global _running_workers, _original_showwarning
-        with _warnings_lock:
-            if _running_workers == 0:
-                # saving our own hook would make it call itself
-                if warnings.showwarning is not _showwarning:
-                    _original_showwarning = warnings.showwarning
-                # insert directly: `filterwarnings` would drop an identical
-                # user filter, which we'd then fail to put back
-                warnings.filters.insert(0, _ALWAYS_FILTER)
-                warnings._filters_mutated()  # type: ignore[attr-defined]
-                warnings.showwarning = _showwarning
-            _running_workers += 1
-        # a worker's `run()` may be called directly inside another worker
-        self._previous_worker = getattr(_thread_worker, "worker", None)
-        _thread_worker.worker = self._worker
-
-    def __exit__(self, *exc_info: Any) -> None:
-        global _running_workers
-        _thread_worker.worker = self._previous_worker
-        with _warnings_lock:
-            _running_workers -= 1
-            if _running_workers == 0:
-                # remove only our filter, keeping any added while we ran
-                with suppress(ValueError):  # e.g. `resetwarnings()` removed it
-                    warnings.filters.remove(_ALWAYS_FILTER)
-                warnings._filters_mutated()  # type: ignore[attr-defined]
-                # don't clobber a hook someone else installed while we ran
-                if warnings.showwarning is _showwarning:
-                    warnings.showwarning = _original_showwarning
-
-
 class WorkerBaseSignals(QObject):
     started = Signal()  # emitted when the work is started
     finished = Signal()  # emitted when the work is finished
     _finished = Signal(object)  # emitted when the work is finished to delete
     returned = Signal(object)  # emitted with return value
     errored = Signal(object)  # emitted with error object on Exception
-    warned = Signal(tuple)  # emitted with showwarning args on warning
+    warned = Signal(tuple)
 
 
 class WorkerBase(QRunnable, Generic[_R]):
@@ -180,6 +113,14 @@ class WorkerBase(QRunnable, Generic[_R]):
         this passthrough allows us to connect to signals on the `_signals`
         object.
         """
+        if name == "warned":
+            warnings.warn(
+                "The `warned` signal is deprecated and is never emitted. "
+                "Warnings raised in a worker now go through the normal "
+                "`warnings` machinery (filters and `warnings.showwarning`).",
+                FutureWarning,
+                stacklevel=2,
+            )
         # the Signal object is actually a class attribute
         attr = getattr(self.signals.__class__, name, None)
         if isinstance(attr, Signal):
@@ -237,8 +178,7 @@ class WorkerBase(QRunnable, Generic[_R]):
         self.started.emit()
         self._running = True
         try:
-            with _capture_warnings(self):
-                result = self.work()
+            result = self.work()
             if isinstance(result, Exception):
                 if isinstance(result, RuntimeError):
                     # The Worker object has likely been deleted.

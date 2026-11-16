@@ -90,27 +90,70 @@ def test_thread_raises2(qtbot):
     assert handle_val[0] == 1
 
 
-def test_thread_warns(qtbot):
-    """Test warnings get returned to main thread"""
+def test_worker_warnings_use_showwarning(qtbot, monkeypatch):
+    """Warnings raised in a worker go to `warnings.showwarning` like any other."""
+    shown = []
+    monkeypatch.setattr(warnings, "showwarning", lambda *w: shown.append(str(w[0])))
+    warnings.simplefilter("always")  # don't depend on the warning registry
 
-    def check_warning(w):
-        return str(w) == "hey!"
-
-    @qthreading.thread_worker(connect={"warned": check_warning}, start_thread=False)
+    @qthreading.thread_worker(start_thread=False)
     def func():
+        warnings.warn("hey!", stacklevel=1)
         yield 1
-        warnings.warn("hey!")  # noqa: B028
-        yield 3
-        warnings.warn("hey!")  # noqa: B028
-        return 1
 
-    wrkr = func()
-    assert isinstance(wrkr, qthreading.GeneratorWorker)
+    worker = func()
+    with qtbot.waitSignal(worker.finished):
+        worker.start()
+    assert shown == ["hey!"]
 
-    signals = [wrkr.yielded, wrkr.warned, wrkr.yielded, wrkr.returned]
-    checks = [equals_1, None, equals_3, equals_1]
-    with qtbot.waitSignals(signals, check_params_cbs=checks):
-        wrkr.start()
+
+def test_ignored_warnings_stay_ignored_while_worker_runs(qtbot, monkeypatch):
+    """A running worker doesn't override the user's warning filters (#371)."""
+    shown = []
+    monkeypatch.setattr(warnings, "showwarning", lambda *w: shown.append(str(w[0])))
+    warnings.filterwarnings("ignore", category=UserWarning)
+
+    @qthreading.thread_worker(start_thread=False)
+    def func(running: threading.Event, done: threading.Event):
+        warnings.warn("from worker", UserWarning, stacklevel=1)
+        running.set()
+        done.wait(5)
+
+    running, done = threading.Event(), threading.Event()
+    worker = func(running, done)
+    worker.start()
+    assert running.wait(5)
+    warnings.warn("from main", UserWarning, stacklevel=1)
+    with qtbot.waitSignal(worker.finished):
+        done.set()
+    assert shown == []
+
+
+def test_worker_leaves_warnings_state_alone(qtbot):
+    """Running a worker changes neither the filters nor `showwarning`."""
+    filters, showwarning = warnings.filters[:], warnings.showwarning
+    during = []
+
+    @qthreading.thread_worker(start_thread=False)
+    def func():
+        during.append((warnings.filters[:], warnings.showwarning))
+
+    worker = func()
+    with qtbot.waitSignal(worker.finished):
+        worker.start()
+    assert during == [(filters, showwarning)]
+    assert (warnings.filters, warnings.showwarning) == (filters, showwarning)
+
+
+def test_warned_is_deprecated(qapp):
+    """`warned` still exists so old code doesn't break, but warns on access."""
+    worker = qthreading.create_worker(lambda: None, _start_thread=False)
+    with pytest.warns(FutureWarning, match="warned"):
+        worker.warned.connect(lambda w: None)
+    with pytest.warns(FutureWarning, match="warned"):
+        qthreading.create_worker(
+            lambda: None, _connect={"warned": lambda w: None}, _start_thread=False
+        )
 
 
 def test_multiple_connections(qtbot):
@@ -298,112 +341,3 @@ def test_nested_threads_start(qtbot):
     event.wait(timeout=2)
     mock1.assert_called_once()
     mock2.assert_called_once()
-
-
-def test_overlapping_workers_restore_showwarning(qtbot):
-    """`warnings.showwarning` is restored once overlapping workers finish."""
-    original = warnings.showwarning
-
-    @qthreading.thread_worker(start_thread=False)
-    def wait(event: threading.Event):
-        event.wait(5)
-
-    first_done, second_done = threading.Event(), threading.Event()
-    first, second = wait(first_done), wait(second_done)
-    with qtbot.waitSignal(first.started):
-        first.start()
-    with qtbot.waitSignal(second.started):
-        second.start()
-    with qtbot.waitSignal(first.finished):
-        first_done.set()
-    with qtbot.waitSignal(second.finished):
-        second_done.set()
-    assert warnings.showwarning is original
-
-
-def test_warnings_go_to_the_worker_in_their_thread(qtbot):
-    """A running worker doesn't capture warnings from other threads."""
-    worker_warnings = []
-    main_warnings = []
-    original = warnings.showwarning
-    warnings.showwarning = lambda *w: main_warnings.append(str(w[0]))
-
-    @qthreading.thread_worker(
-        connect={"warned": lambda w: worker_warnings.append(str(w[0]))},
-        start_thread=False,
-    )
-    def func(event: threading.Event):
-        warnings.warn("from worker", stacklevel=1)
-        event.wait(5)
-
-    done = threading.Event()
-    worker = func(done)
-    try:
-        with qtbot.waitSignal(worker.started):
-            worker.start()
-        qtbot.waitUntil(lambda: worker_warnings == ["from worker"])
-        warnings.warn("from main", stacklevel=1)
-        with qtbot.waitSignal(worker.finished):
-            done.set()
-    finally:
-        warnings.showwarning = original
-    assert main_warnings == ["from main"]
-
-
-def test_worker_exit_inside_catch_warnings(monkeypatch):
-    """A `catch_warnings` block that outlives a worker can't break later workers."""
-    shown = []
-    monkeypatch.setattr(warnings, "showwarning", lambda *a: shown.append(a))
-    warnings.simplefilter("always")  # don't depend on filter state
-    cw = warnings.catch_warnings()
-    # worker finishes while `cw` is open, then `cw` puts the worker's hook back
-    qthreading.create_worker(cw.__enter__, _start_thread=False).run()
-    cw.__exit__(None, None, None)
-    qthreading.create_worker(lambda: None, _start_thread=False).run()
-    warnings.warn("hi", stacklevel=1)
-    assert len(shown) == 1
-
-
-def test_nested_worker_run_restores_outer_worker():
-    """Warnings after a nested worker's `run()` still go to the outer worker."""
-    outer_warnings, inner_warnings = [], []
-
-    def inner_func():
-        warnings.warn("inner", stacklevel=1)
-
-    def outer_func():
-        inner = qthreading.create_worker(inner_func, _start_thread=False)
-        inner.warned.connect(lambda w: inner_warnings.append(str(w[0])))
-        inner.run()
-        warnings.warn("outer", stacklevel=1)
-
-    outer = qthreading.create_worker(outer_func, _start_thread=False)
-    outer.warned.connect(lambda w: outer_warnings.append(str(w[0])))
-    outer.run()
-    assert inner_warnings == ["inner"]
-    assert outer_warnings == ["outer"]
-
-
-def test_filters_added_while_worker_runs_are_kept(qtbot):
-    """Finishing a worker doesn't drop filters added while it was running."""
-
-    class MarkerWarning(UserWarning):
-        """Not in the default filters, unlike e.g. DeprecationWarning."""
-
-    user_filter = ("ignore", None, MarkerWarning, None, 0)
-
-    @qthreading.thread_worker(start_thread=False)
-    def wait(running: threading.Event, done: threading.Event):
-        running.set()  # `started` fires before warnings are captured
-        done.wait(5)
-
-    running, done = threading.Event(), threading.Event()
-    worker = wait(running, done)
-    with warnings.catch_warnings():
-        worker.start()
-        assert running.wait(5)
-        warnings.filterwarnings("ignore", category=MarkerWarning)
-        with qtbot.waitSignal(worker.finished):
-            done.set()
-        assert user_filter in warnings.filters
-        assert ("always", None, Warning, None, 0) not in warnings.filters
