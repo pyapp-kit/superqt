@@ -5,6 +5,7 @@ import pytest
 from qtpy.QtCore import QEvent, QPoint, QPointF, Qt
 from qtpy.QtWidgets import QStyle, QStyleOptionSlider
 
+from superqt import sliders
 from superqt.sliders._generic_slider import _GenericSlider, _sliderValueFromPosition
 
 from ._testutil import _hover_event, _mouse_event, _wheel_event, skip_on_linux_qt6
@@ -185,3 +186,9 @@ def test_steps(gslider: _GenericSlider, qtbot):
 )
 def test_slider_value_from_position(args, result):
     assert math.isclose(_sliderValueFromPosition(*args), result)
+
+
+def test_monterey_styles_fix_deprecated():
+    with pytest.warns(DeprecationWarning, match="applyMacStylePatch"):
+        style = sliders.MONTEREY_SLIDER_STYLES_FIX
+    assert "MONTEREY_SLIDER_STYLES_FIX" in style
