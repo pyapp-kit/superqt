@@ -29,9 +29,7 @@ if TYPE_CHECKING:
 class CallCallable(QObject):
     instances: ClassVar[list[CallCallable]] = []
 
-    def __init__(
-        self, callable: Callable, args: tuple, kwargs: dict, future: Future
-    ):
+    def __init__(self, callable: Callable, args: tuple, kwargs: dict, future: Future):
         super().__init__()
         self._callable = callable
         self._args = args
