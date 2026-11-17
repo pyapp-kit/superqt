@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from concurrent.futures import Future
-from contextlib import suppress
 from functools import wraps
 from typing import TYPE_CHECKING, Any, ClassVar, overload
 
@@ -12,7 +11,6 @@ from qtpy.QtCore import (
     QObject,
     Qt,
     QThread,
-    Signal,
     Slot,
 )
 
@@ -29,22 +27,22 @@ if TYPE_CHECKING:
 
 
 class CallCallable(QObject):
-    finished = Signal(object)
     instances: ClassVar[list[CallCallable]] = []
 
-    def __init__(self, callable: Callable, args: tuple, kwargs: dict):
+    def __init__(
+        self, callable: Callable, args: tuple, kwargs: dict, future: Future
+    ):
         super().__init__()
         self._callable = callable
         self._args = args
         self._kwargs = kwargs
+        self._future = future
         CallCallable.instances.append(self)
 
     @Slot()
     def call(self):
         CallCallable.instances.remove(self)
-        res = self._callable(*self._args, **self._kwargs)
-        with suppress(RuntimeError):
-            self.finished.emit(res)
+        self._future.set_result(self._callable(*self._args, **self._kwargs))
 
 
 # fmt: off
@@ -183,8 +181,10 @@ def _run_in_thread(
             return future
         return result
 
-    f = CallCallable(func, args, kwargs)
+    # Do not connect a Qt signal to the future here. The caller usually drops the
+    # future, and on PySide6 removing that connection from the dying future holds
+    # a Qt signal/slot lock while waiting for the GIL, which can deadlock.
+    f = CallCallable(func, args, kwargs, future)
     f.moveToThread(thread)
-    f.finished.connect(future.set_result, Qt.ConnectionType.DirectConnection)
     QMetaObject.invokeMethod(f, "call", Qt.ConnectionType.QueuedConnection)  # type: ignore
     return future.result(timeout=timeout / 1000) if await_return else future
