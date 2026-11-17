@@ -181,9 +181,6 @@ def _run_in_thread(
             return future
         return result
 
-    # Do not connect a Qt signal to the future here. The caller usually drops the
-    # future, and on PySide6 removing that connection from the dying future holds
-    # a Qt signal/slot lock while waiting for the GIL, which can deadlock.
     f = CallCallable(func, args, kwargs, future)
     f.moveToThread(thread)
     QMetaObject.invokeMethod(f, "call", Qt.ConnectionType.QueuedConnection)  # type: ignore
