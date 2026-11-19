@@ -4,7 +4,9 @@
 
 ??? details
     On MacOS Monterey, with Qt5, there is a bug that causes all sliders
-    (including native Qt sliders) to not respond properly to drag events.  See:
+    (including native Qt sliders) to not respond properly to drag events.  (Qt 6
+    fixed it, in 6.2.3: there, the workaround below isn't needed, and
+    `applyMacStylePatch()` does nothing.)  See:
 
     - [https://bugreports.qt.io/browse/QTBUG-98093](https://bugreports.qt.io/browse/QTBUG-98093)
     - [https://github.com/pyapp-kit/superqt/issues/74](https://github.com/pyapp-kit/superqt/issues/74)

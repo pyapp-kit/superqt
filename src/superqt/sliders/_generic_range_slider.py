@@ -5,7 +5,14 @@ from qtpy import QtGui
 from qtpy.QtCore import Property, QEvent, QPoint, QPointF, QRect, QRectF, Qt, Signal
 from qtpy.QtWidgets import QSlider, QStyle, QStyleOptionSlider, QStylePainter
 
-from ._generic_slider import CC_SLIDER, SC_GROOVE, SC_HANDLE, SC_NONE, _GenericSlider
+from ._generic_slider import (
+    CC_SLIDER,
+    SC_GROOVE,
+    SC_HANDLE,
+    SC_NONE,
+    _GenericSlider,
+    _mac_patch_unneeded,
+)
 from ._range_style import (
     MONTEREY_SLIDER_STYLES_FIX,
     RangeSliderStyle,
@@ -115,6 +122,8 @@ class _GenericRangeSlider(_GenericSlider):
 
         see [FAQ](../faq.md#sliders-not-dragging-properly-on-macos-12) for more details.
         """
+        if _mac_patch_unneeded():
+            return
         super().applyMacStylePatch()
         self._style._macpatch = True
 
