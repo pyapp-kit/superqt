@@ -355,6 +355,11 @@ class _GenericRangeSlider(_GenericSlider):
 
         for i in range(len(self._position)):
             if self._handleRect(i, opt).contains(pos):
+                if self._position[i] == self.minimum():
+                    # Prefer the upper overlapping handle so the range can expand.
+                    for j in range(i + 1, len(self._position)):
+                        if self._handleRect(j, opt).contains(pos):
+                            i = j
                 return (SC_HANDLE, i)
 
         click_pos = self._pixelPosToRangeValue(self._pick(pos))
