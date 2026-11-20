@@ -6,7 +6,6 @@ __all__ = [
     "IconFont",
     "IconFontMeta",
     "IconOpts",
-    "QIconifyIcon",
     "addFont",
     "font",
     "icon",

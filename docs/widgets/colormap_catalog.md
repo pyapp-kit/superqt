@@ -1,35 +1,31 @@
 # CmapCatalogComboBox
 
-Searchable `QComboBox` variant that contains the
-[entire cmap colormap catalog](https://cmap-docs.readthedocs.io/en/latest/catalog/)
+A [`QComboBox`](https://doc.qt.io/qt-6/qcombobox.html) with every colormap in the
+[cmap catalog](https://cmap-docs.readthedocs.io/en/latest/catalog/). Typing in it
+shows the colormaps whose names contain the text, and `currentColormap()`
+returns a [`cmap.Colormap`][].
 
-!!! note "requires cmap"
+!!! note "Requires cmap"
 
-    This widget uses the [cmap](https://cmap-docs.readthedocs.io/) library
-    to provide colormaps.  You can install it with:
+    Colormaps come from the [cmap](https://cmap-docs.readthedocs.io/) library,
+    which you can install with the `cmap` extra:
 
-    ```shell
-    # use the `cmap` extra to include colormap support
-    pip install superqt[cmap]
+    ```bash
+    pip install "superqt[cmap]"
     ```
 
-You can limit the colormaps shown by setting the `categories` or
-`interpolation` keyword arguments.
+The `categories` and `interpolation` keyword arguments limit the colormaps to
+those in some categories (such as `"sequential"`), or with one interpolation
+(such as `"linear"`). By default, colormaps are listed by their short names, and
+by their full names (`namespace:name`) only where two namespaces use the same
+short name; pass `prefer_short_names=False` to always use full names.
+
+{{ show_widget() }}
 
 ```python
-from qtpy.QtWidgets import QApplication
-
-from superqt.cmap import CmapCatalogComboBox
-
-app = QApplication([])
-
-catalog_combo = CmapCatalogComboBox(interpolation="linear")
-catalog_combo.setCurrentText("viridis")
-catalog_combo.show()
-
-app.exec()
+--8<--
+examples/colormap_catalog.py
+--8<--
 ```
-
-{{ show_widget(130) }}
 
 {{ show_members('superqt.cmap.CmapCatalogComboBox') }}

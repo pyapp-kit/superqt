@@ -1,26 +1,22 @@
 # QElidingLabel
 
-`QLabel` variant that will elide text (i.e. add an ellipsis)
-if it is too long to fit in the available space.
+A [`QLabel`](https://doc.qt.io/qt-6/qlabel.html) that elides its text: when the
+text is too long to fit, its end is replaced with an ellipsis ("…"). `text()`
+still returns the full text.
+
+- `setElideMode` sets which part of the text is elided (the end, by default;
+  or the start or the middle), with a `Qt.TextElideMode`.
+- With `setWordWrap(True)`, the text wraps onto as many lines as fit, and only
+  the last line is elided.
+
+For a line edit that does the same, see [`QElidingLineEdit`](qelidinglineedit.md).
+
+{{ show_widget() }}
 
 ```python
-from qtpy.QtWidgets import QApplication
-
-from superqt import QElidingLabel
-
-app = QApplication([])
-
-widget = QElidingLabel(
-    "a skj skjfskfj sdlf sdfl sdlfk jsdf sdlkf jdsf dslfksdl sdlfk sdf sdl "
-    "fjsdlf kjsdlfk laskdfsal as lsdfjdsl kfjdslf asfd dslkjfldskf sdlkfj"
-)
-widget.setWordWrap(True)
-widget.resize(300, 20)
-widget.show()
-
-app.exec_()
+--8<--
+examples/qelidinglabel.py
+--8<--
 ```
-
-{{ show_widget(300) }}
 
 {{ show_members('superqt.QElidingLabel') }}

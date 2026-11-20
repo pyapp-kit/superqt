@@ -1,23 +1,15 @@
 # QDoubleSlider
 
-`QSlider` variant that accepts floating point values.
-
-```python
-from qtpy.QtCore import Qt
-from qtpy.QtWidgets import QApplication
-
-from superqt import QDoubleSlider
-
-app = QApplication([])
-
-slider = QDoubleSlider(Qt.Orientation.Horizontal)
-slider.setRange(0, 1)
-slider.setValue(0.5)
-slider.show()
-
-app.exec_()
-```
+A [`QSlider`](https://doc.qt.io/qt-6/qslider.html) for `float` values. Its
+range, value, and steps are floats (the default single step is `0.01`, and
+the default page step is `0.1`).
 
 {{ show_widget() }}
+
+```python
+--8<--
+examples/qdoubleslider.py
+--8<--
+```
 
 {{ show_members('superqt.QDoubleSlider') }}

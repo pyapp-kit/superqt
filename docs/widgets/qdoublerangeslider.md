@@ -1,23 +1,14 @@
 # QDoubleRangeSlider
 
-Float variant of [`QRangeSlider`](qrangeslider.md). (see that page for more details).
-
-```python
-from qtpy.QtCore import Qt
-from qtpy.QtWidgets import QApplication
-
-from superqt import QDoubleRangeSlider
-
-app = QApplication([])
-
-slider = QDoubleRangeSlider(Qt.Orientation.Horizontal)
-slider.setRange(0, 1)
-slider.setValue((0.2, 0.8))
-slider.show()
-
-app.exec_()
-```
+A [`QRangeSlider`](qrangeslider.md) for `float` values: its range, values, and
+steps are floats. See the `QRangeSlider` page for how range sliders work.
 
 {{ show_widget() }}
+
+```python
+--8<--
+examples/qdoublerangeslider.py
+--8<--
+```
 
 {{ show_members('superqt.QDoubleRangeSlider') }}
