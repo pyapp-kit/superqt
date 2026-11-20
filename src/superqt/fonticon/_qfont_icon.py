@@ -309,8 +309,11 @@ class _QFontIconEngine(QIconEngine):
             for mode, opts in d.items():
                 if not opts:
                     continue
+                color = opts.color
+                if isinstance(color, QColor):  # (not hashable)
+                    color = color.rgba()
                 hsh += hash(
-                    hash(opts.glyph_key) + hash(opts.color) + hash(state) + hash(mode)
+                    hash(opts.glyph_key) + hash(color) + hash(state) + hash(mode)
                 )
         self._opt_hash = hex(hsh)
 
