@@ -34,8 +34,6 @@ from qtpy.QtWidgets import (
     QStylePainter,
 )
 
-from ._range_style import MONTEREY_SLIDER_STYLES_FIX
-
 _T = TypeVar("_T")
 
 SC_NONE = QStyle.SubControl.SC_None
@@ -45,6 +43,58 @@ SC_TICKMARKS = QStyle.SubControl.SC_SliderTickmarks
 
 CC_SLIDER = QStyle.ComplexControl.CC_Slider
 QOVERFLOW = 2**31 - 1
+
+# a fix for https://bugreports.qt.io/browse/QTBUG-98093
+
+MONTEREY_SLIDER_STYLES_FIX = """
+/* MONTEREY_SLIDER_STYLES_FIX */
+
+QSlider::groove {
+    background: #DFDFDF;
+    border: 1px solid #DBDBDB;
+    border-radius: 2px;
+}
+QSlider::groove:horizontal {
+    height: 2px;
+    margin: 2px;
+}
+QSlider::groove:vertical {
+    width: 2px;
+    margin: 2px 0 6px 0;
+}
+
+
+QSlider::handle {
+    background: white;
+    border: 0.5px solid #DADADA;
+    width: 19.5px;
+    height: 19.5px;
+    border-radius: 10.5px;
+}
+QSlider::handle:horizontal {
+    margin: -10px -2px;
+}
+QSlider::handle:vertical {
+    margin: -2px -10px;
+}
+
+QSlider::handle:pressed {
+    background: #F0F0F0;
+}
+
+QSlider::sub-page:horizontal {
+    background: #0981FE;
+    border-radius: 2px;
+    margin: 2px;
+    height: 2px;
+}
+QSlider::add-page:vertical {
+    background: #0981FE;
+    border-radius: 2px;
+    margin: 2px 0 6px 0;
+    width: 2px;
+}
+""".strip()
 
 # whether to use the MONTEREY_SLIDER_STYLES_FIX QSS hack
 # for fixing sliders on macos>=12 with QT < 6
@@ -402,7 +452,9 @@ class _GenericSlider(QSlider):
         if opt.tickPosition != QSlider.TickPosition.NoTicks:
             opt.subControls |= SC_TICKMARKS
         painter.drawComplexControl(CC_SLIDER, opt)
+        self._draw_qss_ticks(painter, opt)
 
+    def _draw_qss_ticks(self, painter, opt):
         if (
             opt.tickPosition != QSlider.TickPosition.NoTicks
             and "MONTEREY_SLIDER_STYLES_FIX" in self.styleSheet()
