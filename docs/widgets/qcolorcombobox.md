@@ -1,27 +1,23 @@
 # QColorComboBox
 
-`QComboBox` designed to select from a specific set of colors.
+A [`QComboBox`](https://doc.qt.io/qt-6/qcombobox.html) for choosing a color
+from a list. Colors can be given as anything that `QColor` accepts (names,
+hex strings, `QColor`s, and so on); `currentColor()` returns a `QColor`, and
+`currentColorChanged` emits one.
+
+- With `setUserColorsAllowed(True)` (or `allow_user_colors=True`), an
+  "Add Color..." item at the end of the list opens a `QColorDialog`, and adds
+  the chosen color.
+- `setInvalidColorPolicy` sets what happens when an invalid color is added:
+  it's ignored (`InvalidColorPolicy.Ignore`, the default), or it causes a
+  warning (`Warn`) or an exception (`Raise`).
+
+{{ show_widget() }}
 
 ```python
-from qtpy.QtWidgets import QApplication
-
-from superqt import QColorComboBox
-
-app = QApplication([])
-
-colors = QColorComboBox()
-colors.addColors(["red", "green", "blue"])
-
-# show an "Add Color" item that opens a QColorDialog when clicked
-colors.setUserColorsAllowed(True)
-
-# emits a QColor when changed
-colors.currentColorChanged.connect(print)
-colors.show()
-
-app.exec_()
+--8<--
+examples/qcolorcombobox.py
+--8<--
 ```
-
-{{ show_widget(100) }}
 
 {{ show_members('superqt.QColorComboBox') }}

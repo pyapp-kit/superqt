@@ -1,19 +1,43 @@
 # Thread workers
 
-The objects in this module provide utilities for running tasks in a separate
-thread. In general (with the exception of `new_worker_qthread`), everything
-here wraps Qt's [QRunnable API](https://doc.qt.io/qt-6/qrunnable.html).
+Workers run a long task in another thread, so that the GUI stays responsive,
+and report back with signals (such as `started`, `returned`, `errored`,
+`finished`, and, for generators, `yielded`), which can safely update the GUI
+from the main thread. Except for
+`new_worker_qthread`, they use Qt's
+[`QRunnable`](https://doc.qt.io/qt-6/qrunnable.html) and global
+[`QThreadPool`](https://doc.qt.io/qt-6/qthreadpool.html).
 
-The highest level object is the
-[`@thread_worker`][superqt.utils.thread_worker] decorator.  It was originally
-written for `napari`, and was later extracted into `superqt`.  You may also be
-interested in reading the [napari
-documentation](https://napari.org/stable/guides/threading.html#threading-in-napari-with-thread-worker) on this feature,
-which provides a more in-depth/introductory usage guide.
+The simplest way to use them is the
+[`@thread_worker`][superqt.utils.thread_worker] decorator. Calling a decorated
+function returns a worker, which runs the function when it's started (or at
+once, if callbacks are given with `connect=`):
 
-For additional control, you can create your own
-[`FunctionWorker`][superqt.utils.FunctionWorker] or
-[`GeneratorWorker`][superqt.utils.GeneratorWorker] objects.
+```python
+import time
+
+from superqt.utils import thread_worker
+
+
+@thread_worker
+def long_task(n):
+    time.sleep(n)
+    return n
+
+
+worker = long_task(2)
+worker.returned.connect(print)
+worker.start()
+```
+
+If the function is a generator, the worker is a
+[`GeneratorWorker`][superqt.utils.GeneratorWorker]: it emits `yielded` for each
+value, and can be paused, resumed, and aborted between them. Otherwise, it's a
+[`FunctionWorker`][superqt.utils.FunctionWorker].
+
+These tools were written for napari, and moved to superqt. The
+[napari guide to threading](https://napari.org/stable/guides/threading.html#threading-in-napari-with-thread-worker)
+describes them in more depth.
 
 ::: superqt.utils.WorkerBase
 

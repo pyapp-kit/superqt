@@ -81,5 +81,5 @@ src/superqt/_version.py
 screenshots
 
 .mypy_cache
-docs/_auto_images/
+docs/_generated/
 uv.lock
